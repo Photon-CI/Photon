@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2011
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon", "Photon\Photon.csproj", "{BFEA3598-75D3-4725-A169-EA48865474CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotonServer", "Photon\PhotonServer.csproj", "{BFEA3598-75D3-4725-A169-EA48865474CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotonAgent", "Photon.Agent\PhotonAgent.csproj", "{2DA02660-629D-48A9-BC50-A43BCA23D768}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Library", "Photon.Library\Photon.Library.csproj", "{76D31D86-404D-4812-9101-C2F7614F28E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{BFEA3598-75D3-4725-A169-EA48865474CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFEA3598-75D3-4725-A169-EA48865474CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFEA3598-75D3-4725-A169-EA48865474CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DA02660-629D-48A9-BC50-A43BCA23D768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DA02660-629D-48A9-BC50-A43BCA23D768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DA02660-629D-48A9-BC50-A43BCA23D768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DA02660-629D-48A9-BC50-A43BCA23D768}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76D31D86-404D-4812-9101-C2F7614F28E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76D31D86-404D-4812-9101-C2F7614F28E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76D31D86-404D-4812-9101-C2F7614F28E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76D31D86-404D-4812-9101-C2F7614F28E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

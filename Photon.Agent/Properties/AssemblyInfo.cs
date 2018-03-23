@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Photon")]
+[assembly: AssemblyTitle("Photon Agent")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Photon")]
+[assembly: AssemblyProduct("Photon Agent")]
 [assembly: AssemblyCopyright("Copyright © Joshua Miller 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("bfea3598-75d3-4725-a169-ea48865474ce")]
+[assembly: Guid("2da02660-629d-48a9-bc50-a43bca23d768")]
 
 // Version information for an assembly consists of the following four values:
 //
