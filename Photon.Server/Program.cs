@@ -1,10 +1,10 @@
 ﻿using log4net;
 using log4net.Config;
-using Photon.Agent.Internal;
+using Photon.Server.Internal;
 using System;
 using System.ServiceProcess;
 
-namespace Photon.Agent
+namespace Photon.Server
 {
     internal static class Program
     {
@@ -29,7 +29,7 @@ namespace Photon.Agent
                 }
                 else {
                     ServiceBase.Run(new [] {
-                        new AgentService(),
+                        new ServerService(),
                     });
                 }
             }
@@ -44,12 +44,12 @@ namespace Photon.Agent
         private static int RunAsConsole(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Photon Agent");
+            Console.WriteLine("Photon Server");
             Console.ResetColor();
 
-            PhotonAgent server = null;
+            PhotonServer server = null;
             try {
-                server = new PhotonAgent();
+                server = new PhotonServer();
                 server.Start();
 
                 Console.ReadKey(true);
