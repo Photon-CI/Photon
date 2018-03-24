@@ -10,33 +10,40 @@ namespace Photon.Server
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
 
+        public static PhotonServer Server {get; set;}
+
 
         public static int Main(string[] args)
         {
-            XmlConfigurator.Configure();
+            try {
+                XmlConfigurator.Configure();
 
+                return Run(args);
+            }
+            catch (Exception error) {
+                Log.Fatal("Unhandled Exception!", error);
+                return -1;
+            }
+            finally {
+                LogManager.Flush(3000);
+            }
+        }
+
+        private static int Run(string[] args) {
             try {
                 Arguments.Parse(args);
             }
             catch (Exception error) {
-                Log.Fatal("Failed to parse arguments!", error);
+                Log.Error("Failed to parse arguments!", error);
                 return 1;
             }
 
-            try {
-                if (Arguments.RunAsConsole) {
-                    return RunAsConsole(args);
-                }
-                else {
-                    ServiceBase.Run(new [] {
-                        new ServerService(),
-                    });
-                }
-            }
-            catch (Exception error) {
-                Log.Fatal("Unhandled Exception!", error);
-                return 1;
-            }
+            if (Arguments.RunAsConsole)
+                return RunAsConsole(args);
+
+            ServiceBase.Run(new [] {
+                new ServerService(),
+            });
 
             return 0;
         }
@@ -47,17 +54,16 @@ namespace Photon.Server
             Console.WriteLine("Photon Server");
             Console.ResetColor();
 
-            PhotonServer server = null;
             try {
-                server = new PhotonServer();
-                server.Start();
+                Server = new PhotonServer();
+                Server.Start();
 
                 Console.ReadKey(true);
             }
             finally {
-                server?.Dispose();
+                Server?.Dispose();
+                //Server = null;
             }
-
 
             return 0;
         }

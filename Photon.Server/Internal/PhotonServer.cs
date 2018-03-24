@@ -1,9 +1,12 @@
 ﻿using log4net;
+using Newtonsoft.Json;
 using Photon.Library;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Photon.Server.Internal
@@ -14,10 +17,13 @@ namespace Photon.Server.Internal
 
         private HttpReceiver receiver;
 
+        public ServerDefinition Definition {get; private set;}
+        public List<ProjectDefinition> Projects {get; private set;}
+
 
         public PhotonServer()
         {
-            //
+            Projects = new List<ProjectDefinition>();
         }
 
         public void Dispose()
@@ -28,9 +34,18 @@ namespace Photon.Server.Internal
 
         public void Start()
         {
+            // Load existing or default server configuration
+            Definition = ParseServerDefinition() ?? new ServerDefinition {
+                Http = {
+                    Host = "localhost",
+                    Port = 80,
+                    Path = "/photon",
+                },
+            };
+
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
-                ListenerPath = Configuration.HttpPath,
+                ListenerPath = Definition.Http.Path,
                 ContentDirectories = {
                     new ContentDirectory {
                         DirectoryPath = Path.Combine(Configuration.AssemblyPath, "Content"),
@@ -42,14 +57,10 @@ namespace Photon.Server.Internal
             var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
             context.Views.AddFolderFromExternal(viewPath);
 
-            var httpUri = new UriBuilder("http", "localhost", Configuration.HttpPort);
+            var httpPrefix = $"http://+:{Definition.Http.Port}/";
 
-            var port = Configuration.HttpPort;
-            var path = Configuration.HttpPath;
-
-            var httpPrefix = $"http://+:{port}/";
-            if (!string.IsNullOrEmpty(path))
-                httpPrefix = NetPath.Combine(httpPrefix, path);
+            if (!string.IsNullOrEmpty(Definition.Http.Path))
+                httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
 
             if (!httpPrefix.EndsWith("/"))
                 httpPrefix += "/";
@@ -74,6 +85,67 @@ namespace Photon.Server.Internal
             }
             catch (Exception error) {
                 Log.Error("Failed to stop HTTP Receiver!", error);
+            }
+        }
+
+        public ProjectDefinition FindProject(string projectName)
+        {
+            return Projects?.FirstOrDefault(x => string.Equals(x.Name, projectName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private ServerDefinition ParseServerDefinition()
+        {
+            var file = Configuration.DefinitionFilename ?? "server.json";
+            var path = Path.Combine(Configuration.AssemblyPath, file);
+            path = Path.GetFullPath(path);
+
+            Log.Debug($"Loading Server Definition: {path}");
+
+            if (!File.Exists(path)) {
+                Log.Warn($"Server Definition not found! {path}");
+                return null;
+            }
+
+            var serializer = new JsonSerializer();
+
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var streamReader = new StreamReader(stream))
+            using (var jsonReader = new JsonTextReader(streamReader)) {
+                return serializer.Deserialize<ServerDefinition>(jsonReader);
+            }
+        }
+
+        private void LoadAllProjectDefinitions()
+        {
+            var dir = Configuration.ProjectDirectory ?? "Projects";
+            var path = Path.Combine(Configuration.AssemblyPath, dir);
+            path = Path.GetFullPath(path);
+
+            Log.Debug($"Loading Projects Definition from: {path}");
+
+            if (!Directory.Exists(path)) {
+                Log.Warn($"Project Directory not found! {path}");
+                return;
+            }
+
+            var serializer = new JsonSerializer();
+            foreach (var file in Directory.EnumerateFiles(path, "*.json")) {
+                try {
+                    var project = LoadProjectDefinition(serializer, file);
+                    Projects.Add(project);
+                }
+                catch (Exception error) {
+                    Log.Error($"Failed to load Project '{file}'!", error);
+                }
+            }
+        }
+
+        private ProjectDefinition LoadProjectDefinition(JsonSerializer serializer, string filename)
+        {
+            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var streamReader = new StreamReader(stream))
+            using (var jsonReader = new JsonTextReader(streamReader)) {
+                return serializer.Deserialize<ProjectDefinition>(jsonReader);
             }
         }
     }

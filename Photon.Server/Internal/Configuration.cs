@@ -8,9 +8,8 @@ namespace Photon.Server.Internal
     {
         public static string AssemblyPath {get;}
 
-        public static string HttpHost => ConfigurationReader.AppSetting("http.host");
-        public static int HttpPort => ConfigurationReader.AppSetting<int>("http.port");
-        public static string HttpPath => ConfigurationReader.AppSetting("http.path");
+        public static string DefinitionFilename => ConfigurationReader.AppSetting("definition");
+        public static string ProjectDirectory => ConfigurationReader.AppSetting("projects");
 
 
         static Configuration()
