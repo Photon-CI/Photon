@@ -48,7 +48,7 @@ namespace Photon.Framework
 
         public string GetApplicationDirectory(string applicationName, string applicationVersion)
         {
-            //
+            throw new NotImplementedException();
         }
     }
 }

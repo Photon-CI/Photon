@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Photon.Framework.Scripts
@@ -29,7 +30,7 @@ namespace Photon.Framework.Scripts
 
         public void RunTasks(params string[] taskNames)
         {
-            //...
+            throw new NotImplementedException();
         }
     }
 }

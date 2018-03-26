@@ -7,7 +7,7 @@
     <ProjectGuid>{9EACE28C-C3AF-4D57-9B6A-6697A1E62E34}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Photon.NuGet</RootNamespace>
+    <RootNamespace>Photon.Plugins.NuGet</RootNamespace>
     <AssemblyName>Photon.NuGet</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Photon.Nuget
+﻿namespace Photon.Plugins.Nuget
 {
-    public class NuGet
+    public static class NuGet
     {
+        //...
     }
 }
