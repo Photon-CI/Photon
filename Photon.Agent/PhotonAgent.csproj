@@ -61,12 +61,19 @@
     <Compile Include="AgentService.Designer.cs">
       <DependentUpon>AgentService.cs</DependentUpon>
     </Compile>
-    <Compile Include="ViewHandlers\IndexHandler.cs" />
+    <Compile Include="Internal\AgentSessionDomain.cs" />
+    <Compile Include="Internal\AgentHttpDefinition.cs" />
+    <Compile Include="Internal\AgentSession.cs" />
+    <Compile Include="Internal\AgentSessionManager.cs" />
+    <Compile Include="Internal\PhotonAgent.cs" />
+    <Compile Include="Internal\AgentDefinition.cs" />
     <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
-    <Compile Include="Internal\PhotonAgent.cs" />
+    <Compile Include="ViewHandlers\SessionReleaseHandler.cs" />
+    <Compile Include="ViewHandlers\IndexHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewHandlers\SessionBeginHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -76,6 +83,10 @@
     <ProjectReference Include="..\Photon.Library\Photon.Library.csproj">
       <Project>{76D31D86-404D-4812-9101-C2F7614F28E7}</Project>
       <Name>Photon.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\Photon.Framework\Photon.Framework.csproj">
+      <Project>{E49360FD-BEAC-4713-A421-579564FB0992}</Project>
+      <Name>Photon.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

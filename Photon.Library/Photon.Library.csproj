@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -44,21 +47,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentDefinition.cs" />
     <Compile Include="ConfigurationReader.cs" />
+    <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="IReferenceItem.cs" />
+    <Compile Include="Models\TaskBeginResponse.cs" />
+    <Compile Include="Models\TaskBeginRequest.cs" />
+    <Compile Include="Models\SessionReleaseResponse.cs" />
+    <Compile Include="Models\SessionReleaseRequest.cs" />
+    <Compile Include="Models\SessionBeginResponse.cs" />
+    <Compile Include="Models\SessionBeginRequest.cs" />
     <Compile Include="NetPath.cs" />
     <Compile Include="ProjectDefinition.cs" />
     <Compile Include="ProjectEnvironmentDefinition.cs" />
     <Compile Include="ProjectTaskDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerAgentDefinition.cs" />
-    <Compile Include="AgentHttpDefinition.cs" />
     <Compile Include="ServerHttpDefinition.cs" />
     <Compile Include="ServerDefinition.cs" />
+    <Compile Include="ReferencePool.cs" />
+    <Compile Include="LifespanReferenceItem.cs" />
+    <Compile Include="Session\SessionDomainBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Plugins\Photon.Framework\Photon.Framework.csproj">
+      <Project>{e49360fd-beac-4713-a421-579564fb0992}</Project>
+      <Name>Photon.Framework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

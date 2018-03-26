@@ -30,8 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,7 +44,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContextDefinition.cs" />
+    <Compile Include="ContextAgentDefinition.cs" />
+    <Compile Include="Domain\DomainAgentBase.cs" />
+    <Compile Include="Domain\ServerDomainAgent.cs" />
+    <Compile Include="Domain\AgentDomainAgent.cs" />
+    <Compile Include="Packages\PackageFilter.cs" />
+    <Compile Include="Packages\PackageTools.cs" />
+    <Compile Include="Scripts\IScript.cs" />
+    <Compile Include="Scripts\ScriptAgent.cs" />
+    <Compile Include="Scripts\ScriptAgentCollection.cs" />
+    <Compile Include="Scripts\ScriptAgentSession.cs" />
+    <Compile Include="Scripts\ScriptContext.cs" />
+    <Compile Include="Scripts\ScriptResult.cs" />
+    <Compile Include="Tasks\ITask.cs" />
+    <Compile Include="Packages\PackageDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\RolesAttribute.cs" />
+    <Compile Include="Tasks\TaskContext.cs" />
+    <Compile Include="TaskProjectDefinition.cs" />
+    <Compile Include="Tasks\TaskResult.cs" />
+    <Compile Include="ContextTaskDefinition.cs" />
+    <Compile Include="ContextProjectDefinition.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

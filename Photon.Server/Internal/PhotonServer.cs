@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Photon.Library;
+using Photon.Library.Extensions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
@@ -106,12 +107,9 @@ namespace Photon.Server.Internal
                 return null;
             }
 
-            var serializer = new JsonSerializer();
-
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var streamReader = new StreamReader(stream))
-            using (var jsonReader = new JsonTextReader(streamReader)) {
-                return serializer.Deserialize<ServerDefinition>(jsonReader);
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                var serializer = new JsonSerializer();
+                return serializer.Deserialize<ServerDefinition>(stream);
             }
         }
 
@@ -131,21 +129,14 @@ namespace Photon.Server.Internal
             var serializer = new JsonSerializer();
             foreach (var file in Directory.EnumerateFiles(path, "*.json")) {
                 try {
-                    var project = LoadProjectDefinition(serializer, file);
-                    Projects.Add(project);
+                    using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                        var project = serializer.Deserialize<ProjectDefinition>(stream);
+                        Projects.Add(project);
+                    }
                 }
                 catch (Exception error) {
                     Log.Error($"Failed to load Project '{file}'!", error);
                 }
-            }
-        }
-
-        private ProjectDefinition LoadProjectDefinition(JsonSerializer serializer, string filename)
-        {
-            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var streamReader = new StreamReader(stream))
-            using (var jsonReader = new JsonTextReader(streamReader)) {
-                return serializer.Deserialize<ProjectDefinition>(jsonReader);
             }
         }
     }

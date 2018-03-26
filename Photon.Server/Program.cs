@@ -10,13 +10,28 @@ namespace Photon.Server
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
 
-        public static PhotonServer Server {get; set;}
+        public static ServerSessionManager Sessions {get;}
+        public static ScriptQueue Queue {get;}
+        //public static ServerTaskManager Tasks {get;}
+        public static PhotonServer Server {get;}
 
+
+        static Program()
+        {
+            Sessions = new ServerSessionManager();
+            Queue = new ScriptQueue();
+            //Tasks = new ServerTaskManager();
+            Server = new PhotonServer();
+        }
 
         public static int Main(string[] args)
         {
             try {
                 XmlConfigurator.Configure();
+
+                // TODO: Load from Configuration
+                Queue.MaxDegreeOfParallelism = 3;
+                //Tasks.Initialize();
 
                 return Run(args);
             }
@@ -29,12 +44,13 @@ namespace Photon.Server
             }
         }
 
-        private static int Run(string[] args) {
+        private static int Run(string[] args)
+        {
             try {
                 Arguments.Parse(args);
             }
             catch (Exception error) {
-                Log.Error("Failed to parse arguments!", error);
+                Log.Fatal("Failed to parse arguments!", error);
                 return 1;
             }
 
@@ -55,14 +71,19 @@ namespace Photon.Server
             Console.ResetColor();
 
             try {
-                Server = new PhotonServer();
                 Server.Start();
+                Sessions.Start();
+                Queue.Start();
 
                 Console.ReadKey(true);
+
+                Queue.Stop();
+                Sessions.Stop();
+                Server.Stop();
             }
             finally {
                 Server?.Dispose();
-                //Server = null;
+                Sessions?.Dispose();
             }
 
             return 0;

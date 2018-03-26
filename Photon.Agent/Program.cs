@@ -10,11 +10,41 @@ namespace Photon.Agent
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
 
+        public static PhotonAgent Agent {get;}
+        public static AgentSessionManager Sessions {get;}
+
+
+        static Program()
+        {
+            Agent = new PhotonAgent();
+            Sessions = new AgentSessionManager();
+        }
 
         public static int Main(string[] args)
         {
-            XmlConfigurator.Configure();
+            try {
+                XmlConfigurator.Configure();
 
+                Sessions.Start();
+
+                var result = Run(args);
+
+                Sessions.Stop();
+
+                return result;
+            }
+            catch (Exception error) {
+                Log.Fatal("Unhandled Exception!", error);
+                return -1;
+            }
+            finally {
+                Sessions.Dispose();
+                LogManager.Flush(3000);
+            }
+        }
+
+        private static int Run(string[] args)
+        {
             try {
                 Arguments.Parse(args);
             }
@@ -23,20 +53,12 @@ namespace Photon.Agent
                 return 1;
             }
 
-            try {
-                if (Arguments.RunAsConsole) {
-                    return RunAsConsole(args);
-                }
-                else {
-                    ServiceBase.Run(new [] {
-                        new AgentService(),
-                    });
-                }
-            }
-            catch (Exception error) {
-                Log.Fatal("Unhandled Exception!", error);
-                return 1;
-            }
+            if (Arguments.RunAsConsole)
+                return RunAsConsole(args);
+
+            ServiceBase.Run(new [] {
+                new AgentService(),
+            });
 
             return 0;
         }
@@ -47,17 +69,16 @@ namespace Photon.Agent
             Console.WriteLine("Photon Agent");
             Console.ResetColor();
 
-            PhotonAgent server = null;
             try {
-                server = new PhotonAgent();
-                server.Start();
+                Agent.Start();
 
                 Console.ReadKey(true);
+
+                Agent.Stop();
             }
             finally {
-                server?.Dispose();
+                Agent?.Dispose();
             }
-
 
             return 0;
         }

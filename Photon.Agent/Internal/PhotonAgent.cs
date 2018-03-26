@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Photon.Library;
+using Photon.Library.Extensions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
@@ -14,6 +15,8 @@ namespace Photon.Agent.Internal
         private static ILog Log = LogManager.GetLogger(typeof(PhotonAgent));
 
         private HttpReceiver receiver;
+
+        public AgentDefinition Definition {get; private set;}
 
 
         public PhotonAgent()
@@ -30,7 +33,7 @@ namespace Photon.Agent.Internal
         public void Start()
         {
             // Load existing or default agent configuration
-            var agent = ParseAgentDefinition() ?? new AgentDefinition {
+            Definition = ParseAgentDefinition() ?? new AgentDefinition {
                 Http = {
                     Host = "localhost",
                     Port = 80,
@@ -40,7 +43,7 @@ namespace Photon.Agent.Internal
 
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
-                ListenerPath = agent.Http.Path,
+                ListenerPath = Definition.Http.Path,
                 ContentDirectories = {
                     new ContentDirectory {
                         DirectoryPath = Path.Combine(Configuration.AssemblyPath, "Content"),
@@ -52,9 +55,9 @@ namespace Photon.Agent.Internal
             var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
             context.Views.AddFolderFromExternal(viewPath);
 
-            var httpPrefix = $"http://+:{agent.Http.Port}/";
-            if (!string.IsNullOrEmpty(agent.Http.Path))
-                httpPrefix = NetPath.Combine(httpPrefix, agent.Http.Path);
+            var httpPrefix = $"http://+:{Definition.Http.Port}/";
+            if (!string.IsNullOrEmpty(Definition.Http.Path))
+                httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
 
             if (!httpPrefix.EndsWith("/"))
                 httpPrefix += "/";
@@ -95,12 +98,9 @@ namespace Photon.Agent.Internal
                 return null;
             }
 
-            var serializer = new JsonSerializer();
-
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var streamReader = new StreamReader(stream))
-            using (var jsonReader = new JsonTextReader(streamReader)) {
-                return serializer.Deserialize<AgentDefinition>(jsonReader);
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                var serializer = new JsonSerializer();
+                return serializer.Deserialize<AgentDefinition>(stream);
             }
         }
     }

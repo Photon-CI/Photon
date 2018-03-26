@@ -11,12 +11,12 @@ namespace Photon.Agent
 
         protected override void OnStart(string[] args)
         {
-            //...
+            Program.Agent.Start();
         }
 
         protected override void OnStop()
         {
-            //...
+            Program.Agent.Stop();
         }
     }
 }

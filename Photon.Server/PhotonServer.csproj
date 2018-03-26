@@ -48,6 +48,10 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.24.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -57,6 +61,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\ScriptQueue.cs" />
+    <Compile Include="Internal\ServerDomain.cs" />
+    <Compile Include="Internal\ServerSession.cs" />
+    <Compile Include="Internal\ServerSessionManager.cs" />
     <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\PhotonServer.cs" />
@@ -74,7 +82,7 @@
       <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewHandlers\RunHandler.cs" />
+    <Compile Include="ViewHandlers\DeployHandler.cs" />
     <Compile Include="ViewHandlers\IndexHandler.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +98,10 @@
     <ProjectReference Include="..\Photon.Library\Photon.Library.csproj">
       <Project>{76D31D86-404D-4812-9101-C2F7614F28E7}</Project>
       <Name>Photon.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\Photon.Framework\Photon.Framework.csproj">
+      <Project>{E49360FD-BEAC-4713-A421-579564FB0992}</Project>
+      <Name>Photon.Framework</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Library
+namespace Photon.Agent.Internal
 {
     public class AgentHttpDefinition
     {

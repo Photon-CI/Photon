@@ -1,5 +1,4 @@
 ﻿using log4net;
-using Photon.Server.Internal;
 using System.ServiceProcess;
 
 namespace Photon.Server
@@ -11,18 +10,20 @@ namespace Photon.Server
 
         public ServerService()
         {
-            Program.Server = new PhotonServer();
-
             InitializeComponent();
         }
 
         protected override void OnStart(string[] args)
         {
             Program.Server.Start();
+            Program.Sessions.Start();
+            Program.Queue.Start();
         }
 
         protected override void OnStop()
         {
+            Program.Queue.Stop();
+            Program.Sessions.Stop();
             Program.Server.Stop();
         }
     }
