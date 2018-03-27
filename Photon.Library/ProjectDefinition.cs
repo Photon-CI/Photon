@@ -7,25 +7,31 @@ namespace Photon.Library
 {
     public class ProjectDefinition
     {
+        [JsonProperty("id")]
+        public string Id {get; set;}
+
         [JsonProperty("name")]
         public string Name {get; set;}
+
+        [JsonProperty("source")]
+        public ProjectSourceDefinition Source {get; set;}
 
         [JsonProperty("environments")]
         public List<ProjectEnvironmentDefinition> Environments {get; set;}
 
-        [JsonProperty("tasks")]
-        public List<ProjectTaskDefinition> Tasks {get; set;}
+        [JsonProperty("jobs")]
+        public List<ProjectJobDefinition> Jobs {get; set;}
 
 
         public ProjectDefinition()
         {
             Environments = new List<ProjectEnvironmentDefinition>();
-            Tasks = new List<ProjectTaskDefinition>();
+            Jobs = new List<ProjectJobDefinition>();
         }
 
-        public ProjectTaskDefinition FindTask(string taskName)
+        public ProjectJobDefinition FindJob(string jobName)
         {
-            return Tasks?.FirstOrDefault(x => string.Equals(x.Name, taskName, StringComparison.OrdinalIgnoreCase));
+            return Jobs?.FirstOrDefault(x => string.Equals(x.Name, jobName, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

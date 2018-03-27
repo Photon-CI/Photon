@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Photon.Library.Extensions;
 using Photon.Library.Models;
+using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
 using System;
 
@@ -21,7 +22,10 @@ namespace Photon.Server.Handlers
             Log.Debug($"Beginning session for Project '{requestData.ProjectName}' @ '{requestData.ReleaseVersion}'.");
 
             try {
-                var session = Program.Sessions.BeginSession(requestData);
+                var session = new ServerDeploySession();
+                //...
+
+                Program.Sessions.BeginSession(session);
                 Program.Queue.Add(session);
 
                 var response = new SessionBeginResponse {

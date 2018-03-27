@@ -7,7 +7,7 @@ namespace Photon.Server.Internal
 {
     internal class ScriptQueue
     {
-        private ActionBlock<ServerSession> queue;
+        private ActionBlock<IServerSession> queue;
 
         public int MaxDegreeOfParallelism {get; set;}
 
@@ -23,7 +23,7 @@ namespace Photon.Server.Internal
                 MaxDegreeOfParallelism = MaxDegreeOfParallelism,
             };
 
-            queue = new ActionBlock<ServerSession>(OnProcess, queueOptions);
+            queue = new ActionBlock<IServerSession>(OnProcess, queueOptions);
         }
 
         public void Stop()
@@ -32,20 +32,18 @@ namespace Photon.Server.Internal
             queue.Completion.GetAwaiter().GetResult();
         }
 
-        public void Add(ServerSession session)
+        public void Add(IServerSession session)
         {
             queue.Post(session);
         }
 
-        private async Task OnProcess(ServerSession session)
+        private async Task OnProcess(IServerSession session)
         {
             var errorList = new List<Exception>();
 
             try {
-                await session.InitializeAsync();
-
                 try {
-                    await session.RunAsync();
+                    session.Run();
                 }
                 catch (Exception error) {
                     errorList.Add(error);
@@ -56,7 +54,7 @@ namespace Photon.Server.Internal
             }
 
             try {
-                await session.CleanupAsync();
+                session.Release();
             }
             catch (Exception error) {
                 errorList.Add(error);
@@ -66,8 +64,6 @@ namespace Photon.Server.Internal
                 session.Exception = new AggregateException(errorList);
             else if (errorList.Count == 1)
                 session.Exception = errorList[0];
-
-            session.Release();
         }
     }
 }

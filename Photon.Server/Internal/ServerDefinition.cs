@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Photon.Library
+namespace Photon.Server.Internal
 {
     public class ServerDefinition
     {

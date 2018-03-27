@@ -76,6 +76,8 @@ namespace Photon.Server.Internal
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);
             }
+
+            LoadAllProjectDefinitions();
         }
 
         public void Stop()
@@ -89,9 +91,9 @@ namespace Photon.Server.Internal
             }
         }
 
-        public ProjectDefinition FindProject(string projectName)
+        public ProjectDefinition FindProject(string projectId)
         {
-            return Projects?.FirstOrDefault(x => string.Equals(x.Name, projectName, StringComparison.OrdinalIgnoreCase));
+            return Projects?.FirstOrDefault(x => string.Equals(x.Id, projectId, StringComparison.OrdinalIgnoreCase));
         }
 
         private ServerDefinition ParseServerDefinition()
