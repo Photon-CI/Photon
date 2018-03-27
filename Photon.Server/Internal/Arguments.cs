@@ -1,16 +1,16 @@
 ﻿namespace Photon.Server.Internal
 {
-    internal static class Arguments
+    internal class Arguments
     {
-        public static bool RunAsConsole {get; private set;}
+        public bool RunAsConsole {get; private set;}
 
 
-        static Arguments()
+        public Arguments()
         {
             RunAsConsole = false;
         }
 
-        public static void Parse(string[] args)
+        public void Parse(string[] args)
         {
             RunAsConsole = true;
         }

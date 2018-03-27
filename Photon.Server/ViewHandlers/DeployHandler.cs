@@ -16,17 +16,26 @@ namespace Photon.Server.Handlers
 
         public override HttpHandlerResult Post()
         {
-            var serializer = new JsonSerializer();
-            var requestData = serializer.Deserialize<SessionBeginRequest>(HttpContext.Request.InputStream);
+            var projectId = GetQuery("project");
+            var jobName = GetQuery("job");
+            var releaseVersion = GetQuery("release");
 
-            Log.Debug($"Beginning session for Project '{requestData.ProjectName}' @ '{requestData.ReleaseVersion}'.");
+            if (string.IsNullOrWhiteSpace(releaseVersion))
+                return BadRequest().SetText("'releaseVersion' is undefined!");
+
+            Log.Debug($"Beginning deployment of Job '{jobName}' from Project '{projectId}' @ '{releaseVersion}'.");
 
             try {
-                var session = new ServerDeploySession();
-                //...
+                var project = PhotonServer.Instance.FindProject(projectId);
+                if (project == null) return BadRequest().SetText($"Project '{projectId}' was not found!");
 
-                Program.Sessions.BeginSession(session);
-                Program.Queue.Add(session);
+                var job = project.FindJob(jobName);
+                if (job == null) return BadRequest().SetText($"Job '{jobName}' was not found in Project '{projectId}'!");
+
+                var session = new ServerDeploySession(project, job, releaseVersion);
+
+                PhotonServer.Instance.Sessions.BeginSession(session);
+                PhotonServer.Instance.Queue.Add(session);
 
                 var response = new SessionBeginResponse {
                     SessionId = session.Id,
@@ -34,10 +43,10 @@ namespace Photon.Server.Handlers
 
                 return Ok()
                     .SetContentType("application/json")
-                    .SetContent(s => serializer.Serialize(s, response));
+                    .SetContent(s => new JsonSerializer().Serialize(s, response));
             }
             catch (Exception error) {
-                Log.Error($"Failed to start session for Project '{requestData.ProjectName}' @ '{requestData.ReleaseVersion}'!", error);
+                Log.Error($"Deployment of Job '{jobName}' from Project '{projectId}' @ '{releaseVersion}'!", error);
                 return Exception(error);
             }
         }

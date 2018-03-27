@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Photon.Framework
+namespace Photon.Framework.Tasks
 {
     public interface IAgent
     {

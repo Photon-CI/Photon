@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Photon.Framework
+namespace Photon.Framework.Tasks
 {
     public class TaskResult
     {

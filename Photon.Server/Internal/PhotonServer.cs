@@ -1,5 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Photon.Framework.Projects;
+using Photon.Framework.Scripts;
 using Photon.Library;
 using Photon.Library.Extensions;
 using PiServerLite.Http;
@@ -12,29 +14,41 @@ using System.Reflection;
 
 namespace Photon.Server.Internal
 {
-    internal class PhotonServer : IDisposable
+    internal class PhotonServer : IServer, IDisposable
     {
         private static ILog Log = LogManager.GetLogger(typeof(PhotonServer));
+        public static PhotonServer Instance {get;} = new PhotonServer();
 
         private HttpReceiver receiver;
+        private bool isStarted;
 
+        public string WorkDirectory {get;}
+        public List<ProjectDefinition> Projects {get;}
+        public ServerSessionManager Sessions {get;}
+        public ScriptQueue Queue {get;}
         public ServerDefinition Definition {get; private set;}
-        public List<ProjectDefinition> Projects {get; private set;}
 
 
         public PhotonServer()
         {
             Projects = new List<ProjectDefinition>();
+
+            WorkDirectory = Configuration.WorkDirectory;
         }
 
         public void Dispose()
         {
+            if (isStarted) Stop();
+
+            Sessions?.Dispose();
             receiver?.Dispose();
             receiver = null;
         }
 
         public void Start()
         {
+            isStarted = true;
+
             // Load existing or default server configuration
             Definition = ParseServerDefinition() ?? new ServerDefinition {
                 Http = {
@@ -78,10 +92,15 @@ namespace Photon.Server.Internal
             }
 
             LoadAllProjectDefinitions();
+            Sessions.Start();
+            Queue.Start();
         }
 
         public void Stop()
         {
+            Queue.Stop();
+            Sessions.Stop();
+
             try {
                 receiver?.Dispose();
                 receiver = null;
@@ -89,6 +108,11 @@ namespace Photon.Server.Internal
             catch (Exception error) {
                 Log.Error("Failed to stop HTTP Receiver!", error);
             }
+        }
+
+        public IEnumerable<ScriptAgent> GetAgents(params string[] roles)
+        {
+            throw new NotImplementedException();
         }
 
         public ProjectDefinition FindProject(string projectId)

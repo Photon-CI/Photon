@@ -60,15 +60,9 @@
     <Compile Include="NetPath.cs" />
     <Compile Include="ProcessResult.cs" />
     <Compile Include="ProcessRunner.cs" />
-    <Compile Include="ProjectDefinition.cs" />
-    <Compile Include="ProjectEnvironmentDefinition.cs" />
-    <Compile Include="ProjectSourceDefinition.cs" />
-    <Compile Include="ProjectJobDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReferencePool.cs" />
     <Compile Include="LifespanReferenceItem.cs" />
-    <Compile Include="ScriptBuildProjectDefinition.cs" />
-    <Compile Include="ScriptBuildDefinition.cs" />
     <Compile Include="Session\SessionDomainBase.cs" />
   </ItemGroup>
   <ItemGroup>

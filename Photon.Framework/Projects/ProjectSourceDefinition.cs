@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Library
+namespace Photon.Framework.Projects
 {
     public class ProjectSourceDefinition
     {

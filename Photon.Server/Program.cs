@@ -6,87 +6,72 @@ using System.ServiceProcess;
 
 namespace Photon.Server
 {
-    internal static class Program
+    internal class Program
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
 
-        public static ServerSessionManager Sessions {get;}
-        public static ScriptQueue Queue {get;}
-        //public static ServerTaskManager Tasks {get;}
-        public static PhotonServer Server {get;}
-
-
-        static Program()
-        {
-            Sessions = new ServerSessionManager();
-            Queue = new ScriptQueue();
-            //Tasks = new ServerTaskManager();
-            Server = new PhotonServer();
-        }
 
         public static int Main(string[] args)
         {
             try {
                 XmlConfigurator.Configure();
 
-                // TODO: Load from Configuration
-                Queue.MaxDegreeOfParallelism = 3;
-                //Tasks.Initialize();
+                var program = new Program();
 
-                return Run(args);
+                // TODO: Load from Configuration
+                PhotonServer.Instance.Queue.MaxDegreeOfParallelism = 3;
+
+                return program.Run(args);
             }
             catch (Exception error) {
                 Log.Fatal("Unhandled Exception!", error);
                 return -1;
             }
             finally {
+                PhotonServer.Instance?.Dispose();
                 LogManager.Flush(3000);
             }
         }
 
-        private static int Run(string[] args)
+        private int Run(string[] args)
         {
+            var arguments = new Arguments();
+
             try {
-                Arguments.Parse(args);
+                arguments.Parse(args);
             }
             catch (Exception error) {
                 Log.Fatal("Failed to parse arguments!", error);
                 return 1;
             }
 
-            if (Arguments.RunAsConsole)
-                return RunAsConsole(args);
-
-            ServiceBase.Run(new [] {
-                new ServerService(),
-            });
+            if (arguments.RunAsConsole) {
+                RunAsConsole(args);
+            }
+            else {
+                ServiceBase.Run(new [] {
+                    new ServerService(),
+                });
+            }
 
             return 0;
         }
 
-        private static int RunAsConsole(string[] args)
+        private void RunAsConsole(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Photon Server");
             Console.ResetColor();
 
-            try {
-                Server.Start();
-                Sessions.Start();
-                Queue.Start();
+            PhotonServer.Instance.Start();
 
-                Console.ReadKey(true);
+            Console.ReadKey(true);
 
-                Queue.Stop();
-                Sessions.Stop();
-                Server.Stop();
-            }
-            finally {
-                Server?.Dispose();
-                Sessions?.Dispose();
-            }
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Stopping Server...");
+            Console.ResetColor();
 
-            return 0;
+            PhotonServer.Instance.Stop();
         }
     }
 }

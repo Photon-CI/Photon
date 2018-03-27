@@ -1,13 +1,10 @@
-﻿using log4net;
+﻿using Photon.Server.Internal;
 using System.ServiceProcess;
 
 namespace Photon.Server
 {
     public partial class ServerService : ServiceBase
     {
-        private static ILog Log = LogManager.GetLogger(typeof(ServerService));
-
-
         public ServerService()
         {
             InitializeComponent();
@@ -15,16 +12,12 @@ namespace Photon.Server
 
         protected override void OnStart(string[] args)
         {
-            Program.Server.Start();
-            Program.Sessions.Start();
-            Program.Queue.Start();
+            PhotonServer.Instance.Start();
         }
 
         protected override void OnStop()
         {
-            Program.Queue.Stop();
-            Program.Sessions.Stop();
-            Program.Server.Stop();
+            PhotonServer.Instance.Stop();
         }
     }
 }

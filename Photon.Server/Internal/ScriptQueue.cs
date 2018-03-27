@@ -43,6 +43,8 @@ namespace Photon.Server.Internal
 
             try {
                 try {
+                    session.PrepareWorkDirectory();
+
                     session.Run();
                 }
                 catch (Exception error) {

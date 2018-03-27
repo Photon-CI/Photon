@@ -10,9 +10,9 @@ namespace Photon.Framework.Domain
             AppDomain.CurrentDomain.AssemblyResolve += Domain_OnAssemblyResolve;
         }
 
-        public void LoadAssembly(string filename)
+        public virtual Assembly LoadAssembly(string filename)
         {
-            Assembly.LoadFile(filename);
+            return Assembly.LoadFile(filename);
         }
 
         private Assembly Domain_OnAssemblyResolve(object sender, ResolveEventArgs e)

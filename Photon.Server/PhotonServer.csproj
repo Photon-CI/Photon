@@ -66,6 +66,7 @@
     <Compile Include="Internal\ServerAgentDefinition.cs" />
     <Compile Include="Internal\ServerDefinition.cs" />
     <Compile Include="Internal\ServerBuildSession.cs" />
+    <Compile Include="Internal\ServerSessionBase.cs" />
     <Compile Include="Internal\ServerDomain.cs" />
     <Compile Include="Internal\ServerHttpDefinition.cs" />
     <Compile Include="Internal\ServerDeploySession.cs" />

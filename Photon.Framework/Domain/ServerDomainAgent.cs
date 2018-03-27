@@ -1,13 +1,30 @@
-﻿using System.Threading;
+﻿using Photon.Framework.Scripts;
+using System.Reflection;
 
 namespace Photon.Framework.Domain
 {
     public class ServerDomainAgent : DomainAgentBase
     {
-        public void RunScript(string scriptName, string jsonData = null)
+        private readonly ScriptRegistry registry;
+
+
+        public ServerDomainAgent()
         {
-            Thread.Sleep(6_000);
-            //...
+            registry = new ScriptRegistry();
+        }
+
+        public override Assembly LoadAssembly(string filename)
+        {
+            var assembly = base.LoadAssembly(filename);
+
+            registry.ScanAssembly(assembly);
+
+            return assembly;
+        }
+
+        public void RunScript(ScriptContext context)
+        {
+            registry.ExecuteScript(context);
         }
     }
 }

@@ -23,15 +23,15 @@ namespace Photon.Server.Handlers
             Log.Debug($"Running Job '{jobName}' from Project '{projectId}'.");
 
             try {
-                var project = Program.Server.FindProject(projectId);
+                var project = PhotonServer.Instance.FindProject(projectId);
                 if (project == null) return BadRequest().SetText($"Project '{projectId}' was not found!");
 
                 var job = project.FindJob(jobName);
                 if (job == null) return BadRequest().SetText($"Job '{jobName}' was not found in Project '{projectId}'!");
 
                 var session = new ServerBuildSession(project, job);
-                Program.Sessions.BeginSession(session);
-                Program.Queue.Add(session);
+                PhotonServer.Instance.Sessions.BeginSession(session);
+                PhotonServer.Instance.Queue.Add(session);
 
                 var response = new SessionBeginResponse {
                     SessionId = session.Id,

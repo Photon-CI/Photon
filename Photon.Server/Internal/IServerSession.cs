@@ -9,5 +9,6 @@ namespace Photon.Server.Internal
 
         void Run();
         void Release();
+        void PrepareWorkDirectory();
     }
 }
