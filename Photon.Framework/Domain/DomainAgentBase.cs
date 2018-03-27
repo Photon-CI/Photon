@@ -12,21 +12,11 @@ namespace Photon.Framework.Domain
 
         public virtual void LoadAssembly(string filename)
         {
-            try {
-                Assembly.LoadFrom(filename);
-            }
-            catch (Exception error) {
-                var e = new ApplicationException($"Failed to load assembly '{filename}'!");
-                e.Data["source-exception"] = error.ToString();
-                throw e;
-            }
-            //OnAssemblyLoaded(assembly);
+            var assembly = Assembly.LoadFrom(filename);
+            OnAssemblyLoaded(assembly);
         }
 
-        protected virtual void OnAssemblyLoaded(Assembly assembly)
-        {
-            //...
-        }
+        protected virtual void OnAssemblyLoaded(Assembly assembly) {}
 
         private Assembly Domain_OnAssemblyResolve(object sender, ResolveEventArgs e)
         {

@@ -10,14 +10,8 @@ namespace Photon.Library.Session
     {
         private AppDomain domain;
         private ClientSponsor sponsor;
-
         protected T agent;
 
-
-        public SessionDomainBase()
-        {
-            //
-        }
 
         public void Dispose()
         {
@@ -54,13 +48,7 @@ namespace Photon.Library.Session
 
             var agentType = typeof(T);
             agent = (T)domain.CreateInstanceAndUnwrap(agentType.Assembly.FullName, agentType.FullName);
-
-            try {
-                agent.LoadAssembly(assemblyFilename);
-            }
-            catch (Exception error) {
-                throw error;
-            }
+            agent.LoadAssembly(assemblyFilename);
 
             sponsor.Register(agent);
         }

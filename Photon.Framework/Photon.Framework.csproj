@@ -49,6 +49,7 @@
     <Compile Include="Domain\DomainAgentBase.cs" />
     <Compile Include="Domain\ServerDomainAgent.cs" />
     <Compile Include="Domain\AgentDomainAgent.cs" />
+    <Compile Include="IServer.cs" />
     <Compile Include="Packages\PackageFilter.cs" />
     <Compile Include="Packages\PackageTools.cs" />
     <Compile Include="Projects\ProjectDefinition.cs" />

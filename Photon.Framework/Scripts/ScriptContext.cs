@@ -1,18 +1,14 @@
 ﻿using Photon.Framework.Projects;
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Text;
 
 namespace Photon.Framework.Scripts
 {
-    public interface IServer
-    {
-        string WorkDirectory {get;}
-        IEnumerable<ScriptAgent> GetAgents(params string[] roles);
-    }
-
+    [Serializable]
     public class ScriptContext
     {
+        [NonSerialized]
         private readonly IServer server;
 
         public string SessionId {get;}
