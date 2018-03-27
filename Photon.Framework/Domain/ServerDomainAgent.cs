@@ -13,13 +13,11 @@ namespace Photon.Framework.Domain
             registry = new ScriptRegistry();
         }
 
-        public override Assembly LoadAssembly(string filename)
+        protected override void OnAssemblyLoaded(Assembly assembly)
         {
-            var assembly = base.LoadAssembly(filename);
+            base.OnAssemblyLoaded(assembly);
 
             registry.ScanAssembly(assembly);
-
-            return assembly;
         }
 
         public void RunScript(ScriptContext context)

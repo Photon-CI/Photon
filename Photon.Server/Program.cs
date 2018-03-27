@@ -65,13 +65,17 @@ namespace Photon.Server
 
             PhotonServer.Instance.Start();
 
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("Server Started");
+            Console.ResetColor();
             Console.ReadKey(true);
 
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Stopping Server...");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write("Server Stopping...");
             Console.ResetColor();
 
             PhotonServer.Instance.Stop();
+            Console.WriteLine();
         }
     }
 }

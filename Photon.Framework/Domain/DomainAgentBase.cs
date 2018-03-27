@@ -10,9 +10,22 @@ namespace Photon.Framework.Domain
             AppDomain.CurrentDomain.AssemblyResolve += Domain_OnAssemblyResolve;
         }
 
-        public virtual Assembly LoadAssembly(string filename)
+        public virtual void LoadAssembly(string filename)
         {
-            return Assembly.LoadFile(filename);
+            try {
+                Assembly.LoadFrom(filename);
+            }
+            catch (Exception error) {
+                var e = new ApplicationException($"Failed to load assembly '{filename}'!");
+                e.Data["source-exception"] = error.ToString();
+                throw e;
+            }
+            //OnAssemblyLoaded(assembly);
+        }
+
+        protected virtual void OnAssemblyLoaded(Assembly assembly)
+        {
+            //...
         }
 
         private Assembly Domain_OnAssemblyResolve(object sender, ResolveEventArgs e)

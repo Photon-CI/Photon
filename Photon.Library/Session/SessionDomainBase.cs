@@ -41,7 +41,7 @@ namespace Photon.Library.Session
 
         public void Initialize(string assemblyFilename)
         {
-            var assemblyName = Path.GetFileNameWithoutExtension(assemblyFilename);
+            var assemblyName = Path.GetFileName(assemblyFilename);
             var assemblyPath = Path.GetDirectoryName(assemblyFilename);
 
             var domainSetup = new AppDomainSetup {
@@ -54,7 +54,13 @@ namespace Photon.Library.Session
 
             var agentType = typeof(T);
             agent = (T)domain.CreateInstanceAndUnwrap(agentType.Assembly.FullName, agentType.FullName);
-            agent.LoadAssembly(assemblyFilename);
+
+            try {
+                agent.LoadAssembly(assemblyFilename);
+            }
+            catch (Exception error) {
+                throw error;
+            }
 
             sponsor.Register(agent);
         }

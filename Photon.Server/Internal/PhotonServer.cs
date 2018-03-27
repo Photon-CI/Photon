@@ -32,6 +32,8 @@ namespace Photon.Server.Internal
         public PhotonServer()
         {
             Projects = new List<ProjectDefinition>();
+            Sessions = new ServerSessionManager();
+            Queue = new ScriptQueue();
 
             WorkDirectory = Configuration.WorkDirectory;
         }
