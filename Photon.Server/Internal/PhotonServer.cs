@@ -1,10 +1,9 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Photon.Framework;
+using Photon.Framework.Extensions;
 using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
-using Photon.Library;
-using Photon.Library.Extensions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
@@ -115,7 +114,10 @@ namespace Photon.Server.Internal
 
         public IEnumerable<ScriptAgent> GetAgents(params string[] roles)
         {
-            throw new NotImplementedException();
+            foreach (var agent in Definition.Agents) {
+                if (agent.MatchesRoles(roles))
+                    yield return new ScriptAgent(agent);
+            }
         }
 
         public ProjectDefinition FindProject(string projectId)

@@ -1,12 +1,22 @@
-﻿namespace Photon.Framework.Scripts
+﻿using System.Threading.Tasks;
+
+namespace Photon.Framework.Scripts
 {
     public class ScriptAgent
     {
-        public ScriptAgentSession BeginSession()
-        {
-            var session = new ScriptAgentSession();
+        private readonly AgentDefinition definition;
 
-            // TODO: Send Agent session/begin request
+
+        public ScriptAgent(AgentDefinition agentDefinition)
+        {
+            this.definition = agentDefinition;
+        }
+
+        public async Task<ScriptAgentSession> BeginSession()
+        {
+            var session = new ScriptAgentSession(definition);
+
+            await session.BeginAsync();
 
             return session;
         }

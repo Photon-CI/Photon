@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Scripts
 {
@@ -12,24 +13,49 @@ namespace Photon.Framework.Scripts
 
         public ScriptAgentCollection(IEnumerable<ScriptAgent> scriptAgents)
         {
+            if (scriptAgents == null)
+                throw new ArgumentNullException(nameof(scriptAgents));
+
             this.scriptAgents = scriptAgents as ScriptAgent[] ?? scriptAgents.ToArray();
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            sessions = scriptAgents
+            var taskList = scriptAgents
                 .Select(x => x.BeginSession())
+                .ToArray();
+
+            await Task.WhenAll(taskList);
+
+            sessions = taskList
+                .Select(t => t.Result)
                 .ToArray();
         }
 
-        public void Release()
+        public async Task ReleaseAsync()
         {
-            foreach (var session in sessions)
-                session.Release();
+            if (sessions == null) return;
+
+            var taskList = sessions
+                .Select(x => x.ReleaseAsync())
+                .ToArray();
+
+            await Task.WhenAll(taskList);
         }
 
-        public void RunTasks(params string[] taskNames)
+        public async Task RunTasks(params string[] taskNames)
         {
+            if (sessions == null) return;
+
+            var taskList = new List<Task>();
+            foreach (var task in taskNames) {
+                foreach (var session in sessions) {
+                    taskList.Add(session.RunTask(task));
+                }
+            }
+
+            await Task.WhenAll(taskList.ToArray());
+
             throw new NotImplementedException();
         }
     }

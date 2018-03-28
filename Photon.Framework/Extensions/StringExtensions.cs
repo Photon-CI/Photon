@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Photon.Library.Extensions
+namespace Photon.Framework.Extensions
 {
     public static class StringExtensions
     {

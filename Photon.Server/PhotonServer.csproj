@@ -63,7 +63,6 @@
   <ItemGroup>
     <Compile Include="Internal\IServerSession.cs" />
     <Compile Include="Internal\ScriptQueue.cs" />
-    <Compile Include="Internal\ServerAgentDefinition.cs" />
     <Compile Include="Internal\ServerDefinition.cs" />
     <Compile Include="Internal\ServerBuildSession.cs" />
     <Compile Include="Internal\ServerSessionBase.cs" />

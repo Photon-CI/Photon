@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Library.Models
+namespace Photon.Framework.Sessions
 {
     public class SessionBeginRequest
     {

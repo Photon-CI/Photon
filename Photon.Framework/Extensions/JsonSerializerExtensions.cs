@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Photon.Library.Extensions
+namespace Photon.Framework.Extensions
 {
     public static class JsonSerializerExtensions
     {

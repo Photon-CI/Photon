@@ -6,6 +6,11 @@ namespace Photon.Server.Internal
 {
     internal class ServerDomain : SessionDomainBase<ServerDomainAgent>
     {
+        public string[] GetScripts()
+        {
+            return agent.GetScripts();
+        }
+
         public void RunScript(ScriptContext context)
         {
             agent.RunScript(context);

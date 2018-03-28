@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Photon.Framework;
 using System.Collections.Generic;
 
 namespace Photon.Server.Internal
@@ -9,13 +10,13 @@ namespace Photon.Server.Internal
         public ServerHttpDefinition Http {get; set;}
 
         [JsonProperty("agents")]
-        public List<ServerAgentDefinition> Agents {get; set;}
+        public List<AgentDefinition> Agents {get; set;}
 
 
         public ServerDefinition()
         {
             Http = new ServerHttpDefinition();
-            Agents = new List<ServerAgentDefinition>();
+            Agents = new List<AgentDefinition>();
         }
     }
 }

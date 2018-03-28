@@ -41,6 +41,9 @@ namespace Photon.Server.Internal
                 throw new FileNotFoundException($"The assembly file '{assemblyFilename}' could not be found!");
 
             Domain.Initialize(assemblyFilename);
+
+            var allScripts = Domain.GetScripts();
+
             Domain.RunScript(Context);
 
             var postBuildCommand = Context.Job.PostBuild;
@@ -55,9 +58,15 @@ namespace Photon.Server.Internal
                 Directory.CreateDirectory(newPath);
             }
 
-            foreach (var path in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories)) {
-                var newPath = path.Replace(sourcePath, destPath);
-                File.Copy(path, newPath, true);
+            foreach (var file in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories)) {
+                var newPath = file.Replace(sourcePath, destPath);
+
+                try {
+                    File.Copy(file, newPath, true);
+                }
+                catch (Exception error) {
+                    Log.Warn($"Failed to copy file '{file}'! {error.Message}");
+                }
             }
         }
     }

@@ -28,7 +28,11 @@ namespace Photon.Server.Internal
             MaxLifespan = TimeSpan.FromMinutes(60);
             Domain = new ServerDomain();
 
-            Context = new ScriptContext(Id, PhotonServer.Instance, project, job);
+            var agents = PhotonServer.Instance.Definition.Agents.ToArray();
+            Context = new ScriptContext(Id, project, job, agents) {
+                WorkDirectory = Path.Combine(PhotonServer.Instance.WorkDirectory, Id)
+            };
+
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
         }
 

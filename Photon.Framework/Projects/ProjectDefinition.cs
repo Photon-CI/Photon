@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace Photon.Framework.Projects
 {
+    [Serializable]
     public class ProjectDefinition
     {
         [JsonProperty("id")]

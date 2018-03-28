@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Photon.Library
+namespace Photon.Framework
 {
     public static class NetPath
     {

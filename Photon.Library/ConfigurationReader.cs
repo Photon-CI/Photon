@@ -1,4 +1,4 @@
-﻿using Photon.Library.Extensions;
+﻿using Photon.Framework.Extensions;
 using System.Configuration;
 
 namespace Photon.Library

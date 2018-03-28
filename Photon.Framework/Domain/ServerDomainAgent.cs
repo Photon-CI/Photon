@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Scripts;
+using System.Linq;
 using System.Reflection;
 
 namespace Photon.Framework.Domain
@@ -18,6 +19,11 @@ namespace Photon.Framework.Domain
             base.OnAssemblyLoaded(assembly);
 
             registry.ScanAssembly(assembly);
+        }
+
+        public string[] GetScripts()
+        {
+            return registry.AllNames.ToArray();
         }
 
         public void RunScript(ScriptContext context)

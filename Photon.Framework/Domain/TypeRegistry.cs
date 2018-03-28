@@ -9,6 +9,8 @@ namespace Photon.Framework.Domain
     {
         protected readonly Dictionary<string, Type> map;
 
+        public IEnumerable<string> AllNames => map.Keys;
+
 
         public TypeRegistry()
         {

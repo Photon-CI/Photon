@@ -48,16 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationReader.cs" />
-    <Compile Include="Extensions\JsonSerializerExtensions.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="IReferenceItem.cs" />
     <Compile Include="Models\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginRequest.cs" />
-    <Compile Include="Models\SessionReleaseResponse.cs" />
-    <Compile Include="Models\SessionReleaseRequest.cs" />
-    <Compile Include="Models\SessionBeginResponse.cs" />
-    <Compile Include="Models\SessionBeginRequest.cs" />
-    <Compile Include="NetPath.cs" />
     <Compile Include="ProcessResult.cs" />
     <Compile Include="ProcessRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

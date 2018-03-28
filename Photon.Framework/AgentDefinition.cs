@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Photon.Server.Internal
+namespace Photon.Framework
 {
-    public class ServerAgentDefinition
+    [Serializable]
+    public class AgentDefinition
     {
         [JsonProperty("name")]
         public string Name {get; set;}
@@ -17,7 +18,7 @@ namespace Photon.Server.Internal
         public List<string> Roles {get; set;}
 
 
-        public ServerAgentDefinition()
+        public AgentDefinition()
         {
             Roles = new List<string>();
         }
