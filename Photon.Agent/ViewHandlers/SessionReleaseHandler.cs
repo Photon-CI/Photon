@@ -1,7 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using Photon.Library.Extensions;
-using Photon.Library.Models;
+using Photon.Framework.Extensions;
+using Photon.Framework.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
 
@@ -15,24 +15,17 @@ namespace Photon.Agent.Handlers
 
         public override HttpHandlerResult Post()
         {
-            var serializer = new JsonSerializer();
-            var requestData = serializer.Deserialize<SessionBeginRequest>(HttpContext.Request.InputStream);
+            var sessionId = GetQuery("session");
 
-            Log.Debug($"Beginning session for Project '{requestData.ProjectName}' @ '{requestData.ReleaseVersion}'.");
+            if (string.IsNullOrEmpty(sessionId))
+                return BadRequest().SetText("'sessionId' is undefined!");
 
             try {
-                var session = Program.Sessions.BeginSession(requestData);
-
-                var response = new SessionBeginResponse {
-                    SessionId = session.Id,
-                };
-
-                return Ok()
-                    .SetContentType("application/json")
-                    .SetContent(s => serializer.Serialize(s, response));
+                Program.Sessions.ReleaseSession(sessionId);
+                return Ok().SetText("Ok");
             }
             catch (Exception error) {
-                Log.Error($"Failed to start session for Project '{requestData.ProjectName}' @ '{requestData.ReleaseVersion}'!", error);
+                Log.Error($"Failed to release Session '{sessionId}'!", error);
                 return Exception(error);
             }
         }

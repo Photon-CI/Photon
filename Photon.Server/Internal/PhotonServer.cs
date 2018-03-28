@@ -56,7 +56,7 @@ namespace Photon.Server.Internal
                 Http = {
                     Host = "localhost",
                     Port = 80,
-                    Path = "/photon",
+                    Path = "/photon/server",
                 },
             };
 

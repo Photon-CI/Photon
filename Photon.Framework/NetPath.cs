@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Web;
 
 namespace Photon.Framework
 {
@@ -33,6 +37,30 @@ namespace Photon.Framework
                 }
 
                 builder.Append(p);
+            }
+
+            return builder.ToString();
+        }
+
+        public static string QueryString(object arguments)
+        {
+            var args = (arguments as IDictionary<string, object>)
+                ?? arguments.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Select(p => new KeyValuePair<string, object>(p.Name, p.GetValue(arguments)))
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+            if (!args.Any()) return string.Empty;
+
+            var builder = new StringBuilder("?");
+
+            var i = 0;
+            foreach (var arg in args) {
+                if (i > 0) builder.Append("&");
+                i++;
+
+                builder.Append(HttpUtility.UrlEncode(arg.Key));
+                builder.Append("=");
+                builder.Append(HttpUtility.UrlEncode(arg.Value?.ToString() ?? string.Empty));
             }
 
             return builder.ToString();

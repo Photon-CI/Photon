@@ -1,11 +1,13 @@
-﻿using Photon.Library;
-using Photon.Library.Models;
+﻿using log4net;
+using Photon.Library;
 using System;
 
 namespace Photon.Agent.Internal
 {
     internal class AgentSessionManager : IDisposable
     {
+        private static ILog Log = LogManager.GetLogger(typeof(AgentSessionManager));
+
         private ReferencePool<AgentSession> pool;
 
 
@@ -24,27 +26,22 @@ namespace Photon.Agent.Internal
 
         public void Start()
         {
+            Log.Debug("Starting session pool...");
             pool.Start();
+            Log.Info("Session pool started.");
         }
 
         public void Stop()
         {
+            Log.Debug("Stopping session pool...");
             pool.Stop();
+            Log.Info("Session pool stopped.");
         }
 
-        public AgentSession BeginSession(SessionBeginRequest request)
+        public void BeginSession(AgentSession session)
         {
-            if (string.IsNullOrEmpty(request.ProjectName))
-                throw new ApplicationException("'ProjectName' is undefined!");
-
-            if (string.IsNullOrEmpty(request.ReleaseVersion))
-                throw new ApplicationException("'ReleaseVersion' is undefined!");
-
-            var session = new AgentSession();
-            //...
-
             pool.Add(session);
-            return session;
+            Log.Info($"Started Session '{session.Id}'.");
         }
 
         public bool TryGetSession(string sessionId, out AgentSession session)
@@ -55,7 +52,9 @@ namespace Photon.Agent.Internal
         public bool ReleaseSession(string sessionId)
         {
             if (pool.TryGet(sessionId, out var session)) {
+                Log.Debug($"Releasing Session '{sessionId}'...");
                 session.Release();
+                Log.Info($"Session '{sessionId}' released.");
                 return true;
             }
 

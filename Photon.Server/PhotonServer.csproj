@@ -114,6 +114,7 @@
     <Folder Include="Content\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="server.json" />
     <None Include="Views\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

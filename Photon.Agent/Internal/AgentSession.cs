@@ -1,5 +1,5 @@
-﻿using Photon.Library;
-using Photon.Library.Models;
+﻿using Photon.Framework.Sessions;
+using Photon.Library;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,9 +12,9 @@ namespace Photon.Agent.Internal
         private DateTime utcCreated;
         private Task initializationTask;
         private ManualResetEventSlim initializedEvent;
+        private AgentSessionDomain domain;
 
         public string Id {get;}
-        private AgentSessionDomain Domain; // {get; private set;}
         public bool IsInitialized {get; private set;}
         public TimeSpan MaxLifespan {get; set;}
 
@@ -29,8 +29,8 @@ namespace Photon.Agent.Internal
 
         public void Dispose()
         {
-            Domain?.Dispose();
-            Domain = null;
+            domain?.Dispose();
+            domain = null;
 
             initializedEvent?.Dispose();
             initializedEvent = null;
@@ -38,7 +38,7 @@ namespace Photon.Agent.Internal
 
         public void Initialize(SessionBeginRequest request)
         {
-            Domain = new AgentSessionDomain();
+            domain = new AgentSessionDomain();
             //...
 
             initializationTask = Task.Run(() => {
@@ -51,7 +51,7 @@ namespace Photon.Agent.Internal
                     // TODO: Parse package manifest
                     var assemblyFilename = "?";
 
-                    Domain.Initialize(assemblyFilename);
+                    domain.Initialize(assemblyFilename);
                 }
                 finally {
                     IsInitialized = true;
@@ -64,7 +64,7 @@ namespace Photon.Agent.Internal
 
         public void Release()
         {
-            Domain.Dispose();
+            domain?.Dispose();
             isReleased = true;
         }
 
@@ -76,12 +76,12 @@ namespace Photon.Agent.Internal
             return elapsed > MaxLifespan;
         }
 
-        public void RunTask(string taskName, string jsonData = null)
+        public async Task RunTask(string taskName, string jsonData = null)
         {
             if (!IsInitialized)
                 initializedEvent.Wait();
 
-            Domain.RunTask(taskName, jsonData);
+            domain.RunTask(taskName, jsonData);
         }
 
         private void DownloadPackage(string packageName, string version, string outputDirectory)

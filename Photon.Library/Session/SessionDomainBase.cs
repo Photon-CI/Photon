@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Runtime.Remoting.Lifetime;
+using System.Threading;
 
 namespace Photon.Library.Session
 {
@@ -28,7 +29,11 @@ namespace Photon.Library.Session
             agent = null;
 
             if (domain != null) {
-                AppDomain.Unload(domain);
+                try {
+                    AppDomain.Unload(domain);
+                }
+                catch (ThreadAbortException) {}
+
                 domain = null;
             }
         }

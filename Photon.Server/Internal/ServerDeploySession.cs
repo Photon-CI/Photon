@@ -1,5 +1,7 @@
 ﻿using Photon.Framework.Projects;
+using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
 {
@@ -18,14 +20,16 @@ namespace Photon.Server.Internal
             //CopyPackage();
         }
 
-        public override void Run()
+        public override async Task RunAsync()
         {
             var assemblyFilename = Path.Combine(Context.WorkDirectory, Context.Job.Assembly);
             if (!File.Exists(assemblyFilename))
                 throw new FileNotFoundException($"The assembly file '{assemblyFilename}' could not be found!");
 
             Domain.Initialize(assemblyFilename);
-            Domain.RunScript(Context);
+
+            var result = await Domain.RunScript(Context);
+            if (!result.Successful) throw new ApplicationException(result.Message);
         }
 
         private void CopyPackage(string packageName, string version, string outputDirectory)

@@ -26,9 +26,14 @@ namespace Photon.Framework.Domain
             return registry.AllNames.ToArray();
         }
 
-        public void RunScript(ScriptContext context)
+        public void RunScript(ScriptContext context, RemoteTaskCompletionSource<ScriptResult> completeEvent)
         {
-            registry.ExecuteScript(context);
+            registry.ExecuteScript(context)
+                .ContinueWith(t => {
+                    if (t.IsCanceled) completeEvent.SetCancelled();
+                    else if (t.IsFaulted) completeEvent.SetException(t.Exception);
+                    else completeEvent.SetResult(t.Result);
+                });
         }
     }
 }

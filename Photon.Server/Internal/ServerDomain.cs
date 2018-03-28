@@ -1,6 +1,7 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Scripts;
 using Photon.Library.Session;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
 {
@@ -11,9 +12,11 @@ namespace Photon.Server.Internal
             return agent.GetScripts();
         }
 
-        public void RunScript(ScriptContext context)
+        public async Task<ScriptResult> RunScript(ScriptContext context)
         {
-            agent.RunScript(context);
+            var completeEvent = new RemoteTaskCompletionSource<ScriptResult>();
+            agent.RunScript(context, completeEvent);
+            return await completeEvent.Task;
         }
     }
 }

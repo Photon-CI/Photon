@@ -69,6 +69,7 @@
     <Compile Include="Internal\AgentDefinition.cs" />
     <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
+    <Compile Include="ViewHandlers\TaskRunHandler.cs" />
     <Compile Include="ViewHandlers\SessionReleaseHandler.cs" />
     <Compile Include="ViewHandlers\IndexHandler.cs" />
     <Compile Include="Program.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="ViewHandlers\SessionBeginHandler.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="agent.json" />
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>

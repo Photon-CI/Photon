@@ -1,5 +1,6 @@
 ﻿using Photon.Library;
 using System;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
 {
@@ -7,8 +8,8 @@ namespace Photon.Server.Internal
     {
         Exception Exception {get; set;}
 
-        void Run();
-        void Release();
+        Task RunAsync();
+        Task ReleaseAsync();
         void PrepareWorkDirectory();
     }
 }

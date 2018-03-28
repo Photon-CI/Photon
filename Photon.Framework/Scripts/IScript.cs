@@ -1,7 +1,9 @@
-﻿namespace Photon.Framework.Scripts
+﻿using System.Threading.Tasks;
+
+namespace Photon.Framework.Scripts
 {
     public interface IScript
     {
-        ScriptResult Run(ScriptContext context);
+        Task<ScriptResult> RunAsync(ScriptContext context);
     }
 }

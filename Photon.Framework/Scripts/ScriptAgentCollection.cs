@@ -32,7 +32,7 @@ namespace Photon.Framework.Scripts
                 .ToArray();
         }
 
-        public async Task ReleaseAsync()
+        public async Task ReleaseAllAsync()
         {
             if (sessions == null) return;
 
@@ -43,7 +43,7 @@ namespace Photon.Framework.Scripts
             await Task.WhenAll(taskList);
         }
 
-        public async Task RunTasks(params string[] taskNames)
+        public async Task RunTasksAsync(params string[] taskNames)
         {
             if (sessions == null) return;
 

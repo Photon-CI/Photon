@@ -1,5 +1,6 @@
 ﻿using Photon.Library;
 using System;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
 {
@@ -36,22 +37,6 @@ namespace Photon.Server.Internal
             pool.Add(session);
         }
 
-        //public ServerDeploySession BeginDeploySession()
-        //{
-        //    //if (string.IsNullOrEmpty(request.ProjectName))
-        //    //    throw new ApplicationException("'ProjectName' is undefined!");
-
-        //    //if (string.IsNullOrEmpty(request.ReleaseVersion))
-        //    //    throw new ApplicationException("'ReleaseVersion' is undefined!");
-
-        //    var session = new ServerDeploySession {
-        //        //Request = request,
-        //    };
-
-        //    pool.Add(session);
-        //    return session;
-        //}
-
         public bool TryGetSession(string sessionId, out IServerSession session)
         {
             return pool.TryGet(sessionId, out session);
@@ -64,10 +49,10 @@ namespace Photon.Server.Internal
                 ? (_session as T) : null;
         }
 
-        public bool ReleaseSession(string sessionId)
+        public async Task<bool> ReleaseSession(string sessionId)
         {
             if (pool.TryGet(sessionId, out var session)) {
-                session.Release();
+                await session.ReleaseAsync();
                 return true;
             }
 

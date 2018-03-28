@@ -6,6 +6,9 @@ namespace Photon.Server.Internal
 {
     public class ServerDefinition
     {
+        [JsonProperty("name")]
+        public string Name {get; set;}
+
         [JsonProperty("http")]
         public ServerHttpDefinition Http {get; set;}
 

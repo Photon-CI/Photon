@@ -1,9 +1,11 @@
 ﻿using log4net;
+using Photon.Framework;
 using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
 using Photon.Library;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
 {
@@ -38,18 +40,34 @@ namespace Photon.Server.Internal
 
         public void Dispose()
         {
-            Release();
+            if (!isReleased)
+                ReleaseAsync().GetAwaiter().GetResult();
+
+            Domain?.Dispose();
         }
 
-        public abstract void Run();
+        public abstract Task RunAsync();
 
-        public void Release()
+        public async Task ReleaseAsync()
         {
             Domain?.Dispose();
-            //domain = null;
 
             if (!isReleased) {
-                DestoryDirectory(Context.WorkDirectory);
+                var workDirectory = Context.WorkDirectory;
+                try {
+                    await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
+                }
+                catch (AggregateException errors) {
+                    errors.Flatten().Handle(e => {
+                        if (e is IOException ioError) {
+                            Log.Warn(errors.Message);
+                            return true;
+                        }
+
+                        return false;
+                    });
+                }
+
                 isReleased = true;
             }
         }
@@ -85,46 +103,6 @@ namespace Photon.Server.Internal
             foreach (var path in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories)) {
                 var newPath = path.Replace(sourcePath, destPath);
                 File.Copy(path, newPath, true);
-            }
-        }
-
-        private void DestoryDirectory(string path)
-        {
-            try {
-                DestoryDirectoryContents(path);
-            }
-            catch {}
-
-            try {
-                Directory.Delete(Context.WorkDirectory, true);
-            }
-            catch (Exception error) {
-                Log.Warn($"Failed to remove directory '{Context.WorkDirectory}'! {error.Message}");
-            }
-        }
-
-        private void DestoryDirectoryContents(string path)
-        {
-            foreach (var subdir in Directory.GetDirectories(path)) {
-                DestoryDirectoryContents(subdir);
-
-                try {
-                    Directory.Delete(subdir);
-                }
-                catch {}
-            }
-
-            foreach (var file in Directory.GetFiles(path)) {
-                try {
-                    var attr = File.GetAttributes(file);
-                    if ((attr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                        File.SetAttributes(file, attr ^ FileAttributes.ReadOnly);
-
-                    File.Delete(file);
-                }
-                catch (Exception error) {
-                    Log.Warn($"Failed to delete file '{file}'! {error.Message}");
-                }
             }
         }
     }
