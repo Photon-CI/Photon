@@ -1,22 +1,26 @@
-﻿using Photon.Framework.Sessions;
+﻿using log4net;
+using Photon.Framework;
+using Photon.Framework.Messages;
 using Photon.Library;
 using System;
-using System.Threading;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal
 {
     internal class AgentSession : IReferenceItem, IDisposable
     {
+        private readonly Lazy<ILog> _log;
+        private readonly DateTime utcCreated;
         private bool isReleased;
-        private DateTime utcCreated;
-        private Task initializationTask;
-        private ManualResetEventSlim initializedEvent;
-        private AgentSessionDomain domain;
 
         public string Id {get;}
-        public bool IsInitialized {get; private set;}
+        protected AgentSessionDomain Domain {get;}
+        //public TaskContext Context {get;}
+        public string WorkDirectory {get; set;}
         public TimeSpan MaxLifespan {get; set;}
+        public Exception Exception {get; set;}
+        protected ILog Log => _log.Value;
 
 
         public AgentSession()
@@ -24,48 +28,76 @@ namespace Photon.Agent.Internal
             Id = Guid.NewGuid().ToString("N");
             utcCreated = DateTime.UtcNow;
             MaxLifespan = TimeSpan.FromMinutes(60);
-            initializedEvent = new ManualResetEventSlim();
+
+            _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
         }
 
         public void Dispose()
         {
-            domain?.Dispose();
-            domain = null;
+            if (!isReleased)
+                ReleaseAsync().GetAwaiter().GetResult();
 
-            initializedEvent?.Dispose();
-            initializedEvent = null;
+            Domain?.Dispose();
         }
 
-        public void Initialize(SessionBeginRequest request)
+        public async Task RunAsync()
         {
-            domain = new AgentSessionDomain();
-            //...
+            var assemblyFilename = Path.Combine(Context.WorkDirectory, Context.Job.Assembly);
 
-            initializationTask = Task.Run(() => {
+            if (!File.Exists(assemblyFilename)) {
+                errorList.Value.Add(new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!"));
+                Context.Output.AppendLine($"The assembly file '{assemblyFilename}' could not be found!");
+                //throw new FileNotFoundException($"The assembly file '{assemblyFilename}' could not be found!");
+                abort = true;
+            }
+
+            if (!abort) {
                 try {
-                    // TODO: Get working directory
-                    var outputPath = "?";
-
-                    DownloadPackage(request.ProjectName, request.ReleaseVersion, outputPath);
-
-                    // TODO: Parse package manifest
-                    var assemblyFilename = "?";
-
-                    domain.Initialize(assemblyFilename);
+                    Domain.Initialize(assemblyFilename);
                 }
-                finally {
-                    IsInitialized = true;
-                    initializedEvent.Set();
+                catch (Exception error) {
+                    errorList.Value.Add(new ApplicationException($"Script initialization failed! [{Id}]", error));
+                    //Log.Error($"Script initialization failed! [{Id}]", error);
+                    Context.Output.AppendLine($"An error occurred while initializing the script! {error.Message} [{Id}]");
+                    abort = true;
                 }
-            }).ContinueWith(t => {
-                IsInitialized = true;
-            });
+            }
+
+            if (!abort) {
+                try {
+                    var result = await Domain.RunScript(Context);
+                    if (!result.Successful) throw new ApplicationException(result.Message);
+                }
+                catch (Exception error) {
+                    errorList.Value.Add(new ApplicationException($"Script execution failed! [{Id}]", error));
+                    //Log.Error($"Script execution failed! [{Id}]", error);
+                    Context.Output.AppendLine($"An error occurred while executing the script! {error.Message} [{Id}]");
+                }
+            }
         }
 
-        public void Release()
+        public async Task ReleaseAsync()
         {
-            domain?.Dispose();
-            isReleased = true;
+            Domain?.Dispose();
+
+            if (!isReleased) {
+                var workDirectory = WorkDirectory;
+                try {
+                    await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
+                }
+                catch (AggregateException errors) {
+                    errors.Flatten().Handle(e => {
+                        if (e is IOException ioError) {
+                            Log.Warn(errors.Message);
+                            return true;
+                        }
+
+                        return false;
+                    });
+                }
+
+                isReleased = true;
+            }
         }
 
         public bool IsExpired()
@@ -76,17 +108,22 @@ namespace Photon.Agent.Internal
             return elapsed > MaxLifespan;
         }
 
+        public virtual void PrepareWorkDirectory()
+        {
+            Directory.CreateDirectory(Context.WorkDirectory);
+        }
+
         public async Task RunTask(string taskName, string jsonData = null)
         {
-            if (!IsInitialized)
-                initializedEvent.Wait();
+            var context = new AgentContext();
 
-            domain.RunTask(taskName, jsonData);
+            await Domain.RunTask(taskName, context);
         }
 
         private void DownloadPackage(string packageName, string version, string outputDirectory)
         {
             //...
+            throw new NotImplementedException();
         }
     }
 }

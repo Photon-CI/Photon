@@ -1,13 +1,22 @@
 ﻿using Photon.Framework.Domain;
+using Photon.Framework.Tasks;
 using Photon.Library.Session;
+using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal
 {
     internal class AgentSessionDomain : SessionDomainBase<AgentDomainAgent>
     {
-        public void RunTask(string taskName, string jsonData = null)
+        public string[] GetTasks()
         {
-            agent.RunTask(taskName, jsonData);
+            return agent.GetTasks();
+        }
+
+        public async Task<TaskResult> RunTask(TaskContext context)
+        {
+            var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
+            agent.RunTask(context, completeEvent);
+            return await completeEvent.Task;
         }
     }
 }

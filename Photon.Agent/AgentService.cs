@@ -1,4 +1,5 @@
-﻿using System.ServiceProcess;
+﻿using Photon.Agent.Internal;
+using System.ServiceProcess;
 
 namespace Photon.Agent
 {
@@ -11,12 +12,12 @@ namespace Photon.Agent
 
         protected override void OnStart(string[] args)
         {
-            Program.Agent.Start();
+            PhotonAgent.Instance.Start();
         }
 
         protected override void OnStop()
         {
-            Program.Agent.Stop();
+            PhotonAgent.Instance.Stop();
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Photon.Framework;
+using Photon.Framework.Communication;
 using Photon.Framework.Extensions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
 using System.IO;
+using System.Net;
 using System.Reflection;
 
 namespace Photon.Agent.Internal
@@ -13,31 +15,50 @@ namespace Photon.Agent.Internal
     internal class PhotonAgent : IDisposable
     {
         private static ILog Log = LogManager.GetLogger(typeof(PhotonAgent));
+        public static PhotonAgent Instance {get;} = new PhotonAgent();
 
+        private readonly MessageProcessor messageProcessor;
+        private readonly MessageListener messageListener;
         private HttpReceiver receiver;
+        private bool isStarted;
 
+        public string WorkDirectory {get;}
+        public AgentSessionManager Sessions {get;}
         public AgentDefinition Definition {get; private set;}
 
 
         public PhotonAgent()
         {
-            //
+            Sessions = new AgentSessionManager();
+
+            messageProcessor = new MessageProcessor();
+            messageProcessor.Scan(Assembly.GetExecutingAssembly());
+
+            messageListener = new MessageListener(messageProcessor);
+
+            WorkDirectory = Configuration.WorkDirectory;
         }
 
         public void Dispose()
         {
+            //if (isStarted) Stop();
+
+            Sessions?.Dispose();
             receiver?.Dispose();
             receiver = null;
         }
 
         public void Start()
         {
+            if (isStarted) throw new Exception("Agent has already been started!");
+            isStarted = true;
+
             // Load existing or default agent configuration
             Definition = ParseAgentDefinition() ?? new AgentDefinition {
                 Http = {
                     Host = "localhost",
                     Port = 80,
-                    Path = "/photon",
+                    Path = "/photon/agent",
                 },
             };
 
@@ -72,17 +93,25 @@ namespace Photon.Agent.Internal
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);
             }
+
+            Sessions.Start();
+            messageProcessor.Start();
+            messageListener.Listen(IPAddress.Any, 10933);
         }
 
         public void Stop()
         {
-            try {
-                receiver?.Dispose();
-                receiver = null;
-            }
-            catch (Exception error) {
-                Log.Error("Failed to stop HTTP Receiver!", error);
-            }
+            if (!isStarted) return;
+            isStarted = false;
+
+            messageListener.Stop()
+                .GetAwaiter().GetResult();
+
+            messageProcessor.StopAsync()
+                .GetAwaiter().GetResult();
+
+            Sessions.Stop();
+            receiver.Stop();
         }
 
         private AgentDefinition ParseAgentDefinition()

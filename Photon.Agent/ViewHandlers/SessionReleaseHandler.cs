@@ -1,7 +1,5 @@
 ﻿using log4net;
-using Newtonsoft.Json;
-using Photon.Framework.Extensions;
-using Photon.Framework.Sessions;
+using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
 using System;
 
@@ -21,7 +19,7 @@ namespace Photon.Agent.Handlers
                 return BadRequest().SetText("'sessionId' is undefined!");
 
             try {
-                Program.Sessions.ReleaseSession(sessionId);
+                PhotonAgent.Instance.Sessions.ReleaseSession(sessionId);
                 return Ok().SetText("Ok");
             }
             catch (Exception error) {

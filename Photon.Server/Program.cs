@@ -18,7 +18,7 @@ namespace Photon.Server
 
                 var program = new Program();
 
-                // TODO: Load from Configuration
+                // TODO: Load Configuration Data
                 PhotonServer.Instance.Queue.MaxDegreeOfParallelism = 3;
 
                 return program.Run(args);
@@ -71,7 +71,7 @@ namespace Photon.Server
             Console.ReadKey(true);
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write("Server Stopping...");
+            Console.WriteLine("Server Stopping...");
             Console.ResetColor();
 
             PhotonServer.Instance.Stop();

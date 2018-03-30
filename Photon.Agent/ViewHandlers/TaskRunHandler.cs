@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
 using System;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Photon.Agent.Handlers
             if (string.IsNullOrEmpty(taskName))
                 return BadRequest().SetText("'task' is undefined!");
 
-            if (!Program.Sessions.TryGetSession(sessionId, out var session))
+            if (!PhotonAgent.Instance.Sessions.TryGetSession(sessionId, out var session))
                 return BadRequest().SetText($"Session '{sessionId}' not found!");
 
             try {

@@ -1,7 +1,9 @@
-﻿namespace Photon.Framework.Tasks
+﻿using System.Threading.Tasks;
+
+namespace Photon.Framework.Tasks
 {
     public interface ITask
     {
-        TaskResult Run(TaskContext context);
+        Task<TaskResult> RunAsync(TaskContext context);
     }
 }

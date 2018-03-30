@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
+using Photon.Framework.Communication;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
@@ -9,32 +11,38 @@ namespace Photon.Framework.Communication
 {
     internal class QueuedMessageSender : IDisposable
     {
-        private readonly Stream stream;
         private readonly object startStopLock;
-        private ActionBlock<IRequestMessage> queue;
+        private readonly JsonSerializer serializer;
+        //private readonly BsonDataWriter bsonWriter;
+        private ActionBlock<IMessage> queue;
+        private Stream stream;
+        private BinaryWriter writer;
         private bool isStarted;
 
 
-        public QueuedMessageSender(Stream stream)
+        public QueuedMessageSender()
         {
-            this.stream = stream;
-
+            serializer = new JsonSerializer();
             startStopLock = new object();
         }
 
         public void Dispose()
         {
+            writer?.Dispose();
             stream?.Dispose();
         }
 
-        public void Start()
+        public void Start(Stream stream)
         {
             lock (startStopLock) {
                 if (isStarted) throw new Exception("Queue has already been started!");
                 isStarted = true;
             }
 
-            queue = new ActionBlock<IRequestMessage>(OnProcess);
+            this.stream = stream;
+
+            writer = new BinaryWriter(stream, Encoding.UTF8, true);
+            queue = new ActionBlock<IMessage>(OnProcess);
         }
 
         public async Task StopAsync()
@@ -48,27 +56,30 @@ namespace Photon.Framework.Communication
             await queue.Completion;
         }
 
-        public void Send(IRequestMessage message)
+        public void Send(IMessage message)
         {
             queue.Post(message);
         }
 
-        private async Task OnProcess(IRequestMessage message)
+        private async Task OnProcess(IMessage message)
         {
+            var messageType = message.GetType().AssemblyQualifiedName;
+
             // TODO: Create a MemoryStream pool for reducing resources?
             using (var bufferStream = new MemoryStream()) {
                 using (var writer = new BsonDataWriter(bufferStream)) {
-                    var serializer = new JsonSerializer();
                     serializer.Serialize(writer, message);
                     //await writer.FlushAsync();
                 }
 
-                var size = bufferStream.Length;
                 bufferStream.Seek(0, SeekOrigin.Begin);
 
-                var sizeData = BitConverter.GetBytes(size);
-                await stream.WriteAsync(sizeData, 0, sizeData.Length);
+                writer.Write(messageType);
+                writer.Write(bufferStream.Length);
+                writer.Flush();
+
                 await bufferStream.CopyToAsync(stream);
+                //await stream.FlushAsync();
             }
         }
     }

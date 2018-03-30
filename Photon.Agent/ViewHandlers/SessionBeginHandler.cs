@@ -21,7 +21,7 @@ namespace Photon.Agent.Handlers
                 var session = new AgentSession();
                 //...
 
-                Program.Sessions.BeginSession(session);
+                PhotonAgent.Instance.Sessions.BeginSession(session);
 
                 var response = new SessionBeginResponse {
                     SessionId = session.Id,
@@ -30,7 +30,8 @@ namespace Photon.Agent.Handlers
                 var memStream = new MemoryStream();
 
                 try {
-                    new JsonSerializer().Serialize(memStream, response, true);
+                    new JsonSerializer()
+                        .Serialize(memStream, response, true);
                 }
                 catch {
                     memStream.Dispose();

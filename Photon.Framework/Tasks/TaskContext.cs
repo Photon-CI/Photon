@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Photon.Framework.Projects;
+using Photon.Framework.Scripts;
+using System;
 using System.Text;
 
 namespace Photon.Framework.Tasks
@@ -10,28 +12,31 @@ namespace Photon.Framework.Tasks
 
     public class TaskContext
     {
-        //public ContextProjectDefinition Project {get; internal set;}
-        public string ProjectName {get; set;}
-
+        public string SessionId {get;}
         public string ReleaseVersion {get; set;}
-
         public string WorkDirectory {get; set;}
-
-        //public ContextTaskDefinition Task {get; internal set;}
-
-        public ContextAgentDefinition Agent {get; internal set;}
-
+        public ProjectDefinition Project {get; set;}
+        public ProjectJobDefinition Job {get; set;}
+        public ContextAgentDefinition Agent {get; set;}
+        public string TaskName {get; set;}
         //public ConcurrentBag<object> Artifacts {get;}
-        public StringBuilder Output {get;}
+        public ScriptOutput Output {get;}
 
 
-        public TaskContext(IAgent agent)
+        public TaskContext(AgentDefinition agent, string sessionId) // IAgent agent
         {
-            //Project = new ContextProjectDefinition();
-            //Task = new ContextTaskDefinition();
-            Agent = new ContextAgentDefinition();
+            this.SessionId = sessionId ?? throw new ArgumentNullException(nameof(sessionId));
+            //this.Project = project ?? throw new ArgumentNullException(nameof(project));
+            //this.Job = job ?? throw new ArgumentNullException(nameof(job));
+            //this.Agent = agent ?? throw new ArgumentNullException(nameof(agents));
+
+            Agent = new ContextAgentDefinition {
+                Name = agent.Name,
+                Roles = agent.Roles,
+            };
+
             //Artifacts = new ConcurrentBag<object>();
-            Output = new StringBuilder();
+            Output = new ScriptOutput();
         }
 
         /// <summary>

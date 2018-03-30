@@ -53,11 +53,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentDefinition.cs" />
-    <Compile Include="Communication\IResponseMessage.cs" />
+    <Compile Include="Communication\ExceptionResponseMessage.cs" />
+    <Compile Include="Communication\IMessage.cs" />
+    <Compile Include="Communication\IProcessMessage.cs" />
     <Compile Include="Communication\IRequestMessage.cs" />
+    <Compile Include="Communication\IResponseMessage.cs" />
+    <Compile Include="Communication\MessageClient.cs" />
+    <Compile Include="Communication\MessageHandle.cs" />
+    <Compile Include="Communication\MessageHost.cs" />
+    <Compile Include="Communication\MessageListener.cs" />
+    <Compile Include="Communication\MessageProcessor.cs" />
+    <Compile Include="Communication\MessageProcessorHandle.cs" />
+    <Compile Include="Communication\MessageProcessorRegistry.cs" />
+    <Compile Include="Communication\MessageReceivedEventArgs.cs" />
+    <Compile Include="Communication\MessageReceiver.cs" />
+    <Compile Include="Communication\MessageTransceiver.cs" />
     <Compile Include="Communication\QueuedMessageSender.cs" />
-    <Compile Include="Communication\TcpMessageClient.cs" />
-    <Compile Include="Communication\TcpMessageHost.cs" />
     <Compile Include="ContextDefinition.cs" />
     <Compile Include="ContextAgentDefinition.cs" />
     <Compile Include="Domain\DomainAgentBase.cs" />
@@ -68,6 +79,8 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="FileUtils.cs" />
     <Compile Include="IServer.cs" />
+    <Compile Include="Messages\TaskBeginResponse.cs" />
+    <Compile Include="Messages\TaskBeginRequest.cs" />
     <Compile Include="NetPath.cs" />
     <Compile Include="Packages\PackageFilter.cs" />
     <Compile Include="Packages\PackageTools.cs" />
@@ -85,14 +98,15 @@
     <Compile Include="Scripts\ScriptOutput.cs" />
     <Compile Include="Scripts\ScriptRegistry.cs" />
     <Compile Include="Scripts\ScriptResult.cs" />
-    <Compile Include="Sessions\SessionBeginRequest.cs" />
-    <Compile Include="Sessions\SessionBeginResponse.cs" />
-    <Compile Include="Sessions\SessionReleaseRequest.cs" />
-    <Compile Include="Sessions\SessionReleaseResponse.cs" />
+    <Compile Include="Messages\SessionBeginRequest.cs" />
+    <Compile Include="Messages\SessionBeginResponse.cs" />
+    <Compile Include="Messages\SessionReleaseRequest.cs" />
+    <Compile Include="Messages\SessionReleaseResponse.cs" />
     <Compile Include="Tasks\ITask.cs" />
     <Compile Include="Packages\PackageDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks\RolesAttribute.cs" />
+    <Compile Include="Tasks\TaskRegistry.cs" />
     <Compile Include="Tasks\TaskContext.cs" />
     <Compile Include="TaskProjectDefinition.cs" />
     <Compile Include="Tasks\TaskResult.cs" />
@@ -103,6 +117,8 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Sessions\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

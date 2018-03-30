@@ -1,8 +1,7 @@
 ﻿namespace Photon.Framework.Communication
 {
-    public interface IResponseMessage
+    public interface IResponseMessage : IMessage
     {
-        string RequestMessageId {get;}
-        string MessageId {get;}
+        string RequestMessageId {get; set;}
     }
 }

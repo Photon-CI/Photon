@@ -6,81 +6,75 @@ using System.ServiceProcess;
 
 namespace Photon.Agent
 {
-    internal static class Program
+    internal class Program
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
 
-        public static PhotonAgent Agent {get;}
-        public static AgentSessionManager Sessions {get;}
-
-
-        static Program()
-        {
-            Agent = new PhotonAgent();
-            Sessions = new AgentSessionManager();
-        }
 
         public static int Main(string[] args)
         {
             try {
                 XmlConfigurator.Configure();
 
-                Sessions.Start();
+                var program = new Program();
 
-                var result = Run(args);
+                // TODO: Load Configuration Data
 
-                Sessions.Stop();
-
-                return result;
+                return program.Run(args);
             }
             catch (Exception error) {
                 Log.Fatal("Unhandled Exception!", error);
                 return -1;
             }
             finally {
-                Sessions.Dispose();
+                PhotonAgent.Instance?.Dispose();
                 LogManager.Flush(3000);
             }
         }
 
-        private static int Run(string[] args)
+        private int Run(string[] args)
         {
+            var arguments = new Arguments();
+
             try {
-                Arguments.Parse(args);
+                arguments.Parse(args);
             }
             catch (Exception error) {
                 Log.Fatal("Failed to parse arguments!", error);
                 return 1;
             }
 
-            if (Arguments.RunAsConsole)
-                return RunAsConsole(args);
-
-            ServiceBase.Run(new [] {
-                new AgentService(),
-            });
+            if (arguments.RunAsConsole) {
+                RunAsConsole(args);
+            }
+            else {
+                ServiceBase.Run(new [] {
+                    new AgentService(),
+                });
+            }
 
             return 0;
         }
 
-        private static int RunAsConsole(string[] args)
+        private void RunAsConsole(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Photon Agent");
             Console.ResetColor();
 
-            try {
-                Agent.Start();
+            PhotonAgent.Instance.Start();
 
-                Console.ReadKey(true);
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("Agent Started");
+            Console.ResetColor();
+            Console.ReadKey(true);
 
-                Agent.Stop();
-            }
-            finally {
-                Agent?.Dispose();
-            }
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Agent Stopping...");
+            Console.ResetColor();
 
-            return 0;
+            PhotonAgent.Instance.Stop();
+            Console.WriteLine();
         }
     }
 }
