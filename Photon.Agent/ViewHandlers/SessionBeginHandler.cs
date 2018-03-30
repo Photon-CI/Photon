@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Photon.Agent.Internal;
 using Photon.Framework.Extensions;
-using Photon.Framework.Sessions;
+using Photon.Framework.Messages;
 using PiServerLite.Http.Handlers;
 using System;
 using System.IO;

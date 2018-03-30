@@ -6,10 +6,10 @@ namespace Photon.Framework.Tasks
 {
     internal class TaskRegistry : TypeRegistry<ITask>
     {
-        public async Task<TaskResult> ExecuteTask(TaskContext context)
+        public async Task<TaskResult> ExecuteTask(BuildTaskContext context)
         {
-            if (!map.TryGetValue(context.Task.Name, out var taskClassType))
-                throw new Exception($"Task '{context.Task.Name}' was not found!");
+            if (!map.TryGetValue(context.TaskName, out var taskClassType))
+                throw new Exception($"Task '{context.TaskName}' was not found!");
 
             object classObject = null;
             try {

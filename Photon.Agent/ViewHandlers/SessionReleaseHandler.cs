@@ -19,7 +19,10 @@ namespace Photon.Agent.Handlers
                 return BadRequest().SetText("'sessionId' is undefined!");
 
             try {
-                PhotonAgent.Instance.Sessions.ReleaseSession(sessionId);
+                PhotonAgent.Instance.Sessions
+                    .ReleaseSessionAsync(sessionId)
+                    .GetAwaiter().GetResult();
+
                 return Ok().SetText("Ok");
             }
             catch (Exception error) {

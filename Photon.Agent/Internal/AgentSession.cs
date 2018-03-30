@@ -1,8 +1,10 @@
 ﻿using log4net;
 using Photon.Framework;
 using Photon.Framework.Messages;
+using Photon.Framework.Tasks;
 using Photon.Library;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -16,7 +18,7 @@ namespace Photon.Agent.Internal
 
         public string Id {get;}
         protected AgentSessionDomain Domain {get;}
-        //public TaskContext Context {get;}
+        public BuildTaskContext Context {get;}
         public string WorkDirectory {get; set;}
         public TimeSpan MaxLifespan {get; set;}
         public Exception Exception {get; set;}
@@ -42,6 +44,8 @@ namespace Photon.Agent.Internal
 
         public async Task RunAsync()
         {
+            var abort = false;
+            var errorList = new Lazy<List<Exception>>();
             var assemblyFilename = Path.Combine(Context.WorkDirectory, Context.Job.Assembly);
 
             if (!File.Exists(assemblyFilename)) {
@@ -65,7 +69,7 @@ namespace Photon.Agent.Internal
 
             if (!abort) {
                 try {
-                    var result = await Domain.RunScript(Context);
+                    var result = await Domain.RunTask(Context);
                     if (!result.Successful) throw new ApplicationException(result.Message);
                 }
                 catch (Exception error) {
@@ -115,9 +119,7 @@ namespace Photon.Agent.Internal
 
         public async Task RunTask(string taskName, string jsonData = null)
         {
-            var context = new AgentContext();
-
-            await Domain.RunTask(taskName, context);
+            await Domain.RunTask(Context);
         }
 
         private void DownloadPackage(string packageName, string version, string outputDirectory)

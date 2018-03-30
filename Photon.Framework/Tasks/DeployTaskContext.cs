@@ -1,15 +1,9 @@
 ﻿using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
 using System;
-using System.Text;
 
 namespace Photon.Framework.Tasks
 {
-    public interface IAgent
-    {
-        string ApplicationDirectory {get;}
-    }
-
     public class TaskContext
     {
         public string SessionId {get;}

@@ -57,7 +57,7 @@ namespace Photon.Framework.Communication
             }
 
             await messageSender.StopAsync();
-            messageReceiver.Stop();
+            await messageReceiver.StopAsync();
             //await processor.FlushAsync();
 
             stream.Close();

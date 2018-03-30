@@ -67,19 +67,19 @@ namespace Photon.Framework.Communication
 
             // TODO: Create a MemoryStream pool for reducing resources?
             using (var bufferStream = new MemoryStream()) {
-                using (var writer = new BsonDataWriter(bufferStream)) {
-                    serializer.Serialize(writer, message);
-                    //await writer.FlushAsync();
+                using (var bsonWriter = new BsonDataWriter(bufferStream)) {
+                    serializer.Serialize(bsonWriter, message);
+                    await bsonWriter.FlushAsync();
+
+                    bufferStream.Seek(0, SeekOrigin.Begin);
+
+                    writer.Write(messageType);
+                    writer.Write(bufferStream.Length);
+                    writer.Flush();
+
+                    await bufferStream.CopyToAsync(stream);
+                    //await stream.FlushAsync();
                 }
-
-                bufferStream.Seek(0, SeekOrigin.Begin);
-
-                writer.Write(messageType);
-                writer.Write(bufferStream.Length);
-                writer.Flush();
-
-                await bufferStream.CopyToAsync(stream);
-                //await stream.FlushAsync();
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Photon.Library;
 using System;
+using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal
 {
@@ -49,11 +50,11 @@ namespace Photon.Agent.Internal
             return pool.TryGet(sessionId, out session);
         }
 
-        public bool ReleaseSession(string sessionId)
+        public async Task<bool> ReleaseSessionAsync(string sessionId)
         {
             if (pool.TryGet(sessionId, out var session)) {
                 Log.Debug($"Releasing Session '{sessionId}'...");
-                session.Release();
+                await session.ReleaseAsync();
                 Log.Info($"Session '{sessionId}' released.");
                 return true;
             }

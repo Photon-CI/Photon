@@ -7,7 +7,7 @@ namespace Photon.Framework.Communication
     /// <summary>
     /// Connects to a remote MessageHost.
     /// </summary>
-    internal class MessageClient : IDisposable
+    public class MessageClient : IDisposable
     {
         private readonly TcpClient client;
         private readonly MessageTransceiver transceiver;

@@ -26,7 +26,7 @@ namespace Photon.Framework.Domain
             return registry.AllNames.ToArray();
         }
 
-        public void RunTask(TaskContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
+        public void RunTask(BuildTaskContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
         {
             registry.ExecuteTask(context)
                 .ContinueWith(t => {

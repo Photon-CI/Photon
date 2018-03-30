@@ -12,7 +12,7 @@ namespace Photon.Agent.Internal
             return agent.GetTasks();
         }
 
-        public async Task<TaskResult> RunTask(TaskContext context)
+        public async Task<TaskResult> RunTask(BuildTaskContext context)
         {
             var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
             agent.RunTask(context, completeEvent);

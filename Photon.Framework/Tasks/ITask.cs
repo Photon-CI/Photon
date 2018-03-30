@@ -4,6 +4,6 @@ namespace Photon.Framework.Tasks
 {
     public interface ITask
     {
-        Task<TaskResult> RunAsync(TaskContext context);
+        Task<TaskResult> RunAsync(BuildTaskContext context);
     }
 }

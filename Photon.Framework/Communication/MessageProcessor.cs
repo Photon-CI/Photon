@@ -1,4 +1,4 @@
-﻿using Photon.Framework.Communication;
+﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -7,13 +7,13 @@ namespace Photon.Framework.Communication
 {
     public class MessageProcessor
     {
-        private readonly MessageProcessorRegistry registry;
+        private readonly MessageRegistry registry;
         private ActionBlock<MessageProcessorHandle> queue;
 
 
         public MessageProcessor()
         {
-            registry = new MessageProcessorRegistry();
+            registry = new MessageRegistry();
         }
 
         public void Scan(Assembly assembly)
@@ -30,6 +30,18 @@ namespace Photon.Framework.Communication
         {
             queue.Complete();
             await queue.Completion;
+        }
+
+        public void Register(Type processorClassType)
+        {
+            registry.Register(processorClassType);
+        }
+
+        public void Register<TProcessor, TRequest>()
+            where TProcessor : IProcessMessage<TRequest>
+            where TRequest : IRequestMessage
+        {
+            registry.Register<TProcessor, TRequest>();
         }
 
         public MessageProcessorHandle Process(IRequestMessage requestMessage)

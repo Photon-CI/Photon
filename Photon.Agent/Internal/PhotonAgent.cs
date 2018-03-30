@@ -104,7 +104,7 @@ namespace Photon.Agent.Internal
             if (!isStarted) return;
             isStarted = false;
 
-            messageListener.Stop()
+            messageListener.StopAsync()
                 .GetAwaiter().GetResult();
 
             messageProcessor.StopAsync()

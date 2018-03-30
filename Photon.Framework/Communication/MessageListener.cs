@@ -41,7 +41,7 @@ namespace Photon.Framework.Communication
             listener.BeginAcceptTcpClient(ConnectionReceived, new object());
         }
 
-        public async Task Stop()
+        public async Task StopAsync()
         {
             lock (startStopLock) {
                 if (!isListening) return;

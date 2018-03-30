@@ -3,6 +3,7 @@ using Newtonsoft.Json.Bson;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Communication
@@ -14,11 +15,14 @@ namespace Photon.Framework.Communication
         private readonly JsonSerializer serializer;
         private Stream stream;
         private BinaryReader reader;
+        private Task task;
+        private CancellationTokenSource tokenSource;
 
 
         public MessageReceiver()
         {
             serializer = new JsonSerializer();
+            serializer.Error += Serializer_Error;
         }
 
         public void Dispose()
@@ -33,14 +37,19 @@ namespace Photon.Framework.Communication
 
             reader = new BinaryReader(stream, Encoding.UTF8, true);
 
-            //...
-            throw new NotImplementedException();
+            tokenSource = new CancellationTokenSource();
+            var token = tokenSource.Token;
+
+            task = Task.Run(async () => {
+                while (!token.IsCancellationRequested)
+                    await ReadMessage();
+            });
         }
 
-        public void Stop()
+        public async Task StopAsync()
         {
-            //...
-            throw new NotImplementedException();
+            tokenSource.Cancel();
+            await task;
         }
 
         protected virtual void OnMessageReceived(IMessage message)
@@ -58,11 +67,14 @@ namespace Photon.Framework.Communication
 
             using (var bufferStream = new MemoryStream()) {
                 await CopyLengthAsync(stream, bufferStream, messageLength);
+                bufferStream.Seek(0, SeekOrigin.Begin);
 
                 object messageData;
                 using (var bsonReader = new BsonDataReader(bufferStream)) {
                     messageData = serializer.Deserialize(bsonReader, messageType);
                 }
+
+                if (messageData == null) throw new Exception("Failed to parse message!");
 
                 OnMessageReceived(messageData as IMessage);
             }
@@ -90,6 +102,11 @@ namespace Photon.Framework.Communication
             }
 
             return buffer;
+        }
+
+        private void Serializer_Error(object sender, Newtonsoft.Json.Serialization.ErrorEventArgs e)
+        {
+            var x = e.ErrorContext.Error;
         }
     }
 }
