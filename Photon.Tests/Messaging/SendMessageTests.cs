@@ -20,6 +20,7 @@ namespace Photon.Tests
         {
             processor = new MessageProcessor();
             processor.Register(typeof(TestMessageProcessor));
+            processor.Register(typeof(TestMessageOneWayProcessor));
 
             listener = new MessageListener(processor);
             client = new MessageClient(processor);
@@ -52,7 +53,14 @@ namespace Photon.Tests
         [Test]
         public async Task SendMessageOneWay()
         {
-            Assert.Ignore();
+            var completeEvent = new TaskCompletionSource<bool>();
+            TestMessageOneWayProcessor.Event = completeEvent;
+
+            var message = new TestRequestOneWayMessage();
+            client.SendOneWay(message);
+
+            var result = await completeEvent.Task;
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -66,6 +74,12 @@ namespace Photon.Tests
                 .GetResponseAsync<TestResponseMessage>();
 
             Assert.That(response.Value, Is.EqualTo(4));
+        }
+
+        class TestRequestOneWayMessage : IRequestMessage
+        {
+            public string MessageId {get; set;}
+            public int Value {get; set;}
         }
 
         class TestRequestMessage : IRequestMessage
@@ -89,6 +103,18 @@ namespace Photon.Tests
                     RequestMessageId = requestMessage.MessageId,
                     Value = requestMessage.Value * 2,
                 });
+            }
+        }
+
+        class TestMessageOneWayProcessor : IProcessMessage<TestRequestOneWayMessage>
+        {
+            public static TaskCompletionSource<bool> Event {get; set;}
+
+            public async Task<IResponseMessage> Process(TestRequestOneWayMessage requestMessage)
+            {
+                Event?.SetResult(true);
+
+                return await Task.FromResult((IResponseMessage)null);
             }
         }
     }

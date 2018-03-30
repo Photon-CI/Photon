@@ -59,8 +59,14 @@ namespace Photon.Framework.Communication
 
         private async Task OnProcess(MessageProcessorHandle handle)
         {
-            var result = await registry.Process(handle.RequestMessage);
-            handle.Complete(result);
+            try {
+                var result = await registry.Process(handle.RequestMessage);
+
+                handle.SetResult(result);
+            }
+            catch (Exception error) {
+                handle.SetException(error);
+            }
         }
     }
 }

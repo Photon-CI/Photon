@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Communication;
+using System;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Communication
@@ -22,9 +23,14 @@ namespace Photon.Framework.Communication
             return await completionEvent.Task;
         }
 
-        internal void Complete(IResponseMessage responseMessage)
+        internal void SetResult(IResponseMessage responseMessage)
         {
             completionEvent.SetResult(responseMessage);
+        }
+
+        internal void SetException(Exception error)
+        {
+            completionEvent.SetException(error);
         }
     }
 }

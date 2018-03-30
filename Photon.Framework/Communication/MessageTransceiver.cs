@@ -65,6 +65,8 @@ namespace Photon.Framework.Communication
 
         public void SendOneWay(IRequestMessage message)
         {
+            message.MessageId = Guid.NewGuid().ToString("N");
+
             messageSender.Send(message);
         }
 
@@ -91,18 +93,21 @@ namespace Photon.Framework.Communication
                 var handle = processor.Process(requestMessage);
                 handle.GetResponse().ContinueWith(t => {
                     if (t.IsFaulted) {
-                        var exceptionResponse = new ExceptionResponseMessage {
-                            RequestMessageId = requestMessage.MessageId,
-                            Exception = t.Exception.ToString()
-                        };
+                        throw new NotImplementedException();
+                        //var exceptionResponse = new ExceptionResponseMessage {
+                        //    RequestMessageId = requestMessage.MessageId,
+                        //    Exception = t.Exception.ToString()
+                        //};
 
-                        messageSender.Send(exceptionResponse);
-                        return;
+                        //messageSender.Send(exceptionResponse);
+                        //return;
                     }
 
                     var _responseMessage = t.Result;
-                    _responseMessage.RequestMessageId = requestMessage.MessageId;
-                    messageSender.Send(_responseMessage);
+                    if (_responseMessage != null) {
+                        _responseMessage.RequestMessageId = requestMessage.MessageId;
+                        messageSender.Send(_responseMessage);
+                    }
                 });
             }
             else {

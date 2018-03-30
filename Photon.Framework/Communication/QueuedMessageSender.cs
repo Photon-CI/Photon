@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
-using Photon.Framework.Communication;
 using System;
 using System.IO;
 using System.Text;

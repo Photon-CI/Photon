@@ -69,6 +69,9 @@ namespace Photon.Framework.Communication
                 await CopyLengthAsync(stream, bufferStream, messageLength);
                 bufferStream.Seek(0, SeekOrigin.Begin);
 
+                //var x = bufferStream.ToArray();
+                //var y = Encoding.UTF8.GetString(x);
+
                 object messageData;
                 using (var bsonReader = new BsonDataReader(bufferStream)) {
                     messageData = serializer.Deserialize(bsonReader, messageType);
@@ -88,7 +91,9 @@ namespace Photon.Framework.Communication
             var position = 0;
             while (position < length) {
                 var count = (int)Math.Min(length - position, buffer_size);
-                position += await stream.ReadAsync(buffer, position, count);
+                var size = await stream.ReadAsync(buffer, 0, count);
+                destStream.Write(buffer, 0, size);
+                position += size;
             }
         }
 
