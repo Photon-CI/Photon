@@ -22,7 +22,6 @@ namespace Photon.Framework.Communication
         public MessageReceiver()
         {
             serializer = new JsonSerializer();
-            serializer.Error += Serializer_Error;
         }
 
         public void Dispose()
@@ -69,9 +68,6 @@ namespace Photon.Framework.Communication
                 await CopyLengthAsync(stream, bufferStream, messageLength);
                 bufferStream.Seek(0, SeekOrigin.Begin);
 
-                //var x = bufferStream.ToArray();
-                //var y = Encoding.UTF8.GetString(x);
-
                 object messageData;
                 using (var bsonReader = new BsonDataReader(bufferStream)) {
                     messageData = serializer.Deserialize(bsonReader, messageType);
@@ -107,11 +103,6 @@ namespace Photon.Framework.Communication
             }
 
             return buffer;
-        }
-
-        private void Serializer_Error(object sender, Newtonsoft.Json.Serialization.ErrorEventArgs e)
-        {
-            var x = e.ErrorContext.Error;
         }
     }
 }
