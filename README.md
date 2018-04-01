@@ -13,7 +13,7 @@ Since standard .NET libraries are used, you can leverage the full user experienc
 
 ## Installation
 
-Though Photon is primarily designed for Windows, it is fully compatible with the [MONO](http://www.mono-project.com) Runtime; Which currently† supports Linux, OS X, BSD, and Windows. It can even be run on the [Raspberry Pi](https://www.raspberrypi.org/)!
+Though Photon is primarily designed for Windows, it is fully compatible with the [MONO](http://www.mono-project.com) Runtime; Which currently† supports Linux, OS X, BSD, and Windows. It can even be run on the [Raspberry Pi](https://www.raspberrypi.org/)!  
 † _04/2018_
 
 **Photon Server**  
@@ -144,11 +144,11 @@ Joshua Miller – null511@outlook.com
 
 Distributed under the MIT license. See ``LICENSE`` for more information.
 
-[[https://github.com/null511/]]
+[https://github.com/null511](https://github.com/null511)
 
 ## Contributing
 
-1. Fork it (<https://github.com/yourname/yourproject/fork>)
+1. Fork it (<https://github.com/null511/photon/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
