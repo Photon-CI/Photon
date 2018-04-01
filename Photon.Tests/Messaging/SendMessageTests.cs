@@ -1,12 +1,13 @@
 ﻿using NUnit.Framework;
 using Photon.Framework.Communication;
+using Photon.Tests.Internal;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Photon.Tests
 {
-    [TestFixture]
+    [IntegrationTestFixture]
     public class SendMessageTests : IDisposable
     {
         private const int port = 10933;
