@@ -1,15 +1,9 @@
 # Photon
 > A platform for packaging and deploying .NET-based automation scripts to provide a complete pipeline-as-code solution for building, testing, and deploying projects.
 
-<!--[![NPM Version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Downloads Stats][npm-downloads]][npm-url]-->
-
 Photon packages your custom .NET library with your applications, allowing users to build, test, and deploy their applications with the full power of .NET! By managing your custom libraries alongside your projects, you can gain full support for branch versioning of your automated tasks. This allows users to make structural project changes that alter their pipelines, without affecting other branches of code!
 
 Since standard .NET libraries are used, you can leverage the full user experience of Visual Studio when editing your pipelines. By decorating your scripts and tasks with test attributes, you can even make your tasks directly runnable and debuggable using your favorite testing platform.
-
-<!--![](header.png)-->
 
 ## Installation
 
@@ -154,5 +148,5 @@ Distributed under the MIT license. See ``LICENSE`` for more information.
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
 
-<!-- Markdown link & img dfn's -->
+
 [wiki]: https://github.com/null511/Photon/wiki
