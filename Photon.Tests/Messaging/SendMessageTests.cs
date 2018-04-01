@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Tests
 {
-    [IntegrationTestFixture]
-    public class SendMessageTests : IDisposable
+    public class SendMessageTests : IntegrationTestFixture, IDisposable
     {
         private const int port = 10933;
 
