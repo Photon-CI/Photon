@@ -1,4 +1,4 @@
-﻿using Photon.Framework.Communication;
+﻿using Photon.Communication;
 using Photon.Framework.Messages;
 using System;
 using System.Reflection;

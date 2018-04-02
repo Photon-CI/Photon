@@ -53,22 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentDefinition.cs" />
-    <Compile Include="Communication\ExceptionResponseMessage.cs" />
-    <Compile Include="Communication\IMessage.cs" />
-    <Compile Include="Communication\IProcessMessage.cs" />
-    <Compile Include="Communication\IRequestMessage.cs" />
-    <Compile Include="Communication\IResponseMessage.cs" />
-    <Compile Include="Communication\MessageClient.cs" />
-    <Compile Include="Communication\MessageHandle.cs" />
-    <Compile Include="Communication\MessageHost.cs" />
-    <Compile Include="Communication\MessageListener.cs" />
-    <Compile Include="Communication\MessageProcessor.cs" />
-    <Compile Include="Communication\MessageProcessorHandle.cs" />
-    <Compile Include="Communication\MessageRegistry.cs" />
-    <Compile Include="Communication\MessageReceivedEventArgs.cs" />
-    <Compile Include="Communication\MessageReceiver.cs" />
-    <Compile Include="Communication\MessageTransceiver.cs" />
-    <Compile Include="Communication\QueuedMessageSender.cs" />
     <Compile Include="ContextDefinition.cs" />
     <Compile Include="ContextAgentDefinition.cs" />
     <Compile Include="Domain\DomainAgentBase.cs" />
@@ -124,6 +108,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Sessions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Photon.Communication\Photon.Communication.csproj">
+      <Project>{E167A349-7691-4406-9F4B-989BD5E6E12F}</Project>
+      <Name>Photon.Communication</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

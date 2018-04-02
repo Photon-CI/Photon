@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace Photon.Framework.Communication
+namespace Photon.Communication
 {
     /// <summary>
     /// Listens for incomming TCP message connections, and manages

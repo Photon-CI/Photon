@@ -1,17 +1,16 @@
-﻿using Photon.Framework.Communication;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace Photon.Framework.Communication
+namespace Photon.Communication
 {
     internal class MessageTransceiver
     {
         private readonly object startStopLock;
         private readonly MessageProcessor processor;
         private readonly ConcurrentDictionary<string, MessageHandle> messageHandles;
-        private QueuedMessageSender messageSender;
+        private MessageSender messageSender;
         private MessageReceiver messageReceiver;
         private NetworkStream stream;
         private bool isStarted;
@@ -23,7 +22,7 @@ namespace Photon.Framework.Communication
 
             startStopLock = new object();
             messageHandles = new ConcurrentDictionary<string, MessageHandle>(StringComparer.Ordinal);
-            messageSender = new QueuedMessageSender();
+            messageSender = new MessageSender();
             messageReceiver = new MessageReceiver();
 
             messageReceiver.MessageReceived += MessageReceiver_MessageReceived;
@@ -105,6 +104,7 @@ namespace Photon.Framework.Communication
 
                     var _responseMessage = t.Result;
                     if (_responseMessage != null) {
+                        _responseMessage.MessageId = Guid.NewGuid().ToString("N");
                         _responseMessage.RequestMessageId = requestMessage.MessageId;
                         messageSender.Send(_responseMessage);
                     }

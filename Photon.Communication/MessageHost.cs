@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace Photon.Framework.Communication
+namespace Photon.Communication
 {
     /// <summary>
     /// An incomming TCP message connection.

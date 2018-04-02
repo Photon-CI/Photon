@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Photon.Framework.Communication
+namespace Photon.Communication
 {
     internal class MessageRegistry
     {
