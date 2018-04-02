@@ -75,6 +75,7 @@
     <Compile Include="Domain\DomainAgentTask.cs" />
     <Compile Include="Domain\ServerDomainAgent.cs" />
     <Compile Include="Domain\AgentDomainAgent.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="FileUtils.cs" />

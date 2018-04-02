@@ -25,5 +25,15 @@ namespace Photon.Framework.Extensions
 
             return (T)Convert.ChangeType(text, type);
         }
+
+        public static string Truncate(this string text, int maxLength)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength));
+
+            return text.Length > maxLength
+                ? text.Substring(0, maxLength)
+                : text;
+        }
     }
 }

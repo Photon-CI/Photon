@@ -1,0 +1,18 @@
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Photon.CLI.Actions
+{
+    public class DeployRunAction
+    {
+        public string ProjectName {get; set;}
+        public string ProjectVersion {get; set;}
+        public string ScriptName {get; set;}
+
+
+        public async Task Run()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
