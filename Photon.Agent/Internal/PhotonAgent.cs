@@ -1,7 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Photon.Communication;
 using Photon.Framework;
-using Photon.Framework.Communication;
 using Photon.Framework.Extensions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;

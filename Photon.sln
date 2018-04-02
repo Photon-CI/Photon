@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.IIS", "Plugins\Photo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Tests", "Photon.Tests\Photon.Tests.csproj", "{82CD3B6E-F663-40BC-B6A2-E41473D093A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotonCLI", "PhotonCLI\PhotonCLI.csproj", "{71EAA761-DC36-4D96-A086-4F1F3586E6B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Communication", "Photon.Communication\Photon.Communication.csproj", "{E167A349-7691-4406-9F4B-989BD5E6E12F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +57,14 @@ Global
 		{82CD3B6E-F663-40BC-B6A2-E41473D093A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82CD3B6E-F663-40BC-B6A2-E41473D093A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82CD3B6E-F663-40BC-B6A2-E41473D093A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71EAA761-DC36-4D96-A086-4F1F3586E6B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71EAA761-DC36-4D96-A086-4F1F3586E6B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71EAA761-DC36-4D96-A086-4F1F3586E6B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71EAA761-DC36-4D96-A086-4F1F3586E6B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E167A349-7691-4406-9F4B-989BD5E6E12F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E167A349-7691-4406-9F4B-989BD5E6E12F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E167A349-7691-4406-9F4B-989BD5E6E12F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E167A349-7691-4406-9F4B-989BD5E6E12F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

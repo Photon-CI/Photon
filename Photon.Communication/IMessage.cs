@@ -1,4 +1,4 @@
-﻿namespace Photon.Framework.Communication
+﻿namespace Photon.Communication
 {
     public interface IMessage
     {

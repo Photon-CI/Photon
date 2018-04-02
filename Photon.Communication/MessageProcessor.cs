@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
-namespace Photon.Framework.Communication
+namespace Photon.Communication
 {
     public class MessageProcessor
     {
