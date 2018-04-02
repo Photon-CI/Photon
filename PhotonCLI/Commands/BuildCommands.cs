@@ -8,6 +8,7 @@ using ConsoleEx = AnsiConsole.AnsiConsole;
 
 namespace Photon.CLI.Commands
 {
+    [Command("Build", "Run Build scripts to create new packages.")]
     internal class BuildCommands : CommandDictionary<CommandContext>
     {
         public string ProjectName {get; set;}

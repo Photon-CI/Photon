@@ -11,7 +11,7 @@ namespace Photon.CLI
         {
             try {
                 var commandContext = new CommandContext();
-                // TODO: Set global context properties
+                commandContext.Initialize();
 
                 var rootCommands = new RootCommands(commandContext);
 

@@ -8,6 +8,7 @@ using ConsoleEx = AnsiConsole.AnsiConsole;
 
 namespace Photon.CLI.Commands
 {
+    [Command("Deploy", "Run Deploy scripts from existing packages.")]
     internal class DeployCommands : CommandDictionary<CommandContext>
     {
         public string ProjectName {get; set;}

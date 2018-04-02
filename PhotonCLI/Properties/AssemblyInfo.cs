@@ -1,0 +1,17 @@
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
+
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]
+
+[assembly: AssemblyTitle("Photon CLI")]
+[assembly: AssemblyDescription("Command-Line Interface for Photon.")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Joshua Miller")]
+[assembly: AssemblyProduct("Photon CLI")]
+[assembly: AssemblyCopyright("Copyright © Joshua Miller 2018")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+[assembly: Guid("7af381ce-87c7-4bb5-a552-c761ef677bd0")]
+[assembly: ComVisible(false)]

@@ -11,6 +11,7 @@ namespace Photon.CLI.Commands
             Map("build").ToAction(new BuildCommands(context));
             Map("deploy").ToAction(new DeployCommands(context));
             Map("package").ToAction(new PackageCommands(context));
+            Map("server").ToAction(new ServerCommands(context));
             Map("help", "?").ToAction(OnHelp);
         }
 
@@ -20,6 +21,7 @@ namespace Photon.CLI.Commands
                 .Add("Build", "Run Build scripts to create new packages.")
                 .Add("Deploy", "Run Deploy scripts from existing packages.")
                 .Add("Package", "Create and Expand packages.")
+                .Add("Server", "Manage the collection of named Photon Server instances.")
                 .PrintAsync();
         }
     }
