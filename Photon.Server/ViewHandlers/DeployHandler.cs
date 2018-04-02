@@ -1,7 +1,4 @@
 ﻿using log4net;
-using Newtonsoft.Json;
-using Photon.Framework.Extensions;
-using Photon.Framework.Messages;
 using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
 using System;
@@ -17,36 +14,44 @@ namespace Photon.Server.Handlers
         public override HttpHandlerResult Post()
         {
             var projectId = GetQuery("project");
-            var jobName = GetQuery("job");
-            var releaseVersion = GetQuery("release");
+            var projectVersion = GetQuery("version");
+            var scriptName = GetQuery("script");
 
-            if (string.IsNullOrWhiteSpace(releaseVersion))
-                return BadRequest().SetText("'releaseVersion' is undefined!");
+            if (string.IsNullOrWhiteSpace(projectId))
+                return BadRequest().SetText("'project' is undefined!");
 
-            Log.Debug($"Beginning deployment of Job '{jobName}' from Project '{projectId}' @ '{releaseVersion}'.");
+            if (string.IsNullOrWhiteSpace(projectVersion))
+                return BadRequest().SetText("'version' is undefined!");
+
+            if (string.IsNullOrWhiteSpace(scriptName))
+                return BadRequest().SetText("'script' is undefined!");
+
+            Log.Debug($"Beginning deployment script '{scriptName}' from Project '{projectId}' @ '{projectVersion}'.");
 
             try {
                 var project = PhotonServer.Instance.FindProject(projectId);
                 if (project == null) return BadRequest().SetText($"Project '{projectId}' was not found!");
 
-                var job = project.FindJob(jobName);
-                if (job == null) return BadRequest().SetText($"Job '{jobName}' was not found in Project '{projectId}'!");
+                throw new NotImplementedException();
 
-                var session = new ServerDeploySession(project, job, releaseVersion);
+                //var job = project.FindJob(jobName);
+                //if (job == null) return BadRequest().SetText($"Job '{jobName}' was not found in Project '{projectId}'!");
 
-                PhotonServer.Instance.Sessions.BeginSession(session);
-                PhotonServer.Instance.Queue.Add(session);
+                //var session = new ServerDeploySession(project, job, releaseVersion);
 
-                var response = new SessionBeginResponse {
-                    SessionId = session.Id,
-                };
+                //PhotonServer.Instance.Sessions.BeginSession(session);
+                //PhotonServer.Instance.Queue.Add(session);
 
-                return Ok()
-                    .SetContentType("application/json")
-                    .SetContent(s => new JsonSerializer().Serialize(s, response));
+                //var response = new SessionBeginResponse {
+                //    SessionId = session.Id,
+                //};
+
+                //return Ok()
+                //    .SetContentType("application/json")
+                //    .SetContent(s => new JsonSerializer().Serialize(s, response));
             }
             catch (Exception error) {
-                Log.Error($"Deployment of Job '{jobName}' from Project '{projectId}' @ '{releaseVersion}'!", error);
+                Log.Error($"Deployment script '{scriptName}' from Project '{projectId}' @ '{projectVersion}' has failed!", error);
                 return Exception(error);
             }
         }
