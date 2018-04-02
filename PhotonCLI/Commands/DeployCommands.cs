@@ -11,6 +11,7 @@ namespace Photon.CLI.Commands
     [Command("Deploy", "Run Deploy scripts from existing packages.")]
     internal class DeployCommands : CommandDictionary<CommandContext>
     {
+        public string ServerName {get; set;}
         public string ProjectName {get; set;}
         public string ProjectVersion {get; set;}
         public string ScriptName {get; set;}
@@ -21,6 +22,7 @@ namespace Photon.CLI.Commands
             Map("run").ToAction(RunCommand);
             Map("help", "?").ToAction(OnHelp);
 
+            Map("-server").ToProperty(v => ServerName = v);
             Map("-p", "-project").ToProperty(v => ProjectName = v);
             Map("-v", "-version").ToProperty(v => ProjectVersion = v);
             Map("-s", "-script").ToProperty(v => ScriptName = v);
@@ -37,9 +39,10 @@ namespace Photon.CLI.Commands
         {
             if (args.ContainsAny("help", "?")) {
                 await new HelpPrinter("Run", "Runs a project deployment script using the specified package version.")
+                    .Add("-server      ", "The name of the Server instance. Defaults to primary server.")
                     .Add("-project | -p", "The ID of the project.")
                     .Add("-version | -v", "The version of the project package.")
-                    .Add("-script | -s", "The name of the deploy script.")
+                    .Add("-script  | -s", "The name of the deploy script.")
                     .PrintAsync();
 
                 return;
@@ -63,21 +66,15 @@ namespace Photon.CLI.Commands
                 .Write(ProjectName, ConsoleColor.Cyan)
                 .WriteLine(".", ConsoleColor.DarkCyan);
 
-            try {
-                await new DeployRunAction {
-                    ProjectName = ProjectName,
-                    ProjectVersion = ProjectVersion,
-                    ScriptName = ScriptName,
-                }.Run();
+            await new DeployRunAction {
+                ServerName = ServerName,
+                ProjectName = ProjectName,
+                ProjectVersion = ProjectVersion,
+                ScriptName = ScriptName,
+            }.Run(Context);
 
-                ConsoleEx.Out
-                    .WriteLine("Script completed successfully.", ConsoleColor.Green);
-            }
-            catch (Exception error) {
-                ConsoleEx.Out
-                    .WriteLine("Script Run Failed!", ConsoleColor.Red)
-                    .WriteLine(error.ToString(), ConsoleColor.DarkRed);
-            }
+            ConsoleEx.Out
+                .WriteLine("Script completed successfully.", ConsoleColor.Green);
         }
     }
 }
