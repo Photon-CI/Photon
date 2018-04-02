@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Photon.Framework.Communication
+namespace Photon.Communication
 {
     internal class MessageReceivedEventArgs : EventArgs
     {

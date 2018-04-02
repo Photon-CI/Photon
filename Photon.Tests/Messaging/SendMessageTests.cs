@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
-using Photon.Framework.Communication;
+using Photon.Communication;
 using Photon.Tests.Internal;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -74,6 +76,34 @@ namespace Photon.Tests
                 .GetResponseAsync<TestResponseMessage>();
 
             Assert.That(response.Value, Is.EqualTo(4));
+        }
+
+        [Test]
+        public async Task Send_1000_MessageResponses()
+        {
+            var timer = Stopwatch.StartNew();
+
+            var responseList = new List<Task<TestResponseMessage>>();
+
+            for (var i = 0; i < 1000; i++) {
+                var request = new TestRequestMessage {
+                    Value = 2,
+                };
+
+                responseList.Add(client.Send(request)
+                    .GetResponseAsync<TestResponseMessage>());
+            }
+
+            await Task.WhenAll(responseList);
+
+            foreach (var responseTask in responseList) {
+                Assert.That(responseTask.Result.Value, Is.EqualTo(4));
+            }
+
+            timer.Stop();
+
+            var count = responseList.Count;
+            await TestContext.Out.WriteLineAsync($"Sent {count:N0} request/response messages in {timer.Elapsed}.");
         }
 
         class TestRequestOneWayMessage : IRequestMessage
