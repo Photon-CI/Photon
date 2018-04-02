@@ -85,6 +85,8 @@
     <Compile Include="NetPath.cs" />
     <Compile Include="Packages\PackageFilter.cs" />
     <Compile Include="Packages\PackageTools.cs" />
+    <Compile Include="Packages\ApplicationPackage.cs" />
+    <Compile Include="Packages\ProjectPackage.cs" />
     <Compile Include="Projects\ProjectDefinition.cs" />
     <Compile Include="Projects\ProjectEnvironmentDefinition.cs" />
     <Compile Include="Projects\ProjectJobDefinition.cs" />

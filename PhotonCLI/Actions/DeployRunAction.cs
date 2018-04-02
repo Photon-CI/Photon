@@ -44,26 +44,34 @@ namespace Photon.CLI.Actions
 
             try {
                 using (var response = (HttpWebResponse)await request.GetResponseAsync()) {
+                    await PrintResponse(response);
+
                     if (response.StatusCode != HttpStatusCode.OK)
                         throw new ApplicationException($"Server Responded with [{(int)response.StatusCode}] {response.StatusDescription}");
-
-                    using (var responseStream = response.GetResponseStream()) {
-                        if (responseStream != null) {
-                            using (var responseReader = new StreamReader(responseStream)) {
-                                while (!responseReader.EndOfStream) {
-                                    var line = await responseReader.ReadLineAsync();
-                                    ConsoleEx.Out.WriteLine(line, ConsoleColor.Gray);
-                                }
-                            }
-                        }
-                    }
                 }
             }
             catch (WebException error) {
-                if (error.Response is HttpWebResponse response)
+                if (error.Response is HttpWebResponse response) {
+                    await PrintResponse(response);
+
                     throw new ApplicationException($"Server Responded with [{(int)response.StatusCode}] {response.StatusDescription}");
+                }
 
                 throw;
+            }
+        }
+
+        private async Task PrintResponse(WebResponse response)
+        {
+            using (var responseStream = response.GetResponseStream()) {
+                if (responseStream == null) return;
+
+                using (var responseReader = new StreamReader(responseStream)) {
+                    while (!responseReader.EndOfStream) {
+                        var line = await responseReader.ReadLineAsync();
+                        ConsoleEx.Out.WriteLine(line, ConsoleColor.Gray);
+                    }
+                }
             }
         }
     }
