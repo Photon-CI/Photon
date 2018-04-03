@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 
 namespace Photon.CLI.Actions
 {
-    public class PackagePackAction
+    public class ProjectUnpackAction
     {
-        public string ContentDirectory {get; set;}
+        public string PackageId {get; set;}
+        public string PackageVersion {get; set;}
+        public string OutputPath {get; set;}
 
 
         public async Task Run()

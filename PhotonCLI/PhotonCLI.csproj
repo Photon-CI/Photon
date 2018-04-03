@@ -51,14 +51,14 @@
     <Compile Include="Actions\ServerListAction.cs" />
     <Compile Include="Actions\ServerRemoveAction.cs" />
     <Compile Include="Actions\ServerAddAction.cs" />
-    <Compile Include="Actions\PackageUnpackAction.cs" />
-    <Compile Include="Actions\PackagePackAction.cs" />
+    <Compile Include="Actions\ProjectUnpackAction.cs" />
+    <Compile Include="Actions\ProjectPackageAction.cs" />
     <Compile Include="Actions\DeployRunAction.cs" />
     <Compile Include="Actions\BuildRunAction.cs" />
     <Compile Include="Commands\BuildCommands.cs" />
     <Compile Include="Commands\DeployCommands.cs" />
     <Compile Include="Commands\ServerCommands.cs" />
-    <Compile Include="Commands\PackageCommands.cs" />
+    <Compile Include="Commands\ProjectCommands.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\CommandContext.cs" />
     <Compile Include="Internal\Commands\CommandActionBuilder.cs" />

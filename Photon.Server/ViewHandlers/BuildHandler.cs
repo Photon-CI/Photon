@@ -9,18 +9,19 @@ using System.IO;
 
 namespace Photon.Server.Handlers
 {
-    [HttpHandler("/run")]
-    internal class RunHandler : HttpHandler
+    [HttpHandler("/build")]
+    internal class BuildHandler : HttpHandler
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RunHandler));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(BuildHandler));
 
 
         public override HttpHandlerResult Post()
         {
             var projectId = GetQuery("project");
-            var jobName = GetQuery("job");
+            var projectRefspec = GetQuery("refspec");
+            var scriptName = GetQuery("script");
 
-            Log.Debug($"Running Job '{jobName}' from Project '{projectId}'.");
+            Log.Debug($"Running Build-Script '{scriptName}' from Project '{projectId}' @ '{projectRefspec}'.");
 
             try {
                 var project = PhotonServer.Instance.FindProject(projectId);
@@ -29,7 +30,10 @@ namespace Photon.Server.Handlers
                 var job = project.FindJob(jobName);
                 if (job == null) return BadRequest().SetText($"Job '{jobName}' was not found in Project '{projectId}'!");
 
-                var session = new ServerBuildSession(project, job);
+                var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
+                var buildNumber = projectData.StartNewBuild();
+
+                var session = new ServerBuildSession(project, job, buildNumber);
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
 

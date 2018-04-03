@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Photon.Framework.Extensions;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -8,92 +9,45 @@ namespace Photon.Framework.Packages
 {
     public class PackageTools
     {
-        public static async Task CreatePackage(ProjectPackage packageDefinition, string filename)
-        {
-            //
-        }
+        private const string PackageBin = "bin";
 
-        public static async Task<string> PackageAsync(string rootPath, string outputPath, PackageDefinition packageDefinition)
+        /// <summary>
+        /// Creates a Project Package using the specified
+        /// definition file.
+        /// </summary>
+        /// <param name="definitionFilename">The file name of the package definition.</param>
+        /// <param name="outputFilename">The file name of the output package.</param>
+        public static async Task CreateProjectPackage(string definitionFilename, string version, string outputFilename)
         {
-            var name = $"{packageDefinition.Id}.{packageDefinition.Version}.zip";
-            var filename = Path.Combine(outputPath, name);
+            var definition = LoadPackageDefinition(definitionFilename);
+            var definitionPath = Path.GetDirectoryName(definitionFilename);
 
-            var rootPathAbs = Path.GetFullPath(rootPath);
+            var outputPath = Path.GetDirectoryName(outputFilename);
 
             if (!Directory.Exists(outputPath))
                 Directory.CreateDirectory(outputPath);
 
-            WritePackage(filename, archive => {
-                // TODO: Add package metadata file
+            await WritePackageArchive(outputFilename, async archive => {
+                AppendPackageMetadata(archive, definition, version);
 
-                await AddFiles(archive, rootPath, )
+                foreach (var fileDefinition in definition.Files) {
+                    var sourcePath = Path.Combine(definitionPath, fileDefinition.Path);
 
-                foreach (var file in Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)) {
-                    // TODO: Apply Filtering
+                    var destPath = PackageBin;
 
-
-                    var file_abs = Path.GetFullPath(file);
-                    var package_file = GetRelativePath(file_abs, rootPathAbs);
-                    var entry = archive.CreateEntry(package_file);
-
-                    using (var fileStream = File.Open(file, FileMode.Open, FileAccess.Read))
-                    using (var entryStream = entry.Open()) {
-                        await fileStream.CopyToAsync(entryStream);
+                    if (fileDefinition.Destination != null)
+                        destPath = Path.Combine(destPath, fileDefinition.Destination);
+                    else {
+                        var destPathRel = Path.GetDirectoryName(fileDefinition.Path);
+                        destPath = Path.Combine(destPath, destPathRel);
                     }
+
+                    await AddFiles(archive, sourcePath, destPath, fileDefinition.Exclude?.ToArray());
                 }
             });
-
-            //using (var zipStream = File.Open(filename, FileMode.Create, FileAccess.Write))
-            //using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, false)) {
-            //    foreach (var file in Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)) {
-            //        // TODO: Apply Filtering
-
-            //        var file_abs = Path.GetFullPath(file);
-            //        var package_file = GetRelativePath(file_abs, rootPathAbs);
-            //        var entry = archive.CreateEntry(package_file);
-
-            //        using (var fileStream = File.Open(file, FileMode.Open, FileAccess.Read))
-            //        using (var entryStream = entry.Open()) {
-            //            await fileStream.CopyToAsync(entryStream);
-            //        }
-            //    }
-            //}
-
-            return filename;
         }
 
-        private static async Task WritePackage(string filename, Func<ZipArchive, Task> archiveFunc)
-        {
-            using (var zipStream = File.Open(filename, FileMode.Create, FileAccess.Write))
-            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, false)) {
-                await archiveFunc(archive);
-            }
-        }
-
-        private static async Task AddFiles(ZipArchive archive, string sourcePath, string destPath = null, PackageFilterCollection filter = null)
-        {
-            foreach (var file in Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories)) {
-                if (filter != null) {
-                    if (!filter.IncludesFile(file))
-                        continue;
-                }
-
-                var file_abs = Path.GetFullPath(file);
-                var file_rel = GetRelativePath(file_abs, sourcePath);
-
-                if (!string.IsNullOrEmpty(destPath))
-                    file_rel = Path.Combine(destPath, file_rel);
-
-                var entry = archive.CreateEntry(file_rel);
-
-                using (var fileStream = File.Open(file, FileMode.Open, FileAccess.Read))
-                using (var entryStream = entry.Open()) {
-                    await fileStream.CopyToAsync(entryStream);
-                }
-            }
-        }
-
-        public static void Unpackage(string package, string path)
+        public static ProjectPackage UnpackProject(string package, string path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
@@ -101,11 +55,50 @@ namespace Photon.Framework.Packages
             throw new NotImplementedException();
         }
 
-        private static string GetRelativePath(string path, string rootPath)
+        private static async Task WritePackageArchive(string filename, Func<ZipArchive, Task> archiveFunc)
         {
-            return path.StartsWith(rootPath)
-                ? path.Substring(rootPath.Length)
-                : path;
+            using (var zipStream = File.Open(filename, FileMode.Create, FileAccess.Write))
+            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, false)) {
+                await archiveFunc(archive);
+            }
+        }
+
+        private static PackageDefinition LoadPackageDefinition(string filename)
+        {
+            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
+                var serializer = new JsonSerializer();
+                return serializer.Deserialize<PackageDefinition>(stream);
+            }
+        }
+
+        private static void AppendPackageMetadata(ZipArchive archive, PackageDefinition definition, string version)
+        {
+            var projectPackage = new ProjectPackage {
+                Id = definition.Id,
+                Name = definition.Name,
+                Description = definition.Description,
+                AssemblyFilename = definition.Assembly,
+                Version = version,
+            };
+
+            var entry = archive.CreateEntry("metadata.json");
+
+            using (var entryStream = entry.Open()) {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(entryStream, projectPackage);
+            }
+        }
+
+        private static async Task AddFiles(ZipArchive archive, string sourcePath, string destPath, string[] exclude = null)
+        {
+            foreach (var file in FilePatternMatching.GetFiles(sourcePath, destPath, exclude)) {
+                var entry = archive.CreateEntry(file.Value);
+
+                using (var fileStream = File.Open(file.Key, FileMode.Open, FileAccess.Read))
+                using (var entryStream = entry.Open()) {
+                    await fileStream.CopyToAsync(entryStream);
+                }
+            }
         }
     }
 }

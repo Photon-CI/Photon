@@ -8,6 +8,7 @@ using ConsoleEx = AnsiConsole.AnsiConsole;
 
 namespace Photon.CLI.Commands
 {
+    [Command("Server", "Manage the collection of named Photon Server instances.")]
     internal class ServerCommands : CommandDictionary<CommandContext>
     {
         public string ServerName {get; set;}

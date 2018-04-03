@@ -2,7 +2,7 @@
 
 namespace Photon.Framework.Packages
 {
-    public class PackageFilterCollection : List<PackageFilter>
+    public class PackageFilterCollection : List<PackageFileDefinition>
     {
         public bool IncludesFile(string filename)
         {

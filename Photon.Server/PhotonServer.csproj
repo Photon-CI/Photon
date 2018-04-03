@@ -61,7 +61,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\Builds\BuildData.cs" />
+    <Compile Include="Internal\Builds\BuildDataManager.cs" />
     <Compile Include="Internal\IServerSession.cs" />
+    <Compile Include="Internal\Packages\PackageManager.cs" />
+    <Compile Include="Internal\Projects\Project.cs" />
+    <Compile Include="Internal\Projects\ProjectData.cs" />
+    <Compile Include="Internal\Projects\ProjectDataManager.cs" />
+    <Compile Include="Internal\Projects\ProjectDataLastBuild.cs" />
+    <Compile Include="Internal\Projects\ProjectManager.cs" />
     <Compile Include="Internal\ScriptQueue.cs" />
     <Compile Include="Internal\ServerDefinition.cs" />
     <Compile Include="Internal\ServerBuildSession.cs" />
@@ -87,7 +95,7 @@
       <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewHandlers\RunHandler.cs" />
+    <Compile Include="ViewHandlers\BuildHandler.cs" />
     <Compile Include="ViewHandlers\DeployHandler.cs" />
     <Compile Include="ViewHandlers\IndexHandler.cs" />
   </ItemGroup>

@@ -22,9 +22,31 @@ namespace Photon.CLI.Internal.Commands
             optionList = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
+        public HelpPrinter(Type classType, string methodName)
+        {
+            this.Title = CommandAttribute.GetName(classType, methodName);
+            this.TitleDescription = CommandAttribute.GetDescription(classType, methodName);
+
+            optionList = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
         public HelpPrinter Add(string name, string description)
         {
             optionList[name] = description;
+            return this;
+        }
+
+        public HelpPrinter Add(Type classType)
+        {
+            var name = CommandAttribute.GetName(classType);
+            optionList[name] = CommandAttribute.GetDescription(classType);
+            return this;
+        }
+
+        public HelpPrinter Add(Type classType, string methodName)
+        {
+            var name = CommandAttribute.GetName(classType, methodName);
+            optionList[name] = CommandAttribute.GetDescription(classType, methodName);
             return this;
         }
 

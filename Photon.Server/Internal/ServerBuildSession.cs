@@ -8,7 +8,13 @@ namespace Photon.Server.Internal
 {
     internal class ServerBuildSession : ServerSessionBase
     {
-        public ServerBuildSession(ProjectDefinition project, ProjectJobDefinition job) : base(project, job) {}
+        public int BuildNumber {get;}
+
+
+        public ServerBuildSession(ProjectDefinition project, ProjectJobDefinition job, int buildNumber) : base(project, job)
+        {
+            this.BuildNumber = buildNumber;
+        }
 
         public override void PrepareWorkDirectory()
         {

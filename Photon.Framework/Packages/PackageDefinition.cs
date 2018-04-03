@@ -14,17 +14,16 @@ namespace Photon.Framework.Packages
         [JsonProperty("description")]
         public string Description {get; set;}
 
-        [JsonProperty("include")]
-        public List<string> Include {get; set;}
+        [JsonProperty("assembly")]
+        public string Assembly {get; set;}
 
-        [JsonProperty("exclude")]
-        public List<string> Exclude {get; set;}
+        [JsonProperty("files")]
+        public List<PackageFileDefinition> Files {get; set;}
 
 
         public PackageDefinition()
         {
-            Include = new List<string>();
-            Exclude = new List<string>();
+            Files = new List<PackageFileDefinition>();
         }
     }
 }

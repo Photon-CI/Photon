@@ -67,7 +67,9 @@
     <Compile Include="Messages\TaskBeginResponse.cs" />
     <Compile Include="Messages\TaskBeginRequest.cs" />
     <Compile Include="NetPath.cs" />
-    <Compile Include="Packages\PackageFilter.cs" />
+    <Compile Include="Packages\FilePatternMatching.cs" />
+    <Compile Include="Packages\PackageFileDefinition.cs" />
+    <Compile Include="Packages\PackageFilterCollection.cs" />
     <Compile Include="Packages\PackageTools.cs" />
     <Compile Include="Packages\ApplicationPackage.cs" />
     <Compile Include="Packages\ProjectPackage.cs" />
