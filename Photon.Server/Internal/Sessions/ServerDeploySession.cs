@@ -13,6 +13,9 @@ namespace Photon.Server.Internal.Sessions
         public ServerDeploySession(ServerDeployContext context)
         {
             this.Context = context;
+
+            context.WorkDirectory = WorkDirectory;
+            context.Output = Output;
         }
 
         public override void PrepareWorkDirectory()

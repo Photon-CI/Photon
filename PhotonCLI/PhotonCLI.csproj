@@ -81,6 +81,10 @@
       <Project>{E49360FD-BEAC-4713-A421-579564FB0992}</Project>
       <Name>Photon.Framework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Photon.Library\Photon.Library.csproj">
+      <Project>{76D31D86-404D-4812-9101-C2F7614F28E7}</Project>
+      <Name>Photon.Library</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

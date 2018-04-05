@@ -35,7 +35,7 @@ namespace Photon.Server.HttpHandlers
             var _scriptName = startInfo?.ScriptName ?? qScriptName;
             var _assemblyFile = startInfo?.AssemblyFile ?? qAssemblyFile;
 
-            Log.Debug($"Running Build-Script '{_scriptName}' from Project '{_projectId}' @ '{_gitRefspec}'.");
+            //Log.Debug($"Running Build-Script '{_scriptName}' from Project '{_projectId}' @ '{_gitRefspec}'.");
 
             try {
                 if (!PhotonServer.Instance.Projects.TryGet(_projectId, out var project))
@@ -45,7 +45,7 @@ namespace Photon.Server.HttpHandlers
                 var buildNumber = projectData.StartNewBuild();
 
                 var context = new ServerBuildContext {
-                    WorkDirectory = Configuration.WorkPath,
+                    WorkDirectory = Configuration.WorkDirectory,
                     BuildNumber = buildNumber,
                     AssemblyFile = _assemblyFile,
                     Project = project,

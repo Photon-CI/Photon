@@ -15,7 +15,7 @@ namespace Photon.Agent.Internal
         public AgentSessionManager()
         {
             pool = new ReferencePool<IAgentSession> {
-                Lifespan = 3600_000, // 60 minutes
+                //Lifespan = 3600_000, // 60 minutes
                 PruneInterval = 60_000 // 1 minute
             };
         }

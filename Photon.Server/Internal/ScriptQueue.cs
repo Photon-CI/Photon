@@ -58,16 +58,14 @@ namespace Photon.Server.Internal
             var errorList = new List<Exception>();
 
             try {
-                try {
-                    session.PrepareWorkDirectory();
+                session.Output.AppendLine("Preparing working directory...");
+                session.PrepareWorkDirectory();
 
-                    await session.RunAsync();
-                }
-                catch (Exception error) {
-                    errorList.Add(error);
-                }
+                session.Output.AppendLine("Running script...");
+                await session.RunAsync();
             }
             catch (Exception error) {
+                session.Output.AppendLine($"An unhandled exception occurred!\n{error}");
                 errorList.Add(error);
             }
 

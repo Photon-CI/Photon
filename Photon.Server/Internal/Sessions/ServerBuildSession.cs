@@ -14,6 +14,9 @@ namespace Photon.Server.Internal.Sessions
         public ServerBuildSession(ServerBuildContext context)
         {
             this.Context = context;
+
+            context.WorkDirectory = WorkDirectory;
+            context.Output = Output;
         }
 
         public override void PrepareWorkDirectory()
@@ -23,11 +26,15 @@ namespace Photon.Server.Internal.Sessions
             var sourceType = Context.Project.SourceType;
 
             if (string.Equals(sourceType, "fs")) {
+                Output.AppendLine($"Copying File-System directory '{Context.Project.SourcePath}' to work directory.");
                 CopyDirectory(Context.Project.SourcePath, Context.WorkDirectory);
+                Output.AppendLine("Copy completed successfully.");
                 return;
             }
 
             if (string.Equals(sourceType, "git")) {
+                Output.AppendLine("Cloning Git Repository '...' to work directory.");
+
                 // TODO: Load Repository
                 throw new NotImplementedException();
             }

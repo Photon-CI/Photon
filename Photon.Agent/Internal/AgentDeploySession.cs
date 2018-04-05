@@ -1,5 +1,4 @@
-﻿using Photon.Framework.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,6 +13,8 @@ namespace Photon.Agent.Internal
         public AgentDeploySession(AgentDeployContext context)
         {
             this.Context = context;
+
+            context.WorkDirectory = WorkPath;
         }
 
         public override async Task RunAsync()

@@ -10,7 +10,7 @@ namespace Photon.Library
         public TimeSpan Lifespan {get; set;}
 
 
-        public LifespanReferenceItem()
+        protected LifespanReferenceItem()
         {
             SessionId = Guid.NewGuid().ToString("N");
             utcStarted = DateTime.UtcNow;

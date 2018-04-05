@@ -47,6 +47,7 @@ namespace Photon.Framework
             var args = (arguments as IDictionary<string, object>)
                 ?? arguments.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     .Select(p => new KeyValuePair<string, object>(p.Name, p.GetValue(arguments)))
+                    .Where(x => x.Value != null)
                     .ToDictionary(x => x.Key, x => x.Value);
 
             if (!args.Any()) return string.Empty;
@@ -55,7 +56,7 @@ namespace Photon.Framework
 
             var i = 0;
             foreach (var arg in args) {
-                if (arg.Value == null) continue;
+                //if (arg.Value == null) continue;
                 if (i > 0) builder.Append("&");
                 i++;
 

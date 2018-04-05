@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpHandlers\Session\OutputHandler.cs" />
     <Compile Include="Internal\Scripts\AgentDeploySessionHandle.cs" />
     <Compile Include="Internal\Scripts\AgentBuildSessionHandle.cs" />
     <Compile Include="Internal\Scripts\ServerDeployContext.cs" />
@@ -79,7 +80,7 @@
     <Compile Include="Internal\Sessions\ServerSessionBase.cs" />
     <Compile Include="Internal\ServerDomain.cs" />
     <Compile Include="Internal\Sessions\ServerDeploySession.cs" />
-    <Compile Include="Internal\ServerSessionManager.cs" />
+    <Compile Include="Internal\Sessions\ServerSessionManager.cs" />
     <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\PhotonServer.cs" />

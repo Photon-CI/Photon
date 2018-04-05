@@ -15,11 +15,6 @@ namespace Photon.Library
         public IEnumerable<T> Items => itemDictionary.Values;
 
         /// <summary>
-        /// Maxmimum time in milliseconds for task references to be stored.
-        /// </summary>
-        public int Lifespan {get; set;}
-
-        /// <summary>
         /// Gets or sets the amount of time in milliseconds between task pruning checks.
         /// </summary>
         public double PruneInterval {
@@ -37,7 +32,6 @@ namespace Photon.Library
             };
             timer.Elapsed += Timer_OnElapsed;
 
-            Lifespan = 3600_000; // 60 minutes
             PruneInterval = 60_000; // 1 minute
         }
 
@@ -68,9 +62,6 @@ namespace Photon.Library
 
         private void Timer_OnElapsed(object sender, ElapsedEventArgs e)
         {
-            if (Lifespan <= 0) return;
-
-            var now = DateTime.UtcNow;
             var keys = itemDictionary.Keys.ToArray();
 
             foreach (var id in keys) {

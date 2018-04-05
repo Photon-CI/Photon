@@ -16,13 +16,13 @@ namespace Photon.Server.Internal.Scripts
         public string WorkDirectory {get; set;}
         public ServerAgentDefinition[] Agents {get; set;}
         //public ConcurrentBag<object> Artifacts {get;}
-        public ScriptOutput Output {get;}
+        public ScriptOutput Output {get; set;}
 
 
         public ServerDeployContext()
         {
             //Artifacts = new ConcurrentBag<object>();
-            Output = new ScriptOutput();
+            //Output = new ScriptOutput();
         }
 
         public AgentSessionHandleCollection RegisterAgents(params string[] roles)

@@ -14,7 +14,7 @@ namespace Photon.Agent.Internal
         {
             this.Context = context;
 
-            context.WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
+            context.WorkDirectory = WorkPath;
         }
 
         public override async Task RunAsync()

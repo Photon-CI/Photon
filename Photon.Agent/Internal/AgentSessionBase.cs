@@ -10,24 +10,28 @@ namespace Photon.Agent.Internal
     {
         private readonly Lazy<ILog> _log;
         private readonly DateTime utcCreated;
+        private DateTime? utcReleased;
         private bool isReleased;
 
-        public string SessionId {get; set;}
-        public string WorkPath {get; set;}
+        public string SessionId {get;}
+        public string WorkPath {get;}
         public string AssemblyFile {get; set;}
-        protected AgentSessionDomain Domain {get; set;}
-        public TimeSpan MaxLifespan {get; set;}
+        public TimeSpan CacheSpan {get; set;}
+        public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
+        protected AgentSessionDomain Domain {get; set;}
         protected ILog Log => _log.Value;
 
 
-        public AgentSessionBase()
+        protected AgentSessionBase()
         {
             SessionId = Guid.NewGuid().ToString("N");
             utcCreated = DateTime.UtcNow;
-            MaxLifespan = TimeSpan.FromMinutes(60);
+            CacheSpan = TimeSpan.FromHours(1);
+            LifeSpan = TimeSpan.FromHours(8);
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
+            WorkPath = Path.Combine(Configuration.WorkDirectory, SessionId);
         }
 
         public virtual void Dispose()
@@ -42,6 +46,7 @@ namespace Photon.Agent.Internal
 
         public async Task ReleaseAsync()
         {
+            utcReleased = DateTime.UtcNow;
             Domain?.Dispose();
 
             if (!isReleased) {
@@ -52,7 +57,7 @@ namespace Photon.Agent.Internal
                 catch (AggregateException errors) {
                     errors.Flatten().Handle(e => {
                         if (e is IOException ioError) {
-                            Log.Warn(errors.Message);
+                            Log.Warn(ioError.Message);
                             return true;
                         }
 
@@ -66,10 +71,12 @@ namespace Photon.Agent.Internal
 
         public bool IsExpired()
         {
-            if (isReleased) return true;
+            if (utcReleased.HasValue) {
+                if (DateTime.UtcNow - utcReleased > CacheSpan)
+                    return true;
+            }
 
-            var elapsed = DateTime.UtcNow - utcCreated;
-            return elapsed > MaxLifespan;
+            return DateTime.UtcNow - utcCreated > LifeSpan;
         }
 
         public virtual void PrepareWorkDirectory()

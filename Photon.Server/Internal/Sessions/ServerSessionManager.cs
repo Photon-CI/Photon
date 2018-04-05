@@ -1,9 +1,8 @@
 ﻿using Photon.Library;
-using Photon.Server.Internal.Sessions;
 using System;
 using System.Threading.Tasks;
 
-namespace Photon.Server.Internal
+namespace Photon.Server.Internal.Sessions
 {
     internal class ServerSessionManager : IDisposable
     {
@@ -13,7 +12,7 @@ namespace Photon.Server.Internal
         public ServerSessionManager()
         {
             pool = new ReferencePool<IServerSession> {
-                Lifespan = 3600_000, // 60 minutes
+                //Lifespan = 3600_000, // 60 minutes
                 PruneInterval = 60_000 // 1 minute
             };
         }

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Server.Internal.Projects;
+using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
@@ -34,7 +35,7 @@ namespace Photon.Server.Internal
             Queue = new ScriptQueue();
             ProjectData = new ProjectDataManager();
 
-            WorkPath = Configuration.WorkPath;
+            WorkPath = Configuration.WorkDirectory;
         }
 
         public void Dispose()
@@ -123,7 +124,7 @@ namespace Photon.Server.Internal
 
         private ServerDefinition ParseServerDefinition()
         {
-            var file = Configuration.DefinitionFile ?? "server.json";
+            var file = Configuration.ServerFile ?? "server.json";
             var path = Path.Combine(Configuration.AssemblyPath, file);
             path = Path.GetFullPath(path);
 

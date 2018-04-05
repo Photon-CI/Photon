@@ -19,7 +19,7 @@ namespace Photon.Server.Internal.Projects
 
         public void Initialize()
         {
-            this.projectDataPath = Configuration.ProjectDataPath;
+            this.projectDataPath = Configuration.ProjectDataDirectory;
 
             foreach (var path in Directory.EnumerateDirectories(projectDataPath, "*", SearchOption.TopDirectoryOnly)) {
                 var indexFilename = Path.Combine(path, "Index.json");

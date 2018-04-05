@@ -1,23 +1,23 @@
-﻿using System.Diagnostics;
+﻿using Photon.Framework.Scripts;
+using System;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Photon.Library
 {
     public static class ProcessRunner
     {
-        public static ProcessResult Run(string workDir, string command)
+        public static ProcessResult Run(string workDir, string command, ScriptOutput output)
         {
             SplitCommand(command, out var _file, out var _args);
-            return Run(workDir, _file, _args);
+            return Run(workDir, _file, _args, output);
         }
 
-        public static ProcessResult Run(string workDir, string filename, string arguments)
+        public static ProcessResult Run(string workDir, string filename, string arguments, ScriptOutput output)
         {
             var _file = Path.Combine(workDir, filename);
-
-            // TODO: Not sure about this line...
-            //var _path = Path.GetDirectoryName(_file);
 
             var startInfo = new ProcessStartInfo {
                 FileName = _file,
@@ -30,8 +30,11 @@ namespace Photon.Library
             };
 
             using (var process = Process.Start(startInfo)) {
-                var readOutTask = process.StandardOutput.ReadToEndAsync();
-                var readErrorTask = process.StandardError.ReadToEndAsync();
+                if (process == null)
+                    throw new ApplicationException("Failed to start process!");
+
+                var readOutTask = ReadToOutput(process.StandardOutput, output);
+                var readErrorTask = ReadToOutput(process.StandardError, output);
 
                 process.WaitForExit();
                 Task.WaitAll(readOutTask, readErrorTask);
@@ -42,6 +45,21 @@ namespace Photon.Library
                     Error = readErrorTask.Result,
                 };
             }
+        }
+
+        private static async Task<string> ReadToOutput(StreamReader reader, ScriptOutput output)
+        {
+            var builder = new StringBuilder();
+
+            while (!reader.EndOfStream) {
+                var line = await reader.ReadLineAsync();
+
+                builder.AppendLine(line);
+                output.AppendLine(line);
+            }
+
+            return builder.ToString();
+            //return await reader.ReadToEndAsync();
         }
 
         private static void SplitCommand(string command, out string exe, out string args)
