@@ -2,6 +2,7 @@
 
 namespace Photon.Framework.Scripts
 {
+    [Serializable]
     public class ScriptResult
     {
         public bool Successful {get; set;}

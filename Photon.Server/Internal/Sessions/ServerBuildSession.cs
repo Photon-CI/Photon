@@ -1,4 +1,4 @@
-﻿using Photon.Server.Internal.Scripts;
+﻿using Photon.Framework.Scripts;
 using System;
 using System.Collections.Generic;
 using System.IO;

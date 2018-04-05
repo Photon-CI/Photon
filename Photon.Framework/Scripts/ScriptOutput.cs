@@ -13,24 +13,35 @@ namespace Photon.Framework.Scripts
         }
     }
 
-    [Serializable]
-    public class ScriptOutput
+    //[Serializable]
+    public class ScriptOutput : MarshalByRefObject
     {
         public event EventHandler<LineAppendedEventArgs> LineAppended;
 
         private readonly StringBuilder builder;
+        private readonly object lockHandle;
 
-        public int Length => builder.Length;
+        public int Length {
+            get {
+                lock (lockHandle) {
+                    return builder.Length;
+                }
+            }
+        }
 
 
         public ScriptOutput()
         {
             builder = new StringBuilder();
+            lockHandle = new object();
         }
 
         public void AppendLine(string line)
         {
-            builder.AppendLine(line);
+            lock (lockHandle) {
+                builder.AppendLine(line);
+            }
+
             OnLineAppended(line);
         }
 
@@ -41,7 +52,9 @@ namespace Photon.Framework.Scripts
 
         public override string ToString()
         {
-            return builder.ToString();
+            lock (lockHandle) {
+                return builder.ToString();
+            }
         }
     }
 }

@@ -1,12 +1,10 @@
 ﻿using Photon.Communication;
-using Photon.Framework;
-using Photon.Framework.Scripts;
-using Photon.Library.Messages;
+using Photon.Framework.Messages;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Photon.Server.Internal.Scripts
+namespace Photon.Framework.Scripts
 {
     public class AgentBuildSessionHandle : IAgentSessionHandle, IDisposable
     {

@@ -1,8 +1,6 @@
-﻿using Photon.Framework;
-using Photon.Framework.Scripts;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace Photon.Server.Internal.Scripts
+namespace Photon.Framework.Scripts
 {
     public class AgentDeploySessionHandle : IAgentSessionHandle
     {

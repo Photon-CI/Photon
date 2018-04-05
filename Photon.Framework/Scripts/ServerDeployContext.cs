@@ -1,27 +1,23 @@
-﻿using Photon.Framework;
-using Photon.Framework.Projects;
-using Photon.Framework.Scripts;
-using System;
+﻿using System;
 using System.Linq;
+using Photon.Framework.Projects;
 
-namespace Photon.Server.Internal.Scripts
+namespace Photon.Framework.Scripts
 {
 
     [Serializable]
-    public class ServerBuildContext : IServerBuildContext
+    public class ServerDeployContext : IServerDeployContext
     {
         public Project Project {get; set;}
         public string AssemblyFile {get; set;}
         public string ScriptName {get; set;}
-        public string RefSpec {get; set;}
         public string WorkDirectory {get; set;}
-        public int BuildNumber {get; set;}
         public ServerAgentDefinition[] Agents {get; set;}
         //public ConcurrentBag<object> Artifacts {get;}
         public ScriptOutput Output {get; set;}
 
 
-        public ServerBuildContext()
+        public ServerDeployContext()
         {
             //Artifacts = new ConcurrentBag<object>();
             //Output = new ScriptOutput();
@@ -34,7 +30,7 @@ namespace Photon.Server.Internal.Scripts
 
             var roleAgents = Agents
                 .Where(a => a.MatchesRoles(roles))
-                .Select(a => new AgentBuildSessionHandle(a));
+                .Select(a => new AgentDeploySessionHandle(a));
 
             return new AgentSessionHandleCollection(roleAgents);
         }

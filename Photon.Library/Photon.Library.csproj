@@ -40,10 +40,6 @@
   <ItemGroup>
     <Compile Include="ConfigurationReader.cs" />
     <Compile Include="IReferenceItem.cs" />
-    <Compile Include="Messages\BuildSessionBeginRequest.cs" />
-    <Compile Include="Messages\BuildSessionBeginResponse.cs" />
-    <Compile Include="Messages\BuildSessionReleaseRequest.cs" />
-    <Compile Include="Messages\BuildSessionReleaseResponse.cs" />
     <Compile Include="Messages\TaskBeginRequest.cs" />
     <Compile Include="Messages\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginResponse.cs" />

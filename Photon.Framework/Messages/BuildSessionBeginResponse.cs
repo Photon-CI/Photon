@@ -1,6 +1,6 @@
 ﻿using Photon.Communication;
 
-namespace Photon.Library.Messages
+namespace Photon.Framework.Messages
 {
     public class BuildSessionBeginResponse : IResponseMessage
     {

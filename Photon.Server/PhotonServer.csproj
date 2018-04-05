@@ -55,10 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HttpHandlers\Session\OutputHandler.cs" />
-    <Compile Include="Internal\Scripts\AgentDeploySessionHandle.cs" />
-    <Compile Include="Internal\Scripts\AgentBuildSessionHandle.cs" />
-    <Compile Include="Internal\Scripts\ServerDeployContext.cs" />
-    <Compile Include="Internal\Scripts\ServerBuildContext.cs" />
     <Compile Include="Internal\BuildStartInfo.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
