@@ -1,10 +1,10 @@
-﻿using Photon.CLI.Actions;
+﻿using AnsiConsole;
+using Photon.CLI.Actions;
 using Photon.CLI.Internal;
 using Photon.CLI.Internal.Commands;
 using Photon.Framework.Extensions;
 using System;
 using System.Threading.Tasks;
-using ConsoleEx = AnsiConsole.AnsiConsole;
 
 namespace Photon.CLI.Commands
 {
@@ -80,7 +80,7 @@ namespace Photon.CLI.Commands
                     .WriteLine(".", ConsoleColor.DarkCyan);
             }
 
-            try {
+            //try {
                 await new BuildRunAction {
                     ProjectName = ProjectId,
                     GitRefspec = GitRefspec,
@@ -91,12 +91,12 @@ namespace Photon.CLI.Commands
 
                 ConsoleEx.Out
                     .WriteLine("Build-Script completed successfully.", ConsoleColor.Green);
-            }
-            catch (Exception error) {
-                ConsoleEx.Out
-                    .WriteLine("Build-Script Failed!", ConsoleColor.Red)
-                    .WriteLine(error.ToString(), ConsoleColor.DarkRed);
-            }
+            //}
+            //catch (Exception error) {
+            //    ConsoleEx.Out
+            //        .WriteLine("Build-Script Failed!", ConsoleColor.Red)
+            //        .WriteLine(error.ToString(), ConsoleColor.DarkRed);
+            //}
         }
     }
 }

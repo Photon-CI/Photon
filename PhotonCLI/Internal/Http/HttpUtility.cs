@@ -1,8 +1,8 @@
-﻿using System;
+﻿using AnsiConsole;
+using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using ConsoleEx = AnsiConsole.AnsiConsole;
 
 namespace Photon.CLI.Internal.Http
 {

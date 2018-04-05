@@ -1,14 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
+﻿using AnsiConsole;
 using Newtonsoft.Json;
 using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Library.Messages;
-using ConsoleEx = AnsiConsole.AnsiConsole;
+using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Photon.CLI.Actions
 {
@@ -47,7 +47,7 @@ namespace Photon.CLI.Actions
 
                 position = data.NewLength;
 
-                ConsoleEx.Out.WriteLine(data.NewText);
+                ConsoleEx.Out.WriteLine(data.NewText, ConsoleColor.Gray);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Photon.CLI.Actions
 
             var request = WebRequest.CreateHttp(url);
             request.Method = "POST";
-            request.KeepAlive = false;
+            request.KeepAlive = true;
 
             if (!string.IsNullOrEmpty(StartFile)) {
                 using (var stream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
@@ -96,7 +96,10 @@ namespace Photon.CLI.Actions
             }
             catch (WebException error) {
                 if (error.Response is HttpWebResponse response) {
-                    await response.PrintResponse();
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                        throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
+
+                    //await response.PrintResponse();
 
                     throw new ApplicationException($"Server Responded with [{(int)response.StatusCode}] {response.StatusDescription}");
                 }
@@ -123,7 +126,7 @@ namespace Photon.CLI.Actions
 
             var request = WebRequest.CreateHttp(url);
             request.Method = "GET";
-            request.KeepAlive = false;
+            request.KeepAlive = true;
 
             try {
                 using (var response = (HttpWebResponse)await request.GetResponseAsync()) {

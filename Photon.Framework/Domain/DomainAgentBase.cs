@@ -5,7 +5,7 @@ namespace Photon.Framework.Domain
 {
     public abstract class DomainAgentBase : MarshalByRefObject
     {
-        public DomainAgentBase()
+        protected DomainAgentBase()
         {
             AppDomain.CurrentDomain.AssemblyResolve += Domain_OnAssemblyResolve;
         }

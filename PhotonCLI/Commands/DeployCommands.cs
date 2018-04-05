@@ -1,10 +1,10 @@
-﻿using Photon.CLI.Actions;
+﻿using AnsiConsole;
+using Photon.CLI.Actions;
 using Photon.CLI.Internal;
 using Photon.CLI.Internal.Commands;
 using Photon.Framework.Extensions;
 using System;
 using System.Threading.Tasks;
-using ConsoleEx = AnsiConsole.AnsiConsole;
 
 namespace Photon.CLI.Commands
 {
