@@ -7,7 +7,7 @@ namespace Photon.Framework.Domain
     {
         protected DomainAgentBase()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += Domain_OnAssemblyResolve;
+            //AppDomain.CurrentDomain.AssemblyResolve += Domain_OnAssemblyResolve;
         }
 
         public virtual void LoadAssembly(string filename)
@@ -18,16 +18,16 @@ namespace Photon.Framework.Domain
 
         protected virtual void OnAssemblyLoaded(Assembly assembly) {}
 
-        private Assembly Domain_OnAssemblyResolve(object sender, ResolveEventArgs e)
-        {
-            Assembly _assembly = null;
+        //private Assembly Domain_OnAssemblyResolve(object sender, ResolveEventArgs e)
+        //{
+        //    Assembly _assembly = null;
 
-            try {
-                _assembly = Assembly.Load(e.Name);
-            }
-            catch {}
+        //    try {
+        //        _assembly = Assembly.Load(e.Name);
+        //    }
+        //    catch {}
 
-            return _assembly;
-        }
+        //    return _assembly;
+        //}
     }
 }
