@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Tasks;
+﻿using Photon.Framework.Extensions;
+using Photon.Framework.Tasks;
 using System.Linq;
 using System.Reflection;
 
@@ -6,34 +7,44 @@ namespace Photon.Framework.Domain
 {
     public class AgentDomainAgent : DomainAgentBase
     {
-        private readonly TaskRegistry registry;
+        private readonly BuildTaskRegistry buildTaskRegistry;
+        private readonly DeployTaskRegistry deployTaskRegistry;
 
 
         public AgentDomainAgent()
         {
-            registry = new TaskRegistry();
+            buildTaskRegistry = new BuildTaskRegistry();
+            deployTaskRegistry = new DeployTaskRegistry();
         }
 
         protected override void OnAssemblyLoaded(Assembly assembly)
         {
             base.OnAssemblyLoaded(assembly);
 
-            registry.ScanAssembly(assembly);
+            buildTaskRegistry.ScanAssembly(assembly);
+            deployTaskRegistry.ScanAssembly(assembly);
         }
 
-        public string[] GetTasks()
+        public string[] GetBuildTasks()
         {
-            return registry.AllNames.ToArray();
+            return buildTaskRegistry.AllNames.ToArray();
         }
 
-        public void RunTask(BuildTaskContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
+        public string[] GetDeployTasks()
         {
-            registry.ExecuteTask(context)
-                .ContinueWith(t => {
-                    if (t.IsCanceled) completeEvent.SetCancelled();
-                    else if (t.IsFaulted) completeEvent.SetException(t.Exception);
-                    else completeEvent.SetResult(t.Result);
-                });
+            return deployTaskRegistry.AllNames.ToArray();
+        }
+
+        public void RunBuildTask(IAgentBuildContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
+        {
+            buildTaskRegistry.ExecuteTask(context)
+                .ContinueWith(completeEvent.FromTask);
+        }
+
+        public void RunDeployTask(IDeployTaskContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
+        {
+            deployTaskRegistry.ExecuteTask(context)
+                .ContinueWith(completeEvent.FromTask);
         }
     }
 }

@@ -51,14 +51,14 @@
     <Compile Include="Actions\ServerListAction.cs" />
     <Compile Include="Actions\ServerRemoveAction.cs" />
     <Compile Include="Actions\ServerAddAction.cs" />
-    <Compile Include="Actions\PackageUnpackAction.cs" />
-    <Compile Include="Actions\PackagePackAction.cs" />
+    <Compile Include="Actions\ProjectUnpackAction.cs" />
+    <Compile Include="Actions\ProjectPackageAction.cs" />
     <Compile Include="Actions\DeployRunAction.cs" />
     <Compile Include="Actions\BuildRunAction.cs" />
     <Compile Include="Commands\BuildCommands.cs" />
     <Compile Include="Commands\DeployCommands.cs" />
     <Compile Include="Commands\ServerCommands.cs" />
-    <Compile Include="Commands\PackageCommands.cs" />
+    <Compile Include="Commands\ProjectCommands.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\CommandContext.cs" />
     <Compile Include="Internal\Commands\CommandActionBuilder.cs" />
@@ -66,8 +66,9 @@
     <Compile Include="Internal\Commands\CommandDictionary.cs" />
     <Compile Include="Internal\Commands\HelpPrinter.cs" />
     <Compile Include="Internal\Commands\ICommandParser.cs" />
+    <Compile Include="Internal\Http\HttpUtility.cs" />
     <Compile Include="Internal\ServerCollection.cs" />
-    <Compile Include="Internal\ServerDefinition.cs" />
+    <Compile Include="Internal\PhotonServerDefinition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -79,6 +80,10 @@
     <ProjectReference Include="..\Photon.Framework\Photon.Framework.csproj">
       <Project>{E49360FD-BEAC-4713-A421-579564FB0992}</Project>
       <Name>Photon.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Photon.Library\Photon.Library.csproj">
+      <Project>{76D31D86-404D-4812-9101-C2F7614F28E7}</Project>
+      <Name>Photon.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

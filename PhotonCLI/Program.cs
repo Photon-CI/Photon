@@ -3,6 +3,10 @@ using Photon.CLI.Internal;
 using System;
 using ConsoleEx = AnsiConsole.AnsiConsole;
 
+#if DEBUG
+using System.Diagnostics;
+#endif
+
 namespace Photon.CLI
 {
     internal class Program
@@ -10,6 +14,8 @@ namespace Photon.CLI
         public static int Main(string[] args)
         {
             try {
+                ConsoleEx.EnabledAnsi = false;
+
                 var commandContext = new CommandContext();
                 commandContext.Initialize();
 
@@ -36,6 +42,11 @@ namespace Photon.CLI
             }
             finally {
                 ConsoleEx.Out.ResetColor();
+
+#if DEBUG
+                if (Debugger.IsAttached)
+                    Console.ReadKey(true);
+#endif
             }
         }
     }

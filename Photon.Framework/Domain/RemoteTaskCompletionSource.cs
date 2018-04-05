@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Photon.Framework.Tasks;
 
 namespace Photon.Framework.Domain
 {

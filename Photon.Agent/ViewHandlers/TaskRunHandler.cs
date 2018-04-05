@@ -1,10 +1,10 @@
-﻿using log4net;
+﻿using System;
+using System.Threading.Tasks;
+using log4net;
 using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
-using System;
-using System.Threading.Tasks;
 
-namespace Photon.Agent.Handlers
+namespace Photon.Agent.ViewHandlers
 {
     [HttpHandler("/task/begin")]
     internal class TaskRunHandler : HttpHandlerAsync

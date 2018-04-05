@@ -12,12 +12,12 @@ namespace Photon.CLI.Internal
         private string filename;
 
         [JsonProperty("definitions")]
-        public List<ServerDefinition> Definitions {get;}
+        public List<PhotonServerDefinition> Definitions {get;}
 
 
         public ServerCollection()
         {
-            Definitions = new List<ServerDefinition>();
+            Definitions = new List<PhotonServerDefinition>();
         }
 
         public ServerCollection(string filename) : this()
@@ -41,7 +41,7 @@ namespace Photon.CLI.Internal
         {
             var filePath = Path.GetDirectoryName(filename);
 
-            if (!Directory.Exists(filePath))
+            if (!string.IsNullOrEmpty(filePath) && !Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
 
             using (var stream = File.Open(filename, FileMode.Create, FileAccess.Write)) {
@@ -50,14 +50,32 @@ namespace Photon.CLI.Internal
             }
         }
 
-        public void Add(ServerDefinition definition)
+        public void Add(PhotonServerDefinition definition)
         {
             Definitions.Add(definition);
         }
 
-        public ServerDefinition Get(string name)
+        public bool TryGet(string name, out PhotonServerDefinition server)
         {
-            return Definitions.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+            server = Definitions.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+            return server != null;
+        }
+
+        public PhotonServerDefinition Get(string name)
+        {
+            PhotonServerDefinition server;
+            if (name != null) {
+                server = Definitions.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+
+                if (server == null) throw new ApplicationException($"Server '{name}' could not be found!");
+            }
+            else {
+                server = Definitions.FirstOrDefault(x => x.Primary);
+
+                if (server == null) throw new ApplicationException("No primary Server could not be found!");
+            }
+
+            return server;
         }
 
         public bool RemoveByName(string name)
@@ -65,10 +83,10 @@ namespace Photon.CLI.Internal
             return Definitions.RemoveAll(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)) > 0;
         }
 
-        public ServerDefinition GetPrimary()
-        {
-            return Definitions.FirstOrDefault(x => x.Primary);
-        }
+        //public PhotonServerDefinition GetPrimary()
+        //{
+        //    return Definitions.FirstOrDefault(x => x.Primary);
+        //}
 
         public void SetPrimary(string name)
         {

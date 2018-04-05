@@ -12,7 +12,7 @@ namespace Photon.CLI.Actions
 
         public async Task Run(CommandContext context)
         {
-            var definition = new ServerDefinition {
+            var definition = new PhotonServerDefinition {
                 Name = ServerName,
                 Url = ServerUrl,
                 Primary = ServerPrimary,

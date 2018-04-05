@@ -1,9 +1,9 @@
-﻿using log4net;
+﻿using System;
+using log4net;
 using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
-using System;
 
-namespace Photon.Agent.Handlers
+namespace Photon.Agent.ViewHandlers
 {
     [HttpHandler("/session/release")]
     internal class SessionReleaseHandler : HttpHandler

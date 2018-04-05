@@ -20,6 +20,8 @@ namespace Photon.Framework.Scripts
 
         private readonly StringBuilder builder;
 
+        public int Length => builder.Length;
+
 
         public ScriptOutput()
         {

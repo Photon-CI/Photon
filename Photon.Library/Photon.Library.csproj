@@ -49,6 +49,12 @@
   <ItemGroup>
     <Compile Include="ConfigurationReader.cs" />
     <Compile Include="IReferenceItem.cs" />
+    <Compile Include="Messages\BuildSessionBeginRequest.cs" />
+    <Compile Include="Messages\BuildSessionBeginResponse.cs" />
+    <Compile Include="Messages\BuildSessionReleaseRequest.cs" />
+    <Compile Include="Messages\BuildSessionReleaseResponse.cs" />
+    <Compile Include="Messages\TaskBeginRequest.cs" />
+    <Compile Include="Messages\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginRequest.cs" />
     <Compile Include="ProcessResult.cs" />
@@ -63,6 +69,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Photon.Communication\Photon.Communication.csproj">
+      <Project>{E167A349-7691-4406-9F4B-989BD5E6E12F}</Project>
+      <Name>Photon.Communication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Photon.Framework\Photon.Framework.csproj">
       <Project>{e49360fd-beac-4713-a421-579564fb0992}</Project>
       <Name>Photon.Framework</Name>

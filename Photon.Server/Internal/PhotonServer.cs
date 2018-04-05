@@ -2,40 +2,40 @@
 using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Framework.Projects;
-using Photon.Framework.Scripts;
+using Photon.Server.Internal.Projects;
+using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace Photon.Server.Internal
 {
-    internal class PhotonServer : IServer, IDisposable
+    internal class PhotonServer : IDisposable
     {
-        private static ILog Log = LogManager.GetLogger(typeof(PhotonServer));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PhotonServer));
         public static PhotonServer Instance {get;} = new PhotonServer();
 
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public string WorkDirectory {get;}
-        public List<ProjectDefinition> Projects {get;}
+        public string WorkPath {get;}
+        public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ScriptQueue Queue {get;}
         public ServerDefinition Definition {get; private set;}
+        public ProjectDataManager ProjectData {get;}
 
 
         public PhotonServer()
         {
-            Projects = new List<ProjectDefinition>();
+            Projects = new ProjectManager();
             Sessions = new ServerSessionManager();
             Queue = new ScriptQueue();
+            ProjectData = new ProjectDataManager();
 
-            WorkDirectory = Configuration.WorkDirectory;
+            WorkPath = Configuration.WorkDirectory;
         }
 
         public void Dispose()
@@ -93,7 +93,9 @@ namespace Photon.Server.Internal
                 Log.Error("Failed to start HTTP Receiver!", error);
             }
 
-            LoadAllProjectDefinitions();
+            Projects.Initialize();
+            ProjectData.Initialize();
+
             Sessions.Start();
             Queue.Start();
         }
@@ -112,22 +114,17 @@ namespace Photon.Server.Internal
             }
         }
 
-        public IEnumerable<ScriptAgent> GetAgents(params string[] roles)
-        {
-            foreach (var agent in Definition.Agents) {
-                if (agent.MatchesRoles(roles))
-                    yield return new ScriptAgent(agent);
-            }
-        }
-
-        public ProjectDefinition FindProject(string projectId)
-        {
-            return Projects?.FirstOrDefault(x => string.Equals(x.Id, projectId, StringComparison.OrdinalIgnoreCase));
-        }
+        //public IEnumerable<AgentDefinition> GetAgents(params string[] roles)
+        //{
+        //    foreach (var agent in Definition.Agents) {
+        //        if (agent.MatchesRoles(roles))
+        //            yield return new BuildScriptAgent(agent);
+        //    }
+        //}
 
         private ServerDefinition ParseServerDefinition()
         {
-            var file = Configuration.DefinitionFilename ?? "server.json";
+            var file = Configuration.ServerFile ?? "server.json";
             var path = Path.Combine(Configuration.AssemblyPath, file);
             path = Path.GetFullPath(path);
 
@@ -141,33 +138,6 @@ namespace Photon.Server.Internal
             using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 var serializer = new JsonSerializer();
                 return serializer.Deserialize<ServerDefinition>(stream);
-            }
-        }
-
-        private void LoadAllProjectDefinitions()
-        {
-            var dir = Configuration.ProjectDirectory ?? "Projects";
-            var path = Path.Combine(Configuration.AssemblyPath, dir);
-            path = Path.GetFullPath(path);
-
-            Log.Debug($"Loading Projects Definition from: {path}");
-
-            if (!Directory.Exists(path)) {
-                Log.Warn($"Project Directory not found! {path}");
-                return;
-            }
-
-            var serializer = new JsonSerializer();
-            foreach (var file in Directory.EnumerateFiles(path, "*.json")) {
-                try {
-                    using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                        var project = serializer.Deserialize<ProjectDefinition>(stream);
-                        Projects.Add(project);
-                    }
-                }
-                catch (Exception error) {
-                    Log.Error($"Failed to load Project '{file}'!", error);
-                }
             }
         }
     }

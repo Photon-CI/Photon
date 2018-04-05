@@ -1,13 +1,13 @@
-﻿using NUnit.Framework;
-using Photon.Communication;
-using Photon.Tests.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using NUnit.Framework;
+using Photon.Communication;
+using Photon.Tests.Internal;
 
-namespace Photon.Tests
+namespace Photon.Tests.Messaging
 {
     public class SendMessageTests : IntegrationTestFixture, IDisposable
     {
