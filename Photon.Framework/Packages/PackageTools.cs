@@ -55,6 +55,15 @@ namespace Photon.Framework.Packages
             throw new NotImplementedException();
         }
 
+
+        public static ProjectPackage UnpackApplication(string package, string path)
+        {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            throw new NotImplementedException();
+        }
+
         private static async Task WritePackageArchive(string filename, Func<ZipArchive, Task> archiveFunc)
         {
             using (var zipStream = File.Open(filename, FileMode.Create, FileAccess.Write))

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Photon.Agent.Internal.Tasks;
 
 namespace Photon.Agent.Internal
 {

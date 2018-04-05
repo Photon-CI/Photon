@@ -3,7 +3,7 @@ using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
 using Photon.Framework.Tasks;
 
-namespace Photon.Agent.Internal
+namespace Photon.Agent.Internal.Tasks
 {
     public class AgentBuildContext : IAgentBuildContext
     {

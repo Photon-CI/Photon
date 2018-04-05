@@ -60,8 +60,8 @@
     <Compile Include="Internal\AgentSessionBase.cs" />
     <Compile Include="Internal\AgentSessionDomain.cs" />
     <Compile Include="Internal\AgentSessionManager.cs" />
-    <Compile Include="Internal\AgentBuildContext.cs" />
-    <Compile Include="Internal\AgentDeployContext.cs" />
+    <Compile Include="Internal\Tasks\AgentBuildContext.cs" />
+    <Compile Include="Internal\Tasks\AgentDeployContext.cs" />
     <Compile Include="Internal\IAgentSession.cs" />
     <Compile Include="Internal\PhotonAgent.cs" />
     <Compile Include="Internal\Arguments.cs" />

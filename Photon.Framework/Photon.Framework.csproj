@@ -81,7 +81,7 @@
     <Compile Include="ServerHttpDefinition.cs" />
     <Compile Include="Tasks\DeployTaskRegistry.cs" />
     <Compile Include="Tasks\IBuildTask.cs" />
-    <Compile Include="Tasks\IDeployTaskContext.cs" />
+    <Compile Include="Tasks\IAgentDeployContext.cs" />
     <Compile Include="Tasks\IAgentBuildContext.cs" />
     <Compile Include="Tasks\IDeployTask.cs" />
     <Compile Include="Packages\PackageDefinition.cs" />

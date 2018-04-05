@@ -2,6 +2,7 @@
 using Photon.Communication;
 using Photon.Library.Messages;
 using System.Threading.Tasks;
+using Photon.Agent.Internal.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {

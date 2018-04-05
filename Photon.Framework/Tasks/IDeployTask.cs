@@ -4,6 +4,6 @@ namespace Photon.Framework.Tasks
 {
     public interface IDeployTask
     {
-        Task<TaskResult> RunAsync(IDeployTaskContext context);
+        Task<TaskResult> RunAsync(IAgentDeployContext context);
     }
 }

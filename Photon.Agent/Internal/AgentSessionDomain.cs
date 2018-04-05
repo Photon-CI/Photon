@@ -2,6 +2,7 @@
 using Photon.Framework.Tasks;
 using Photon.Library.Session;
 using System.Threading.Tasks;
+using Photon.Agent.Internal.Tasks;
 
 namespace Photon.Agent.Internal
 {
