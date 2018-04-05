@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Scripts;
+﻿using Photon.Framework.Extensions;
+using Photon.Framework.Scripts;
 using System.Linq;
 using System.Reflection;
 
@@ -6,34 +7,44 @@ namespace Photon.Framework.Domain
 {
     public class ServerDomainAgent : DomainAgentBase
     {
-        private readonly ScriptRegistry registry;
+        private readonly BuildScriptRegistry buildScriptRegistry;
+        private readonly DeployScriptRegistry deployScriptRegistry;
 
 
         public ServerDomainAgent()
         {
-            registry = new ScriptRegistry();
+            buildScriptRegistry = new BuildScriptRegistry();
+            deployScriptRegistry = new DeployScriptRegistry();
         }
 
         protected override void OnAssemblyLoaded(Assembly assembly)
         {
             base.OnAssemblyLoaded(assembly);
 
-            registry.ScanAssembly(assembly);
+            buildScriptRegistry.ScanAssembly(assembly);
+            deployScriptRegistry.ScanAssembly(assembly);
         }
 
-        public string[] GetScripts()
+        public string[] GetBuildScripts()
         {
-            return registry.AllNames.ToArray();
+            return buildScriptRegistry.AllNames.ToArray();
         }
 
-        public void RunScript(ScriptContext context, RemoteTaskCompletionSource<ScriptResult> completeEvent)
+        public string[] GetDeployScripts()
         {
-            registry.ExecuteScript(context)
-                .ContinueWith(t => {
-                    if (t.IsCanceled) completeEvent.SetCancelled();
-                    else if (t.IsFaulted) completeEvent.SetException(t.Exception);
-                    else completeEvent.SetResult(t.Result);
-                });
+            return deployScriptRegistry.AllNames.ToArray();
+        }
+
+        public void RunBuildScript(IServerBuildContext context, RemoteTaskCompletionSource<ScriptResult> completeEvent)
+        {
+            buildScriptRegistry.ExecuteScript(context)
+                .ContinueWith(completeEvent.FromTask);
+        }
+
+        public void RunDeployScript(IServerDeployContext context, RemoteTaskCompletionSource<ScriptResult> completeEvent)
+        {
+            deployScriptRegistry.ExecuteScript(context)
+                .ContinueWith(completeEvent.FromTask);
         }
     }
 }

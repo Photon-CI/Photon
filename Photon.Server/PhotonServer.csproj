@@ -61,22 +61,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\Scripts\AgentDeploySessionHandle.cs" />
+    <Compile Include="Internal\Scripts\AgentBuildSessionHandle.cs" />
+    <Compile Include="Internal\Scripts\ServerDeployContext.cs" />
+    <Compile Include="Internal\Scripts\ServerBuildContext.cs" />
+    <Compile Include="Internal\BuildStartInfo.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
-    <Compile Include="Internal\IServerSession.cs" />
+    <Compile Include="Internal\Sessions\IServerSession.cs" />
     <Compile Include="Internal\Packages\PackageManager.cs" />
-    <Compile Include="Internal\Projects\Project.cs" />
     <Compile Include="Internal\Projects\ProjectData.cs" />
     <Compile Include="Internal\Projects\ProjectDataManager.cs" />
     <Compile Include="Internal\Projects\ProjectDataLastBuild.cs" />
     <Compile Include="Internal\Projects\ProjectManager.cs" />
     <Compile Include="Internal\ScriptQueue.cs" />
-    <Compile Include="Internal\ServerDefinition.cs" />
-    <Compile Include="Internal\ServerBuildSession.cs" />
-    <Compile Include="Internal\ServerSessionBase.cs" />
+    <Compile Include="Internal\Sessions\ServerBuildSession.cs" />
+    <Compile Include="Internal\Sessions\ServerSessionBase.cs" />
     <Compile Include="Internal\ServerDomain.cs" />
-    <Compile Include="Internal\ServerHttpDefinition.cs" />
-    <Compile Include="Internal\ServerDeploySession.cs" />
+    <Compile Include="Internal\Sessions\ServerDeploySession.cs" />
     <Compile Include="Internal\ServerSessionManager.cs" />
     <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
@@ -95,9 +97,9 @@
       <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewHandlers\BuildHandler.cs" />
-    <Compile Include="ViewHandlers\DeployHandler.cs" />
-    <Compile Include="ViewHandlers\IndexHandler.cs" />
+    <Compile Include="HttpHandlers\BuildHandler.cs" />
+    <Compile Include="HttpHandlers\DeployHandler.cs" />
+    <Compile Include="HttpHandlers\IndexHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -109,6 +111,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Photon.Communication\Photon.Communication.csproj">
+      <Project>{E167A349-7691-4406-9F4B-989BD5E6E12F}</Project>
+      <Name>Photon.Communication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Photon.Framework\Photon.Framework.csproj">
       <Project>{e49360fd-beac-4713-a421-579564fb0992}</Project>
       <Name>Photon.Framework</Name>

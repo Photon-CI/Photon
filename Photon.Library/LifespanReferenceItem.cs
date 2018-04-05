@@ -6,13 +6,13 @@ namespace Photon.Library
     {
         private readonly DateTime utcStarted;
 
-        public string Id {get;}
+        public string SessionId {get;}
         public TimeSpan Lifespan {get; set;}
 
 
         public LifespanReferenceItem()
         {
-            Id = Guid.NewGuid().ToString("N");
+            SessionId = Guid.NewGuid().ToString("N");
             utcStarted = DateTime.UtcNow;
         }
 

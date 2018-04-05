@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Photon.Server.Internal.Sessions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -47,12 +48,12 @@ namespace Photon.Server.Internal
         {
             queue.Post(session);
 
-            Log.Debug($"Queued Script Session '{session.Id}'.");
+            Log.Debug($"Queued Script Session '{session.SessionId}'.");
         }
 
         private async Task OnProcess(IServerSession session)
         {
-            Log.Debug($"Processing Script Session '{session.Id}'.");
+            Log.Debug($"Processing Script Session '{session.SessionId}'.");
 
             var errorList = new List<Exception>();
 
@@ -83,9 +84,9 @@ namespace Photon.Server.Internal
                 session.Exception = errorList[0];
 
             if (session.Exception != null)
-                Log.Warn($"Completed Script Session '{session.Id}' with errors.", session.Exception);
+                Log.Warn($"Completed Script Session '{session.SessionId}' with errors.", session.Exception);
             else
-                Log.Debug($"Completed Script Session '{session.Id}' successfully.");
+                Log.Debug($"Completed Script Session '{session.SessionId}' successfully.");
         }
     }
 }

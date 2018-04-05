@@ -1,6 +1,6 @@
 ﻿using PiServerLite.Http.Handlers;
 
-namespace Photon.Agent.Handlers
+namespace Photon.Agent.ViewHandlers
 {
     [HttpHandler("/")]
     [HttpHandler("/index")]

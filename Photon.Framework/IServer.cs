@@ -5,7 +5,7 @@ namespace Photon.Framework
 {
     public interface IServer
     {
-        string WorkDirectory {get;}
-        IEnumerable<ScriptAgent> GetAgents(params string[] roles);
+        string WorkPath {get;}
+        IEnumerable<BuildScriptAgent> GetAgents(params string[] roles);
     }
 }

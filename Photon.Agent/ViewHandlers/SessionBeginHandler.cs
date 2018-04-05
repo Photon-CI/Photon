@@ -1,13 +1,13 @@
-﻿using log4net;
+﻿using System;
+using System.IO;
+using log4net;
 using Newtonsoft.Json;
 using Photon.Agent.Internal;
 using Photon.Framework.Extensions;
-using Photon.Framework.Messages;
+using Photon.Library.Messages;
 using PiServerLite.Http.Handlers;
-using System;
-using System.IO;
 
-namespace Photon.Agent.Handlers
+namespace Photon.Agent.ViewHandlers
 {
     [HttpHandler("/session/begin")]
     internal class SessionBeginHandler : HttpHandler
@@ -23,8 +23,8 @@ namespace Photon.Agent.Handlers
 
                 PhotonAgent.Instance.Sessions.BeginSession(session);
 
-                var response = new SessionBeginResponse {
-                    SessionId = session.Id,
+                var response = new BuildSessionBeginResponse {
+                    SessionId = session.SessionId,
                 };
 
                 var memStream = new MemoryStream();

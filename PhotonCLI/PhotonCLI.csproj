@@ -66,8 +66,9 @@
     <Compile Include="Internal\Commands\CommandDictionary.cs" />
     <Compile Include="Internal\Commands\HelpPrinter.cs" />
     <Compile Include="Internal\Commands\ICommandParser.cs" />
+    <Compile Include="Internal\Http\HttpUtility.cs" />
     <Compile Include="Internal\ServerCollection.cs" />
-    <Compile Include="Internal\ServerDefinition.cs" />
+    <Compile Include="Internal\PhotonServerDefinition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

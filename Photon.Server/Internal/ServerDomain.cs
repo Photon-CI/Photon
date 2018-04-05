@@ -1,21 +1,34 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Scripts;
 using Photon.Library.Session;
+using Photon.Server.Internal.Scripts;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
 {
     internal class ServerDomain : SessionDomainBase<ServerDomainAgent>
     {
-        public string[] GetScripts()
+        public string[] GetBuildScripts()
         {
-            return agent.GetScripts();
+            return agent.GetBuildScripts();
         }
 
-        public async Task<ScriptResult> RunScript(ScriptContext context)
+        public string[] GetDeployScripts()
+        {
+            return agent.GetDeployScripts();
+        }
+
+        public async Task<ScriptResult> RunBuildScript(ServerBuildContext context)
         {
             var completeEvent = new RemoteTaskCompletionSource<ScriptResult>();
-            agent.RunScript(context, completeEvent);
+            agent.RunBuildScript(context, completeEvent);
+            return await completeEvent.Task;
+        }
+
+        public async Task<ScriptResult> RunDeployScript(ServerDeployContext context)
+        {
+            var completeEvent = new RemoteTaskCompletionSource<ScriptResult>();
+            agent.RunDeployScript(context, completeEvent);
             return await completeEvent.Task;
         }
     }

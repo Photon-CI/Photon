@@ -1,4 +1,5 @@
 ﻿using Photon.Library;
+using Photon.Server.Internal.Sessions;
 using System;
 using System.Threading.Tasks;
 
@@ -6,7 +7,7 @@ namespace Photon.Server.Internal
 {
     internal class ServerSessionManager : IDisposable
     {
-        private ReferencePool<IServerSession> pool;
+        private readonly ReferencePool<IServerSession> pool;
 
 
         public ServerSessionManager()

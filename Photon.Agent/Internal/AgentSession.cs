@@ -1,8 +1,6 @@
 ﻿using log4net;
 using Photon.Framework;
-using Photon.Framework.Messages;
 using Photon.Framework.Tasks;
-using Photon.Library;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,16 +8,17 @@ using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal
 {
-    internal class AgentSession : IReferenceItem, IDisposable
+    internal class AgentSession : IAgentSession
     {
         private readonly Lazy<ILog> _log;
         private readonly DateTime utcCreated;
         private bool isReleased;
 
-        public string Id {get;}
-        protected AgentSessionDomain Domain {get;}
-        public BuildTaskContext Context {get;}
+        public string SessionId {get; set;}
+        public string AssemblyFile {get; set;}
         public string WorkDirectory {get; set;}
+        protected AgentSessionDomain Domain {get; set;}
+        public BuildTaskContext Context {get;}
         public TimeSpan MaxLifespan {get; set;}
         public Exception Exception {get; set;}
         protected ILog Log => _log.Value;
@@ -27,7 +26,7 @@ namespace Photon.Agent.Internal
 
         public AgentSession()
         {
-            Id = Guid.NewGuid().ToString("N");
+            SessionId = Guid.NewGuid().ToString("N");
             utcCreated = DateTime.UtcNow;
             MaxLifespan = TimeSpan.FromMinutes(60);
 
@@ -46,7 +45,7 @@ namespace Photon.Agent.Internal
         {
             var abort = false;
             var errorList = new Lazy<List<Exception>>();
-            var assemblyFilename = Path.Combine(Context.WorkDirectory, Context.Job.Assembly);
+            var assemblyFilename = Path.Combine(WorkDirectory, AssemblyFile);
 
             if (!File.Exists(assemblyFilename)) {
                 errorList.Value.Add(new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!"));
@@ -60,9 +59,9 @@ namespace Photon.Agent.Internal
                     Domain.Initialize(assemblyFilename);
                 }
                 catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script initialization failed! [{Id}]", error));
+                    errorList.Value.Add(new ApplicationException($"Script initialization failed! [{SessionId}]", error));
                     //Log.Error($"Script initialization failed! [{Id}]", error);
-                    Context.Output.AppendLine($"An error occurred while initializing the script! {error.Message} [{Id}]");
+                    Context.Output.AppendLine($"An error occurred while initializing the script! {error.Message} [{SessionId}]");
                     abort = true;
                 }
             }
@@ -73,9 +72,9 @@ namespace Photon.Agent.Internal
                     if (!result.Successful) throw new ApplicationException(result.Message);
                 }
                 catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script execution failed! [{Id}]", error));
+                    errorList.Value.Add(new ApplicationException($"Script execution failed! [{SessionId}]", error));
                     //Log.Error($"Script execution failed! [{Id}]", error);
-                    Context.Output.AppendLine($"An error occurred while executing the script! {error.Message} [{Id}]");
+                    Context.Output.AppendLine($"An error occurred while executing the script! {error.Message} [{SessionId}]");
                 }
             }
         }

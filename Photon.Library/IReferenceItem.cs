@@ -2,7 +2,7 @@
 {
     public interface IReferenceItem
     {
-        string Id {get;}
+        string SessionId {get;}
 
         bool IsExpired();
     }

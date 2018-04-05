@@ -58,7 +58,7 @@ namespace Photon.Library
 
         public void Add(T task)
         {
-            itemDictionary[task.Id] = task;
+            itemDictionary[task.SessionId] = task;
         }
 
         public bool TryGet(string id, out T task)

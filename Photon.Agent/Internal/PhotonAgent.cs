@@ -14,7 +14,8 @@ namespace Photon.Agent.Internal
 {
     internal class PhotonAgent : IDisposable
     {
-        private static ILog Log = LogManager.GetLogger(typeof(PhotonAgent));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PhotonAgent));
+
         public static PhotonAgent Instance {get;} = new PhotonAgent();
 
         private readonly MessageProcessor messageProcessor;

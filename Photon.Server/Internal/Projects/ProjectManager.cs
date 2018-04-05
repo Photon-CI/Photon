@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Photon.Framework.Extensions;
+using Photon.Framework.Projects;
 using System.Collections.Generic;
 using System.IO;
 
@@ -18,7 +19,7 @@ namespace Photon.Server.Internal.Projects
 
         public void Initialize()
         {
-            this.filename = Configuration.;
+            this.filename = Configuration.ProjectsFile;
 
             Project[] _projects;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
@@ -28,6 +29,11 @@ namespace Photon.Server.Internal.Projects
 
             foreach (var project in _projects)
                 projects[project.Id] = project;
+        }
+
+        public bool TryGet(string projectId, out Project project)
+        {
+            return projects.TryGetValue(projectId, out project);
         }
     }
 }

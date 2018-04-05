@@ -2,29 +2,24 @@
 using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Framework.Projects;
-using Photon.Framework.Scripts;
-using Photon.Server.Internal.Project;
 using Photon.Server.Internal.Projects;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace Photon.Server.Internal
 {
-    internal class PhotonServer : IServer, IDisposable
+    internal class PhotonServer : IDisposable
     {
-        private static ILog Log = LogManager.GetLogger(typeof(PhotonServer));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PhotonServer));
         public static PhotonServer Instance {get;} = new PhotonServer();
 
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public string WorkDirectory {get;}
+        public string WorkPath {get;}
         public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ScriptQueue Queue {get;}
@@ -39,7 +34,7 @@ namespace Photon.Server.Internal
             Queue = new ScriptQueue();
             ProjectData = new ProjectDataManager();
 
-            WorkDirectory = Configuration.WorkDirectory;
+            WorkPath = Configuration.WorkPath;
         }
 
         public void Dispose()
@@ -97,9 +92,8 @@ namespace Photon.Server.Internal
                 Log.Error("Failed to start HTTP Receiver!", error);
             }
 
-            //LoadAllProjectDefinitions();
             Projects.Initialize();
-            ProjectData.Initialize(Configuration.ApplicationDataDirectory);
+            ProjectData.Initialize();
 
             Sessions.Start();
             Queue.Start();
@@ -119,22 +113,17 @@ namespace Photon.Server.Internal
             }
         }
 
-        public IEnumerable<ScriptAgent> GetAgents(params string[] roles)
-        {
-            foreach (var agent in Definition.Agents) {
-                if (agent.MatchesRoles(roles))
-                    yield return new ScriptAgent(agent);
-            }
-        }
-
-        //public ProjectDefinition FindProject(string projectId)
+        //public IEnumerable<AgentDefinition> GetAgents(params string[] roles)
         //{
-        //    return Projects?.FirstOrDefault(x => string.Equals(x.Id, projectId, StringComparison.OrdinalIgnoreCase));
+        //    foreach (var agent in Definition.Agents) {
+        //        if (agent.MatchesRoles(roles))
+        //            yield return new BuildScriptAgent(agent);
+        //    }
         //}
 
         private ServerDefinition ParseServerDefinition()
         {
-            var file = Configuration.DefinitionPath ?? "server.json";
+            var file = Configuration.DefinitionFile ?? "server.json";
             var path = Path.Combine(Configuration.AssemblyPath, file);
             path = Path.GetFullPath(path);
 
@@ -150,32 +139,5 @@ namespace Photon.Server.Internal
                 return serializer.Deserialize<ServerDefinition>(stream);
             }
         }
-
-        //private void LoadAllProjectDefinitions()
-        //{
-        //    var dir = Configuration.ProjectDirectory ?? "Projects";
-        //    var path = Path.Combine(Configuration.AssemblyPath, dir);
-        //    path = Path.GetFullPath(path);
-
-        //    Log.Debug($"Loading Projects Definition from: {path}");
-
-        //    if (!Directory.Exists(path)) {
-        //        Log.Warn($"Project Directory not found! {path}");
-        //        return;
-        //    }
-
-        //    var serializer = new JsonSerializer();
-        //    foreach (var file in Directory.EnumerateFiles(path, "*.json")) {
-        //        try {
-        //            using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-        //                var project = serializer.Deserialize<ProjectDefinition>(stream);
-        //                Projects.Add(project);
-        //            }
-        //        }
-        //        catch (Exception error) {
-        //            Log.Error($"Failed to load Project '{file}'!", error);
-        //        }
-        //    }
-        //}
     }
 }

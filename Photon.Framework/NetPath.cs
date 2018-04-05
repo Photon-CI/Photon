@@ -55,12 +55,13 @@ namespace Photon.Framework
 
             var i = 0;
             foreach (var arg in args) {
+                if (arg.Value == null) continue;
                 if (i > 0) builder.Append("&");
                 i++;
 
                 builder.Append(HttpUtility.UrlEncode(arg.Key));
                 builder.Append("=");
-                builder.Append(HttpUtility.UrlEncode(arg.Value?.ToString() ?? string.Empty));
+                builder.Append(HttpUtility.UrlEncode(arg.Value.ToString()));
             }
 
             return builder.ToString();
