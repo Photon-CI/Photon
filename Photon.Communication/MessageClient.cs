@@ -13,6 +13,8 @@ namespace Photon.Communication
         private readonly MessageTransceiver transceiver;
         //private readonly MessageProcessor processor;
 
+        public bool IsConnected => transceiver.IsStarted;
+
 
         public MessageClient(MessageProcessor processor)
         {

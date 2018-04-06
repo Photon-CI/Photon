@@ -8,6 +8,7 @@ namespace Photon.Framework.Scripts
 {
     public class AgentBuildSessionHandle : IAgentSessionHandle, IDisposable
     {
+        private readonly IServerBuildContext scriptContext;
         private readonly ServerAgentDefinition definition;
         private readonly MessageProcessor messageProcessor;
         private readonly MessageClient messageClient;
@@ -15,8 +16,9 @@ namespace Photon.Framework.Scripts
         private string sessionId;
 
 
-        public AgentBuildSessionHandle(ServerAgentDefinition agentDefinition)
+        public AgentBuildSessionHandle(IServerBuildContext scriptContext, ServerAgentDefinition agentDefinition)
         {
+            this.scriptContext = scriptContext;
             this.definition = agentDefinition;
 
             messageProcessor = new MessageProcessor();
@@ -30,13 +32,18 @@ namespace Photon.Framework.Scripts
             messageClient?.Dispose();
         }
 
-        public async Task BeginAsync()
+        public async Task BeginAsync(string packageId, string packageVersion)
         {
             messageProcessor.Start();
 
             await messageClient.ConnectAsync(definition.TcpHost, definition.TcpPort);
 
-            var message = new BuildSessionBeginRequest();
+            var message = new BuildSessionBeginRequest {
+                Project = scriptContext.Project,
+                AssemblyFile = scriptContext.AssemblyFile,
+                PackageId = packageId,
+                PackageVersion = packageVersion,
+            };
 
             var handle = messageClient.Send(message);
             var response = await handle.GetResponseAsync<BuildSessionBeginResponse>();
@@ -50,26 +57,50 @@ namespace Photon.Framework.Scripts
         {
             // TODO: Locking on sessionId and isActive
 
-            var message = new BuildSessionReleaseRequest {
-                SessionId = sessionId,
-            };
+            if (messageClient.IsConnected) {
+                var message = new BuildSessionReleaseRequest {
+                    SessionId = sessionId,
+                };
 
-            var handle = messageClient.Send(message);
-            var response = await handle.GetResponseAsync<BuildSessionReleaseResponse>();
+                var handle = messageClient.Send(message);
+                var response = await handle.GetResponseAsync<BuildSessionReleaseResponse>();
 
-            if (!(response?.Successful ?? false))
-                throw new ApplicationException("Failed to release agent session!");
+                if (!(response?.Successful ?? false))
+                    throw new ApplicationException("Failed to release agent session!");
 
-            await messageClient.DisconnectAsync();
+                await messageClient.DisconnectAsync();
+            }
 
             await messageProcessor.StopAsync();
         }
 
-        public Task RunTaskAsync(string taskName)
+        public async Task RunTaskAsync(string taskName)
         {
-            // TODO: this
+            var message = new BuildTaskRunRequest {
+                SessionId = sessionId,
+                TaskName = taskName,
+            };
 
-            throw new NotImplementedException();
+            var handle = messageClient.Send(message);
+            var response = await handle.GetResponseAsync<BuildTaskRunResponse>();
+
+            scriptContext.Output
+                .Append("Running Task ", ConsoleColor.DarkCyan)
+                .Append(taskName, ConsoleColor.Cyan)
+                .Append(" on Agent ", ConsoleColor.DarkCyan)
+                .Append(definition.Name, ConsoleColor.Cyan)
+                .AppendLine("...", ConsoleColor.DarkCyan);
+
+            if (!response.Successful) {
+                scriptContext.Output
+                    .AppendLine($"Task '{taskName}' Failed!", ConsoleColor.Red)
+                    .AppendLine(response.Exception, ConsoleColor.DarkYellow);
+            }
+
+            scriptContext.Output
+                .Append("Task ", ConsoleColor.DarkGreen)
+                .Append(taskName, ConsoleColor.Green)
+                .Append(" completed successfully.", ConsoleColor.DarkGreen);
         }
     }
 }

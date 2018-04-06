@@ -19,22 +19,20 @@ namespace Photon.Framework.Scripts
         public ScriptOutput Output {get; set;}
 
 
-        public ServerBuildContext()
-        {
-            //Artifacts = new ConcurrentBag<object>();
-            //Output = new ScriptOutput();
-        }
-
         public AgentSessionHandleCollection RegisterAgents(params string[] roles)
         {
             if (Agents == null)
                 throw new Exception("No agents have been defined!");
 
-            var roleAgents = Agents
-                .Where(a => a.MatchesRoles(roles))
-                .Select(a => new AgentBuildSessionHandle(a));
+            var roleAgents = Agents.Where(a => a.MatchesRoles(roles)).ToArray();
 
-            return new AgentSessionHandleCollection(roleAgents);
+            var agentNames = roleAgents.Select(x => x.Name);
+            Output.Append("Registering Agents: ", ConsoleColor.DarkCyan)
+                .AppendLine(string.Join("; ", agentNames));
+
+            var roleAgentHandles = roleAgents.Select(a => new AgentBuildSessionHandle(this, a));
+
+            return new AgentSessionHandleCollection(roleAgentHandles);
         }
     }
 }

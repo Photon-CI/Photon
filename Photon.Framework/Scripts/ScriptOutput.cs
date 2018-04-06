@@ -1,24 +1,27 @@
-﻿using System;
+﻿using AnsiConsole;
+using System;
+using System.IO;
 using System.Text;
 
 namespace Photon.Framework.Scripts
 {
-    public class LineAppendedEventArgs
-    {
-        public string Line {get;}
+    //public class LineAppendedEventArgs
+    //{
+    //    public string Line {get;}
 
-        public LineAppendedEventArgs(string line)
-        {
-            this.Line = line;
-        }
-    }
+    //    public LineAppendedEventArgs(string line)
+    //    {
+    //        this.Line = line;
+    //    }
+    //}
 
-    //[Serializable]
-    public class ScriptOutput : MarshalByRefObject
+    public class ScriptOutput : MarshalByRefObject, IDisposable
     {
-        public event EventHandler<LineAppendedEventArgs> LineAppended;
+        //public event EventHandler<LineAppendedEventArgs> LineAppended;
 
         private readonly StringBuilder builder;
+        private readonly StringWriter writer;
+        private readonly AnsiWriter ansiWriter;
         private readonly object lockHandle;
 
         public int Length {
@@ -33,22 +36,39 @@ namespace Photon.Framework.Scripts
         public ScriptOutput()
         {
             builder = new StringBuilder();
+            writer = new StringWriter(builder);
+            ansiWriter = new AnsiWriter(writer);
             lockHandle = new object();
         }
 
-        public void AppendLine(string line)
+        public void Dispose()
+        {
+            writer?.Dispose();
+        }
+
+        public ScriptOutput Append(string text, ConsoleColor color = ConsoleColor.Gray)
         {
             lock (lockHandle) {
-                builder.AppendLine(line);
+                ansiWriter.Write(text, color);
             }
 
-            OnLineAppended(line);
+            return this;
         }
 
-        protected virtual void OnLineAppended(string line)
+        public ScriptOutput AppendLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
-            LineAppended?.Invoke(this, new LineAppendedEventArgs(line));
+            lock (lockHandle) {
+                ansiWriter.WriteLine(text, color);
+            }
+
+            //OnLineAppended(line);
+            return this;
         }
+
+        //protected virtual void OnLineAppended(string line)
+        //{
+        //    LineAppended?.Invoke(this, new LineAppendedEventArgs(line));
+        //}
 
         public override string ToString()
         {

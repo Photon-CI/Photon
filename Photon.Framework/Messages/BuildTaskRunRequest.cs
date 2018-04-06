@@ -1,0 +1,11 @@
+﻿using Photon.Communication;
+
+namespace Photon.Framework.Messages
+{
+    public class BuildTaskRunRequest : IRequestMessage
+    {
+        public string MessageId {get; set;}
+        public string SessionId {get; set;}
+        public string TaskName {get; set;}
+    }
+}

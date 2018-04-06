@@ -17,7 +17,7 @@ namespace Photon.Server.Internal.Sessions
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
-        protected ServerDomain Domain {get;}
+        protected ServerDomain Domain {get; private set;}
         public bool Complete {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
@@ -39,39 +39,44 @@ namespace Photon.Server.Internal.Sessions
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (!isReleased)
                 ReleaseAsync().GetAwaiter().GetResult();
 
             Domain?.Dispose();
+            Domain = null;
         }
 
         public abstract Task RunAsync();
 
         public async Task ReleaseAsync()
         {
+            if (isReleased) return;
+            isReleased = true;
+
+            // TODO: Hack! A ThreadAbortException
+            //  will be called if we immediately
+            //  close the AppDomain.
+            await Task.Delay(200);
+
             Complete = true;
             utcReleased = DateTime.UtcNow;
-            Domain?.Dispose();
+            Domain?.Unload();
 
-            if (!isReleased) {
-                var workDirectory = WorkDirectory;
-                try {
-                    await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
-                }
-                catch (AggregateException errors) {
-                    errors.Flatten().Handle(e => {
-                        if (e is IOException ioError) {
-                            Log.Warn(ioError.Message);
-                            return true;
-                        }
+            var workDirectory = WorkDirectory;
+            try {
+                await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
+            }
+            catch (AggregateException errors) {
+                errors.Flatten().Handle(e => {
+                    if (e is IOException ioError) {
+                        Log.Warn(ioError.Message);
+                        return true;
+                    }
 
-                        return false;
-                    });
-                }
-
-                isReleased = true;
+                    return false;
+                });
             }
         }
 

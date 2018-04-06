@@ -12,14 +12,14 @@ namespace Photon.Framework.Scripts
 
         public AgentSessionHandleCollection(IEnumerable<IAgentSessionHandle> agentSessions)
         {
-            this.agentSessionList = agentSessions as IAgentSessionHandle[] ?? agentSessions.ToArray()
+            this.agentSessionList = agentSessions as IAgentSessionHandle[] ?? agentSessions?.ToArray()
                 ?? throw new ArgumentNullException(nameof(agentSessions));
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(string packageId, string packageVersion)
         {
             var taskList = agentSessionList
-                .Select(x => x.BeginAsync())
+                .Select(x => x.BeginAsync(packageId, packageVersion))
                 .ToArray();
 
             await Task.WhenAll(taskList);

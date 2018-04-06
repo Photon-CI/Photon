@@ -42,7 +42,7 @@ namespace Photon.Agent.Internal
             Domain?.Dispose();
         }
 
-        public abstract Task RunAsync();
+        public abstract Task RunTaskAsync(string taskName);
 
         public async Task ReleaseAsync()
         {

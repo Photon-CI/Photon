@@ -10,10 +10,12 @@ namespace Photon.Communication
         private readonly object startStopLock;
         private readonly MessageProcessor processor;
         private readonly ConcurrentDictionary<string, MessageHandle> messageHandles;
-        private MessageSender messageSender;
-        private MessageReceiver messageReceiver;
+        private readonly MessageSender messageSender;
+        private readonly MessageReceiver messageReceiver;
         private NetworkStream stream;
         private bool isStarted;
+
+        public bool IsStarted => isStarted;
 
 
         public MessageTransceiver(MessageProcessor processor)

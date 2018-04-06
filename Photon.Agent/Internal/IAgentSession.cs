@@ -8,7 +8,7 @@ namespace Photon.Agent.Internal
     {
         Exception Exception {get; set;}
 
-        //Task RunAsync();
+        Task RunTaskAsync(string taskName);
         Task ReleaseAsync();
         //void PrepareWorkDirectory();
     }

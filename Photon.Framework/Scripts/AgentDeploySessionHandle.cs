@@ -12,7 +12,7 @@ namespace Photon.Framework.Scripts
             this.definition = agentDefinition;
         }
 
-        public Task BeginAsync()
+        public Task BeginAsync(string packageId, string packageVersion)
         {
             // TODO: Create and connect TCP message client
 
