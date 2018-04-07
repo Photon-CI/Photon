@@ -14,7 +14,7 @@ namespace Photon.Communication
         private readonly MessageRegistry messageRegistry;
         private MessageTransceiver transceiver;
 
-        public bool IsConnected => transceiver.IsStarted;
+        public bool IsConnected => transceiver?.IsStarted ?? false;
 
 
         public MessageClient(MessageRegistry registry)

@@ -7,11 +7,14 @@ using Photon.Server.Internal.Tasks;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using log4net;
 
 namespace Photon.Server.Internal.Sessions
 {
     public class AgentBuildSessionHandle : IDisposable
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AgentBuildSessionHandle));
+
         private readonly ServerAgentDefinition definition;
         private readonly MessageClient messageClient;
 
@@ -44,7 +47,14 @@ namespace Photon.Server.Internal.Sessions
 
         public async Task BeginSessionAsync()
         {
-            await messageClient.ConnectAsync(definition.TcpHost, definition.TcpPort);
+            try {
+                await messageClient.ConnectAsync(definition.TcpHost, definition.TcpPort);
+                Log.Info($"Connected to Agent '{definition.Name}'.");
+            }
+            catch (Exception error) {
+                Log.Error($"Failed to connect to Agent '{definition.Name}'!", error);
+                throw new ApplicationException($"Failed to connect to Agent '{definition.Name}'! {error.Message}");
+            }
 
             var message = new BuildSessionBeginRequest {
                 ServerSessionId = ServerSessionId,

@@ -16,12 +16,7 @@ namespace Photon.Server
             try {
                 XmlConfigurator.Configure();
 
-                var program = new Program();
-
-                // TODO: Load Configuration Data
-                PhotonServer.Instance.Queue.MaxDegreeOfParallelism = 3;
-
-                return program.Run(args);
+                return Run(args);
             }
             catch (Exception error) {
                 Log.Fatal("Unhandled Exception!", error);
@@ -33,7 +28,7 @@ namespace Photon.Server
             }
         }
 
-        private int Run(string[] args)
+        private static int Run(string[] args)
         {
             var arguments = new Arguments();
 
@@ -45,55 +40,48 @@ namespace Photon.Server
                 return 1;
             }
 
-            if (arguments.RunAsConsole) {
-                var result = 0;
-                try {
-                    RunAsConsole(args);
-                }
-                catch (Exception error) {
-                    Log.Fatal("Unhandled Exception!", error);
-                    result = 1;
-                }
+            if (arguments.RunAsConsole)
+                return RunAsConsole();
 
-                if (result != 0) {
-                    try {
-                        Console.ResetColor();
-                        Console.WriteLine("Press any key to exit...");
-                        Console.ReadKey(true);
-                    }
-                    catch {}
-                }
+            ServiceBase.Run(new ServiceBase[] {
+                new ServerService(),
+            });
 
-                return result;
-            }
-            else {
-                ServiceBase.Run(new [] {
-                    new ServerService(),
-                });
-
-                return 0;
-            }
+            return 0;
         }
 
-        private void RunAsConsole(string[] args)
+        private static int RunAsConsole()
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Photon Server");
             Console.ResetColor();
 
-            PhotonServer.Instance.Start();
+            try {
+                PhotonServer.Instance.Start();
 
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine("Server Started");
-            Console.ResetColor();
-            Console.ReadKey(true);
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Server Started");
+                Console.ResetColor();
+                Console.ReadKey(true);
+                return 0;
+            }
+            catch (Exception error) {
+                Log.Fatal("Unhandled Exception!", error);
 
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Server Stopping...");
-            Console.ResetColor();
+                Console.ResetColor();
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey(true);
 
-            PhotonServer.Instance.Stop();
-            Console.WriteLine();
+                return 1;
+            }
+            finally {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Server Stopping...");
+                Console.ResetColor();
+
+                PhotonServer.Instance.Stop();
+                Console.WriteLine();
+            }
         }
     }
 }

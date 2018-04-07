@@ -5,6 +5,6 @@
     "description": "Photon sample application for Build and Deploy scripts.",
     "sourceType": "fs",
     "sourcePath": "Z:\\Photon.Sample",
-    "preBuild": "bin\\msbuild.cmd \"PhotonTasks\\PhotonTasks.csproj\" /t:Rebuild /p:Configuration=Release /p:Platform=\"Any CPU\" /p:OutputPath=\"bin\\Release\"",
+    "preBuild": "bin\\msbuild.cmd \"PhotonTasks\\PhotonTasks.csproj\" /t:Rebuild /p:Configuration=Release /p:Platform=\"Any CPU\" /p:OutputPath=\"bin\\Release\""
   }
 ]

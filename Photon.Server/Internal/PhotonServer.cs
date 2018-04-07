@@ -36,7 +36,10 @@ namespace Photon.Server.Internal
             Sessions = new ServerSessionManager();
             TaskRunners = new ServerTaskRunnerManager();
             ProjectData = new ProjectDataManager();
-            Queue = new ScriptQueue();
+
+            Queue = new ScriptQueue {
+                MaxDegreeOfParallelism = Configuration.Parallelism,
+            };
 
             WorkPath = Configuration.WorkDirectory;
         }
@@ -64,6 +67,52 @@ namespace Photon.Server.Internal
                 },
             };
 
+            Projects.Initialize();
+            ProjectData.Initialize();
+
+            TaskRunners.Start();
+            Sessions.Start();
+            Queue.Start();
+
+            StartHttpServer();
+        }
+
+        public void Stop()
+        {
+            Queue.Stop();
+            Sessions.Stop();
+            TaskRunners.Stop();
+
+            try {
+                receiver?.Dispose();
+                receiver = null;
+            }
+            catch (Exception error) {
+                Log.Error("Failed to stop HTTP Receiver!", error);
+            }
+        }
+
+        private ServerDefinition ParseServerDefinition()
+        {
+            var file = Configuration.ServerFile ?? "server.json";
+            var path = Path.Combine(Configuration.AssemblyPath, file);
+            path = Path.GetFullPath(path);
+
+            Log.Debug($"Loading Server Definition: {path}");
+
+            if (!File.Exists(path)) {
+                Log.Warn($"Server Definition not found! {path}");
+                return null;
+            }
+
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                var serializer = new JsonSerializer();
+                return serializer.Deserialize<ServerDefinition>(stream);
+            }
+        }
+
+        private void StartHttpServer()
+        {
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
                 ListenerPath = Definition.Http.Path,
@@ -78,7 +127,7 @@ namespace Photon.Server.Internal
             var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
             context.Views.AddFolderFromExternal(viewPath);
 
-            var httpPrefix = $"http://+:{Definition.Http.Port}/";
+            var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
 
             if (!string.IsNullOrEmpty(Definition.Http.Path))
                 httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
@@ -97,55 +146,6 @@ namespace Photon.Server.Internal
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);
-            }
-
-            Projects.Initialize();
-            ProjectData.Initialize();
-
-            TaskRunners.Start();
-            Sessions.Start();
-            Queue.Start();
-        }
-
-        public void Stop()
-        {
-            Queue.Stop();
-            Sessions.Stop();
-            TaskRunners.Stop();
-
-            try {
-                receiver?.Dispose();
-                receiver = null;
-            }
-            catch (Exception error) {
-                Log.Error("Failed to stop HTTP Receiver!", error);
-            }
-        }
-
-        //public IEnumerable<AgentDefinition> GetAgents(params string[] roles)
-        //{
-        //    foreach (var agent in Definition.Agents) {
-        //        if (agent.MatchesRoles(roles))
-        //            yield return new BuildScriptAgent(agent);
-        //    }
-        //}
-
-        private ServerDefinition ParseServerDefinition()
-        {
-            var file = Configuration.ServerFile ?? "server.json";
-            var path = Path.Combine(Configuration.AssemblyPath, file);
-            path = Path.GetFullPath(path);
-
-            Log.Debug($"Loading Server Definition: {path}");
-
-            if (!File.Exists(path)) {
-                Log.Warn($"Server Definition not found! {path}");
-                return null;
-            }
-
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<ServerDefinition>(stream);
             }
         }
     }

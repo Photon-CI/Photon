@@ -16,11 +16,7 @@ namespace Photon.Agent
             try {
                 XmlConfigurator.Configure();
 
-                var program = new Program();
-
-                // TODO: Load Configuration Data
-
-                return program.Run(args);
+                return Run(args);
             }
             catch (Exception error) {
                 Log.Fatal("Unhandled Exception!", error);
@@ -32,7 +28,7 @@ namespace Photon.Agent
             }
         }
 
-        private int Run(string[] args)
+        private static int Run(string[] args)
         {
             var arguments = new Arguments();
 
@@ -44,37 +40,48 @@ namespace Photon.Agent
                 return 1;
             }
 
-            if (arguments.RunAsConsole) {
-                RunAsConsole(args);
-            }
-            else {
-                ServiceBase.Run(new [] {
-                    new AgentService(),
-                });
-            }
+            if (arguments.RunAsConsole)
+                return RunAsConsole();
+
+            ServiceBase.Run(new ServiceBase[] {
+                new AgentService(),
+            });
 
             return 0;
         }
 
-        private void RunAsConsole(string[] args)
+        private static int RunAsConsole()
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Photon Agent");
             Console.ResetColor();
 
-            PhotonAgent.Instance.Start();
+            try {
+                PhotonAgent.Instance.Start();
 
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine("Agent Started");
-            Console.ResetColor();
-            Console.ReadKey(true);
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Agent Started");
+                Console.ResetColor();
+                Console.ReadKey(true);
+                return 0;
+            }
+            catch (Exception error) {
+                Log.Fatal("Unhandled Exception!", error);
 
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Agent Stopping...");
-            Console.ResetColor();
+                Console.ResetColor();
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey(true);
 
-            PhotonAgent.Instance.Stop();
-            Console.WriteLine();
+                return 1;
+            }
+            finally {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Agent Stopping...");
+                Console.ResetColor();
+
+                PhotonAgent.Instance.Stop();
+                Console.WriteLine();
+            }
         }
     }
 }
