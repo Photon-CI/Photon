@@ -51,8 +51,6 @@
     <Compile Include="Messages\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginRequest.cs" />
-    <Compile Include="ProcessResult.cs" />
-    <Compile Include="ProcessRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReferencePool.cs" />
     <Compile Include="LifespanReferenceItem.cs" />

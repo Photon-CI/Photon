@@ -1,4 +1,4 @@
-﻿namespace Photon.Library
+﻿namespace Photon.Framework
 {
     public class ProcessResult
     {

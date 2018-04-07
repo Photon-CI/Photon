@@ -37,10 +37,6 @@ namespace Photon.Server.Internal.Sessions
 
                     await sessionHandle.RunTaskAsync();
                 }
-                catch (Exception error) {
-                    Exception = error;
-                    throw;
-                }
                 finally {
                     await sessionHandle.ReleaseSessionAsync();
                 }

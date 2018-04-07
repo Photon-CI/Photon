@@ -1,6 +1,6 @@
 ﻿using Photon.Communication;
+using Photon.Framework;
 using Photon.Framework.Tasks;
-using Photon.Library;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +12,7 @@ namespace Photon.Agent.Internal.Session
     {
         public string TaskName {get; set;}
         public string GitRefspec {get; set;}
+        public int BuildNumber {get; set;}
 
 
         public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId)
@@ -36,7 +37,8 @@ namespace Photon.Agent.Internal.Session
                 GitRefspec = GitRefspec,
                 TaskName = taskName,
                 WorkDirectory = WorkDirectory,
-                Output = new TaskOutput(Transceiver, taskSessionId),
+                BuildNumber = BuildNumber,
+                Output = Output.Writer,
             };
 
             return await Domain.RunBuildTask(context);
@@ -128,7 +130,7 @@ namespace Photon.Agent.Internal.Session
 
         protected void RunCommandLine(string command)
         {
-            var result = ProcessRunner.Run(WorkDirectory, command, Output);
+            var result = ProcessRunner.Run(WorkDirectory, command, Output.Writer);
 
             if (result.ExitCode != 0)
                 throw new ApplicationException("Process terminated with a non-zero exit code!");

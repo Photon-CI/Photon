@@ -73,6 +73,8 @@
     <Compile Include="Packages\ApplicationPackage.cs" />
     <Compile Include="Packages\ProjectPackage.cs" />
     <Compile Include="Domain\RemoteTaskCompletionSource.cs" />
+    <Compile Include="ProcessResult.cs" />
+    <Compile Include="ProcessRunner.cs" />
     <Compile Include="Projects\Project.cs" />
     <Compile Include="Scripts\AgentDeploySessionHandle.cs" />
     <Compile Include="Scripts\DeployScriptRegistry.cs" />
@@ -100,7 +102,6 @@
     <Compile Include="Tasks\RolesAttribute.cs" />
     <Compile Include="Tasks\BuildTaskRegistry.cs" />
     <Compile Include="TaskProjectDefinition.cs" />
-    <Compile Include="Tasks\TaskOutput.cs" />
     <Compile Include="Tasks\TaskResult.cs" />
     <Compile Include="ContextTaskDefinition.cs" />
     <Compile Include="ContextProjectDefinition.cs" />

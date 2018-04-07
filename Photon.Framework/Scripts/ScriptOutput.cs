@@ -7,6 +7,8 @@ namespace Photon.Framework.Scripts
 {
     public class ScriptOutput : MarshalByRefObject, IDisposable
     {
+        public event EventHandler Changed;
+
         private readonly StringBuilder builder;
         private readonly StringWriter writer;
         private readonly AnsiWriter ansiWriter;
@@ -40,6 +42,7 @@ namespace Photon.Framework.Scripts
                 ansiWriter.Write(text, color);
             }
 
+            OnChanged();
             return this;
         }
 
@@ -49,6 +52,7 @@ namespace Photon.Framework.Scripts
                 ansiWriter.WriteLine(text, color);
             }
 
+            OnChanged();
             return this;
         }
 
@@ -60,6 +64,11 @@ namespace Photon.Framework.Scripts
             }
 
             return this;
+        }
+
+        protected virtual void OnChanged()
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public override string ToString()

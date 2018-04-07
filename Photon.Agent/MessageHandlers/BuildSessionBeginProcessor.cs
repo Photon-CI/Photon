@@ -2,6 +2,7 @@
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework.Messages;
+using System;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
@@ -10,20 +11,29 @@ namespace Photon.Agent.MessageHandlers
     {
         public override async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
         {
-            var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
-                Project = requestMessage.Project,
-                AssemblyFile = requestMessage.AssemblyFile,
-                GitRefspec = requestMessage.GitRefspec,
-                TaskName = requestMessage.TaskName,
-            };
+            var response = new BuildSessionBeginResponse();
 
-            PhotonAgent.Instance.Sessions.BeginSession(session);
+            try {
+                var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
+                    Project = requestMessage.Project,
+                    AssemblyFile = requestMessage.AssemblyFile,
+                    GitRefspec = requestMessage.GitRefspec,
+                    TaskName = requestMessage.TaskName,
+                    BuildNumber = requestMessage.BuildNumber,
+                };
 
-            await session.InitializeAsync();
+                PhotonAgent.Instance.Sessions.BeginSession(session);
 
-            return new BuildSessionBeginResponse {
-                SessionId = session.SessionId,
-            };
+                await session.InitializeAsync();
+
+                response.SessionId = session.SessionId;
+                response.Successful = true;
+            }
+            catch (Exception error) {
+                response.Exception = error.Message;
+            }
+
+            return response;
         }
     }
 }

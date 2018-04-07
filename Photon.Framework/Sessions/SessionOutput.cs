@@ -11,12 +11,15 @@ namespace Photon.Framework.Sessions
         ISessionOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray);
     }
 
+    [Serializable]
     public class SessionOutput : ISessionOutput
     {
         private readonly string serverSessionId;
         private readonly MessageTransceiver transceiver;
         private readonly ScriptOutput output;
         private int readPos;
+
+        public ScriptOutput Writer => output;
 
 
         public SessionOutput(MessageTransceiver transceiver, string serverSessionId)
@@ -25,23 +28,22 @@ namespace Photon.Framework.Sessions
             this.serverSessionId = serverSessionId;
 
             output = new ScriptOutput();
+            output.Changed += Output_OnChanged;
         }
 
         public ISessionOutput Write(string text, ConsoleColor color = ConsoleColor.Gray)
         {
             output.Append(text, color);
-            Update();
             return this;
         }
 
         public ISessionOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
             output.AppendLine(text, color);
-            Update();
             return this;
         }
 
-        private void Update()
+        private void Output_OnChanged(object sender, EventArgs e)
         {
             var length = output.Length;
             if (length <= readPos) return;

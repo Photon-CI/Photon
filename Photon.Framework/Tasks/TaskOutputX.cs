@@ -11,7 +11,7 @@ namespace Photon.Framework.Tasks
         ITaskOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray);
     }
 
-    public class TaskOutput : ITaskOutput
+    public class TaskOutput : MarshalByRefObject, ITaskOutput
     {
         private readonly string taskSessionId;
         private readonly MessageTransceiver transceiver;

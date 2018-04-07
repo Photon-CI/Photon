@@ -1,21 +1,21 @@
-﻿using Photon.Framework.Sessions;
+﻿using Photon.Framework.Scripts;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Photon.Library
+namespace Photon.Framework
 {
     public static class ProcessRunner
     {
-        public static ProcessResult Run(string workDir, string command, ISessionOutput output)
+        public static ProcessResult Run(string workDir, string command, ScriptOutput output)
         {
             SplitCommand(command, out var _file, out var _args);
             return Run(workDir, _file, _args, output);
         }
 
-        public static ProcessResult Run(string workDir, string filename, string arguments, ISessionOutput output)
+        public static ProcessResult Run(string workDir, string filename, string arguments, ScriptOutput output)
         {
             var _file = Path.Combine(workDir, filename);
 
@@ -33,8 +33,8 @@ namespace Photon.Library
                 if (process == null)
                     throw new ApplicationException("Failed to start process!");
 
-                var readOutTask = ReadToOutput(process.StandardOutput, output);
-                var readErrorTask = ReadToOutput(process.StandardError, output);
+                var readOutTask = ReadToOutput(process.StandardOutput, output, ConsoleColor.Gray);
+                var readErrorTask = ReadToOutput(process.StandardError, output, ConsoleColor.DarkYellow);
 
                 process.WaitForExit();
                 Task.WaitAll(readOutTask, readErrorTask);
@@ -47,7 +47,7 @@ namespace Photon.Library
             }
         }
 
-        private static async Task<string> ReadToOutput(StreamReader reader, ISessionOutput output)
+        private static async Task<string> ReadToOutput(StreamReader reader, ScriptOutput output, ConsoleColor color)
         {
             var builder = new StringBuilder();
 
@@ -55,7 +55,7 @@ namespace Photon.Library
                 var line = await reader.ReadLineAsync();
 
                 builder.AppendLine(line);
-                output.WriteLine(line);
+                output.AppendLine(line, color);
             }
 
             return builder.ToString();

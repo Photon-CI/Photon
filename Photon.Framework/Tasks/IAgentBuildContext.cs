@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Projects;
+using Photon.Framework.Scripts;
 
 namespace Photon.Framework.Tasks
 {
@@ -9,6 +10,10 @@ namespace Photon.Framework.Tasks
         string TaskName {get;}
         string GitRefspec {get;}
         string WorkDirectory {get;}
-        ITaskOutput Output {get;}
+        int BuildNumber {get;}
+        ScriptOutput Output {get;}
+
+        void RunCommandLine(string command);
+        void PushProjectPackage(string filename);
     }
 }

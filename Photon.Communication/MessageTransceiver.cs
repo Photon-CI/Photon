@@ -99,14 +99,14 @@ namespace Photon.Communication
                 var handle = Processor.Process(requestMessage);
                 handle.GetResponse().ContinueWith(t => {
                     if (t.IsFaulted) {
-                        throw new NotImplementedException();
-                        //var exceptionResponse = new ExceptionResponseMessage {
-                        //    RequestMessageId = requestMessage.MessageId,
-                        //    Exception = t.Exception.ToString()
-                        //};
+                        var exceptionResponse = new ExceptionResponseMessage {
+                            MessageId = Guid.NewGuid().ToString("N"),
+                            RequestMessageId = requestMessage.MessageId,
+                            Exception = t.Exception?.Message,
+                        };
 
-                        //messageSender.Send(exceptionResponse);
-                        //return;
+                        messageSender.Send(exceptionResponse);
+                        return;
                     }
 
                     var _responseMessage = t.Result;

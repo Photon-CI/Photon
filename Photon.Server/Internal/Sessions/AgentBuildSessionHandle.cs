@@ -10,10 +10,9 @@ using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
 {
-    public class AgentBuildSessionHandle : /*IAgentSessionHandle,*/ IDisposable
+    public class AgentBuildSessionHandle : IDisposable
     {
         private readonly ServerAgentDefinition definition;
-        //private readonly MessageProcessor messageProcessor;
         private readonly MessageClient messageClient;
 
         private string agentSessionId;
@@ -31,7 +30,7 @@ namespace Photon.Server.Internal.Sessions
         {
             this.definition = agentDefinition;
 
-            // TODO: This can be moved to PhotonServer
+            // TODO: This can be moved to single instance in PhotonServer
             var registry = new MessageRegistry();
             registry.Scan(Assembly.GetExecutingAssembly());
 
@@ -59,7 +58,10 @@ namespace Photon.Server.Internal.Sessions
             var handle = messageClient.Send(message);
             var response = await handle.GetResponseAsync<BuildSessionBeginResponse>();
 
-            agentSessionId = response?.SessionId;
+            if (!response.Successful)
+                throw new ApplicationException($"Failed to start Agent Session! {response.Exception}");
+
+            agentSessionId = response.SessionId;
             if (string.IsNullOrEmpty(agentSessionId))
                 throw new ApplicationException("Failed to begin agent session!");
         }
