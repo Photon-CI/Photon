@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Photon.Framework.Projects
 {
+    [Serializable]
     public class Project
     {
         [JsonProperty("id")]

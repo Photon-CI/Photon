@@ -2,6 +2,7 @@
 
 namespace Photon.Framework.Tasks
 {
+    [Serializable]
     public class TaskResult
     {
         public bool Successful {get; set;}

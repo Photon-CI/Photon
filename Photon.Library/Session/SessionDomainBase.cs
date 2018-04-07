@@ -9,12 +9,13 @@ namespace Photon.Library.Session
     public abstract class SessionDomainBase<T> : IDisposable
         where T : DomainAgentBase
     {
+        private bool isUnloaded;
         private AppDomain domain;
         private ClientSponsor sponsor;
         protected T agent;
 
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (sponsor != null) {
                 if (agent != null) {
@@ -26,16 +27,7 @@ namespace Photon.Library.Session
                 sponsor = null;
             }
 
-            agent = null;
-
-            if (domain != null) {
-                try {
-                    AppDomain.Unload(domain);
-                }
-                catch (ThreadAbortException) {}
-
-                domain = null;
-            }
+            if (!isUnloaded) Unload();
         }
 
         public void Initialize(string assemblyFilename)
@@ -56,6 +48,19 @@ namespace Photon.Library.Session
             agent.LoadAssembly(assemblyFilename);
 
             sponsor.Register(agent);
+        }
+
+        public void Unload()
+        {
+            try {
+                AppDomain.Unload(domain);
+            }
+            catch (ThreadAbortException) {
+                Thread.ResetAbort();
+            }
+
+            domain = null;
+            isUnloaded = true;
         }
     }
 }

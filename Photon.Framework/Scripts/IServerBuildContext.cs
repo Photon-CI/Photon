@@ -9,6 +9,7 @@ namespace Photon.Framework.Scripts
         string ScriptName {get;}
         string WorkDirectory {get;}
         int BuildNumber {get;}
+        ScriptOutput Output {get;}
 
         AgentSessionHandleCollection RegisterAgents(params string[] roles);
     }

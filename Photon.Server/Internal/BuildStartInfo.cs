@@ -10,10 +10,13 @@ namespace Photon.Server.Internal
         [JsonProperty("assembly")]
         public string AssemblyFile {get; set;}
 
+        [JsonProperty("task")]
+        public string TaskName {get; set;}
+
         [JsonProperty("refspec")]
         public string GitRefspec {get; set;}
 
-        [JsonProperty("script")]
-        public string ScriptName {get; set;}
+        [JsonProperty("roles")]
+        public string[] Roles {get; set;}
     }
 }

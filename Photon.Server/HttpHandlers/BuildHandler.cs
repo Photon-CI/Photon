@@ -1,9 +1,8 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Photon.Framework.Extensions;
-using Photon.Library.Messages;
+using Photon.Framework.Messages;
 using Photon.Server.Internal;
-using Photon.Server.Internal.Scripts;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
@@ -19,10 +18,7 @@ namespace Photon.Server.HttpHandlers
 
         public override HttpHandlerResult Post()
         {
-            var qProjectId = GetQuery("project");
             var qGitRefspec = GetQuery("refspec");
-            var qScriptName = GetQuery("script");
-            var qAssemblyFile = GetQuery("assembly");
 
             BuildStartInfo startInfo = null;
             if (HttpContext.Request.ContentLength64 > 0) {
@@ -30,31 +26,26 @@ namespace Photon.Server.HttpHandlers
                 startInfo = serializer.Deserialize<BuildStartInfo>(HttpContext.Request.InputStream);
             }
 
-            var _projectId = startInfo?.ProjectId ?? qProjectId;
-            var _gitRefspec = startInfo?.GitRefspec ?? qGitRefspec;
-            var _scriptName = startInfo?.ScriptName ?? qScriptName;
-            var _assemblyFile = startInfo?.AssemblyFile ?? qAssemblyFile;
+            if (startInfo == null)
+                return BadRequest().SetText("No json request was found!");
 
-            //Log.Debug($"Running Build-Script '{_scriptName}' from Project '{_projectId}' @ '{_gitRefspec}'.");
+            var _gitRefspec = qGitRefspec ?? startInfo.GitRefspec;
 
             try {
-                if (!PhotonServer.Instance.Projects.TryGet(_projectId, out var project))
-                    return BadRequest().SetText($"Project '{_projectId}' was not found!");
+                if (!PhotonServer.Instance.Projects.TryGet(startInfo.ProjectId, out var project))
+                    return BadRequest().SetText($"Project '{startInfo.ProjectId}' was not found!");
 
                 var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
                 var buildNumber = projectData.StartNewBuild();
 
-                var context = new ServerBuildContext {
-                    WorkDirectory = Configuration.WorkDirectory,
-                    BuildNumber = buildNumber,
-                    AssemblyFile = _assemblyFile,
+                var session = new ServerBuildSession {
                     Project = project,
-                    ScriptName = _scriptName,
-                    RefSpec = _gitRefspec,
-                    Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
+                    AssemblyFile = startInfo.AssemblyFile,
+                    TaskName = startInfo.TaskName,
+                    GitRefspec = _gitRefspec,
+                    BuildNumber = buildNumber,
+                    Roles = startInfo.Roles,
                 };
-
-                var session = new ServerBuildSession(context);
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
@@ -79,7 +70,7 @@ namespace Photon.Server.HttpHandlers
                 }
             }
             catch (Exception error) {
-                Log.Error($"Failed to run Build-Script '{_scriptName}' from Project '{_projectId}' @ '{_gitRefspec}'!", error);
+                Log.Error($"Failed to run Build-Task '{startInfo.TaskName}' from Project '{startInfo.ProjectId}' @ '{_gitRefspec}'!", error);
                 return Exception(error);
             }
         }

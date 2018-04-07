@@ -1,4 +1,5 @@
-﻿using Photon.CLI.Internal;
+﻿using AnsiConsole;
+using Photon.CLI.Internal;
 using Photon.CLI.Internal.Commands;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace Photon.CLI.Commands
             Map("project").ToAction(new ProjectCommands(context));
             Map("server").ToAction(new ServerCommands(context));
             Map("help", "?").ToAction(OnHelp);
+
+            Map("-ansi").ToProperty(v => ConsoleEx.EnabledAnsi = v, true);
         }
 
         private async Task OnHelp(string[] args)

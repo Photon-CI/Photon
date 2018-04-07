@@ -1,7 +1,7 @@
 ﻿using Photon.CLI.Commands;
 using Photon.CLI.Internal;
 using System;
-using ConsoleEx = AnsiConsole.AnsiConsole;
+using AnsiConsole;
 
 #if DEBUG
 using System.Diagnostics;

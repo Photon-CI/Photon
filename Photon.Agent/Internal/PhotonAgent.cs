@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using Photon.Agent.Internal.Session;
 
 namespace Photon.Agent.Internal
 {
@@ -18,7 +19,6 @@ namespace Photon.Agent.Internal
 
         public static PhotonAgent Instance {get;} = new PhotonAgent();
 
-        private readonly MessageProcessor messageProcessor;
         private readonly MessageListener messageListener;
         private HttpReceiver receiver;
         private bool isStarted;
@@ -30,14 +30,13 @@ namespace Photon.Agent.Internal
 
         public PhotonAgent()
         {
+            WorkDirectory = Configuration.WorkDirectory;
+
             Sessions = new AgentSessionManager();
 
-            messageProcessor = new MessageProcessor();
-            messageProcessor.Scan(Assembly.GetExecutingAssembly());
-
-            messageListener = new MessageListener(messageProcessor);
-
-            WorkDirectory = Configuration.WorkDirectory;
+            var messageRegistry = new MessageRegistry();
+            messageRegistry.Scan(Assembly.GetExecutingAssembly());
+            messageListener = new MessageListener(messageRegistry);
         }
 
         public void Dispose()
@@ -96,7 +95,7 @@ namespace Photon.Agent.Internal
             }
 
             Sessions.Start();
-            messageProcessor.Start();
+            //messageProcessor.Start();
             messageListener.Listen(IPAddress.Any, 10933);
         }
 
@@ -108,8 +107,8 @@ namespace Photon.Agent.Internal
             messageListener.StopAsync()
                 .GetAwaiter().GetResult();
 
-            messageProcessor.StopAsync()
-                .GetAwaiter().GetResult();
+            //messageProcessor.StopAsync()
+            //    .GetAwaiter().GetResult();
 
             Sessions.Stop();
             receiver.Stop();

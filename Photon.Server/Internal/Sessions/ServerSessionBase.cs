@@ -1,7 +1,6 @@
 ﻿using log4net;
 using Photon.Framework;
 using Photon.Framework.Scripts;
-using Photon.Library;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ namespace Photon.Server.Internal.Sessions
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
-        protected ServerDomain Domain {get;}
+        protected ServerDomain Domain {get; private set;}
         public bool Complete {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
@@ -32,46 +31,56 @@ namespace Photon.Server.Internal.Sessions
             utcCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
-            Domain = new ServerDomain();
+            //Domain = new ServerDomain();
             Output = new ScriptOutput();
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (!isReleased)
                 ReleaseAsync().GetAwaiter().GetResult();
 
             Domain?.Dispose();
+            Domain = null;
+        }
+
+        public virtual void PrepareWorkDirectory()
+        {
+            Directory.CreateDirectory(WorkDirectory);
         }
 
         public abstract Task RunAsync();
 
         public async Task ReleaseAsync()
         {
+            if (isReleased) return;
+            isReleased = true;
+
+            // TODO: Hack! A ThreadAbortException
+            //  will be called if we immediately
+            //  close the AppDomain.
+            await Task.Delay(200);
+
             Complete = true;
             utcReleased = DateTime.UtcNow;
-            Domain?.Dispose();
+            Domain?.Unload();
 
-            if (!isReleased) {
-                var workDirectory = WorkDirectory;
-                try {
-                    await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
-                }
-                catch (AggregateException errors) {
-                    errors.Flatten().Handle(e => {
-                        if (e is IOException ioError) {
-                            Log.Warn(ioError.Message);
-                            return true;
-                        }
+            var workDirectory = WorkDirectory;
+            try {
+                await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
+            }
+            catch (AggregateException errors) {
+                errors.Flatten().Handle(e => {
+                    if (e is IOException ioError) {
+                        Log.Warn(ioError.Message);
+                        return true;
+                    }
 
-                        return false;
-                    });
-                }
-
-                isReleased = true;
+                    return false;
+                });
             }
         }
 
@@ -85,17 +94,12 @@ namespace Photon.Server.Internal.Sessions
             return DateTime.UtcNow - utcCreated > LifeSpan;
         }
 
-        public virtual void PrepareWorkDirectory()
-        {
-            Directory.CreateDirectory(WorkDirectory);
-        }
+        //protected void RunCommandLine(string command)
+        //{
+        //    var result = ProcessRunner.Run(WorkDirectory, command, Output);
 
-        protected void RunCommandLine(string command)
-        {
-            var result = ProcessRunner.Run(WorkDirectory, command, Output);
-
-            if (result.ExitCode != 0)
-                throw new ApplicationException("Process terminated with a non-zero exit code!");
-        }
+        //    if (result.ExitCode != 0)
+        //        throw new ApplicationException("Process terminated with a non-zero exit code!");
+        //}
     }
 }

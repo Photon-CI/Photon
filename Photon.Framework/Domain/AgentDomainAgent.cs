@@ -41,7 +41,7 @@ namespace Photon.Framework.Domain
                 .ContinueWith(completeEvent.FromTask);
         }
 
-        public void RunDeployTask(IDeployTaskContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
+        public void RunDeployTask(IAgentDeployContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
         {
             deployTaskRegistry.ExecuteTask(context)
                 .ContinueWith(completeEvent.FromTask);

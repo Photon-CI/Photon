@@ -39,10 +39,10 @@
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.1.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.1.6\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.1.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.1.7\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,20 +55,20 @@
     <Compile Include="AgentService.Designer.cs">
       <DependentUpon>AgentService.cs</DependentUpon>
     </Compile>
-    <Compile Include="Internal\AgentBuildSession.cs" />
-    <Compile Include="Internal\AgentDeploySession.cs" />
-    <Compile Include="Internal\AgentSessionBase.cs" />
+    <Compile Include="Internal\Session\AgentBuildSession.cs" />
+    <Compile Include="Internal\Session\AgentDeploySession.cs" />
+    <Compile Include="Internal\Session\AgentSessionBase.cs" />
     <Compile Include="Internal\AgentSessionDomain.cs" />
-    <Compile Include="Internal\AgentSessionManager.cs" />
-    <Compile Include="Internal\AgentBuildContext.cs" />
-    <Compile Include="Internal\AgentDeployContext.cs" />
-    <Compile Include="Internal\IAgentSession.cs" />
+    <Compile Include="Internal\Session\AgentSessionManager.cs" />
+    <Compile Include="Internal\Session\IAgentSession.cs" />
     <Compile Include="Internal\PhotonAgent.cs" />
     <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
+    <Compile Include="Internal\Session\SessionTaskHandle.cs" />
+    <Compile Include="MessageHandlers\BuildTaskRunProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionReleaseProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionBeginProcessor.cs" />
-    <Compile Include="ViewHandlers\IndexHandler.cs" />
+    <Compile Include="HttpHandlers\IndexHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

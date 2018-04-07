@@ -1,7 +1,7 @@
-﻿using Photon.CLI.Internal;
+﻿using AnsiConsole;
+using Photon.CLI.Internal;
 using System;
 using System.Threading.Tasks;
-using ConsoleEx = AnsiConsole.AnsiConsole;
 
 namespace Photon.CLI.Actions
 {

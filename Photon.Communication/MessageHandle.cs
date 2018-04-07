@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
     public class MessageHandle
     {
-        private TaskCompletionSource<IResponseMessage> completionEvent;
+        private readonly TaskCompletionSource<IResponseMessage> completionEvent;
 
         public IRequestMessage Request {get;}
         public IResponseMessage Response {get; private set;}
@@ -24,7 +25,12 @@ namespace Photon.Communication
 
         public async Task<T> GetResponseAsync<T>()
         {
-            return (T)await completionEvent.Task;
+            var response = await completionEvent.Task;
+
+            if (response is ExceptionResponseMessage exceptionResponse)
+                throw new ApplicationException($"Failed to send message! {exceptionResponse.Exception}");
+
+            return (T)response;
         }
 
         internal void Complete(IResponseMessage message)

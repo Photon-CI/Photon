@@ -1,13 +1,13 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Communication;
-using Photon.Library.Messages;
+using Photon.Framework.Messages;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {
-    public class BuildSessionReleaseProcessor : IProcessMessage<BuildSessionReleaseRequest>
+    public class BuildSessionReleaseProcessor : MessageProcessorBase<BuildSessionReleaseRequest>
     {
-        public async Task<IResponseMessage> Process(BuildSessionReleaseRequest requestMessage)
+        public override async Task<IResponseMessage> Process(BuildSessionReleaseRequest requestMessage)
         {
             await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.SessionId);
 

@@ -1,29 +1,39 @@
 ﻿using Photon.Agent.Internal;
+using Photon.Agent.Internal.Session;
 using Photon.Communication;
-using Photon.Library.Messages;
+using Photon.Framework.Messages;
+using System;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {
-    public class BuildSessionBeginProcessor : IProcessMessage<BuildSessionBeginRequest>
+    public class BuildSessionBeginProcessor : MessageProcessorBase<BuildSessionBeginRequest>
     {
-        public async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
+        public override async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
         {
-            var agent = PhotonAgent.Instance.Definition;
+            var response = new BuildSessionBeginResponse();
 
-            var context = new AgentBuildContext(agent) {
-                Project = requestMessage.Project,
-                PackageId = requestMessage.PackageId,
-                PackageVersion = requestMessage.PackageVersion,
-            };
+            try {
+                var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
+                    Project = requestMessage.Project,
+                    AssemblyFile = requestMessage.AssemblyFile,
+                    GitRefspec = requestMessage.GitRefspec,
+                    TaskName = requestMessage.TaskName,
+                    BuildNumber = requestMessage.BuildNumber,
+                };
 
-            var session = new AgentBuildSession(context);
+                PhotonAgent.Instance.Sessions.BeginSession(session);
 
-            PhotonAgent.Instance.Sessions.BeginSession(session);
+                await session.InitializeAsync();
 
-            return new BuildSessionBeginResponse {
-                SessionId = session.SessionId,
-            };
+                response.SessionId = session.SessionId;
+                response.Successful = true;
+            }
+            catch (Exception error) {
+                response.Exception = error.Message;
+            }
+
+            return response;
         }
     }
 }

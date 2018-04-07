@@ -1,4 +1,4 @@
-﻿using Photon.Server.Internal.Scripts;
+﻿using Photon.Framework.Scripts;
 using System;
 using System.IO;
 using System.Threading.Tasks;

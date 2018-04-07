@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -40,16 +40,17 @@
   <ItemGroup>
     <Compile Include="ConfigurationReader.cs" />
     <Compile Include="IReferenceItem.cs" />
-    <Compile Include="Messages\BuildSessionBeginRequest.cs" />
-    <Compile Include="Messages\BuildSessionBeginResponse.cs" />
-    <Compile Include="Messages\BuildSessionReleaseRequest.cs" />
-    <Compile Include="Messages\BuildSessionReleaseResponse.cs" />
+    <Compile Include="Messages\BuildTaskCompleteMessage.cs" />
+    <Compile Include="Messages\BuildTaskRunRequest.cs" />
+    <Compile Include="Messages\BuildTaskRunResponse.cs" />
+    <Compile Include="Messages\BuildTaskStartRequest.cs" />
+    <Compile Include="Messages\BuildTaskStartResponse.cs" />
+    <Compile Include="Messages\BuildTaskStatusRequest.cs" />
+    <Compile Include="Messages\BuildTaskStatusResponse.cs" />
     <Compile Include="Messages\TaskBeginRequest.cs" />
     <Compile Include="Messages\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginRequest.cs" />
-    <Compile Include="ProcessResult.cs" />
-    <Compile Include="ProcessRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReferencePool.cs" />
     <Compile Include="LifespanReferenceItem.cs" />

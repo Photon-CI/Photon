@@ -16,6 +16,8 @@ namespace Photon.Framework.Scripts
                 classObject = Activator.CreateInstance(scriptClassType);
                 var script = classObject as IBuildScript;
 
+                if (script == null) throw new Exception($"Unable to run Build-Script of type '{scriptClassType}'!");
+
                 return await script.RunAsync(context);
             }
             finally {

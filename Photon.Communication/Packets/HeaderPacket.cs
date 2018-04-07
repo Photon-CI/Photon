@@ -20,12 +20,12 @@ namespace Photon.Communication.Packets
 
         public async Task WriteToAsync(BinaryWriter writer)
         {
-            writer.Write(MessageId);
-            writer.Write(PacketType);
-            writer.Write(MessageType);
-            writer.Write(MessageSize);
+            await Task.Run(() => {
+                writer.Write(MessageId);
+                writer.Write(PacketType);
+                writer.Write(MessageType);
+                writer.Write(MessageSize);
+            });
         }
-
-        // TODO: Parse Method
     }
 }

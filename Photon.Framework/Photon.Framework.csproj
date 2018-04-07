@@ -30,8 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="AnsiConsole, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AnsiConsole.0.2.0\lib\net45\AnsiConsole.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json.Bson, Version=1.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.Bson.1.0.1\lib\net45\Newtonsoft.Json.Bson.dll</HintPath>
@@ -56,6 +59,12 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\RemoteTaskExtensions.cs" />
     <Compile Include="FileUtils.cs" />
+    <Compile Include="Messages\BuildSessionBeginRequest.cs" />
+    <Compile Include="Messages\BuildSessionBeginResponse.cs" />
+    <Compile Include="Messages\BuildSessionReleaseRequest.cs" />
+    <Compile Include="Messages\BuildSessionReleaseResponse.cs" />
+    <Compile Include="Messages\AgentSessionOutputMessage.cs" />
+    <Compile Include="Messages\BuildTaskOutputMessage.cs" />
     <Compile Include="NetPath.cs" />
     <Compile Include="Packages\FilePatternMatching.cs" />
     <Compile Include="Packages\PackageFileDefinition.cs" />
@@ -64,24 +73,28 @@
     <Compile Include="Packages\ApplicationPackage.cs" />
     <Compile Include="Packages\ProjectPackage.cs" />
     <Compile Include="Domain\RemoteTaskCompletionSource.cs" />
+    <Compile Include="ProcessResult.cs" />
+    <Compile Include="ProcessRunner.cs" />
     <Compile Include="Projects\Project.cs" />
+    <Compile Include="Scripts\AgentDeploySessionHandle.cs" />
     <Compile Include="Scripts\DeployScriptRegistry.cs" />
     <Compile Include="Scripts\IAgentSessionHandle.cs" />
     <Compile Include="Scripts\IDeployScript.cs" />
     <Compile Include="Scripts\IServerDeployContext.cs" />
-    <Compile Include="Scripts\IServerBuildContext.cs" />
-    <Compile Include="Scripts\IBuildScript.cs" />
     <Compile Include="Scripts\AgentSessionHandleCollection.cs" />
     <Compile Include="Domain\TypeRegistry.cs" />
     <Compile Include="Scripts\ScriptOutput.cs" />
-    <Compile Include="Scripts\BuildScriptRegistry.cs" />
     <Compile Include="Scripts\ScriptResult.cs" />
+    <Compile Include="Scripts\ServerDeployContext.cs" />
     <Compile Include="ServerAgentDefinition.cs" />
     <Compile Include="ServerDefinition.cs" />
     <Compile Include="ServerHttpDefinition.cs" />
+    <Compile Include="Sessions\SessionOutput.cs" />
+    <Compile Include="Tasks\AgentBuildContext.cs" />
+    <Compile Include="Tasks\AgentDeployContext.cs" />
     <Compile Include="Tasks\DeployTaskRegistry.cs" />
     <Compile Include="Tasks\IBuildTask.cs" />
-    <Compile Include="Tasks\IDeployTaskContext.cs" />
+    <Compile Include="Tasks\IAgentDeployContext.cs" />
     <Compile Include="Tasks\IAgentBuildContext.cs" />
     <Compile Include="Tasks\IDeployTask.cs" />
     <Compile Include="Packages\PackageDefinition.cs" />
@@ -97,8 +110,12 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Sessions\" />
+    <ProjectReference Include="..\Photon.Communication\Photon.Communication.csproj">
+      <Project>{E167A349-7691-4406-9F4B-989BD5E6E12F}</Project>
+      <Name>Photon.Communication</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

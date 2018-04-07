@@ -5,20 +5,24 @@ using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
-    internal class MessageTransceiver
+    public class MessageTransceiver
     {
         private readonly object startStopLock;
-        private readonly MessageProcessor processor;
         private readonly ConcurrentDictionary<string, MessageHandle> messageHandles;
-        private MessageSender messageSender;
-        private MessageReceiver messageReceiver;
+        private readonly MessageSender messageSender;
+        private readonly MessageReceiver messageReceiver;
+        private TcpClient tcpClient;
         private NetworkStream stream;
-        private bool isStarted;
+
+        internal MessageProcessor Processor {get;}
+        public bool IsStarted {get; private set;}
 
 
-        public MessageTransceiver(MessageProcessor processor)
+        internal MessageTransceiver(MessageRegistry registry)
         {
-            this.processor = processor;
+            //this.Processor = processor;
+            Processor = new MessageProcessor(this, registry);
+            //...
 
             startStopLock = new object();
             messageHandles = new ConcurrentDictionary<string, MessageHandle>(StringComparer.Ordinal);
@@ -33,17 +37,20 @@ namespace Photon.Communication
             messageSender?.Dispose();
             messageReceiver.Dispose();
             stream?.Dispose();
+            tcpClient?.Dispose();
         }
 
-        public void Start(NetworkStream stream)
+        public void Start(TcpClient client)
         {
             lock (startStopLock) {
-                if (isStarted) throw new Exception("Transceiver is already started!");
-                isStarted = true;
+                if (IsStarted) throw new Exception("Transceiver is already started!");
+                IsStarted = true;
             }
 
-            this.stream = stream;
+            tcpClient = client;
+            stream = tcpClient.GetStream();
 
+            Processor.Start();
             messageSender.Start(stream);
             messageReceiver.Start(stream);
         }
@@ -51,13 +58,13 @@ namespace Photon.Communication
         public async Task StopAsync()
         {
             lock (startStopLock) {
-                if (!isStarted) return;
-                isStarted = false;
+                if (!IsStarted) return;
+                IsStarted = false;
             }
 
+            await Processor.StopAsync();
             await messageSender.StopAsync();
             await messageReceiver.StopAsync();
-            //await processor.FlushAsync();
 
             stream.Close();
         }
@@ -89,17 +96,17 @@ namespace Photon.Communication
                 handle.Complete(responseMessage);
             }
             else if (e.Message is IRequestMessage requestMessage) {
-                var handle = processor.Process(requestMessage);
+                var handle = Processor.Process(requestMessage);
                 handle.GetResponse().ContinueWith(t => {
                     if (t.IsFaulted) {
-                        throw new NotImplementedException();
-                        //var exceptionResponse = new ExceptionResponseMessage {
-                        //    RequestMessageId = requestMessage.MessageId,
-                        //    Exception = t.Exception.ToString()
-                        //};
+                        var exceptionResponse = new ExceptionResponseMessage {
+                            MessageId = Guid.NewGuid().ToString("N"),
+                            RequestMessageId = requestMessage.MessageId,
+                            Exception = t.Exception?.Message,
+                        };
 
-                        //messageSender.Send(exceptionResponse);
-                        //return;
+                        messageSender.Send(exceptionResponse);
+                        return;
                     }
 
                     var _responseMessage = t.Result;

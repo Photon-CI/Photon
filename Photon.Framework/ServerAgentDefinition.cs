@@ -31,11 +31,15 @@ namespace Photon.Framework
 
         public bool MatchesRoles(IEnumerable<string> roles)
         {
+            if (roles == null) throw new ArgumentNullException(nameof(roles));
+
             return roles.Any(ContainsRole);
         }
 
         public bool ContainsRole(string role)
         {
+            if (role == null) throw new ArgumentNullException(nameof(role));
+
             return Roles.Any(x => string.Equals(x, role, StringComparison.OrdinalIgnoreCase));
         }
     }
