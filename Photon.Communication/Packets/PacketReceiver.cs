@@ -25,7 +25,7 @@ namespace Photon.Communication.Packets
         public void Dispose()
         {
             reader?.Dispose();
-            //streamBuffer?.Dispose();
+            streamBuffer?.Dispose();
         }
 
         public async Task ReadPacket()

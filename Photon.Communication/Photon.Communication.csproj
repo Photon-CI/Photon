@@ -54,6 +54,7 @@
     <Compile Include="MessageHost.cs" />
     <Compile Include="MessageListener.cs" />
     <Compile Include="MessageProcessor.cs" />
+    <Compile Include="MessageProcessorBase.cs" />
     <Compile Include="MessageProcessorHandle.cs" />
     <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="MessageReceiver.cs" />

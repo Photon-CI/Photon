@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
-    internal class MessageRegistry
+    internal delegate Task<IResponseMessage> ProcessEvent(MessageTransceiver transceiver, IRequestMessage message);
+
+    public class MessageRegistry
     {
-        private readonly Dictionary<Type, Func<IRequestMessage, Task<IResponseMessage>>> processorMap;
+        private readonly Dictionary<Type, ProcessEvent> processorMap;
 
 
         public MessageRegistry()
         {
-            processorMap = new Dictionary<Type, Func<IRequestMessage, Task<IResponseMessage>>>();
+            processorMap = new Dictionary<Type, ProcessEvent>();
         }
 
         public void Scan(Assembly assembly)
@@ -25,14 +27,14 @@ namespace Photon.Communication
                 Register(classType);
         }
 
-        public async Task<IResponseMessage> Process(IRequestMessage requestMessage)
+        internal async Task<IResponseMessage> Process(MessageTransceiver transceiver, IRequestMessage requestMessage)
         {
             var requestType = requestMessage.GetType();
 
             if (!processorMap.TryGetValue(requestType, out var processorFunc))
                 throw new Exception($"No processor found matching request type '{requestType.Name}'!");
 
-            return await processorFunc.Invoke(requestMessage);
+            return await processorFunc.Invoke(transceiver, requestMessage);
         }
 
         public void Register<TProcessor, TRequest>()
@@ -58,23 +60,31 @@ namespace Photon.Communication
                 var requestType = argumentTypeList[0];
 
                 var method = classInterface.GetMethod("Process");
-                //var genericMethod = method.MakeGenericMethod(requestType);
+                if (method == null) continue;
 
-                processorMap[requestType] = async request => {
-                    object processor = null;
+                processorMap[requestType] = (transceiver, message) =>
+                    OnProcess(transceiver, processorClassType, method, message);
+            }
+        }
 
-                    try {
-                        processor = Activator.CreateInstance(processorClassType);
+        private static async Task<IResponseMessage> OnProcess(MessageTransceiver transceiver, Type processorClassType, MethodInfo processMethod, IRequestMessage request)
+        {
+            object processor = null;
 
-                        var arguments = new[] {request};
-                        var result = method.Invoke(processor, arguments);
+            try {
+                processor = Activator.CreateInstance(processorClassType);
 
-                        return await (Task<IResponseMessage>)result;
-                    }
-                    finally {
-                        (processor as IDisposable)?.Dispose();
-                    }
-                };
+                processorClassType.GetProperty("Transceiver")?.SetValue(processor, transceiver);
+                //processorClassType.GetProperty("Context")?.SetValue(processor, context);
+
+                var arguments = new object[] {request};
+
+                var result = processMethod.Invoke(processor, arguments);
+
+                return await (Task<IResponseMessage>)result;
+            }
+            finally {
+                (processor as IDisposable)?.Dispose();
             }
         }
     }

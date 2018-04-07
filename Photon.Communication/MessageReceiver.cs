@@ -16,8 +16,6 @@ namespace Photon.Communication
         private Task task;
 
 
-        public MessageReceiver() {}
-
         public void Dispose()
         {
             packetReceiver?.Dispose();

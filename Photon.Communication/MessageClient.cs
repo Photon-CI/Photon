@@ -4,24 +4,24 @@ using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
+    /// <inheritdoc />
     /// <summary>
     /// Connects to a remote MessageHost.
     /// </summary>
     public class MessageClient : IDisposable
     {
         private readonly TcpClient client;
-        private readonly MessageTransceiver transceiver;
-        //private readonly MessageProcessor processor;
+        private readonly MessageRegistry messageRegistry;
+        private MessageTransceiver transceiver;
 
         public bool IsConnected => transceiver.IsStarted;
 
 
-        public MessageClient(MessageProcessor processor)
+        public MessageClient(MessageRegistry registry)
         {
-            //this.processor = processor;
+            messageRegistry = registry;
 
             client = new TcpClient();
-            transceiver = new MessageTransceiver(processor);
         }
 
         public void Dispose()
@@ -33,9 +33,9 @@ namespace Photon.Communication
         public async Task ConnectAsync(string hostname, int port)
         {
             await client.ConnectAsync(hostname, port);
-            var stream = client.GetStream();
 
-            transceiver.Start(stream);
+            transceiver = new MessageTransceiver(messageRegistry);
+            transceiver.Start(client);
         }
 
         public async Task DisconnectAsync()

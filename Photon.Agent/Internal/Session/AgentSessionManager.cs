@@ -3,7 +3,7 @@ using Photon.Library;
 using System;
 using System.Threading.Tasks;
 
-namespace Photon.Agent.Internal
+namespace Photon.Agent.Internal.Session
 {
     internal class AgentSessionManager : IDisposable
     {

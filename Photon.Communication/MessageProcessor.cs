@@ -5,15 +5,19 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Photon.Communication
 {
-    public class MessageProcessor
+    internal class MessageProcessor
     {
+        private readonly MessageTransceiver transceiver;
         private readonly MessageRegistry registry;
         private ActionBlock<MessageProcessorHandle> queue;
 
 
-        public MessageProcessor()
+        public MessageProcessor(MessageTransceiver transceiver, MessageRegistry registry)
         {
-            registry = new MessageRegistry();
+            this.transceiver = transceiver;
+            this.registry = registry;
+
+            //registry = new MessageRegistry();
         }
 
         public void Scan(Assembly assembly)
@@ -51,16 +55,10 @@ namespace Photon.Communication
             return handle;
         }
 
-        //public async Task FlushAsync()
-        //{
-        //    //...
-        //    throw new NotImplementedException();
-        //}
-
         private async Task OnProcess(MessageProcessorHandle handle)
         {
             try {
-                var result = await registry.Process(handle.RequestMessage);
+                var result = await registry.Process(transceiver, handle.RequestMessage);
 
                 handle.SetResult(result);
             }

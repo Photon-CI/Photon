@@ -1,4 +1,4 @@
-﻿using Photon.Framework.Scripts;
+﻿using Photon.Framework.Sessions;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -9,13 +9,13 @@ namespace Photon.Library
 {
     public static class ProcessRunner
     {
-        public static ProcessResult Run(string workDir, string command, ScriptOutput output)
+        public static ProcessResult Run(string workDir, string command, ISessionOutput output)
         {
             SplitCommand(command, out var _file, out var _args);
             return Run(workDir, _file, _args, output);
         }
 
-        public static ProcessResult Run(string workDir, string filename, string arguments, ScriptOutput output)
+        public static ProcessResult Run(string workDir, string filename, string arguments, ISessionOutput output)
         {
             var _file = Path.Combine(workDir, filename);
 
@@ -47,7 +47,7 @@ namespace Photon.Library
             }
         }
 
-        private static async Task<string> ReadToOutput(StreamReader reader, ScriptOutput output)
+        private static async Task<string> ReadToOutput(StreamReader reader, ISessionOutput output)
         {
             var builder = new StringBuilder();
 
@@ -55,11 +55,10 @@ namespace Photon.Library
                 var line = await reader.ReadLineAsync();
 
                 builder.AppendLine(line);
-                output.AppendLine(line);
+                output.WriteLine(line);
             }
 
             return builder.ToString();
-            //return await reader.ReadToEndAsync();
         }
 
         private static void SplitCommand(string command, out string exe, out string args)

@@ -2,9 +2,11 @@
 
 namespace Photon.Communication
 {
-    public interface IProcessMessage<TRequest>
+    public interface IProcessMessage<in TRequest>
         where TRequest : IRequestMessage
     {
+        MessageTransceiver Transceiver {get; set;}
+
         Task<IResponseMessage> Process(TRequest requestMessage);
     }
 }

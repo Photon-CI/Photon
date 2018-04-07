@@ -1,7 +1,6 @@
 ﻿using log4net;
 using Photon.Framework;
 using Photon.Framework.Scripts;
-using Photon.Library;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ namespace Photon.Server.Internal.Sessions
             utcCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
-            Domain = new ServerDomain();
+            //Domain = new ServerDomain();
             Output = new ScriptOutput();
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
@@ -46,6 +45,11 @@ namespace Photon.Server.Internal.Sessions
 
             Domain?.Dispose();
             Domain = null;
+        }
+
+        public virtual void PrepareWorkDirectory()
+        {
+            Directory.CreateDirectory(WorkDirectory);
         }
 
         public abstract Task RunAsync();
@@ -90,17 +94,12 @@ namespace Photon.Server.Internal.Sessions
             return DateTime.UtcNow - utcCreated > LifeSpan;
         }
 
-        public virtual void PrepareWorkDirectory()
-        {
-            Directory.CreateDirectory(WorkDirectory);
-        }
+        //protected void RunCommandLine(string command)
+        //{
+        //    var result = ProcessRunner.Run(WorkDirectory, command, Output);
 
-        protected void RunCommandLine(string command)
-        {
-            var result = ProcessRunner.Run(WorkDirectory, command, Output);
-
-            if (result.ExitCode != 0)
-                throw new ApplicationException("Process terminated with a non-zero exit code!");
-        }
+        //    if (result.ExitCode != 0)
+        //        throw new ApplicationException("Process terminated with a non-zero exit code!");
+        //}
     }
 }

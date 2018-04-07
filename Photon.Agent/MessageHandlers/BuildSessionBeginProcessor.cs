@@ -1,27 +1,25 @@
 ﻿using Photon.Agent.Internal;
+using Photon.Agent.Internal.Session;
 using Photon.Communication;
-using Photon.Library.Messages;
-using System.Threading.Tasks;
-using Photon.Agent.Internal.Tasks;
 using Photon.Framework.Messages;
+using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {
-    public class BuildSessionBeginProcessor : IProcessMessage<BuildSessionBeginRequest>
+    public class BuildSessionBeginProcessor : MessageProcessorBase<BuildSessionBeginRequest>
     {
-        public async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
+        public override async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
         {
-            var agent = PhotonAgent.Instance.Definition;
-
-            var context = new AgentBuildContext(agent) {
+            var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
                 Project = requestMessage.Project,
-                PackageId = requestMessage.PackageId,
-                PackageVersion = requestMessage.PackageVersion,
+                AssemblyFile = requestMessage.AssemblyFile,
+                GitRefspec = requestMessage.GitRefspec,
+                TaskName = requestMessage.TaskName,
             };
 
-            var session = new AgentBuildSession(context);
-
             PhotonAgent.Instance.Sessions.BeginSession(session);
+
+            await session.InitializeAsync();
 
             return new BuildSessionBeginResponse {
                 SessionId = session.SessionId,

@@ -4,22 +4,18 @@ using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Library.Messages;
+using Photon.Framework.Messages;
 using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Photon.Framework.Messages;
 
 namespace Photon.CLI.Actions
 {
     internal class BuildRunAction
     {
         public string ServerName {get; set;}
-        public string ProjectName {get; set;}
         public string GitRefspec {get; set;}
-        public string AssemblyFile {get; set;}
-        public string ScriptName {get; set;}
         public string StartFile {get; set;}
 
 
@@ -56,27 +52,19 @@ namespace Photon.CLI.Actions
         {
             var url = NetPath.Combine(server.Url, "build")
                 +NetPath.QueryString(new {
-                    project = ProjectName,
                     refspec = GitRefspec,
-                    assembly = AssemblyFile,
-                    script = ScriptName,
                 });
 
             var request = WebRequest.CreateHttp(url);
             request.Method = "POST";
             request.KeepAlive = true;
 
-            if (!string.IsNullOrEmpty(StartFile)) {
-                using (var stream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
-                    request.ContentLength = stream.Length;
+            using (var stream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
+                request.ContentLength = stream.Length;
 
-                    using (var requestStream = request.GetRequestStream()) {
-                        await stream.CopyToAsync(requestStream);
-                    }
+                using (var requestStream = request.GetRequestStream()) {
+                    await stream.CopyToAsync(requestStream);
                 }
-            }
-            else {
-                request.ContentLength = 0;
             }
 
             try {
@@ -109,14 +97,6 @@ namespace Photon.CLI.Actions
             }
         }
 
-        class OutputData
-        {
-            public bool IsModified {get; set;}
-            public bool IsComplete {get; set;}
-            public string NewText {get; set;}
-            public int NewLength {get; set;}
-        }
-
         private async Task<OutputData> UpdateOutput(PhotonServerDefinition server, string sessionId, int position)
         {
             var url = NetPath.Combine(server.Url, "session/output")
@@ -138,11 +118,6 @@ namespace Photon.CLI.Actions
 
                     if (int.TryParse(response.Headers.Get("X-Text-Pos"), out var _textPos))
                         result.NewLength = _textPos;
-
-                    //if (response.StatusCode == HttpStatusCode.NotModified)
-                    //    return result;
-
-                    //await response.PrintResponse();
 
                     if (response.StatusCode != HttpStatusCode.OK)
                         throw new ApplicationException($"Server Responded with [{(int)response.StatusCode}] {response.StatusDescription}");
@@ -175,6 +150,14 @@ namespace Photon.CLI.Actions
 
                 throw;
             }
+        }
+
+        private class OutputData
+        {
+            public bool IsModified {get; set;}
+            public bool IsComplete {get; set;}
+            public string NewText {get; set;}
+            public int NewLength {get; set;}
         }
     }
 }

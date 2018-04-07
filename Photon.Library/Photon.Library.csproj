@@ -40,6 +40,13 @@
   <ItemGroup>
     <Compile Include="ConfigurationReader.cs" />
     <Compile Include="IReferenceItem.cs" />
+    <Compile Include="Messages\BuildTaskCompleteMessage.cs" />
+    <Compile Include="Messages\BuildTaskRunRequest.cs" />
+    <Compile Include="Messages\BuildTaskRunResponse.cs" />
+    <Compile Include="Messages\BuildTaskStartRequest.cs" />
+    <Compile Include="Messages\BuildTaskStartResponse.cs" />
+    <Compile Include="Messages\BuildTaskStatusRequest.cs" />
+    <Compile Include="Messages\BuildTaskStatusResponse.cs" />
     <Compile Include="Messages\TaskBeginRequest.cs" />
     <Compile Include="Messages\TaskBeginResponse.cs" />
     <Compile Include="Models\TaskBeginResponse.cs" />

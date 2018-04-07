@@ -1,47 +1,44 @@
-﻿using System;
+﻿using NUnit.Framework;
+using Photon.Communication;
+using Photon.Tests.Internal;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using NUnit.Framework;
-using Photon.Communication;
-using Photon.Tests.Internal;
 
 namespace Photon.Tests.Messaging
 {
     public class SendMessageTests : IntegrationTestFixture, IDisposable
     {
-        private const int port = 10933;
+        private const int Port = 10933;
 
-        private readonly MessageProcessor processor;
         private readonly MessageListener listener;
         private readonly MessageClient client;
 
 
         public SendMessageTests()
         {
-            processor = new MessageProcessor();
-            processor.Register(typeof(TestMessageProcessor));
-            processor.Register(typeof(TestMessageOneWayProcessor));
+            var registry = new MessageRegistry();
+            registry.Register(typeof(TestMessageProcessor));
+            registry.Register(typeof(TestMessageOneWayProcessor));
 
-            listener = new MessageListener(processor);
-            client = new MessageClient(processor);
+            listener = new MessageListener(registry);
+            client = new MessageClient(registry);
         }
 
         public void Dispose()
         {
-            client.Dispose();
-            //listener.Dispose();
-            //processor.Dispose();
+            client?.Dispose();
+            listener?.Dispose();
         }
 
         [OneTimeSetUp]
         public async Task Begin()
         {
-            processor.Start();
-            listener.Listen(IPAddress.Any, port);
+            listener.Listen(IPAddress.Any, Port);
 
-            await client.ConnectAsync("localhost", port);
+            await client.ConnectAsync("localhost", Port);
         }
 
         [OneTimeTearDown]
@@ -49,14 +46,13 @@ namespace Photon.Tests.Messaging
         {
             await client.DisconnectAsync();
             await listener.StopAsync();
-            await processor.StopAsync();
         }
 
         [Test]
         public async Task SendMessageOneWay()
         {
             var completeEvent = new TaskCompletionSource<bool>();
-            TestMessageOneWayProcessor.Event = completeEvent;
+            TestMessageOneWayProcessor._event = completeEvent;
 
             var message = new TestRequestOneWayMessage();
             client.SendOneWay(message);
@@ -106,28 +102,27 @@ namespace Photon.Tests.Messaging
             await TestContext.Out.WriteLineAsync($"Sent {count:N0} request/response messages in {timer.Elapsed}.");
         }
 
-        class TestRequestOneWayMessage : IRequestMessage
+        private class TestRequestOneWayMessage : IRequestMessage
+        {
+            public string MessageId {get; set;}
+        }
+
+        private class TestRequestMessage : IRequestMessage
         {
             public string MessageId {get; set;}
             public int Value {get; set;}
         }
 
-        class TestRequestMessage : IRequestMessage
-        {
-            public string MessageId {get; set;}
-            public int Value {get; set;}
-        }
-
-        class TestResponseMessage : IResponseMessage
+        private class TestResponseMessage : IResponseMessage
         {
             public string MessageId {get; set;}
             public string RequestMessageId {get; set;}
             public int Value {get; set;}
         }
 
-        class TestMessageProcessor : IProcessMessage<TestRequestMessage>
+        private class TestMessageProcessor : MessageProcessorBase<TestRequestMessage>
         {
-            public async Task<IResponseMessage> Process(TestRequestMessage requestMessage)
+            public override async Task<IResponseMessage> Process(TestRequestMessage requestMessage)
             {
                 return await Task.FromResult(new TestResponseMessage {
                     RequestMessageId = requestMessage.MessageId,
@@ -136,13 +131,14 @@ namespace Photon.Tests.Messaging
             }
         }
 
-        class TestMessageOneWayProcessor : IProcessMessage<TestRequestOneWayMessage>
+        private class TestMessageOneWayProcessor : MessageProcessorBase<TestRequestOneWayMessage>
         {
-            public static TaskCompletionSource<bool> Event {get; set;}
+            internal static TaskCompletionSource<bool> _event;
 
-            public async Task<IResponseMessage> Process(TestRequestOneWayMessage requestMessage)
+            
+            public override async Task<IResponseMessage> Process(TestRequestOneWayMessage requestMessage)
             {
-                Event?.SetResult(true);
+                _event?.SetResult(true);
 
                 return await Task.FromResult((IResponseMessage)null);
             }

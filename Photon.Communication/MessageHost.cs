@@ -12,21 +12,17 @@ namespace Photon.Communication
         public event EventHandler Stopped;
 
         private readonly TcpClient client;
-        private readonly MessageProcessor processor;
         private readonly MessageTransceiver transceiver;
         private bool isConnected;
 
 
-        public MessageHost(TcpClient client, MessageProcessor processor)
+        public MessageHost(TcpClient client, MessageRegistry registry)
         {
             this.client = client;
-            this.processor = processor;
 
-            transceiver = new MessageTransceiver(processor);
-
-            var stream = client.GetStream();
-            transceiver.Start(stream);
             isConnected = true;
+            transceiver = new MessageTransceiver(registry);
+            transceiver.Start(client);
         }
 
         public void Dispose()
@@ -42,8 +38,6 @@ namespace Photon.Communication
 
             try {
                 await transceiver.StopAsync();
-                await processor.StopAsync();
-
                 client.Close();
             }
             finally {

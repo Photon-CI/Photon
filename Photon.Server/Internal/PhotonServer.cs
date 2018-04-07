@@ -4,6 +4,7 @@ using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.Sessions;
+using Photon.Server.Internal.Tasks;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
@@ -20,20 +21,22 @@ namespace Photon.Server.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public string WorkPath {get;}
+        public ServerDefinition Definition {get; private set;}
         public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
-        public ScriptQueue Queue {get;}
-        public ServerDefinition Definition {get; private set;}
+        public ServerTaskRunnerManager TaskRunners {get;}
         public ProjectDataManager ProjectData {get;}
+        public ScriptQueue Queue {get;}
+        public string WorkPath {get;}
 
 
         public PhotonServer()
         {
             Projects = new ProjectManager();
             Sessions = new ServerSessionManager();
-            Queue = new ScriptQueue();
+            TaskRunners = new ServerTaskRunnerManager();
             ProjectData = new ProjectDataManager();
+            Queue = new ScriptQueue();
 
             WorkPath = Configuration.WorkDirectory;
         }
@@ -42,6 +45,7 @@ namespace Photon.Server.Internal
         {
             if (isStarted) Stop();
 
+            TaskRunners?.Dispose();
             Sessions?.Dispose();
             receiver?.Dispose();
             receiver = null;
@@ -96,6 +100,7 @@ namespace Photon.Server.Internal
             Projects.Initialize();
             ProjectData.Initialize();
 
+            TaskRunners.Start();
             Sessions.Start();
             Queue.Start();
         }
@@ -104,6 +109,7 @@ namespace Photon.Server.Internal
         {
             Queue.Stop();
             Sessions.Stop();
+            TaskRunners.Stop();
 
             try {
                 receiver?.Dispose();

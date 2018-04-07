@@ -8,6 +8,9 @@ namespace Photon.Framework.Tasks
     {
         public async Task<TaskResult> ExecuteTask(IAgentBuildContext context)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (string.IsNullOrEmpty(context.TaskName)) throw new ArgumentException("TaskName is undefined!");
+
             if (!map.TryGetValue(context.TaskName, out var taskClassType))
                 throw new Exception($"Build Task '{context.TaskName}' was not found!");
 

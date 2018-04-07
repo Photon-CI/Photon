@@ -1,15 +1,14 @@
-﻿using System.Threading.Tasks;
-using Photon.Framework.Projects;
+﻿using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Tasks
 {
     public interface IAgentDeployContext
     {
         Project Project {get;}
-        string ProjectId {get;}
-        string ProjectVersion {get;}
-        //ContextAgentDefinition Agent {get;}
+        string ProjectPackageId {get;}
+        string ProjectPackageVersion {get;}
         string TaskName {get;}
         string WorkDirectory {get;}
         ScriptOutput Output {get;}

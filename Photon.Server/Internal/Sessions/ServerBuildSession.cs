@@ -1,133 +1,98 @@
-﻿using Photon.Framework.Scripts;
+﻿using Photon.Framework;
+using Photon.Framework.Projects;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
 {
     internal class ServerBuildSession : ServerSessionBase
     {
-        public ServerBuildContext Context {get;}
+        private AgentBuildSessionHandle sessionHandle;
+
+        //private readonly ReferencePool<TaskRunner> runningTasks;
+
+        public Project Project {get; set;}
+        public string AssemblyFile {get; set;}
+        public string TaskName {get; set;}
+        public string GitRefspec {get; set;}
+        public string[] Roles {get; set;}
+        public int BuildNumber {get; set;}
 
 
-        public ServerBuildSession(ServerBuildContext context)
+        public override void Dispose()
         {
-            this.Context = context;
+            //runningTasks?.Dispose();
+            sessionHandle?.Dispose();
 
-            context.WorkDirectory = WorkDirectory;
-            context.Output = Output;
-        }
-
-        public override void PrepareWorkDirectory()
-        {
-            base.PrepareWorkDirectory();
-
-            var sourceType = Context.Project.SourceType;
-
-            if (string.Equals(sourceType, "fs")) {
-                Output.AppendLine($"Copying File-System directory '{Context.Project.SourcePath}' to work directory.");
-                CopyDirectory(Context.Project.SourcePath, Context.WorkDirectory);
-                Output.AppendLine("Copy completed successfully.");
-                return;
-            }
-
-            if (string.Equals(sourceType, "git")) {
-                Output.AppendLine("Cloning Git Repository '...' to work directory.");
-
-                // TODO: Load Repository
-                throw new NotImplementedException();
-            }
-
-            throw new ApplicationException($"Unknown source type '{sourceType}'!");
+            base.Dispose();
         }
 
         public override async Task RunAsync()
         {
-            var errorList = new Lazy<List<Exception>>();
-            var abort = false;
-
-            var preBuildCommand = Context.Project.PreBuild;
-            if (!string.IsNullOrWhiteSpace(preBuildCommand)) {
-                //Log.Debug("Running script Pre-Build command...");
-
+            using (sessionHandle = RegisterAgent(Roles)) {
                 try {
-                    RunCommandLine(preBuildCommand);
+                    await sessionHandle.BeginSessionAsync();
+
+                    await sessionHandle.RunTaskAsync();
                 }
                 catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script Pre-Build command failed! [{SessionId}]", error));
-                    //Log.Error($"Script Pre-Build command failed! [{Id}]", error);
-                    Context.Output.AppendLine($"An error occurred while executing the script Pre-Build command! {error.Message} [{SessionId}]");
-                    abort = true;
+                    Exception = error;
+                    throw;
+                }
+                finally {
+                    await sessionHandle.ReleaseSessionAsync();
                 }
             }
-
-            var assemblyFilename = Path.Combine(Context.WorkDirectory, Context.AssemblyFile);
-
-            if (!File.Exists(assemblyFilename)) {
-                errorList.Value.Add(new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!"));
-                Context.Output.AppendLine($"The assembly file '{assemblyFilename}' could not be found!");
-                //throw new FileNotFoundException($"The assembly file '{assemblyFilename}' could not be found!");
-                abort = true;
-            }
-
-            if (!abort) {
-                try {
-                    Domain.Initialize(assemblyFilename);
-                }
-                catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script initialization failed! [{SessionId}]", error));
-                    //Log.Error($"Script initialization failed! [{Id}]", error);
-                    Context.Output.AppendLine($"An error occurred while initializing the script! {error.Message} [{SessionId}]");
-                    abort = true;
-                }
-            }
-
-            if (!abort) {
-                try {
-                    var result = await Domain.RunBuildScript(Context);
-                    if (!result.Successful) throw new ApplicationException(result.Message);
-                }
-                catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script execution failed! [{SessionId}]", error));
-                    //Log.Error($"Script execution failed! [{Id}]", error);
-                    Context.Output.AppendLine($"An error occurred while executing the script! {error.Message} [{SessionId}]");
-                }
-            }
-
-            var postBuildCommand = Context.Project.PostBuild;
-            if (!string.IsNullOrWhiteSpace(postBuildCommand)) {
-                try {
-                    RunCommandLine(postBuildCommand);
-                }
-                catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script Post-Build command failed! [{SessionId}]", error));
-                    //Log.Error($"Script Post-Build command failed! [{Id}]", error);
-                    Context.Output.AppendLine($"An error occurred while executing the script Post-Build command! {error.Message} [{SessionId}]");
-                }
-            }
-
-            if (errorList.IsValueCreated)
-                throw new AggregateException(errorList.Value);
         }
 
-        private void CopyDirectory(string sourcePath, string destPath)
+        private AgentBuildSessionHandle RegisterAgent(params string[] roles)
         {
-            foreach (var path in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories)) {
-                var newPath = path.Replace(sourcePath, destPath);
-                Directory.CreateDirectory(newPath);
+            if (roles == null) throw new ArgumentNullException(nameof(roles));
+
+            var roleAgents = PhotonServer.Instance.Definition
+                .Agents.Where(a => a.MatchesRoles(roles)).ToArray();
+
+            if (!roleAgents.Any())
+                throw new ApplicationException($"No Agents found in roles '{string.Join("; ", roles)}'!");
+
+            PrintFoundAgents(roleAgents);
+
+            ServerAgentDefinition agent;
+            if (roleAgents.Length == 1) {
+                agent = roleAgents[0];
+            }
+            else {
+                var random = new Random();
+                agent = roleAgents[random.Next(roleAgents.Length)];
             }
 
-            foreach (var file in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories)) {
-                var newPath = file.Replace(sourcePath, destPath);
+            return new AgentBuildSessionHandle(agent) {
+                ServerSessionId = SessionId,
+                Project = Project,
+                AssemblyFile = AssemblyFile,
+                TaskName = TaskName,
+                GitRefspec = GitRefspec,
+                BuildNumber = BuildNumber,
+                Output = Output,
+            };
+        }
 
-                try {
-                    File.Copy(file, newPath, true);
-                }
-                catch (Exception error) {
-                    Log.Warn($"Failed to copy file '{file}'! {error.Message}");
-                }
+        private void PrintFoundAgents(IEnumerable<ServerAgentDefinition> agents)
+        {
+            var agentNames = agents.Select(x => x.Name);
+            Output.Append("Found Agents: ", ConsoleColor.DarkCyan);
+
+            var i = 0;
+            foreach (var name in agentNames) {
+                if (i > 0) Output.Append("; ", ConsoleColor.DarkCyan);
+                i++;
+
+                Output.Append(name, ConsoleColor.Cyan);
             }
+
+            Output.AppendLine(".", ConsoleColor.DarkCyan);
         }
     }
 }

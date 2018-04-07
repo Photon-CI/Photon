@@ -7,25 +7,39 @@ using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
+    /// <inheritdoc />
     /// <summary>
     /// Listens for incomming TCP message connections, and manages
-    /// a collection of <see cref="MessageHost"/> instances.
+    /// a collection of <see cref="T:Photon.Communication.MessageHost" /> instances.
     /// </summary>
-    public class MessageListener
+    public class MessageListener : IDisposable
     {
-        private readonly MessageProcessor processor;
+        private readonly MessageRegistry messageRegistry;
         private readonly List<MessageHost> hostList;
         private readonly object startStopLock;
         private TcpListener listener;
         private bool isListening;
 
 
-        public MessageListener(MessageProcessor processor)
+        public MessageListener(MessageRegistry registry)
         {
-            this.processor = processor;
+            messageRegistry = registry;
 
             hostList = new List<MessageHost>();
             startStopLock = new object();
+        }
+
+        public void Dispose()
+        {
+            foreach (var host in hostList) {
+                try {
+                    host.Dispose();
+                }
+                catch {}
+            }
+            hostList.Clear();
+
+            listener?.Stop();
         }
 
         public void Listen(IPAddress address, int port)
@@ -70,7 +84,7 @@ namespace Photon.Communication
                 listener.BeginAcceptTcpClient(ConnectionReceived, new object());
             }
 
-            var host = new MessageHost(client, processor);
+            var host = new MessageHost(client, messageRegistry);
             host.Stopped += Host_Stopped;
             hostList.Add(host);
         }

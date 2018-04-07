@@ -1,26 +1,22 @@
-﻿using Photon.Agent.Internal.Tasks;
+﻿using Photon.Communication;
+using Photon.Framework.Tasks;
 using System;
 using System.Threading.Tasks;
 
-namespace Photon.Agent.Internal
+namespace Photon.Agent.Internal.Session
 {
-    internal class AgentBuildSession : AgentSessionBase
+    internal class AgentDeploySession : AgentSessionBase
     {
-        public AgentBuildContext Context {get;}
-
-
-        public AgentBuildSession(AgentBuildContext context)
+        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId)
         {
-            this.Context = context;
-
-            context.WorkDirectory = WorkPath;
+            //
         }
 
         //public override async Task RunAsync()
         //{
         //    var abort = false;
         //    var errorList = new Lazy<List<Exception>>();
-        //    var assemblyFilename = Path.Combine(WorkPath, AssemblyFile);
+        //    var assemblyFilename = Path.Combine(WorkDirectory, AssemblyFile);
 
         //    if (!File.Exists(assemblyFilename)) {
         //        errorList.Value.Add(new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!"));
@@ -54,10 +50,17 @@ namespace Photon.Agent.Internal
         //    //}
         //}
 
-        public override async Task RunTaskAsync(string taskName)
+        public override async Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId)
         {
-            await Domain.RunBuildTask(Context);
+            throw new NotImplementedException();
+            //await Domain.RunDeployTask(Context);
         }
+
+        //public override SessionTaskHandle BeginTask(string taskName)
+        //{
+        //    throw new NotImplementedException();
+        //    //await Domain.RunDeployTask(Context);
+        //}
 
         private void DownloadPackage(string packageName, string version, string outputDirectory)
         {

@@ -1,25 +1,25 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Communication;
-using Photon.Framework.Messages;
+using Photon.Library.Messages;
 using System;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {
-    public class BuildTaskRunProcessor : IProcessMessage<BuildTaskRunRequest>
+    public class BuildTaskRunProcessor : MessageProcessorBase<BuildTaskRunRequest>
     {
-        public async Task<IResponseMessage> Process(BuildTaskRunRequest requestMessage)
+        public override async Task<IResponseMessage> Process(BuildTaskRunRequest requestMessage)
         {
-            if (!PhotonAgent.Instance.Sessions.TryGetSession(requestMessage.SessionId, out var session))
+            if (!PhotonAgent.Instance.Sessions.TryGetSession(requestMessage.AgentSessionId, out var session))
                 return new BuildTaskRunResponse {
                     Successful = false,
-                    Output = $"Session '{requestMessage.SessionId}' not found!",
+                    Exception = $"Session '{requestMessage.AgentSessionId}' not found!",
                 };
 
             var response = new BuildTaskRunResponse();
 
             try {
-                await session.RunTaskAsync(requestMessage.TaskName);
+                response.Result = await session.RunTaskAsync(requestMessage.TaskName, requestMessage.TaskSessionId);
                 response.Successful = true;
             }
             catch (Exception error) {

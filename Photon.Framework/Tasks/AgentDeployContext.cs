@@ -1,18 +1,16 @@
-﻿using Photon.Framework;
+﻿using System;
+using System.Threading.Tasks;
 using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
-using Photon.Framework.Tasks;
-using System;
-using System.Threading.Tasks;
 
-namespace Photon.Agent.Internal.Tasks
+namespace Photon.Framework.Tasks
 {
     public class AgentDeployContext : IAgentDeployContext
     {
         public Project Project {get; set;}
         //public ContextAgentDefinition Agent {get; set;}
-        public string ProjectId {get; set;}
-        public string ProjectVersion {get; set;}
+        public string ProjectPackageId {get; set;}
+        public string ProjectPackageVersion {get; set;}
         public string TaskName {get; set;}
         public string WorkDirectory {get; set;}
         //public ConcurrentBag<object> Artifacts {get;}
