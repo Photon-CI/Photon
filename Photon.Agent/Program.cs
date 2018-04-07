@@ -3,6 +3,8 @@ using log4net.Config;
 using Photon.Agent.Internal;
 using System;
 using System.ServiceProcess;
+using System.Threading.Tasks;
+using Photon.Agent.Commands;
 
 namespace Photon.Agent
 {
@@ -16,7 +18,7 @@ namespace Photon.Agent
             try {
                 XmlConfigurator.Configure();
 
-                return Run(args);
+                return Run(args).GetAwaiter().GetResult();
             }
             catch (Exception error) {
                 Log.Fatal("Unhandled Exception!", error);
@@ -28,19 +30,19 @@ namespace Photon.Agent
             }
         }
 
-        private static int Run(string[] args)
+        private static async Task<int> Run(string[] args)
         {
-            var arguments = new Arguments();
+            var arguments = new RootCommands();
 
             try {
-                arguments.Parse(args);
+                await arguments.ParseAsync(args);
             }
             catch (Exception error) {
                 Log.Fatal("Failed to parse arguments!", error);
                 return 1;
             }
 
-            if (arguments.RunAsConsole)
+            if (arguments.Debug)
                 return RunAsConsole();
 
             ServiceBase.Run(new ServiceBase[] {

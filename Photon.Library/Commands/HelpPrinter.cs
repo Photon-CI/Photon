@@ -3,21 +3,21 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Photon.CLI.Internal.Commands
+namespace Photon.Library.Commands
 {
-    internal class HelpPrinter
+    public class HelpPrinter
     {
         private readonly Dictionary<string, string> optionList;
 
         public string Title {get; set;}
-        public string TitleDescription {get; set;}
+        public string Description {get; set;}
         public int NameWidth {get; set;} = 20;
 
 
-        public HelpPrinter(string title = null, string title_description = null)
+        public HelpPrinter(string title = null, string description = null)
         {
             this.Title = title;
-            this.TitleDescription = title_description;
+            this.Description = description;
 
             optionList = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
@@ -25,7 +25,7 @@ namespace Photon.CLI.Internal.Commands
         public HelpPrinter(Type classType, string methodName)
         {
             this.Title = CommandAttribute.GetName(classType, methodName);
-            this.TitleDescription = CommandAttribute.GetDescription(classType, methodName);
+            this.Description = CommandAttribute.GetDescription(classType, methodName);
 
             optionList = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
@@ -52,10 +52,10 @@ namespace Photon.CLI.Internal.Commands
 
         public void Print()
         {
-            if (!string.IsNullOrEmpty(TitleDescription)) {
+            if (!string.IsNullOrEmpty(Description)) {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("  ");
-                Console.WriteLine(TitleDescription);
+                Console.WriteLine(Description);
                 Console.WriteLine();
             }
 
