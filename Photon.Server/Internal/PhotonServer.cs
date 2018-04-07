@@ -59,7 +59,7 @@ namespace Photon.Server.Internal
             Definition = ParseServerDefinition() ?? new ServerDefinition {
                 Http = {
                     Host = "localhost",
-                    Port = 80,
+                    Port = 8088,
                     Path = "/photon/server",
                 },
             };
@@ -92,6 +92,8 @@ namespace Photon.Server.Internal
 
             try {
                 receiver.Start();
+
+                Log.Info($"HTTP Server listening at http://{httpPrefix}");
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);

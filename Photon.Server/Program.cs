@@ -46,15 +46,33 @@ namespace Photon.Server
             }
 
             if (arguments.RunAsConsole) {
-                RunAsConsole(args);
+                var result = 0;
+                try {
+                    RunAsConsole(args);
+                }
+                catch (Exception error) {
+                    Log.Fatal("Unhandled Exception!", error);
+                    result = 1;
+                }
+
+                if (result != 0) {
+                    try {
+                        Console.ResetColor();
+                        Console.WriteLine("Press any key to exit...");
+                        Console.ReadKey(true);
+                    }
+                    catch {}
+                }
+
+                return result;
             }
             else {
                 ServiceBase.Run(new [] {
                     new ServerService(),
                 });
-            }
 
-            return 0;
+                return 0;
+            }
         }
 
         private void RunAsConsole(string[] args)

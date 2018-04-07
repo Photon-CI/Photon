@@ -12,6 +12,7 @@ namespace Photon.Server.Internal
         private static readonly ILog Log = LogManager.GetLogger(typeof(ScriptQueue));
 
         private ActionBlock<IServerSession> queue;
+        private bool isStarted;
 
         public int MaxDegreeOfParallelism {get; set;}
 
@@ -23,6 +24,9 @@ namespace Photon.Server.Internal
 
         public void Start()
         {
+            if (isStarted) throw new ApplicationException("ScriptQueue has already been started!");
+            isStarted = true;
+
             Log.Debug($"Starting Script Queue [{MaxDegreeOfParallelism} workers]...");
 
             var queueOptions = new ExecutionDataflowBlockOptions {
@@ -36,6 +40,9 @@ namespace Photon.Server.Internal
 
         public void Stop()
         {
+            if (!isStarted) return;
+            isStarted = false;
+
             Log.Debug("Stopping Script Queue...");
 
             queue.Complete();

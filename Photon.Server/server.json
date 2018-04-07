@@ -2,7 +2,7 @@
   "name": "Photon Server",
   "http": {
     "host": "localhost",
-    "port": 80,
+    "port": 8088,
     "path": "/photon/server"
   },
   "agents": [
