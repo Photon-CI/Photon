@@ -1,17 +1,18 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
+using Photon.Communication.Messages;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Communication.Packets
 {
     internal class PacketBuilder : IDisposable
     {
-        private readonly MemoryStream messageData;
         private readonly JsonSerializer jsonSerializer;
-        private MemoryStream streamData;
+        private Stream messageData;
+        private Stream streamData;
+        private string tempFilename;
 
         public string MessageId {get;}
         public string MessageTypeName {get; private set;}
@@ -24,15 +25,16 @@ namespace Photon.Communication.Packets
         {
             this.MessageId = messageId;
 
-            messageData = new MemoryStream();
-            streamData = new MemoryStream();
             jsonSerializer = new JsonSerializer();
         }
 
         public void Dispose()
         {
             messageData?.Dispose();
+            messageData = null;
+
             streamData?.Dispose();
+            streamData = null;
         }
 
         public async Task Append(IPacket packet)
@@ -45,20 +47,57 @@ namespace Photon.Communication.Packets
             }
 
             if (packet is DataPacket dataPacket) {
-                if (messageData.Length < MessageLength) {
-                    await messageData.WriteAsync(dataPacket.PacketBuffer, 0, dataPacket.PacketSize);
-                }
-                else if (streamData.Length < StreamLength) {
-                    await streamData.WriteAsync(dataPacket.PacketBuffer, 0, dataPacket.PacketSize);
-                }
+                await AppendDataPacket(dataPacket);
 
-                if (messageData.Length >= MessageLength && streamData.Length >= StreamLength)
+                var actualMessageLength = messageData?.Length ?? 0;
+                var actualDataLength = streamData?.Length ?? 0;
+
+                if (actualMessageLength >= MessageLength && actualDataLength >= StreamLength)
                     IsComplete = true;
 
                 return;
             }
 
             throw new Exception($"Unknown packet type '{packet.GetType().Name}'!");
+        }
+
+        private async Task AppendDataPacket(DataPacket dataPacket)
+        {
+            if (MessageLength > 0) {
+                if (messageData == null)
+                    messageData = new MemoryStream((int)MessageLength);
+
+                if (messageData.Length < MessageLength) {
+                    await messageData.WriteAsync(dataPacket.PacketBuffer, 0, dataPacket.PacketSize);
+                    return;
+                }
+            }
+
+            if (StreamLength > 0) {
+                if (streamData == null) {
+                    PrepareDataStream();
+                }
+
+                if (streamData.Length < StreamLength) {
+                    await streamData.WriteAsync(dataPacket.PacketBuffer, 0, dataPacket.PacketSize);
+                    return;
+                }
+            }
+
+            throw new Exception("No target for data packet!");
+        }
+
+        private void PrepareDataStream()
+        {
+            var messageType = Type.GetType(MessageTypeName);
+
+            if (typeof(IFileMessage).IsAssignableFrom(messageType)) {
+                tempFilename = Path.GetTempFileName();
+                streamData = File.Open(tempFilename, FileMode.Create, FileAccess.Write);
+            }
+            else if (typeof(IStreamMessage).IsAssignableFrom(messageType)) {
+                streamData = new MemoryStream((int)Math.Min(StreamLength, int.MaxValue));
+            }
         }
 
         public IMessage GetMessage()
@@ -83,6 +122,10 @@ namespace Photon.Communication.Packets
                 var _stream = streamData;
                 streamMessage.StreamFunc = () => _stream;
                 streamData = null;
+            }
+
+            if (message is IFileMessage fileMessage) {
+                fileMessage.Filename = tempFilename;
             }
 
             return message;

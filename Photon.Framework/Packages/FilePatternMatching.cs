@@ -14,131 +14,121 @@ namespace Photon.Framework.Packages
     {
         public static IEnumerable<PackageFileInfo> GetFiles(string rootPath, string sourcePath, string destPath, params string[] exclude)
         {
-            var context = new FilterContext {
-                SourcePathParts = sourcePath.Split('\\'),
-                DestPathParts = sourcePath.Split('\\'),
-                ExcludePathsPartsList = exclude
-                    .Select(x => x.Split('\\')).ToArray(),
-            };
+            var sourceParts = sourcePath.Split('\\');
 
-            return context.Filter(rootPath);
-
-            //foreach (var file in Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)) {
-            //    // TODO: Filter using 'filterPath'
-
-            //    var file_abs = Path.GetFullPath(file);
-            //    var file_rel = GetRelativePath(file_abs, rootPath);
-
-            //    if (!string.IsNullOrEmpty(destPath))
-            //        file_rel = Path.Combine(destPath, file_rel);
-
-            //    if (exclude != null) {
-            //        // TODO: Exclusion Filtering!
-            //    }
-
-            //    yield return new KeyValuePair<string, string>(file, file_rel);
-            //}
-        }
-
-        //public static string GetRelativePath(string path, string rootPath)
-        //{
-        //    return path.StartsWith(rootPath)
-        //        ? path.Substring(rootPath.Length).TrimStart('\\')
-        //        : path;
-        //}
-    }
-
-    internal class FilterContext
-    {
-        //public string RootPath {get; set;}
-        public string[] SourcePathParts {get; set;}
-        public string[] DestPathParts {get; set;}
-        public string[][] ExcludePathsPartsList {get; set;}
-        public bool IsAnySourcePath {get; set;}
-
-
-        public IEnumerable<PackageFileInfo> Filter(string rootPath)
-        {
-            var sourcePart = SourcePathParts[0];
-
-            var excludeParts = new List<string>();
-            foreach (var excludePathParts in ExcludePathsPartsList) {
-                string excludePart = null;
-                if (excludePathParts.Length > 0)
-                    excludePart = excludePathParts[0];
-
-                excludeParts.Add(excludePart);
+            var anyPathIndex = -1;
+            for (var i = 0; i < sourceParts.Length; i++) {
+                if (sourceParts[i] == "**") {
+                    anyPathIndex = i;
+                    break;
+                }
             }
 
-            // TODO: break if source matches any exclude
+            if (anyPathIndex >= 0) {
+                var rootParts = sourceParts.Take(anyPathIndex).ToArray();
 
-            if (sourcePart == "**") {
-                foreach (var y in ScanFolders(rootPath, "*"))
-                    yield return y;
+                var filePart = sourceParts.Skip(anyPathIndex + 1).ToArray();
 
-                foreach (var y in ScanFiles(rootPath))
-                    yield return y;
+                foreach (var path in GetPaths(rootPath, string.Empty, rootParts)) {
+                    var pathAbs = Path.Combine(rootPath, path);
 
-                //var fileSourcePart = SourcePathParts.Skip(1).FirstOrDefault();
-                //var destPath = Path.Combine(DestPathParts);
+                    if (filePart.Length > 1) {
+                        foreach (var file in GetPathFiles(pathAbs, string.Empty, filePart)) {
+                            yield return new PackageFileInfo {
+                                AbsoluteFilename = Path.Combine(pathAbs, file),
+                                RelativeFilename = Path.Combine(destPath, file),
+                            };
+                        }
+                    }
+                    else {
+                        foreach (var subPath in GetAllPaths(pathAbs, string.Empty)) {
+                            var subPathName = Path.GetFileName(subPath) ?? string.Empty;
+                            var subPathAbs = Path.Combine(pathAbs, subPath);
 
-                //foreach (var file in Directory.EnumerateFiles(rootPath, "*", SearchOption.TopDirectoryOnly)) {
-                //    var file_name = Path.GetFileName(file);
+                            foreach (var file in GetPathFiles(subPathAbs, string.Empty, filePart)) {
+                                yield return new PackageFileInfo {
+                                    AbsoluteFilename = Path.Combine(subPathAbs, file),
+                                    RelativeFilename = Path.Combine(destPath, subPathName, file),
+                                };
+                            }
+                        }
 
-                //    // TODO: Match file_name against fileSourcePart
-
-                //    // TODO: Check excludes
-
-                //    yield return new PackageFileInfo {
-                //        AbsoluteFilename = file,
-                //        RelativeFilename = Path.Combine(destPath, file_name),
-                //    };
-                //}
+                        foreach (var file in GetPathFiles(pathAbs, string.Empty, filePart)) {
+                            yield return new PackageFileInfo {
+                                AbsoluteFilename = Path.Combine(pathAbs, file),
+                                RelativeFilename = Path.Combine(destPath, file),
+                            };
+                        }
+                    }
+                }
             }
             else {
-                foreach (var y in ScanFolders(rootPath, sourcePart))
-                    yield return y;
+                var rootParts = sourceParts.Length > 0
+                    ? sourceParts.Take(sourceParts.Length - 1).ToArray()
+                    : new string[0];
 
-                //...
+                var filePart = new[] {sourceParts.LastOrDefault()};
+
+                if (rootParts.Length > 0) {
+                    foreach (var path in GetPaths(rootPath, string.Empty, rootParts)) {
+                        var pathAbs = Path.Combine(rootPath, path);
+
+                        foreach (var file in GetPathFiles(pathAbs, string.Empty, filePart)) {
+                            yield return new PackageFileInfo {
+                                AbsoluteFilename = Path.Combine(pathAbs, file),
+                                RelativeFilename = Path.Combine(destPath, file),
+                            };
+                        }
+                    }
+                }
+                else {
+                    foreach (var file in GetPathFiles(rootPath, string.Empty, filePart)) {
+                        yield return new PackageFileInfo {
+                            AbsoluteFilename = Path.Combine(rootPath, file),
+                            RelativeFilename = Path.Combine(destPath, file),
+                        };
+                    }
+                }
             }
         }
 
-        private IEnumerable<PackageFileInfo> ScanFolders(string rootPath, string pattern)
+        private static IEnumerable<string> GetAllPaths(string rootPath, string destPath)
         {
-            foreach (var path in Directory.EnumerateDirectories(rootPath, pattern, SearchOption.TopDirectoryOnly)) {
-                var path_name = Path.GetFileName(path);
+            foreach (var path in Directory.EnumerateDirectories(rootPath, "*", SearchOption.TopDirectoryOnly)) {
+                var pathName = Path.GetFileName(path) ?? string.Empty;
+                var subDestPath = Path.Combine(destPath, pathName);
+                yield return subDestPath;
 
-                var destPathList = DestPathParts.ToList();
-                destPathList.Add(path_name);
-
-                var x = new FilterContext {
-                    SourcePathParts = SourcePathParts.Skip(1).ToArray(),
-                    DestPathParts = destPathList.ToArray(),
-                    ExcludePathsPartsList = ExcludePathsPartsList.Select(z => z.Skip(1).ToArray()).ToArray(),
-                    IsAnySourcePath = true,
-                };
-
-                foreach (var y in x.Filter(path))
-                    yield return y;
+                foreach (var subPath in GetAllPaths(path, subDestPath))
+                    yield return subPath;
             }
         }
 
-        private IEnumerable<PackageFileInfo> ScanFiles(string rootPath)
+        private static IEnumerable<string> GetPaths(string rootPath, string destPath, string[] pathParts)
         {
-            var fileSourcePart = SourcePathParts.Skip(1).FirstOrDefault();
-            var destPath = Path.Combine(DestPathParts);
+            foreach (var path in Directory.EnumerateDirectories(rootPath, pathParts[0], SearchOption.TopDirectoryOnly)) {
+                var pathName = Path.GetFileName(path) ?? string.Empty;
+                var subDestPath = Path.Combine(destPath, pathName);
 
-            foreach (var file in Directory.EnumerateFiles(rootPath, "*", SearchOption.TopDirectoryOnly)) {
-                var file_name = Path.GetFileName(file);
+                if (pathParts.Length <= 1) {
+                    yield return subDestPath;
+                }
+                else {
+                    foreach (var subPath in GetPaths(path, subDestPath, pathParts.Skip(1).ToArray())) {
+                        yield return subPath;
+                    }
+                }
+            }
+        }
 
-                // TODO: Match file_name against fileSourcePart
+        private static IEnumerable<string> GetPathFiles(string rootPath, string destPath, string[] pathParts)
+        {
+            var pattern = pathParts.FirstOrDefault() ?? "*";
 
-                // TODO: Check excludes
+            foreach (var file in Directory.EnumerateFiles(rootPath, pattern, SearchOption.TopDirectoryOnly)) {
+                var name = Path.GetFileName(file) ?? string.Empty;
 
-                yield return new PackageFileInfo {
-                    AbsoluteFilename = file,
-                    RelativeFilename = Path.Combine(destPath, file_name),
-                };
+                yield return Path.Combine(destPath, name);
             }
         }
     }

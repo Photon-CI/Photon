@@ -73,7 +73,7 @@ namespace Photon.Agent.Internal.Session
         public async Task ReleaseAsync()
         {
             utcReleased = DateTime.UtcNow;
-            Domain?.Dispose();
+            Domain?.Unload(true);
 
             if (!isReleased) {
                 var workDirectory = WorkDirectory;

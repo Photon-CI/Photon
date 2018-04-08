@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Photon.Communication.Messages;
+using System;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Communication
 {
@@ -8,13 +8,11 @@ namespace Photon.Communication
     {
         private readonly TaskCompletionSource<IResponseMessage> completionEvent;
 
-        //public MessageHost Host {get;}
         public IRequestMessage RequestMessage {get;}
 
 
         public MessageProcessorHandle(IRequestMessage requestMessage)
         {
-            //this.Host = host;
             this.RequestMessage = requestMessage;
 
             completionEvent = new TaskCompletionSource<IResponseMessage>();

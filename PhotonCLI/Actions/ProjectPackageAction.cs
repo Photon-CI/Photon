@@ -12,7 +12,7 @@ namespace Photon.CLI.Actions
 
         public async Task Run()
         {
-            await PackageTools.CreateProjectPackage(MetadataFilename, PackageVersion, PackageFilename);
+            await ProjectPackageTools.CreatePackage(MetadataFilename, PackageVersion, PackageFilename);
         }
     }
 }

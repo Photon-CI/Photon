@@ -20,6 +20,7 @@ namespace Photon.Agent.Internal
         public async Task<TaskResult> RunBuildTask(AgentBuildContext context)
         {
             Sponsor.Register(context);
+            Sponsor.Register(context.Output);
 
             TaskResult result;
             try {
@@ -28,6 +29,7 @@ namespace Photon.Agent.Internal
                 result = await completeEvent.Task;
             }
             finally {
+                Sponsor.Unregister(context.Output);
                 Sponsor.Unregister(context);
             }
 
@@ -37,6 +39,7 @@ namespace Photon.Agent.Internal
         public async Task<TaskResult> RunDeployTask(AgentDeployContext context)
         {
             Sponsor.Register(context);
+            Sponsor.Register(context.Output);
 
             TaskResult result;
             try {
@@ -45,6 +48,7 @@ namespace Photon.Agent.Internal
                 result = await completeEvent.Task;
             }
             finally {
+                Sponsor.Unregister(context.Output);
                 Sponsor.Unregister(context);
             }
 

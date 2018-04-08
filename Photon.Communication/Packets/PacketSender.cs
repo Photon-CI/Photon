@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
+using Photon.Communication.Messages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Communication.Packets
 {
@@ -122,7 +122,14 @@ namespace Photon.Communication.Packets
             var messageId = message.MessageId;
             var messageType = message.GetType().AssemblyQualifiedName;
             var messageData = new MemoryStream();
-            var streamData = (message as IStreamMessage)?.StreamFunc();
+
+            Stream streamData = null;
+            if (message is IStreamMessage streamMessage) {
+                streamData = streamMessage.StreamFunc();
+            }
+            else if (message is IFileMessage fileMessage) {
+                streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read);
+            }
 
             // TODO: BsonDataWriter should be disposed!
             //   but it will close the stream.

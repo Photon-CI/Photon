@@ -34,6 +34,10 @@ namespace Photon.Communication.Packets
         public void Dispose()
         {
             MessageData?.Dispose();
+            MessageData = null;
+
+            StreamData?.Dispose();
+            StreamData = null;
         }
 
         public async Task<IPacket> TryTakePacket()

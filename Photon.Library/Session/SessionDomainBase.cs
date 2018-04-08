@@ -64,7 +64,7 @@ namespace Photon.Library.Session
 
                 AppDomain.Unload(domain);
 
-                if (wait) await Task.Delay(200);
+                if (wait) await Task.Delay(600);
             }
             catch (ThreadAbortException) {
                 Thread.ResetAbort();

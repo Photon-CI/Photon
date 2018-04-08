@@ -3,6 +3,7 @@ using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Library.Messages;
 using Photon.Server.Internal;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -15,22 +16,26 @@ namespace Photon.Server.MessageProcessors
 
         public override async Task<IResponseMessage> Process(ProjectPackageRequest requestMessage)
         {
-            if (!PhotonServer.Instance.Sessions.TryGetSession(requestMessage.SessionId, out var session)) {
-                Log.Warn($"Unable to map response, Server Session '{requestMessage.SessionId}' not found!");
-                return null;
+            var response = new ProjectPackageResponse();
+
+            try {
+                await PhotonServer.Instance.ProjectPackages.Add(requestMessage.Filename);
+
+                response.Successful = true;
+            }
+            catch (Exception error) {
+                Log.Error("Failed to add Project Package!", error);
+                response.Exception = error.Message;
             }
 
-            // TODO: Append ProjectPackage to session
-            var filename = Path.Combine(session.WorkDirectory, "Project.zip");
-
-            using (var fileStream = File.Open(filename, FileMode.Create, FileAccess.Write))
-            using (var messageStream = requestMessage.StreamFunc()) {
-                await messageStream.CopyToAsync(fileStream);
+            try {
+                File.Delete(requestMessage.Filename);
+            }
+            catch (Exception error) {
+                Log.Warn("Failed to remove temporary package file!", error);
             }
 
-            return new ProjectPackageResponse {
-                Successful = true,
-            };
+            return response;
         }
     }
 }

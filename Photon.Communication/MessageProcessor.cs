@@ -17,8 +17,6 @@ namespace Photon.Communication
         {
             this.transceiver = transceiver;
             this.registry = registry;
-
-            //registry = new MessageRegistry();
         }
 
         public void Scan(Assembly assembly)

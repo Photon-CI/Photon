@@ -47,6 +47,8 @@
     <Compile Include="Messages\ExceptionResponseMessage.cs" />
     <Compile Include="Messages\IMessage.cs" />
     <Compile Include="Messages\IProcessMessage.cs" />
+    <Compile Include="Messages\IFileMessage.cs" />
+    <Compile Include="Messages\IFileRequestMessage.cs" />
     <Compile Include="Messages\IStreamRequestMessage.cs" />
     <Compile Include="Messages\IStreamMessage.cs" />
     <Compile Include="Messages\IRequestMessage.cs" />

@@ -53,8 +53,7 @@ namespace Photon.Agent.Internal.Session
         private void Context_OnProjectPackagePushed(object sender, PackagePushEventArgs e)
         {
             var message = new ProjectPackageRequest {
-                SessionId = ServerSessionId,
-                StreamFunc = () => File.Open(e.Filename, FileMode.Open, FileAccess.Read),
+                Filename = e.Filename,
             };
 
             var response = Transceiver.Send(message)
