@@ -1,47 +1,135 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Photon.Framework.Packages
 {
-    static class FilePatternMatching
+    internal class PackageFileInfo
     {
-        public static IEnumerable<KeyValuePair<string, string>> GetFiles(string sourcePath, string destPath, params string[] exclude)
-        {
-            string rootPath, filterPath;
+        public string AbsoluteFilename {get; set;}
+        public string RelativeFilename {get; set;}
+    }
 
-            var i = sourcePath.IndexOf("*");
-            if (i >= 0) {
-                var x = sourcePath.Substring(0, i);
-                rootPath = Path.GetDirectoryName(x);
-                filterPath = sourcePath.Substring(rootPath.Length + 1);
+    internal static class FilePatternMatching
+    {
+        public static IEnumerable<PackageFileInfo> GetFiles(string rootPath, string sourcePath, string destPath, params string[] exclude)
+        {
+            var sourceParts = sourcePath.Split('\\');
+
+            var anyPathIndex = -1;
+            for (var i = 0; i < sourceParts.Length; i++) {
+                if (sourceParts[i] == "**") {
+                    anyPathIndex = i;
+                    break;
+                }
+            }
+
+            if (anyPathIndex >= 0) {
+                var rootParts = sourceParts.Take(anyPathIndex).ToArray();
+
+                var filePart = sourceParts.Skip(anyPathIndex + 1).ToArray();
+
+                foreach (var path in GetPaths(rootPath, string.Empty, rootParts)) {
+                    var pathAbs = Path.Combine(rootPath, path);
+
+                    if (filePart.Length > 1) {
+                        foreach (var file in GetPathFiles(pathAbs, string.Empty, filePart)) {
+                            yield return new PackageFileInfo {
+                                AbsoluteFilename = Path.Combine(pathAbs, file),
+                                RelativeFilename = Path.Combine(destPath, file),
+                            };
+                        }
+                    }
+                    else {
+                        foreach (var subPath in GetAllPaths(pathAbs, string.Empty)) {
+                            var subPathName = Path.GetFileName(subPath) ?? string.Empty;
+                            var subPathAbs = Path.Combine(pathAbs, subPath);
+
+                            foreach (var file in GetPathFiles(subPathAbs, string.Empty, filePart)) {
+                                yield return new PackageFileInfo {
+                                    AbsoluteFilename = Path.Combine(subPathAbs, file),
+                                    RelativeFilename = Path.Combine(destPath, subPathName, file),
+                                };
+                            }
+                        }
+
+                        foreach (var file in GetPathFiles(pathAbs, string.Empty, filePart)) {
+                            yield return new PackageFileInfo {
+                                AbsoluteFilename = Path.Combine(pathAbs, file),
+                                RelativeFilename = Path.Combine(destPath, file),
+                            };
+                        }
+                    }
+                }
             }
             else {
-                rootPath = sourcePath;
-                filterPath = "";
-            }
+                var rootParts = sourceParts.Length > 0
+                    ? sourceParts.Take(sourceParts.Length - 1).ToArray()
+                    : new string[0];
 
-            foreach (var file in Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)) {
-                // TODO: Filter using 'filterPath'
+                var filePart = new[] {sourceParts.LastOrDefault()};
 
-                var file_abs = Path.GetFullPath(file);
-                var file_rel = GetRelativePath(file_abs, rootPath);
+                if (rootParts.Length > 0) {
+                    foreach (var path in GetPaths(rootPath, string.Empty, rootParts)) {
+                        var pathAbs = Path.Combine(rootPath, path);
 
-                if (!string.IsNullOrEmpty(destPath))
-                    file_rel = Path.Combine(destPath, file_rel);
-
-                if (exclude != null) {
-                    // TODO: Exclusion Filtering!
+                        foreach (var file in GetPathFiles(pathAbs, string.Empty, filePart)) {
+                            yield return new PackageFileInfo {
+                                AbsoluteFilename = Path.Combine(pathAbs, file),
+                                RelativeFilename = Path.Combine(destPath, file),
+                            };
+                        }
+                    }
                 }
-
-                yield return new KeyValuePair<string, string>(file, file_rel);
+                else {
+                    foreach (var file in GetPathFiles(rootPath, string.Empty, filePart)) {
+                        yield return new PackageFileInfo {
+                            AbsoluteFilename = Path.Combine(rootPath, file),
+                            RelativeFilename = Path.Combine(destPath, file),
+                        };
+                    }
+                }
             }
         }
 
-        public static string GetRelativePath(string path, string rootPath)
+        private static IEnumerable<string> GetAllPaths(string rootPath, string destPath)
         {
-            return path.StartsWith(rootPath)
-                ? path.Substring(rootPath.Length).TrimStart('\\')
-                : path;
+            foreach (var path in Directory.EnumerateDirectories(rootPath, "*", SearchOption.TopDirectoryOnly)) {
+                var pathName = Path.GetFileName(path) ?? string.Empty;
+                var subDestPath = Path.Combine(destPath, pathName);
+                yield return subDestPath;
+
+                foreach (var subPath in GetAllPaths(path, subDestPath))
+                    yield return subPath;
+            }
+        }
+
+        private static IEnumerable<string> GetPaths(string rootPath, string destPath, string[] pathParts)
+        {
+            foreach (var path in Directory.EnumerateDirectories(rootPath, pathParts[0], SearchOption.TopDirectoryOnly)) {
+                var pathName = Path.GetFileName(path) ?? string.Empty;
+                var subDestPath = Path.Combine(destPath, pathName);
+
+                if (pathParts.Length <= 1) {
+                    yield return subDestPath;
+                }
+                else {
+                    foreach (var subPath in GetPaths(path, subDestPath, pathParts.Skip(1).ToArray())) {
+                        yield return subPath;
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<string> GetPathFiles(string rootPath, string destPath, string[] pathParts)
+        {
+            var pattern = pathParts.FirstOrDefault() ?? "*";
+
+            foreach (var file in Directory.EnumerateFiles(rootPath, pattern, SearchOption.TopDirectoryOnly)) {
+                var name = Path.GetFileName(file) ?? string.Empty;
+
+                yield return Path.Combine(destPath, name);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
+using Photon.Communication.Messages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -122,6 +123,14 @@ namespace Photon.Communication.Packets
             var messageType = message.GetType().AssemblyQualifiedName;
             var messageData = new MemoryStream();
 
+            Stream streamData = null;
+            if (message is IStreamMessage streamMessage) {
+                streamData = streamMessage.StreamFunc();
+            }
+            else if (message is IFileMessage fileMessage) {
+                streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read);
+            }
+
             // TODO: BsonDataWriter should be disposed!
             //   but it will close the stream.
             var bsonWriter = new BsonDataWriter(messageData);
@@ -131,7 +140,10 @@ namespace Photon.Communication.Packets
 
             messageData.Seek(0, SeekOrigin.Begin);
 
-            return new PacketSource(messageId, messageType, messageData);
+            return new PacketSource(messageId, messageType) {
+                MessageData = messageData,
+                StreamData = streamData,
+            };
         }
     }
 }

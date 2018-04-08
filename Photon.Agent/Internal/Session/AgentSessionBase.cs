@@ -27,6 +27,8 @@ namespace Photon.Agent.Internal.Session
         public string SessionId {get;}
         public string ServerSessionId {get;}
         public string WorkDirectory {get;}
+        public string ContentDirectory {get;}
+        public string BinDirectory {get;}
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
         protected ILog Log => _log.Value;
@@ -41,11 +43,12 @@ namespace Photon.Agent.Internal.Session
             utcCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
-            //Domain = new AgentSessionDomain();
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
             Output = new SessionOutput(transceiver, serverSessionId);
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
+            ContentDirectory = Path.Combine(WorkDirectory, "content");
+            BinDirectory = Path.Combine(WorkDirectory, "bin");
         }
 
         public virtual void Dispose()
@@ -58,17 +61,19 @@ namespace Photon.Agent.Internal.Session
 
         public virtual async Task InitializeAsync()
         {
-            await Task.Run(() => Directory.CreateDirectory(WorkDirectory));
+            await Task.Run(() => {
+                Directory.CreateDirectory(WorkDirectory);
+                Directory.CreateDirectory(ContentDirectory);
+                Directory.CreateDirectory(BinDirectory);
+            });
         }
 
         public abstract Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId);
 
-        //public abstract SessionTaskHandle BeginTask(string taskName);
-
         public async Task ReleaseAsync()
         {
             utcReleased = DateTime.UtcNow;
-            Domain?.Dispose();
+            Domain?.Unload(true);
 
             if (!isReleased) {
                 var workDirectory = WorkDirectory;

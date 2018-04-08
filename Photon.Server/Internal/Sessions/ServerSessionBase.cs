@@ -31,7 +31,6 @@ namespace Photon.Server.Internal.Sessions
             utcCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
-            //Domain = new ServerDomain();
             Output = new ScriptOutput();
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
@@ -59,14 +58,9 @@ namespace Photon.Server.Internal.Sessions
             if (isReleased) return;
             isReleased = true;
 
-            // TODO: Hack! A ThreadAbortException
-            //  will be called if we immediately
-            //  close the AppDomain.
-            await Task.Delay(200);
-
             Complete = true;
             utcReleased = DateTime.UtcNow;
-            Domain?.Unload();
+            Domain?.Unload(true);
 
             var workDirectory = WorkDirectory;
             try {
@@ -93,13 +87,5 @@ namespace Photon.Server.Internal.Sessions
 
             return DateTime.UtcNow - utcCreated > LifeSpan;
         }
-
-        //protected void RunCommandLine(string command)
-        //{
-        //    var result = ProcessRunner.Run(WorkDirectory, command, Output);
-
-        //    if (result.ExitCode != 0)
-        //        throw new ApplicationException("Process terminated with a non-zero exit code!");
-        //}
     }
 }

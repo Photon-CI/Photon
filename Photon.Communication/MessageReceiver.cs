@@ -1,4 +1,5 @@
-﻿using Photon.Communication.Packets;
+﻿using Photon.Communication.Messages;
+using Photon.Communication.Packets;
 using System;
 using System.IO;
 using System.Threading;

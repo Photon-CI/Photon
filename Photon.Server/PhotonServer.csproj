@@ -76,6 +76,7 @@
     <Compile Include="Internal\PhotonServer.cs" />
     <Compile Include="Internal\Tasks\TaskRunner.cs" />
     <Compile Include="Internal\Tasks\TaskRunnerManager.cs" />
+    <Compile Include="MessageProcessors\ProjectPackageProcessor.cs" />
     <Compile Include="MessageProcessors\SessionOutputProcessor.cs" />
     <Compile Include="MessageProcessors\BuildTaskOutputProcessor.cs" />
     <Compile Include="ServerService.cs">
@@ -97,7 +98,9 @@
     <Compile Include="HttpHandlers\IndexHandler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

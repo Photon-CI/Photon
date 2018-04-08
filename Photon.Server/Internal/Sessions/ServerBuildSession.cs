@@ -11,8 +11,6 @@ namespace Photon.Server.Internal.Sessions
     {
         private AgentBuildSessionHandle sessionHandle;
 
-        //private readonly ReferencePool<TaskRunner> runningTasks;
-
         public Project Project {get; set;}
         public string AssemblyFile {get; set;}
         public string TaskName {get; set;}
@@ -23,7 +21,6 @@ namespace Photon.Server.Internal.Sessions
 
         public override void Dispose()
         {
-            //runningTasks?.Dispose();
             sessionHandle?.Dispose();
 
             base.Dispose();

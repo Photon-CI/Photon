@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Photon.Communication.Messages;
 
 namespace Photon.Communication
 {

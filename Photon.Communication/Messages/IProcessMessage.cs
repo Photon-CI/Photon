@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Photon.Communication
+namespace Photon.Communication.Messages
 {
     public interface IProcessMessage<in TRequest>
         where TRequest : IRequestMessage

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Photon.Framework.Projects;
+﻿using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
+using System;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Tasks
 {
-    public class AgentDeployContext : IAgentDeployContext
+    public class AgentDeployContext : MarshalByRefObject, IAgentDeployContext
     {
         public Project Project {get; set;}
         //public ContextAgentDefinition Agent {get; set;}
@@ -17,7 +17,7 @@ namespace Photon.Framework.Tasks
         public ScriptOutput Output {get;}
 
 
-        public AgentDeployContext(AgentDefinition agent)
+        public AgentDeployContext()
         {
             //Agent = new ContextAgentDefinition {
             //    Name = agent.Name,

@@ -1,6 +1,7 @@
 ﻿using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Tasks;
+using Photon.Library.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,11 +38,42 @@ namespace Photon.Agent.Internal.Session
                 GitRefspec = GitRefspec,
                 TaskName = taskName,
                 WorkDirectory = WorkDirectory,
+                ContentDirectory = ContentDirectory,
+                BinDirectory = BinDirectory,
                 BuildNumber = BuildNumber,
                 Output = Output.Writer,
             };
 
+            context.ProjectPackagePushed += Context_OnProjectPackagePushed;
+            context.ApplicationPackagePushed += Context_OnApplicationPackagePushed;
+
             return await Domain.RunBuildTask(context);
+        }
+
+        private void Context_OnProjectPackagePushed(object sender, PackagePushEventArgs e)
+        {
+            var message = new ProjectPackageRequest {
+                Filename = e.Filename,
+            };
+
+            var response = Transceiver.Send(message)
+                .GetResponseAsync<ProjectPackageResponse>()
+                .GetAwaiter().GetResult();
+
+            if (response.Successful) {
+                Output.WriteLine("Project Package pushed successfully.", ConsoleColor.DarkGreen);
+            }
+            else {
+                Output.WriteLine($"Failed to push Project Package! {response.Exception}", ConsoleColor.DarkYellow);
+            }
+        }
+
+        private void Context_OnApplicationPackagePushed(object sender, PackagePushEventArgs e)
+        {
+            //...
+
+            //Transceiver.SendOneWay();
+            throw new NotImplementedException();
         }
 
         private void LoadProjectSource()
@@ -49,14 +81,14 @@ namespace Photon.Agent.Internal.Session
             var sourceType = Project.SourceType;
 
             if (string.Equals(sourceType, "fs")) {
-                Output.WriteLine($"Copying File-System directory '{Project.SourcePath}' to work directory.", ConsoleColor.DarkCyan);
-                CopyDirectory(Project.SourcePath, WorkDirectory);
+                Output.WriteLine($"Copying File-System directory '{Project.SourcePath}' to work content directory.", ConsoleColor.DarkCyan);
+                CopyDirectory(Project.SourcePath, ContentDirectory);
                 Output.WriteLine("Copy completed successfully.", ConsoleColor.DarkGreen);
                 return;
             }
 
             if (string.Equals(sourceType, "git")) {
-                Output.WriteLine("Cloning Git Repository '...' to work directory.", ConsoleColor.DarkCyan);
+                Output.WriteLine("Cloning Git Repository '...' to work content directory.", ConsoleColor.DarkCyan);
 
                 // TODO: Load Repository
                 throw new NotImplementedException();
@@ -85,7 +117,7 @@ namespace Photon.Agent.Internal.Session
                 }
             }
 
-            var assemblyFilename = Path.Combine(WorkDirectory, AssemblyFile);
+            var assemblyFilename = Path.Combine(ContentDirectory, AssemblyFile);
 
             if (!File.Exists(assemblyFilename)) {
                 errorList.Value.Add(new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!"));
@@ -93,10 +125,24 @@ namespace Photon.Agent.Internal.Session
                 abort = true;
             }
 
+            // Shadow-Copy assembly folder
+            string assemblyCopyFilename = null;
+            try {
+                var sourcePath = Path.GetDirectoryName(assemblyFilename);
+                var assemblyName = Path.GetFileName(assemblyFilename);
+                assemblyCopyFilename = Path.Combine(BinDirectory, assemblyName);
+                CopyDirectory(sourcePath, BinDirectory);
+            }
+            catch (Exception error) {
+                errorList.Value.Add(new ApplicationException($"Failed to shadow-copy assembly '{assemblyFilename}'!", error));
+                Output.WriteLine($"Failed to shadow-copy assembly '{assemblyFilename}'!", ConsoleColor.DarkYellow);
+                abort = true;
+            }
+
             if (!abort) {
                 try {
                     Domain = new AgentSessionDomain();
-                    Domain.Initialize(assemblyFilename);
+                    Domain.Initialize(assemblyCopyFilename);
                 }
                 catch (Exception error) {
                     errorList.Value.Add(new ApplicationException($"Script initialization failed! [{SessionId}]", error));
@@ -130,7 +176,7 @@ namespace Photon.Agent.Internal.Session
 
         protected void RunCommandLine(string command)
         {
-            var result = ProcessRunner.Run(WorkDirectory, command, Output.Writer);
+            var result = ProcessRunner.Run(ContentDirectory, command, Output.Writer);
 
             if (result.ExitCode != 0)
                 throw new ApplicationException("Process terminated with a non-zero exit code!");

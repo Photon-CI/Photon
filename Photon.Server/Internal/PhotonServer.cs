@@ -1,7 +1,9 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Server.Internal.Packages;
 using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.Sessions;
 using Photon.Server.Internal.Tasks;
@@ -29,6 +31,9 @@ namespace Photon.Server.Internal
         public ScriptQueue Queue {get;}
         public string WorkPath {get;}
 
+        public PackageManager ProjectPackages {get;}
+        public MessageRegistry MessageRegistry {get;}
+
 
         public PhotonServer()
         {
@@ -36,6 +41,9 @@ namespace Photon.Server.Internal
             Sessions = new ServerSessionManager();
             TaskRunners = new ServerTaskRunnerManager();
             ProjectData = new ProjectDataManager();
+
+            ProjectPackages = new PackageManager();
+            MessageRegistry = new MessageRegistry();
 
             Queue = new ScriptQueue {
                 MaxDegreeOfParallelism = Configuration.Parallelism,
@@ -69,6 +77,10 @@ namespace Photon.Server.Internal
 
             Projects.Initialize();
             ProjectData.Initialize();
+            MessageRegistry.Scan(Assembly.GetExecutingAssembly());
+
+            // TODO: Cache Project Package Index?
+            //ProjectPackages.Initialize();
 
             TaskRunners.Start();
             Sessions.Start();

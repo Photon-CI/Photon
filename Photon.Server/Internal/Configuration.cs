@@ -15,11 +15,13 @@ namespace Photon.Server.Internal
         private static string ProjectsFilePath => ConfigurationReader.AppSetting("projectsFile", "projects.json");
         private static string WorkPath => ConfigurationReader.AppSetting("work", "Work");
         private static string ProjectDataPath => ConfigurationReader.AppSetting("projectData", "ProjectData");
+        private static string ProjectPackagePath => ConfigurationReader.AppSetting("projectPackages", "ProjectPackages");
 
-        public static string ServerFile => Path.Combine(Directory, ServerFilePath);
-        public static string ProjectsFile => Path.Combine(Directory, ProjectsFilePath);
-        public static string WorkDirectory => Path.Combine(Directory, WorkPath);
-        public static string ProjectDataDirectory => Path.Combine(Directory, ProjectDataPath);
+        public static string ServerFile => FullPath(Directory, ServerFilePath);
+        public static string ProjectsFile => FullPath(Directory, ProjectsFilePath);
+        public static string WorkDirectory => FullPath(Directory, WorkPath);
+        public static string ProjectDataDirectory => FullPath(Directory, ProjectDataPath);
+        public static string ProjectPackageDirectory => FullPath(Directory, ProjectPackagePath);
 
 
         static Configuration()
@@ -30,8 +32,14 @@ namespace Photon.Server.Internal
             var _appData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             var defaultDirectory = Path.Combine(_appData, "Photon", "Server");
 
-            var _dir = ConfigurationReader.AppSetting("directory", defaultDirectory);;
+            var _dir = ConfigurationReader.AppSetting("directory", defaultDirectory);
             Directory = _dir == "." ? AssemblyPath : Path.GetFullPath(_dir);
+        }
+
+        private static string FullPath(params string[] paths)
+        {
+            var path = Path.Combine(paths);
+            return Path.GetFullPath(path);
         }
     }
 }

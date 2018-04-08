@@ -10,10 +10,13 @@ namespace Photon.Framework.Tasks
         string TaskName {get;}
         string GitRefspec {get;}
         string WorkDirectory {get;}
+        string ContentDirectory {get;}
+        string BinDirectory {get;}
         int BuildNumber {get;}
         ScriptOutput Output {get;}
 
         void RunCommandLine(string command);
         void PushProjectPackage(string filename);
+        void PushApplicationPackage(string filename);
     }
 }

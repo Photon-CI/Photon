@@ -65,6 +65,13 @@ namespace Photon.Server
                 Console.WriteLine("Server Started");
                 Console.ResetColor();
                 Console.ReadKey(true);
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Server Stopping...");
+                Console.ResetColor();
+
+                PhotonServer.Instance.Stop();
+                Console.WriteLine();
                 return 0;
             }
             catch (Exception error) {
@@ -75,14 +82,6 @@ namespace Photon.Server
                 Console.ReadKey(true);
 
                 return 1;
-            }
-            finally {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Server Stopping...");
-                Console.ResetColor();
-
-                PhotonServer.Instance.Stop();
-                Console.WriteLine();
             }
         }
     }

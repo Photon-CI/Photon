@@ -1,4 +1,5 @@
 ﻿using System;
+using Photon.Communication.Messages;
 
 namespace Photon.Communication
 {

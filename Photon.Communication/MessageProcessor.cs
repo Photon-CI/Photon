@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Communication.Messages;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -16,8 +17,6 @@ namespace Photon.Communication
         {
             this.transceiver = transceiver;
             this.registry = registry;
-
-            //registry = new MessageRegistry();
         }
 
         public void Scan(Assembly assembly)

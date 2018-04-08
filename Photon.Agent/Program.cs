@@ -1,10 +1,10 @@
 ﻿using log4net;
 using log4net.Config;
+using Photon.Agent.Commands;
 using Photon.Agent.Internal;
 using System;
 using System.ServiceProcess;
 using System.Threading.Tasks;
-using Photon.Agent.Commands;
 
 namespace Photon.Agent
 {
@@ -65,6 +65,13 @@ namespace Photon.Agent
                 Console.WriteLine("Agent Started");
                 Console.ResetColor();
                 Console.ReadKey(true);
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Agent Stopping...");
+                Console.ResetColor();
+
+                PhotonAgent.Instance.Stop();
+                Console.WriteLine();
                 return 0;
             }
             catch (Exception error) {
@@ -75,14 +82,6 @@ namespace Photon.Agent
                 Console.ReadKey(true);
 
                 return 1;
-            }
-            finally {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Agent Stopping...");
-                Console.ResetColor();
-
-                PhotonAgent.Instance.Stop();
-                Console.WriteLine();
             }
         }
     }

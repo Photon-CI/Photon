@@ -1,13 +1,12 @@
-﻿using Photon.Communication;
+﻿using log4net;
+using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Messages;
 using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
 using Photon.Server.Internal.Tasks;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
-using log4net;
 
 namespace Photon.Server.Internal.Sessions
 {
@@ -33,11 +32,7 @@ namespace Photon.Server.Internal.Sessions
         {
             this.definition = agentDefinition;
 
-            // TODO: This can be moved to single instance in PhotonServer
-            var registry = new MessageRegistry();
-            registry.Scan(Assembly.GetExecutingAssembly());
-
-            messageClient = new MessageClient(registry);
+            messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry);
         }
 
         public void Dispose()

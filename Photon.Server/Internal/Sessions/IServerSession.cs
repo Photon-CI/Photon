@@ -1,12 +1,13 @@
-﻿using Photon.Library;
+﻿using Photon.Framework.Scripts;
+using Photon.Library;
 using System;
 using System.Threading.Tasks;
-using Photon.Framework.Scripts;
 
 namespace Photon.Server.Internal.Sessions
 {
     internal interface IServerSession : IReferenceItem, IDisposable
     {
+        string WorkDirectory {get;}
         Exception Exception {get; set;}
         ScriptOutput Output {get;}
         bool Complete {get;}
