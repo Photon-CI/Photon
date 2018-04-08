@@ -54,6 +54,7 @@
     <Reference Include="System.ServiceProcess" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="HttpHandlers\Session\OutputHandler.cs" />
     <Compile Include="Internal\BuildStartInfo.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
@@ -71,7 +72,6 @@
     <Compile Include="Internal\ServerDomain.cs" />
     <Compile Include="Internal\Sessions\ServerDeploySession.cs" />
     <Compile Include="Internal\Sessions\ServerSessionManager.cs" />
-    <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\PhotonServer.cs" />
     <Compile Include="Internal\Tasks\TaskRunner.cs" />

@@ -7,11 +7,10 @@ namespace Photon.Server.Internal
 {
     internal class Configuration
     {
-        private static readonly string DefaultDirectory;
-
         public static string AssemblyPath {get;}
+        public static string Directory {get;}
 
-        public static string Directory => ConfigurationReader.AppSetting("directory", DefaultDirectory);
+        public static int Parallelism => ConfigurationReader.AppSetting("parallelism", 1);
         private static string ServerFilePath => ConfigurationReader.AppSetting("serverFile", "server.json");
         private static string ProjectsFilePath => ConfigurationReader.AppSetting("projectsFile", "projects.json");
         private static string WorkPath => ConfigurationReader.AppSetting("work", "Work");
@@ -29,7 +28,10 @@ namespace Photon.Server.Internal
             AssemblyPath = Path.GetDirectoryName(assembly.Location);
 
             var _appData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            DefaultDirectory = Path.Combine(_appData, "Photon", "Server");
+            var defaultDirectory = Path.Combine(_appData, "Photon", "Server");
+
+            var _dir = ConfigurationReader.AppSetting("directory", defaultDirectory);;
+            Directory = _dir == "." ? AssemblyPath : Path.GetFullPath(_dir);
         }
     }
 }

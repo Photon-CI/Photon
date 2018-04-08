@@ -3,16 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Photon.CLI.Internal.Commands
+namespace Photon.Library.Commands
 {
-    internal class CommandActionBuilder
+    public class CommandActionBuilder
     {
         private readonly IDictionary<string, CommandActionEventHandler> actionList;
         private readonly IDictionary<string, CommandPropertyEventHandler> propertyList;
         private readonly string[] names;
 
 
-        public CommandActionBuilder(IDictionary<string, CommandActionEventHandler> actionList, IDictionary<string, CommandPropertyEventHandler> propertyList, string[] names)
+        internal CommandActionBuilder(IDictionary<string, CommandActionEventHandler> actionList, IDictionary<string, CommandPropertyEventHandler> propertyList, string[] names)
         {
             this.actionList = actionList;
             this.propertyList = propertyList;

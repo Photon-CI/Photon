@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Photon.CLI.Internal.Commands
+namespace Photon.Library.Commands
 {
-    internal interface ICommandParser
+    public interface ICommandParser
     {
         Task ParseAsync(string[] args);
     }

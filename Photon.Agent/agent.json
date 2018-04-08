@@ -1,8 +1,12 @@
 {
 	"name": "Photon Agent",
+  "tcp": {
+    "host":  "localhost",
+    "port":  10933 
+  },
 	"http": {
 		"host": "localhost",
-		"port": 80,
+		"port": 8088,
 		"path": "/photon/build"
 	}
 }

@@ -72,7 +72,7 @@ namespace Photon.Agent.Internal.Session
 
             var preBuildCommand = Project.PreBuild;
             if (!string.IsNullOrWhiteSpace(preBuildCommand)) {
-                //Log.Debug("Running script Pre-Build command...");
+                Output.WriteLine("Running Pre-Build Command...", ConsoleColor.DarkCyan);
 
                 try {
                     RunCommandLine(preBuildCommand);

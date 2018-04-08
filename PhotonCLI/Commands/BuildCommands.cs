@@ -1,8 +1,8 @@
 ﻿using AnsiConsole;
 using Photon.CLI.Actions;
 using Photon.CLI.Internal;
-using Photon.CLI.Internal.Commands;
 using Photon.Framework.Extensions;
+using Photon.Library.Commands;
 using System;
 using System.Threading.Tasks;
 

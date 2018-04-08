@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 
-namespace Photon.CLI.Internal.Commands
+namespace Photon.Library.Commands
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    internal class CommandAttribute : Attribute
+    public class CommandAttribute : Attribute
     {
         public string Name {get; set;}
         public string Description {get; set;}
@@ -50,7 +50,7 @@ namespace Photon.CLI.Internal.Commands
 
         private static CommandAttribute GetAttribute(Type type, string methodName)
         {
-            return type.GetMethod(methodName)
+            return type.GetMethod(methodName)?
                 .GetCustomAttributes(typeof(CommandAttribute), true)
                 .FirstOrDefault() as CommandAttribute;
         }

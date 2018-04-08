@@ -1,5 +1,6 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
@@ -9,7 +10,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using Photon.Agent.Internal.Session;
 
 namespace Photon.Agent.Internal
 {
@@ -43,6 +43,7 @@ namespace Photon.Agent.Internal
         {
             //if (isStarted) Stop();
 
+            messageListener?.Dispose();
             Sessions?.Dispose();
             receiver?.Dispose();
             receiver = null;
@@ -57,11 +58,50 @@ namespace Photon.Agent.Internal
             Definition = ParseAgentDefinition() ?? new AgentDefinition {
                 Http = {
                     Host = "localhost",
-                    Port = 80,
+                    Port = 8088,
                     Path = "/photon/agent",
                 },
             };
 
+            Sessions.Start();
+
+            messageListener.Listen(IPAddress.Any, 10933);
+            StartHttpServer();
+        }
+
+        public void Stop()
+        {
+            if (!isStarted) return;
+            isStarted = false;
+
+            messageListener.StopAsync()
+                .GetAwaiter().GetResult();
+
+            Sessions.Stop();
+            receiver.Stop();
+        }
+
+        private AgentDefinition ParseAgentDefinition()
+        {
+            var file = Configuration.AgentFile ?? "agent.json";
+            var path = Path.Combine(Configuration.AssemblyPath, file);
+            path = Path.GetFullPath(path);
+
+            Log.Debug($"Loading Agent Definition: {path}");
+
+            if (!File.Exists(path)) {
+                Log.Warn($"Agent Definition not found! {path}");
+                return null;
+            }
+
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                var serializer = new JsonSerializer();
+                return serializer.Deserialize<AgentDefinition>(stream);
+            }
+        }
+
+        private void StartHttpServer()
+        {
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
                 ListenerPath = Definition.Http.Path,
@@ -76,7 +116,7 @@ namespace Photon.Agent.Internal
             var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
             context.Views.AddFolderFromExternal(viewPath);
 
-            var httpPrefix = $"http://+:{Definition.Http.Port}/";
+            var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
             if (!string.IsNullOrEmpty(Definition.Http.Path))
                 httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
 
@@ -89,47 +129,11 @@ namespace Photon.Agent.Internal
 
             try {
                 receiver.Start();
+
+                Log.Info($"HTTP Server listening at http://{httpPrefix}");
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);
-            }
-
-            Sessions.Start();
-            //messageProcessor.Start();
-            messageListener.Listen(IPAddress.Any, 10933);
-        }
-
-        public void Stop()
-        {
-            if (!isStarted) return;
-            isStarted = false;
-
-            messageListener.StopAsync()
-                .GetAwaiter().GetResult();
-
-            //messageProcessor.StopAsync()
-            //    .GetAwaiter().GetResult();
-
-            Sessions.Stop();
-            receiver.Stop();
-        }
-
-        private AgentDefinition ParseAgentDefinition()
-        {
-            var file = Configuration.DefinitionPath ?? "agent.json";
-            var path = Path.Combine(Configuration.AssemblyPath, file);
-            path = Path.GetFullPath(path);
-
-            Log.Debug($"Loading Agent Definition: {path}");
-
-            if (!File.Exists(path)) {
-                Log.Warn($"Agent Definition not found! {path}");
-                return null;
-            }
-
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<AgentDefinition>(stream);
             }
         }
     }

@@ -55,6 +55,7 @@
     <Compile Include="AgentService.Designer.cs">
       <DependentUpon>AgentService.cs</DependentUpon>
     </Compile>
+    <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Session\AgentBuildSession.cs" />
     <Compile Include="Internal\Session\AgentDeploySession.cs" />
     <Compile Include="Internal\Session\AgentSessionBase.cs" />
@@ -62,7 +63,6 @@
     <Compile Include="Internal\Session\AgentSessionManager.cs" />
     <Compile Include="Internal\Session\IAgentSession.cs" />
     <Compile Include="Internal\PhotonAgent.cs" />
-    <Compile Include="Internal\Arguments.cs" />
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\Session\SessionTaskHandle.cs" />
     <Compile Include="MessageHandlers\BuildTaskRunProcessor.cs" />
