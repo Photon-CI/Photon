@@ -1,5 +1,6 @@
 ﻿using log4net;
 using Photon.Communication;
+using Photon.Communication.Messages;
 using Photon.Framework.Messages;
 using Photon.Server.Internal;
 using System.Threading.Tasks;

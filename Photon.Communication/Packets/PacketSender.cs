@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Communication.Messages;
 
 namespace Photon.Communication.Packets
 {
@@ -121,6 +122,7 @@ namespace Photon.Communication.Packets
             var messageId = message.MessageId;
             var messageType = message.GetType().AssemblyQualifiedName;
             var messageData = new MemoryStream();
+            var streamData = (message as IStreamMessage)?.StreamFunc();
 
             // TODO: BsonDataWriter should be disposed!
             //   but it will close the stream.
@@ -131,7 +133,10 @@ namespace Photon.Communication.Packets
 
             messageData.Seek(0, SeekOrigin.Begin);
 
-            return new PacketSource(messageId, messageType, messageData);
+            return new PacketSource(messageId, messageType) {
+                MessageData = messageData,
+                StreamData = streamData,
+            };
         }
     }
 }

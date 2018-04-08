@@ -9,26 +9,46 @@ namespace Photon.Agent.Internal
     {
         public string[] GetBuildTasks()
         {
-            return agent.GetBuildTasks();
+            return Agent.GetBuildTasks();
         }
 
         public string[] GetDeployTasks()
         {
-            return agent.GetDeployTasks();
+            return Agent.GetDeployTasks();
         }
 
         public async Task<TaskResult> RunBuildTask(AgentBuildContext context)
         {
-            var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
-            agent.RunBuildTask(context, completeEvent);
-            return await completeEvent.Task;
+            Sponsor.Register(context);
+
+            TaskResult result;
+            try {
+                var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
+                Agent.RunBuildTask(context, completeEvent);
+                result = await completeEvent.Task;
+            }
+            finally {
+                Sponsor.Unregister(context);
+            }
+
+            return result;
         }
 
         public async Task<TaskResult> RunDeployTask(AgentDeployContext context)
         {
-            var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
-            agent.RunDeployTask(context, completeEvent);
-            return await completeEvent.Task;
+            Sponsor.Register(context);
+
+            TaskResult result;
+            try {
+                var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
+                Agent.RunDeployTask(context, completeEvent);
+                result = await completeEvent.Task;
+            }
+            finally {
+                Sponsor.Unregister(context);
+            }
+
+            return result;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Photon.Communication
+﻿namespace Photon.Communication.Messages
 {
     public interface IResponseMessage : IMessage
     {

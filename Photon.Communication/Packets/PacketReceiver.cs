@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Photon.Communication.Messages;
 
 namespace Photon.Communication.Packets
 {
@@ -58,8 +59,9 @@ namespace Photon.Communication.Packets
                 case PacketTypes.Header:
                     var headerMessageType = reader.ReadString();
                     var headerMessageSize = reader.ReadInt64();
+                    var headerStreamSize = reader.ReadInt64();
 
-                    return new HeaderPacket(messageId, headerMessageType, headerMessageSize);
+                    return new HeaderPacket(messageId, headerMessageType, headerMessageSize, headerStreamSize);
                 case PacketTypes.Data:
                     var dataMessageSize = reader.ReadInt32();
                     var dataMessageData = reader.ReadBytes(dataMessageSize);

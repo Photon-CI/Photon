@@ -1,15 +1,11 @@
-﻿using Photon.Communication;
+﻿using Photon.Communication.Messages;
 
 namespace Photon.Library.Messages
 {
-    public class BuildTaskStatusResponse : IResponseMessage
+    public class ProjectPackageResponse : IResponseMessage
     {
         public string MessageId {get; set;}
         public string RequestMessageId {get; set;}
-
-        public string OutputText {get; set;}
-        public int OutputPosition {get; set;}
-        public bool Complete {get; set;}
         public bool Successful {get; set;}
         public string Exception {get; set;}
     }

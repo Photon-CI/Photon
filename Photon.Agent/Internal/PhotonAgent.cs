@@ -74,11 +74,11 @@ namespace Photon.Agent.Internal
             if (!isStarted) return;
             isStarted = false;
 
-            messageListener.StopAsync()
+            messageListener?.StopAsync()
                 .GetAwaiter().GetResult();
 
-            Sessions.Stop();
-            receiver.Stop();
+            Sessions?.Stop();
+            receiver?.Stop();
         }
 
         private AgentDefinition ParseAgentDefinition()

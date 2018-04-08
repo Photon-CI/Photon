@@ -44,11 +44,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExceptionResponseMessage.cs" />
-    <Compile Include="IMessage.cs" />
-    <Compile Include="IProcessMessage.cs" />
-    <Compile Include="IRequestMessage.cs" />
-    <Compile Include="IResponseMessage.cs" />
+    <Compile Include="Messages\ExceptionResponseMessage.cs" />
+    <Compile Include="Messages\IMessage.cs" />
+    <Compile Include="Messages\IProcessMessage.cs" />
+    <Compile Include="Messages\IStreamRequestMessage.cs" />
+    <Compile Include="Messages\IStreamMessage.cs" />
+    <Compile Include="Messages\IRequestMessage.cs" />
+    <Compile Include="Messages\IResponseMessage.cs" />
     <Compile Include="MessageClient.cs" />
     <Compile Include="MessageHandle.cs" />
     <Compile Include="MessageHost.cs" />

@@ -4,6 +4,7 @@ using Photon.Communication;
 using Photon.Framework.Messages;
 using System;
 using System.Threading.Tasks;
+using Photon.Communication.Messages;
 
 namespace Photon.Agent.MessageHandlers
 {

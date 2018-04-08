@@ -1,4 +1,5 @@
 ﻿using Photon.Communication;
+using Photon.Communication.Messages;
 using Photon.Framework.Tasks;
 
 namespace Photon.Library.Messages

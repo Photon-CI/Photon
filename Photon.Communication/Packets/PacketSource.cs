@@ -8,46 +8,63 @@ namespace Photon.Communication.Packets
     {
         private readonly string messageId;
         private readonly string messageType;
-        private readonly Stream messageData;
-        private readonly long messageSize;
+        private readonly byte[] messageDataBuffer;
 
-        private byte[] messageDataBuffer;
-        private bool isStarted;
+        private bool sentHeader;
+        private bool sentMessage;
+        private bool sentStream;
+        private long messageLength;
+        private long streamLength;
 
+        public Stream MessageData {get; set;}
+        public Stream StreamData {get; set;}
         public bool IsComplete {get; private set;}
         public int PacketSize {get; set;}
 
 
-        public PacketSource(string messageId, string messageType, Stream messageData)
+        public PacketSource(string messageId, string messageType)
         {
             this.messageId = messageId ?? throw new ArgumentNullException(nameof(messageId));
             this.messageType = messageType ?? throw new ArgumentNullException(nameof(messageType));
-            this.messageData = messageData ?? throw new ArgumentNullException(nameof(messageData));
 
             PacketSize = 4096;
             messageDataBuffer = new byte[PacketSize];
-            messageSize = messageData.Length;
         }
 
         public void Dispose()
         {
-            messageData?.Dispose();
+            MessageData?.Dispose();
         }
 
         public async Task<IPacket> TryTakePacket()
         {
-            if (!isStarted) {
-                isStarted = true;
-                return new HeaderPacket(messageId, messageType, messageSize);
+            if (!sentHeader) {
+                sentHeader = true;
+                messageLength = MessageData?.Length ?? 0;
+                streamLength = StreamData?.Length ?? 0;
+
+                MessageData?.Seek(0, SeekOrigin.Begin);
+                StreamData?.Seek(0, SeekOrigin.Begin);
+
+                return new HeaderPacket(messageId, messageType, messageLength, streamLength);
             }
 
-            var readSize = await messageData.ReadAsync(messageDataBuffer, 0, PacketSize);
+            if (MessageData != null && !sentMessage) {
+                var readSize = await MessageData.ReadAsync(messageDataBuffer, 0, PacketSize);
 
-            if (readSize > 0) {
-                if (messageData.Position >= messageData.Length)
-                    IsComplete = true;
+                if (readSize > 0)
+                    return new DataPacket(messageId, messageDataBuffer, readSize);
 
-                return new DataPacket(messageId, messageDataBuffer, readSize);
+                sentMessage = true;
+            }
+
+            if (StreamData != null && !sentStream) {
+                var readSize = await StreamData.ReadAsync(messageDataBuffer, 0, PacketSize);
+
+                if (readSize > 0)
+                    return new DataPacket(messageId, messageDataBuffer, readSize);
+
+                sentStream = true;
             }
 
             IsComplete = true;

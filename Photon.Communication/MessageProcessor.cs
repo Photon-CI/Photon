@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Communication.Messages;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;

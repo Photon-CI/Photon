@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Runtime.Remoting.Lifetime;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Library.Session
 {
@@ -11,23 +12,23 @@ namespace Photon.Library.Session
     {
         private bool isUnloaded;
         private AppDomain domain;
-        private ClientSponsor sponsor;
-        protected T agent;
+        protected ClientSponsor Sponsor;
+        protected T Agent;
 
 
         public virtual void Dispose()
         {
-            if (sponsor != null) {
-                if (agent != null) {
+            if (Sponsor != null) {
+                if (Agent != null) {
                     //...
-                    sponsor.Unregister(agent);
+                    Sponsor.Unregister(Agent);
                 }
 
-                sponsor.Close();
-                sponsor = null;
+                Sponsor.Close();
+                Sponsor = null;
             }
 
-            if (!isUnloaded) Unload();
+            if (!isUnloaded) Unload(false).GetAwaiter().GetResult();
         }
 
         public void Initialize(string assemblyFilename)
@@ -35,29 +36,40 @@ namespace Photon.Library.Session
             var assemblyName = Path.GetFileName(assemblyFilename);
             var assemblyPath = Path.GetDirectoryName(assemblyFilename);
 
+            if (string.IsNullOrEmpty(assemblyName))
+                throw new ApplicationException("Assembly filename is empty!");
+
             var domainSetup = new AppDomainSetup {
                 ApplicationBase = assemblyPath,
                 ConfigurationFile = $"{assemblyFilename}.config",
             };
 
-            sponsor = new ClientSponsor();
+            Sponsor = new ClientSponsor();
             domain = AppDomain.CreateDomain(assemblyName, null, domainSetup);
 
             var agentType = typeof(T);
-            agent = (T)domain.CreateInstanceAndUnwrap(agentType.Assembly.FullName, agentType.FullName);
-            agent.LoadAssembly(assemblyFilename);
+            Agent = (T)domain.CreateInstanceAndUnwrap(agentType.Assembly.FullName, agentType.FullName);
+            Agent.LoadAssembly(assemblyFilename);
 
-            sponsor.Register(agent);
+            Sponsor.Register(Agent);
         }
 
-        public void Unload()
+        public async Task Unload(bool wait)
         {
+            // A ThreadAbortException will be called
+            // if we immediately close the AppDomain.
+
             try {
+                if (wait) await Task.Delay(200);
+
                 AppDomain.Unload(domain);
+
+                if (wait) await Task.Delay(200);
             }
             catch (ThreadAbortException) {
                 Thread.ResetAbort();
             }
+            catch (Exception) {}
 
             domain = null;
             isUnloaded = true;

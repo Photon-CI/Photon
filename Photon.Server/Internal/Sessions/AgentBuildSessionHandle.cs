@@ -1,4 +1,5 @@
-﻿using Photon.Communication;
+﻿using log4net;
+using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Messages;
 using Photon.Framework.Projects;
@@ -7,7 +8,6 @@ using Photon.Server.Internal.Tasks;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using log4net;
 
 namespace Photon.Server.Internal.Sessions
 {
