@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Photon.Communication.Messages;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Communication.Packets
 {

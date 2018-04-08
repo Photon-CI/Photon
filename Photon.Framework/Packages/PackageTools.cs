@@ -16,13 +16,18 @@ namespace Photon.Framework.Packages
         /// definition file.
         /// </summary>
         /// <param name="definitionFilename">The file name of the package definition.</param>
+        /// <param name="version">The version of the package to create.</param>
         /// <param name="outputFilename">The file name of the output package.</param>
         public static async Task CreateProjectPackage(string definitionFilename, string version, string outputFilename)
         {
             var definition = LoadPackageDefinition(definitionFilename);
             var definitionPath = Path.GetDirectoryName(definitionFilename);
 
-            var outputPath = Path.GetDirectoryName(outputFilename);
+            var outputFilenameFull = Path.GetFullPath(outputFilename);
+            var outputPath = Path.GetDirectoryName(outputFilenameFull);
+
+            if (string.IsNullOrEmpty(outputPath))
+                throw new ApplicationException("Empty package output path!");
 
             if (!Directory.Exists(outputPath))
                 Directory.CreateDirectory(outputPath);
@@ -31,18 +36,9 @@ namespace Photon.Framework.Packages
                 AppendPackageMetadata(archive, definition, version);
 
                 foreach (var fileDefinition in definition.Files) {
-                    var sourcePath = Path.Combine(definitionPath, fileDefinition.Path);
+                    var destPath = Path.Combine(PackageBin, fileDefinition.Destination);
 
-                    var destPath = PackageBin;
-
-                    if (fileDefinition.Destination != null)
-                        destPath = Path.Combine(destPath, fileDefinition.Destination);
-                    else {
-                        var destPathRel = Path.GetDirectoryName(fileDefinition.Path);
-                        destPath = Path.Combine(destPath, destPathRel);
-                    }
-
-                    await AddFiles(archive, sourcePath, destPath, fileDefinition.Exclude?.ToArray());
+                    await AddFiles(archive, definitionPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
                 }
             });
         }
@@ -98,12 +94,12 @@ namespace Photon.Framework.Packages
             }
         }
 
-        private static async Task AddFiles(ZipArchive archive, string sourcePath, string destPath, string[] exclude = null)
+        private static async Task AddFiles(ZipArchive archive, string rootPath, string sourcePath, string destPath, string[] exclude = null)
         {
-            foreach (var file in FilePatternMatching.GetFiles(sourcePath, destPath, exclude)) {
-                var entry = archive.CreateEntry(file.Value);
+            foreach (var file in FilePatternMatching.GetFiles(rootPath, sourcePath, destPath, exclude)) {
+                var entry = archive.CreateEntry(file.RelativeFilename);
 
-                using (var fileStream = File.Open(file.Key, FileMode.Open, FileAccess.Read))
+                using (var fileStream = File.Open(file.AbsoluteFilename, FileMode.Open, FileAccess.Read))
                 using (var entryStream = entry.Open()) {
                     await fileStream.CopyToAsync(entryStream);
                 }

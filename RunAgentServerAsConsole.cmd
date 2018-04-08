@@ -1,5 +1,0 @@
-cd "Photon.Server"
-start cmd /k "call .\RunAsConsole.cmd"
-cd "..\Photon.Agent"
-start cmd /k "call .\RunAsConsole.cmd"
-cd ".."
