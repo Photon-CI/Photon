@@ -11,15 +11,17 @@
       "url": "http://localhost/photon/build",
       "tcpHost": "localhost",
       "tcpPort": 10933,
-            "roles": [
-        "build"
+      "roles": [
+        "build",
+        "deploy.web",
+        "deploy.svc"
       ]
     },{
       "name": "Deploy Agent",
       "url": "http://localhost/photon/deploy",
       "tcpHost": "localhost",
       "tcpPort": 10934,
-            "roles": [
+      "roles": [
         "deploy"
       ]
     }

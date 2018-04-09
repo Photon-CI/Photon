@@ -1,9 +1,9 @@
 ﻿using log4net;
 using Photon.Communication;
-using Photon.Framework.Messages;
 using Photon.Server.Internal;
 using System.Threading.Tasks;
 using Photon.Communication.Messages;
+using Photon.Framework.TcpMessages;
 
 namespace Photon.Server.MessageProcessors
 {

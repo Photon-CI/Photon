@@ -1,7 +1,6 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
-using Photon.Framework.Messages;
 using System;
 using System.Threading.Tasks;
 using Photon.Communication.Messages;

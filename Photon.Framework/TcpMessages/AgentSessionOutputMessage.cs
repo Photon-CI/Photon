@@ -1,7 +1,6 @@
-﻿using Photon.Communication;
-using Photon.Communication.Messages;
+﻿using Photon.Communication.Messages;
 
-namespace Photon.Framework.Messages
+namespace Photon.Framework.TcpMessages
 {
     public class AgentSessionOutputMessage : IRequestMessage
     {

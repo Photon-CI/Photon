@@ -1,7 +1,6 @@
-﻿using Photon.Communication;
-using Photon.Communication.Messages;
+﻿using Photon.Communication.Messages;
 
-namespace Photon.Framework.Messages
+namespace Photon.Library.TcpMessages
 {
     public class BuildSessionReleaseResponse : IResponseMessage
     {

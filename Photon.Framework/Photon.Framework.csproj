@@ -59,10 +59,11 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\RemoteTaskExtensions.cs" />
     <Compile Include="FileUtils.cs" />
-    <Compile Include="Messages\BuildSessionReleaseRequest.cs" />
-    <Compile Include="Messages\BuildSessionReleaseResponse.cs" />
-    <Compile Include="Messages\AgentSessionOutputMessage.cs" />
-    <Compile Include="Messages\BuildTaskOutputMessage.cs" />
+    <Compile Include="TcpMessages\DeploySessionReleaseRequest.cs" />
+    <Compile Include="TcpMessages\DeploySessionReleaseResponse.cs" />
+    <Compile Include="TcpMessages\DeploySessionBeginResponse.cs" />
+    <Compile Include="TcpMessages\AgentSessionOutputMessage.cs" />
+    <Compile Include="TcpMessages\BuildTaskOutputMessage.cs" />
     <Compile Include="NetPath.cs" />
     <Compile Include="Packages\FilePatternMatching.cs" />
     <Compile Include="Packages\PackageFileDefinition.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Tasks\TaskResult.cs" />
     <Compile Include="ContextTaskDefinition.cs" />
     <Compile Include="ContextProjectDefinition.cs" />
+    <Compile Include="TcpMessages\DeploySessionBeginRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

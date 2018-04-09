@@ -1,12 +1,12 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Framework;
-using Photon.Framework.Messages;
 using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
 using Photon.Server.Internal.Tasks;
 using System;
 using System.Threading.Tasks;
+using Photon.Framework.TcpMessages;
 using Photon.Library.TcpMessages;
 
 namespace Photon.Server.Internal.Sessions

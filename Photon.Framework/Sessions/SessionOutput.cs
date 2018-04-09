@@ -1,7 +1,7 @@
 ﻿using Photon.Communication;
-using Photon.Framework.Messages;
 using Photon.Framework.Scripts;
 using System;
+using Photon.Framework.TcpMessages;
 
 namespace Photon.Framework.Sessions
 {

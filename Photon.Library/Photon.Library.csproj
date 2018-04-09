@@ -49,6 +49,8 @@
     <Compile Include="IReferenceItem.cs" />
     <Compile Include="TcpMessages\BuildSessionBeginRequest.cs" />
     <Compile Include="TcpMessages\BuildSessionBeginResponse.cs" />
+    <Compile Include="TcpMessages\BuildSessionReleaseRequest.cs" />
+    <Compile Include="TcpMessages\BuildSessionReleaseResponse.cs" />
     <Compile Include="TcpMessages\ProjectPackageResponse.cs" />
     <Compile Include="TcpMessages\ProjectPackageRequest.cs" />
     <Compile Include="TcpMessages\BuildTaskCompleteMessage.cs" />
