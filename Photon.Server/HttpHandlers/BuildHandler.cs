@@ -1,7 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Photon.Framework.Extensions;
-using Photon.Framework.Messages;
+using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
@@ -50,7 +50,7 @@ namespace Photon.Server.HttpHandlers
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
 
-                var response = new BuildSessionBeginResponse {
+                var response = new HttpBuildStartResponse {
                     SessionId = session.SessionId,
                 };
 
@@ -59,15 +59,15 @@ namespace Photon.Server.HttpHandlers
                 try {
                     var serializer = new JsonSerializer();
                     serializer.Serialize(memStream, response, true);
-
-                    return Ok()
-                        .SetContentType("application/json")
-                        .SetContent(memStream);
                 }
                 catch {
                     memStream.Dispose();
                     throw;
                 }
+
+                return Ok()
+                    .SetContentType("application/json")
+                    .SetContent(memStream);
             }
             catch (Exception error) {
                 Log.Error($"Failed to run Build-Task '{startInfo.TaskName}' from Project '{startInfo.ProjectId}' @ '{_gitRefspec}'!", error);

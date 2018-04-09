@@ -1,8 +1,7 @@
-﻿using Photon.Communication;
-using Photon.Communication.Messages;
+﻿using Photon.Communication.Messages;
 using Photon.Framework.Projects;
 
-namespace Photon.Framework.Messages
+namespace Photon.Library.TcpMessages
 {
     public class BuildSessionBeginRequest : IRequestMessage
     {

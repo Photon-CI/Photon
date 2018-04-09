@@ -1,11 +1,11 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Communication.Messages;
-using Photon.Library.Messages;
 using Photon.Server.Internal;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Photon.Library.TcpMessages;
 
 namespace Photon.Server.MessageProcessors
 {

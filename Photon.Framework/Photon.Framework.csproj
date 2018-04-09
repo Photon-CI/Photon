@@ -59,8 +59,6 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\RemoteTaskExtensions.cs" />
     <Compile Include="FileUtils.cs" />
-    <Compile Include="Messages\BuildSessionBeginRequest.cs" />
-    <Compile Include="Messages\BuildSessionBeginResponse.cs" />
     <Compile Include="Messages\BuildSessionReleaseRequest.cs" />
     <Compile Include="Messages\BuildSessionReleaseResponse.cs" />
     <Compile Include="Messages\AgentSessionOutputMessage.cs" />

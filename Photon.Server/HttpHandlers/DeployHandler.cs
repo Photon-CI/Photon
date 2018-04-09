@@ -1,7 +1,12 @@
-﻿using System;
-using log4net;
+﻿using log4net;
+using Newtonsoft.Json;
+using Photon.Framework.Extensions;
+using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using System;
+using System.IO;
 
 namespace Photon.Server.HttpHandlers
 {
@@ -13,45 +18,50 @@ namespace Photon.Server.HttpHandlers
 
         public override HttpHandlerResult Post()
         {
-            var projectId = GetQuery("project");
-            var projectVersion = GetQuery("version");
-            var scriptName = GetQuery("script");
+            var projectPackageId = GetQuery("id");
+            var projectPackageVersion = GetQuery("version");
 
-            if (string.IsNullOrWhiteSpace(projectId))
-                return BadRequest().SetText("'project' is undefined!");
+            if (string.IsNullOrWhiteSpace(projectPackageId))
+                return BadRequest().SetText("'id' is undefined!");
 
-            if (string.IsNullOrWhiteSpace(projectVersion))
+            if (string.IsNullOrWhiteSpace(projectPackageVersion))
                 return BadRequest().SetText("'version' is undefined!");
 
-            if (string.IsNullOrWhiteSpace(scriptName))
-                return BadRequest().SetText("'script' is undefined!");
-
-            Log.Debug($"Beginning deployment script '{scriptName}' from Project '{projectId}' @ '{projectVersion}'.");
-
             try {
-                if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
-                    return BadRequest().SetText($"Project '{projectId}' was not found!");
+                if (!PhotonServer.Instance.ProjectPackages.TryGet(projectPackageId, projectPackageVersion, out var packageFilename))
+                    return BadRequest().SetText($"Project Package '{projectPackageId}.{projectPackageVersion}' was not found!");
 
-                throw new NotImplementedException();
+                var session = new ServerDeploySession {
+                    ProjectPackageId = projectPackageId,
+                    ProjectPackageVersion = projectPackageVersion,
+                    ProjectPackageFilename = packageFilename,
+                };
 
-                //var job = project.FindJob(jobName);
-                //if (job == null) return BadRequest().SetText($"Job '{jobName}' was not found in Project '{projectId}'!");
+                PhotonServer.Instance.Sessions.BeginSession(session);
+                PhotonServer.Instance.Queue.Add(session);
 
-                //var session = new ServerDeploySession(project, job, releaseVersion);
+                var response = new HttpDeployStartResponse {
+                    SessionId = session.SessionId,
+                };
 
-                //PhotonServer.Instance.Sessions.BeginSession(session);
-                //PhotonServer.Instance.Queue.Add(session);
+                var memStream = new MemoryStream();
 
-                //var response = new SessionBeginResponse {
-                //    SessionId = session.Id,
-                //};
+                try {
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(memStream, response, true);
+                }
+                catch {
+                    memStream.Dispose();
+                    throw;
+                }
 
-                //return Ok()
-                //    .SetContentType("application/json")
-                //    .SetContent(s => new JsonSerializer().Serialize(s, response));
+                return Ok()
+                    .SetContentType("application/json")
+                    .SetContent(memStream);
+                    //.SetContent(s => new JsonSerializer().Serialize(s, response));
             }
             catch (Exception error) {
-                Log.Error($"Deployment script '{scriptName}' from Project '{projectId}' @ '{projectVersion}' has failed!", error);
+                Log.Error($"Deployment of Project Package '{projectPackageId}.{projectPackageVersion}' has failed!", error);
                 return Exception(error);
             }
         }

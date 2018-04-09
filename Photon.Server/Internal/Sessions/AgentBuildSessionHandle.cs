@@ -7,6 +7,7 @@ using Photon.Framework.Scripts;
 using Photon.Server.Internal.Tasks;
 using System;
 using System.Threading.Tasks;
+using Photon.Library.TcpMessages;
 
 namespace Photon.Server.Internal.Sessions
 {

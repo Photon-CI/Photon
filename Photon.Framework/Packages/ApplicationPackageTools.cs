@@ -31,7 +31,7 @@ namespace Photon.Framework.Packages
             await PackageTools.WriteArchive(outputFilename, async archive => {
                 AppendMetadata(archive, definition, version);
 
-                foreach (var fileDefinition in definition.Files) {
+                foreach (var fileDefinition in definition.FileList) {
                     var destPath = Path.Combine("bin", fileDefinition.Destination);
 
                     await PackageTools.AddFiles(archive, definitionPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
@@ -44,7 +44,7 @@ namespace Photon.Framework.Packages
             ApplicationPackage package = null;
 
             await PackageTools.ReadArchive(filename, async archive => {
-                package = await PackageTools.ParseMetadata<ApplicationPackage>(archive);
+                package = await PackageTools.ParseMetadataAsync<ApplicationPackage>(archive);
             });
 
             return package;

@@ -16,7 +16,9 @@ namespace Photon.Server.Internal.Sessions
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
-        protected ServerDomain Domain {get; private set;}
+        public string BinDirectory {get;}
+        public string ContentDirectory {get;}
+        protected ServerDomain Domain {get; set;}
         public bool Complete {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
@@ -35,6 +37,8 @@ namespace Photon.Server.Internal.Sessions
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
+            BinDirectory = Path.Combine(WorkDirectory, "bin");
+            ContentDirectory = Path.Combine(WorkDirectory, "content");
         }
 
         public virtual void Dispose()
@@ -46,9 +50,13 @@ namespace Photon.Server.Internal.Sessions
             Domain = null;
         }
 
-        public virtual void PrepareWorkDirectory()
+        public virtual async Task PrepareWorkDirectoryAsync()
         {
-            Directory.CreateDirectory(WorkDirectory);
+            await Task.Run(() => {
+                Directory.CreateDirectory(WorkDirectory);
+                Directory.CreateDirectory(BinDirectory);
+                Directory.CreateDirectory(ContentDirectory);
+            });
         }
 
         public abstract Task RunAsync();

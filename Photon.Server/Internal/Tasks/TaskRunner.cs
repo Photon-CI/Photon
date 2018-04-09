@@ -1,10 +1,10 @@
 ﻿using Photon.Communication;
 using Photon.Framework.Tasks;
 using Photon.Library;
-using Photon.Library.Messages;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Photon.Library.TcpMessages;
 
 namespace Photon.Server.Internal.Tasks
 {

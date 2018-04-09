@@ -1,8 +1,7 @@
-﻿using Photon.Communication;
-using Photon.Communication.Messages;
+﻿using Photon.Communication.Messages;
 using Photon.Framework.Tasks;
 
-namespace Photon.Library.Messages
+namespace Photon.Library.TcpMessages
 {
     public class BuildTaskRunResponse : IResponseMessage
     {

@@ -31,7 +31,7 @@ namespace Photon.Framework.Packages
             await PackageTools.WriteArchive(outputFilename, async archive => {
                 AppendMetadata(archive, definition, version);
 
-                foreach (var fileDefinition in definition.Files) {
+                foreach (var fileDefinition in definition.FileList) {
                     var destPath = Path.Combine("bin", fileDefinition.Destination);
 
                     await PackageTools.AddFiles(archive, definitionPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
@@ -44,18 +44,26 @@ namespace Photon.Framework.Packages
             ProjectPackage package = null;
 
             await PackageTools.ReadArchive(filename, async archive => {
-                package = await PackageTools.ParseMetadata<ProjectPackage>(archive);
+                package = await PackageTools.ParseMetadataAsync<ProjectPackage>(archive);
             });
 
             return package;
         }
 
-        public static ProjectPackage Unpack(string package, string path)
+        public static async Task<ProjectPackage> UnpackAsync(string filename, string path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
-            throw new NotImplementedException();
+            ProjectPackage metadata = null;
+
+            await PackageTools.ReadArchive(filename, async archive => {
+                metadata = await PackageTools.ParseMetadataAsync<ProjectPackage>(archive);
+
+                await PackageTools.UnpackBin(archive, path);
+            });
+
+            return metadata;
         }
 
         private static void AppendMetadata(ZipArchive archive, PackageDefinition definition, string version)
@@ -64,7 +72,8 @@ namespace Photon.Framework.Packages
                 Id = definition.Id,
                 Name = definition.Name,
                 Description = definition.Description,
-                AssemblyFilename = definition.Assembly,
+                AssemblyFilename = definition.AssemblyFilename,
+                ScriptName = definition.ScriptName,
                 Version = version,
             };
 

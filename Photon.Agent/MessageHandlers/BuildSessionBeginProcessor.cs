@@ -5,6 +5,7 @@ using Photon.Framework.Messages;
 using System;
 using System.Threading.Tasks;
 using Photon.Communication.Messages;
+using Photon.Library.TcpMessages;
 
 namespace Photon.Agent.MessageHandlers
 {

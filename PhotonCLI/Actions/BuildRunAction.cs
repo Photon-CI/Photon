@@ -4,7 +4,7 @@ using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Framework.Messages;
+using Photon.Library.HttpMessages;
 using System;
 using System.IO;
 using System.Net;
@@ -48,7 +48,7 @@ namespace Photon.CLI.Actions
             }
         }
 
-        private async Task<BuildSessionBeginResponse> StartSession(PhotonServerDefinition server)
+        private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server)
         {
             var url = NetPath.Combine(server.Url, "build")
                 +NetPath.QueryString(new {
@@ -79,7 +79,7 @@ namespace Photon.CLI.Actions
                             return null;
 
                         var serializer = new JsonSerializer();
-                        return serializer.Deserialize<BuildSessionBeginResponse>(responseStream);
+                        return serializer.Deserialize<HttpBuildStartResponse>(responseStream);
                     }
                 }
             }

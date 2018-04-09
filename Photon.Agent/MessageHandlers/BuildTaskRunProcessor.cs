@@ -1,9 +1,9 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Communication;
-using Photon.Library.Messages;
 using System;
 using System.Threading.Tasks;
 using Photon.Communication.Messages;
+using Photon.Library.TcpMessages;
 
 namespace Photon.Agent.MessageHandlers
 {

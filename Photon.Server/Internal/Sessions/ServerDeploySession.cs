@@ -1,4 +1,6 @@
-﻿using Photon.Framework.Scripts;
+﻿using Photon.Framework.Packages;
+using Photon.Framework.Projects;
+using Photon.Framework.Scripts;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,40 +9,46 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerDeploySession : ServerSessionBase
     {
-        public ServerDeployContext Context {get;}
+        public Project Project {get; set;}
+        public string AssemblyFilename {get; set;}
+        public string ScriptName {get; set;}
+        public string ProjectPackageId {get; set;}
+        public string ProjectPackageVersion {get; set;}
+        public string ProjectPackageFilename {get; set;}
 
 
-        public ServerDeploySession(ServerDeployContext context)
+        public override async Task PrepareWorkDirectoryAsync()
         {
-            this.Context = context;
+            await base.PrepareWorkDirectoryAsync();
 
-            context.WorkDirectory = WorkDirectory;
-            context.Output = Output;
-        }
+            var metadata = await ProjectPackageTools.UnpackAsync(ProjectPackageFilename, BinDirectory);
 
-        public override void PrepareWorkDirectory()
-        {
-            base.PrepareWorkDirectory();
-
-            // TODO: Copy release package
-            //CopyPackage();
+            AssemblyFilename = metadata.AssemblyFilename;
+            ScriptName = metadata.ScriptName;
         }
 
         public override async Task RunAsync()
         {
-            var assemblyFilename = Path.Combine(Context.WorkDirectory, Context.AssemblyFile);
+            var assemblyFilename = Path.Combine(BinDirectory, AssemblyFilename);
             if (!File.Exists(assemblyFilename))
                 throw new FileNotFoundException($"The assembly file '{assemblyFilename}' could not be found!");
 
+            Domain = new ServerDomain();
             Domain.Initialize(assemblyFilename);
 
-            var result = await Domain.RunDeployScript(Context);
-            if (!result.Successful) throw new ApplicationException(result.Message);
-        }
+            var context = new ServerDeployContext {
+                Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
+                ProjectPackageId = ProjectPackageId,
+                ProjectPackageVersion = ProjectPackageVersion,
+                ScriptName = ScriptName,
+                WorkDirectory = WorkDirectory,
+                BinDirectory = BinDirectory,
+                ContentDirectory = ContentDirectory,
+                Output = Output,
+            };
 
-        private void CopyPackage(string packageName, string version, string outputDirectory)
-        {
-            //...
+            var result = await Domain.RunDeployScript(context);
+            if (!result.Successful) throw new ApplicationException(result.Message);
         }
     }
 }

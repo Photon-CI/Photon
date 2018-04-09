@@ -1,6 +1,6 @@
 ﻿using Photon.Communication.Messages;
 
-namespace Photon.Library.Messages
+namespace Photon.Library.TcpMessages
 {
     public class ProjectPackageResponse : IResponseMessage
     {

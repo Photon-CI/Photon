@@ -1,11 +1,11 @@
 ﻿using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Tasks;
-using Photon.Library.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Photon.Library.TcpMessages;
 
 namespace Photon.Agent.Internal.Session
 {

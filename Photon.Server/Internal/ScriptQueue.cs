@@ -66,7 +66,7 @@ namespace Photon.Server.Internal
 
             try {
                 session.Output.AppendLine("Preparing working directory...");
-                session.PrepareWorkDirectory();
+                await session.PrepareWorkDirectoryAsync();
 
                 session.Output.AppendLine("Running script...");
                 await session.RunAsync();
