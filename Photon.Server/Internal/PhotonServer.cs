@@ -3,7 +3,8 @@ using Newtonsoft.Json;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Server.Internal.Packages;
+using Photon.Framework.Packages;
+using Photon.Library;
 using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.Sessions;
 using Photon.Server.Internal.Tasks;
@@ -30,9 +31,8 @@ namespace Photon.Server.Internal
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
         public string WorkPath {get;}
-
-        public PackageManager ProjectPackages {get;}
-        public MessageRegistry MessageRegistry {get;}
+        public ProjectPackageManager ProjectPackages {get;}
+        public MessageProcessorRegistry MessageRegistry {get;}
 
 
         public PhotonServer()
@@ -41,9 +41,11 @@ namespace Photon.Server.Internal
             Sessions = new ServerSessionManager();
             TaskRunners = new ServerTaskRunnerManager();
             ProjectData = new ProjectDataManager();
+            MessageRegistry = new MessageProcessorRegistry();
 
-            ProjectPackages = new PackageManager();
-            MessageRegistry = new MessageRegistry();
+            ProjectPackages = new ProjectPackageManager {
+                PackageDirectory = Configuration.ProjectPackageDirectory,
+            };
 
             Queue = new ScriptQueue {
                 MaxDegreeOfParallelism = Configuration.Parallelism,
@@ -77,7 +79,10 @@ namespace Photon.Server.Internal
 
             Projects.Initialize();
             ProjectData.Initialize();
+
             MessageRegistry.Scan(Assembly.GetExecutingAssembly());
+            MessageRegistry.Scan(typeof(ILibraryAssembly).Assembly);
+            MessageRegistry.Scan(typeof(IFrameworkAssembly).Assembly);
 
             // TODO: Cache Project Package Index?
             //ProjectPackages.Initialize();

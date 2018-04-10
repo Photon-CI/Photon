@@ -1,4 +1,5 @@
-﻿using Photon.Library;
+﻿using Photon.Framework.Sessions;
+using Photon.Library;
 using System;
 using System.Threading.Tasks;
 

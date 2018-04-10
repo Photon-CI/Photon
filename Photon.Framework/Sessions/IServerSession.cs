@@ -1,11 +1,10 @@
 ﻿using Photon.Framework.Scripts;
-using Photon.Library;
 using System;
 using System.Threading.Tasks;
 
-namespace Photon.Server.Internal.Sessions
+namespace Photon.Framework.Sessions
 {
-    internal interface IServerSession : IReferenceItem, IDisposable
+    public interface IServerSession : IReferenceItem, IDisposable
     {
         string WorkDirectory {get;}
         string BinDirectory {get;}

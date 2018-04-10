@@ -1,22 +1,22 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Communication.Messages;
+using Photon.Library.TcpMessages;
 using Photon.Server.Internal;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Library.TcpMessages;
 
 namespace Photon.Server.MessageProcessors
 {
-    internal class ProjectPackageProcessor : MessageProcessorBase<ProjectPackageRequest>
+    internal class ProjectPackagePushProcessor : MessageProcessorBase<ProjectPackagePushRequest>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectPackageProcessor));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectPackagePushProcessor));
 
 
-        public override async Task<IResponseMessage> Process(ProjectPackageRequest requestMessage)
+        public override async Task<IResponseMessage> Process(ProjectPackagePushRequest requestMessage)
         {
-            var response = new ProjectPackageResponse();
+            var response = new ProjectPackagePushResponse();
 
             try {
                 await PhotonServer.Instance.ProjectPackages.Add(requestMessage.Filename);

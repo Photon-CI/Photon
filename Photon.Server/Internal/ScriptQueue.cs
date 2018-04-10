@@ -1,5 +1,5 @@
 ﻿using log4net;
-using Photon.Server.Internal.Sessions;
+using Photon.Framework.Sessions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

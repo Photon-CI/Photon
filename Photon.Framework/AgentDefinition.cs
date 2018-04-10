@@ -11,13 +11,13 @@ namespace Photon.Framework
         public AgentHttpDefinition Http {get; set;}
 
         [JsonProperty("tcp")]
-        public AgentHttpDefinition Tcp {get; set;}
+        public AgentTcpDefinition Tcp {get; set;}
 
 
         public AgentDefinition()
         {
             Http = new AgentHttpDefinition();
-            Tcp = new AgentHttpDefinition();
+            Tcp = new AgentTcpDefinition();
         }
     }
 }

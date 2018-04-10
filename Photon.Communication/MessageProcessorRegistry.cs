@@ -9,12 +9,12 @@ namespace Photon.Communication
 {
     internal delegate Task<IResponseMessage> ProcessEvent(MessageTransceiver transceiver, IRequestMessage message);
 
-    public class MessageRegistry
+    public class MessageProcessorRegistry
     {
         private readonly Dictionary<Type, ProcessEvent> processorMap;
 
 
-        public MessageRegistry()
+        public MessageProcessorRegistry()
         {
             processorMap = new Dictionary<Type, ProcessEvent>();
         }
@@ -76,7 +76,6 @@ namespace Photon.Communication
                 processor = Activator.CreateInstance(processorClassType);
 
                 processorClassType.GetProperty("Transceiver")?.SetValue(processor, transceiver);
-                //processorClassType.GetProperty("Context")?.SetValue(processor, context);
 
                 var arguments = new object[] {request};
 

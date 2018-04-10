@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Photon.Communication.Messages;
+using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Communication
 {
@@ -10,6 +10,8 @@ namespace Photon.Communication
     /// </summary>
     public class MessageHost
     {
+        public event UnhandledExceptionEventHandler ThreadException;
+
         public event EventHandler Stopped;
 
         private readonly TcpClient client;
@@ -17,12 +19,14 @@ namespace Photon.Communication
         private bool isConnected;
 
 
-        public MessageHost(TcpClient client, MessageRegistry registry)
+        public MessageHost(TcpClient client, MessageProcessorRegistry registry)
         {
             this.client = client;
 
             isConnected = true;
             transceiver = new MessageTransceiver(registry);
+            transceiver.ThreadException += Transceiver_OnThreadException;
+
             transceiver.Start(client);
         }
 
@@ -59,6 +63,16 @@ namespace Photon.Communication
         protected virtual void OnStopped()
         {
             Stopped?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnThreadException(object exceptionObject)
+        {
+            ThreadException?.Invoke(this, new UnhandledExceptionEventArgs(exceptionObject, false));
+        }
+
+        private void Transceiver_OnThreadException(object sender, UnhandledExceptionEventArgs e)
+        {
+            OnThreadException(e.ExceptionObject);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Photon.Agent.MessageHandlers
             try {
                 var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
                     Project = requestMessage.Project,
-                    AssemblyFile = requestMessage.AssemblyFile,
+                    AssemblyFilename = requestMessage.AssemblyFile,
                     GitRefspec = requestMessage.GitRefspec,
                     TaskName = requestMessage.TaskName,
                     BuildNumber = requestMessage.BuildNumber,

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework;
+using System;
 
 namespace Photon.Library
 {

@@ -63,16 +63,17 @@ namespace Photon.Library.Session
                 if (wait) await Task.Delay(200);
 
                 AppDomain.Unload(domain);
-
-                if (wait) await Task.Delay(600);
+                domain = null;
             }
             catch (ThreadAbortException) {
                 Thread.ResetAbort();
             }
             catch (Exception) {}
+            finally {
+                isUnloaded = true;
+            }
 
-            domain = null;
-            isUnloaded = true;
+            if (wait) await Task.Delay(2000);
         }
     }
 }

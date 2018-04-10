@@ -65,6 +65,8 @@
     <Compile Include="Internal\PhotonAgent.cs" />
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\Session\SessionTaskHandle.cs" />
+    <Compile Include="MessageHandlers\DeploySessionBeginProcessor.cs" />
+    <Compile Include="MessageHandlers\DeploySessionReleaseProcessor.cs" />
     <Compile Include="MessageHandlers\BuildTaskRunProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionReleaseProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionBeginProcessor.cs" />

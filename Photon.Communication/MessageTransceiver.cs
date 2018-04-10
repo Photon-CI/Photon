@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Photon.Communication.Messages;
+using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Communication
 {
     public class MessageTransceiver
     {
+        public event UnhandledExceptionEventHandler ThreadException;
+
         private readonly object startStopLock;
         private readonly ConcurrentDictionary<string, MessageHandle> messageHandles;
         private readonly MessageSender messageSender;
@@ -16,21 +18,20 @@ namespace Photon.Communication
         private NetworkStream stream;
 
         internal MessageProcessor Processor {get;}
+        public object Context {get; set;}
         public bool IsStarted {get; private set;}
 
 
-        internal MessageTransceiver(MessageRegistry registry)
+        internal MessageTransceiver(MessageProcessorRegistry registry)
         {
-            //this.Processor = processor;
-            Processor = new MessageProcessor(this, registry);
-            //...
-
             startStopLock = new object();
             messageHandles = new ConcurrentDictionary<string, MessageHandle>(StringComparer.Ordinal);
             messageSender = new MessageSender();
+            Processor = new MessageProcessor(this, registry);
             messageReceiver = new MessageReceiver();
 
             messageReceiver.MessageReceived += MessageReceiver_MessageReceived;
+            messageReceiver.ThreadException += MessageReceiver_OnThreadException;
         }
 
         public void Dispose()
@@ -88,6 +89,11 @@ namespace Photon.Communication
             return handle;
         }
 
+        protected virtual void OnThreadException(object exceptionObject)
+        {
+            ThreadException?.Invoke(this, new UnhandledExceptionEventArgs(exceptionObject, false));
+        }
+
         private void MessageReceiver_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
             if (e.Message is IResponseMessage responseMessage) {
@@ -122,6 +128,11 @@ namespace Photon.Communication
                 var messageType = e.Message.GetType();
                 throw new Exception($"Unknown message type '{messageType.Name}'!");
             }
+        }
+
+        private void MessageReceiver_OnThreadException(object sender, UnhandledExceptionEventArgs e)
+        {
+            OnThreadException(e.ExceptionObject);
         }
     }
 }

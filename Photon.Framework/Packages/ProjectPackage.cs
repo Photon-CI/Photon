@@ -1,6 +1,6 @@
 ﻿namespace Photon.Framework.Packages
 {
-    public class ProjectPackage
+    public class ProjectPackage : IPackageMetadata
     {
         public string Id {get; set;}
         public string Name {get; set;}

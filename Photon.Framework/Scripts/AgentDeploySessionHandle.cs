@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Photon.Communication;
+﻿using Photon.Communication;
 using Photon.Framework.TcpMessages;
+using System;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Scripts
 {
@@ -12,17 +12,31 @@ namespace Photon.Framework.Scripts
 
         private string agentSessionId;
 
+        //public IServerDeployContext Context {get;}
         public string ServerSessionId {get; set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
         public ScriptOutput Output {get; set;}
 
 
-        public AgentDeploySessionHandle(ServerAgentDefinition agentDefinition, MessageRegistry registry)
+        public AgentDeploySessionHandle(IServerDeployContext context, ServerAgentDefinition agentDefinition, MessageProcessorRegistry registry)
         {
             this.definition = agentDefinition;
 
-            messageClient = new MessageClient(registry);
+            ProjectPackageId = context.ProjectPackageId;
+            ProjectPackageVersion = context.ProjectPackageVersion;
+            Output = context.Output;
+
+            messageClient = new MessageClient(registry) {
+                Context = context,
+            };
+
+            messageClient.ThreadException += MessageClient_OnThreadException;
+        }
+
+        private void MessageClient_OnThreadException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var x = (Exception)e.ExceptionObject;
         }
 
         public void Dispose()

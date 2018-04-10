@@ -45,6 +45,7 @@ namespace Photon.Server.Internal.Sessions
                 BinDirectory = BinDirectory,
                 ContentDirectory = ContentDirectory,
                 Output = Output,
+                ProjectPackages = PhotonServer.Instance.ProjectPackages,
             };
 
             var result = await Domain.RunDeployScript(context);

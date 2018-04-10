@@ -61,7 +61,7 @@ namespace Photon.Server.Internal.Sessions
                 agent = roleAgents[random.Next(roleAgents.Length)];
             }
 
-            return new AgentBuildSessionHandle(agent) {
+            return new AgentBuildSessionHandle(this, agent) {
                 ServerSessionId = SessionId,
                 Project = Project,
                 AssemblyFile = AssemblyFile,

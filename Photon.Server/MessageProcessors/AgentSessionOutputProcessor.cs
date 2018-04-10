@@ -7,9 +7,9 @@ using Photon.Framework.TcpMessages;
 
 namespace Photon.Server.MessageProcessors
 {
-    internal class SessionOutputProcessor : MessageProcessorBase<AgentSessionOutputMessage>
+    internal class AgentSessionOutputProcessor : MessageProcessorBase<AgentSessionOutputMessage>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SessionOutputProcessor));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AgentSessionOutputProcessor));
 
 
         public override async Task<IResponseMessage> Process(AgentSessionOutputMessage requestMessage)

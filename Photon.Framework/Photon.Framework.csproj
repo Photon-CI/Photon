@@ -59,6 +59,15 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\RemoteTaskExtensions.cs" />
     <Compile Include="FileUtils.cs" />
+    <Compile Include="IFrameworkAssembly.cs" />
+    <Compile Include="IReferenceItem.cs" />
+    <Compile Include="MessageProcessors\AgentSessionOutputProcessor.cs" />
+    <Compile Include="MessageProcessors\ProjectPackagePullProcessor.cs" />
+    <Compile Include="Packages\IPackageMetadata.cs" />
+    <Compile Include="Packages\PackageManagerBase.cs" />
+    <Compile Include="Packages\ProjectPackageManager.cs" />
+    <Compile Include="Scripts\IServerContext.cs" />
+    <Compile Include="Sessions\IServerSession.cs" />
     <Compile Include="TcpMessages\DeploySessionReleaseRequest.cs" />
     <Compile Include="TcpMessages\DeploySessionReleaseResponse.cs" />
     <Compile Include="TcpMessages\DeploySessionBeginResponse.cs" />
@@ -107,6 +116,8 @@
     <Compile Include="ContextTaskDefinition.cs" />
     <Compile Include="ContextProjectDefinition.cs" />
     <Compile Include="TcpMessages\DeploySessionBeginRequest.cs" />
+    <Compile Include="TcpMessages\ProjectPackagePullRequest.cs" />
+    <Compile Include="TcpMessages\ProjectPackagePullResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

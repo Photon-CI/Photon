@@ -18,7 +18,7 @@ namespace Photon.Agent.Internal.Session
         private bool isReleased;
 
         public Project Project {get; set;}
-        public string AssemblyFile {get; set;}
+        public string AssemblyFilename {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
@@ -76,9 +76,9 @@ namespace Photon.Agent.Internal.Session
             Domain?.Unload(true);
 
             if (!isReleased) {
-                var workDirectory = WorkDirectory;
                 try {
-                    await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
+                    var _workDirectory = WorkDirectory;
+                    await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
                 }
                 catch (AggregateException errors) {
                     errors.Flatten().Handle(e => {
@@ -87,8 +87,12 @@ namespace Photon.Agent.Internal.Session
                             return true;
                         }
 
-                        return false;
+                        Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
+                        return true;
                     });
+                }
+                catch (Exception error) {
+                    Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
                 }
 
                 isReleased = true;

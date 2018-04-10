@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using Photon.Framework.Packages;
 
 namespace Photon.Framework.Scripts
 {
@@ -20,6 +20,8 @@ namespace Photon.Framework.Scripts
         public ServerAgentDefinition[] Agents {get; set;}
         public ScriptOutput Output {get; set;}
 
+        public ProjectPackageManager ProjectPackages {get; set;}
+
 
         public AgentSessionHandleCollection RegisterAgents(params string[] roles)
         {
@@ -31,15 +33,11 @@ namespace Photon.Framework.Scripts
 
             PrintFoundAgents(roleAgents);
 
-            var registry = new MessageRegistry();
-            registry.Scan(Assembly.GetExecutingAssembly());
+            var registry = new MessageProcessorRegistry();
+            registry.Scan(typeof(IFrameworkAssembly).Assembly);
 
             var roleAgentHandles = roleAgents
-                .Select(a => new AgentDeploySessionHandle(a, registry) {
-                    ProjectPackageId = ProjectPackageId,
-                    ProjectPackageVersion = ProjectPackageVersion,
-                    Output = Output,
-                });
+                .Select(a => new AgentDeploySessionHandle(this, a, registry));
 
             return new AgentSessionHandleCollection(roleAgentHandles);
         }

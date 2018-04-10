@@ -1,71 +1,91 @@
 ﻿using Photon.Communication;
+using Photon.Framework.Packages;
 using Photon.Framework.Tasks;
+using Photon.Framework.TcpMessages;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Session
 {
     internal class AgentDeploySession : AgentSessionBase
     {
-        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId)
+        public ProjectPackage Metadata {get; private set;}
+        public string ProjectPackageId {get; set;}
+        public string ProjectPackageVersion {get; set;}
+
+
+        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId) {}
+
+        public override async Task InitializeAsync()
         {
-            //
+            await base.InitializeAsync();
+
+            await DownloadProjectPackage();
+
+            LoadProjectAssembly();
         }
 
-        //public override async Task RunAsync()
-        //{
-        //    var abort = false;
-        //    var errorList = new Lazy<List<Exception>>();
-        //    var assemblyFilename = Path.Combine(WorkDirectory, AssemblyFile);
+        private async Task DownloadProjectPackage()
+        {
+            var packageRequest = new ProjectPackagePullRequest {
+                ProjectPackageId = ProjectPackageId,
+                ProjectPackageVersion = ProjectPackageVersion,
+            };
 
-        //    if (!File.Exists(assemblyFilename)) {
-        //        errorList.Value.Add(new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!"));
-        //        Context.Output.AppendLine($"The assembly file '{assemblyFilename}' could not be found!");
-        //        //throw new FileNotFoundException($"The assembly file '{assemblyFilename}' could not be found!");
-        //        abort = true;
-        //    }
+            var packageResponse = await Transceiver.Send(packageRequest)
+                .GetResponseAsync<ProjectPackagePullResponse>();
 
-        //    if (!abort) {
-        //        try {
-        //            Domain.Initialize(assemblyFilename);
-        //        }
-        //        catch (Exception error) {
-        //            errorList.Value.Add(new ApplicationException($"Script initialization failed! [{SessionId}]", error));
-        //            //Log.Error($"Script initialization failed! [{Id}]", error);
-        //            Context.Output.AppendLine($"An error occurred while initializing the script! {error.Message} [{SessionId}]");
-        //            abort = true;
-        //        }
-        //    }
+            if (!packageResponse.Successful)
+                throw new ApplicationException($"Failed to download package '{ProjectPackageId}.{ProjectPackageVersion}'! {packageResponse.Exception}");
 
-        //    //if (!abort) {
-        //    //    try {
-        //    //        var result = await Domain.RunBuildTask(Context);
-        //    //        if (!result.Successful) throw new ApplicationException(result.Message);
-        //    //    }
-        //    //    catch (Exception error) {
-        //    //        errorList.Value.Add(new ApplicationException($"Script execution failed! [{SessionId}]", error));
-        //    //        //Log.Error($"Script execution failed! [{Id}]", error);
-        //    //        Context.Output.AppendLine($"An error occurred while executing the script! {error.Message} [{SessionId}]");
-        //    //    }
-        //    //}
-        //}
+            try {
+                Metadata = await ProjectPackageTools.UnpackAsync(packageResponse.Filename, BinDirectory);
+
+                AssemblyFilename = Path.Combine(BinDirectory, Metadata.AssemblyFilename);
+            }
+            finally {
+                try {
+                    File.Delete(packageResponse.Filename);
+                }
+                catch (Exception error) {
+                    Log.Warn("Failed to remove temporary package file!", error);
+                }
+            }
+        }
+
+        private void LoadProjectAssembly()
+        {
+            if (!File.Exists(AssemblyFilename)) {
+                Output.WriteLine($"The assembly file '{AssemblyFilename}' could not be found!", ConsoleColor.DarkYellow);
+                throw new ApplicationException($"The assembly file '{AssemblyFilename}' could not be found!");
+            }
+
+            try {
+                Domain = new AgentSessionDomain();
+                Domain.Initialize(AssemblyFilename);
+            }
+            catch (Exception error) {
+                Output.WriteLine($"An error occurred while initializing the assembly! {error.Message} [{SessionId}]", ConsoleColor.DarkRed);
+                throw new ApplicationException($"Failed to initialize assembly! [{SessionId}]", error);
+            }
+        }
 
         public override async Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId)
         {
-            throw new NotImplementedException();
-            //await Domain.RunDeployTask(Context);
-        }
+            var context = new AgentDeployContext {
+                Project = Project,
+                ProjectPackageId = ProjectPackageId,
+                ProjectPackageVersion = ProjectPackageVersion,
+                AssemblyFilename = AssemblyFilename,
+                TaskName = taskName,
+                WorkDirectory = WorkDirectory,
+                ContentDirectory = ContentDirectory,
+                BinDirectory = BinDirectory,
+                Output = Output.Writer,
+            };
 
-        //public override SessionTaskHandle BeginTask(string taskName)
-        //{
-        //    throw new NotImplementedException();
-        //    //await Domain.RunDeployTask(Context);
-        //}
-
-        private void DownloadPackage(string packageName, string version, string outputDirectory)
-        {
-            //...
-            throw new NotImplementedException();
+            return await Domain.RunDeployTask(context);
         }
     }
 }

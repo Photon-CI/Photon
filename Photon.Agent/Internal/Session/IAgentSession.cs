@@ -1,5 +1,5 @@
-﻿using Photon.Framework.Tasks;
-using Photon.Library;
+﻿using Photon.Framework;
+using Photon.Framework.Tasks;
 using System;
 using System.Threading.Tasks;
 

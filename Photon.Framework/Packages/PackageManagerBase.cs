@@ -1,23 +1,23 @@
-﻿using Photon.Framework.Packages;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Photon.Server.Internal.Packages
+namespace Photon.Framework.Packages
 {
-    internal class PackageManager
+    [Serializable]
+    public abstract class PackageManagerBase
     {
+        public string PackageDirectory {get; set;}
+
+
         public bool TryGet(string packageId, string packageVersion, out string packageFilename)
         {
             packageFilename = GetPackageFilename(packageId, packageVersion);
             return File.Exists(packageFilename);
         }
 
-        public async Task Add(string filename)
+        protected async Task Add(string filename, IPackageMetadata metadata)
         {
-            var metadata = await ProjectPackageTools.GetMetadata(filename);
-            if (metadata == null) throw new Exception("No metadata file found in package!");
-
             var packageFilename = GetPackageFilename(metadata.Id, metadata.Version);
 
             if (File.Exists(packageFilename))
@@ -33,10 +33,10 @@ namespace Photon.Server.Internal.Packages
             });
         }
 
-        private static string GetPackageFilename(string packageId, string packageVersion)
+        protected string GetPackageFilename(string packageId, string packageVersion)
         {
             var filename = $"{packageId}.{packageVersion}.zip";
-            return Path.Combine(Configuration.ProjectPackageDirectory, packageId, packageVersion, filename);
+            return Path.Combine(PackageDirectory, packageId, packageVersion, filename);
         }
     }
 }

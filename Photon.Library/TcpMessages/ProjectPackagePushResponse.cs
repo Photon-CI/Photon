@@ -2,7 +2,7 @@
 
 namespace Photon.Library.TcpMessages
 {
-    public class ProjectPackageResponse : IResponseMessage
+    public class ProjectPackagePushResponse : IResponseMessage
     {
         public string MessageId {get; set;}
         public string RequestMessageId {get; set;}

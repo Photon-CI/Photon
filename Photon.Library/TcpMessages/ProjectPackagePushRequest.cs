@@ -3,7 +3,7 @@ using Photon.Communication.Messages;
 
 namespace Photon.Library.TcpMessages
 {
-    public class ProjectPackageRequest : IFileRequestMessage
+    public class ProjectPackagePushRequest : IFileRequestMessage
     {
         public string MessageId {get; set;}
 

@@ -8,25 +8,15 @@ namespace Photon.Framework.Tasks
     public class AgentDeployContext : MarshalByRefObject, IAgentDeployContext
     {
         public Project Project {get; set;}
-        //public ContextAgentDefinition Agent {get; set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
+        public string AssemblyFilename {get; set;}
         public string TaskName {get; set;}
         public string WorkDirectory {get; set;}
-        //public ConcurrentBag<object> Artifacts {get;}
-        public ScriptOutput Output {get;}
+        public string ContentDirectory {get; set;}
+        public string BinDirectory {get; set;}
+        public ScriptOutput Output {get; set;}
 
-
-        public AgentDeployContext()
-        {
-            //Agent = new ContextAgentDefinition {
-            //    Name = agent.Name,
-            //    Roles = agent.Roles,
-            //};
-
-            //Artifacts = new ConcurrentBag<object>();
-            Output = new ScriptOutput();
-        }
 
         public string GetApplicationDirectory(string applicationName, string applicationVersion)
         {

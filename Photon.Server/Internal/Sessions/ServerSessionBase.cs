@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Photon.Framework;
 using Photon.Framework.Scripts;
+using Photon.Framework.Sessions;
 using System;
 using System.IO;
 using System.Threading.Tasks;

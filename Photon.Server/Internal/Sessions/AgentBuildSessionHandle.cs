@@ -3,11 +3,11 @@ using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Projects;
 using Photon.Framework.Scripts;
+using Photon.Framework.Sessions;
+using Photon.Library.TcpMessages;
 using Photon.Server.Internal.Tasks;
 using System;
 using System.Threading.Tasks;
-using Photon.Framework.TcpMessages;
-using Photon.Library.TcpMessages;
 
 namespace Photon.Server.Internal.Sessions
 {
@@ -29,11 +29,15 @@ namespace Photon.Server.Internal.Sessions
         public ScriptOutput Output {get; set;}
 
 
-        public AgentBuildSessionHandle(ServerAgentDefinition agentDefinition)
+        public AgentBuildSessionHandle(IServerSession session, ServerAgentDefinition agentDefinition)
         {
             this.definition = agentDefinition;
 
-            messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry);
+            messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry) {
+                Context = session,
+            };
+
+            messageClient.ThreadException += MessageClient_OnThreadException;
         }
 
         public void Dispose()
@@ -119,6 +123,11 @@ namespace Photon.Server.Internal.Sessions
                 .Append("Task ", ConsoleColor.DarkGreen)
                 .Append(TaskName, ConsoleColor.Green)
                 .Append(" completed successfully.", ConsoleColor.DarkGreen);
+        }
+
+        private void MessageClient_OnThreadException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Error("Unhandled TCP Message Error!", (Exception)e.ExceptionObject);
         }
     }
 }

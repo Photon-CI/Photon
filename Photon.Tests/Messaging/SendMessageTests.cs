@@ -20,7 +20,7 @@ namespace Photon.Tests.Messaging
 
         public SendMessageTests()
         {
-            var registry = new MessageRegistry();
+            var registry = new MessageProcessorRegistry();
             registry.Register(typeof(TestMessageProcessor));
             registry.Register(typeof(TestMessageOneWayProcessor));
 

@@ -60,8 +60,6 @@
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
     <Compile Include="Internal\Sessions\AgentBuildSessionHandle.cs" />
-    <Compile Include="Internal\Sessions\IServerSession.cs" />
-    <Compile Include="Internal\Packages\PackageManager.cs" />
     <Compile Include="Internal\Projects\ProjectData.cs" />
     <Compile Include="Internal\Projects\ProjectDataManager.cs" />
     <Compile Include="Internal\Projects\ProjectDataLastBuild.cs" />
@@ -76,8 +74,7 @@
     <Compile Include="Internal\PhotonServer.cs" />
     <Compile Include="Internal\Tasks\TaskRunner.cs" />
     <Compile Include="Internal\Tasks\TaskRunnerManager.cs" />
-    <Compile Include="MessageProcessors\ProjectPackageProcessor.cs" />
-    <Compile Include="MessageProcessors\SessionOutputProcessor.cs" />
+    <Compile Include="MessageProcessors\ProjectPackagePushProcessor.cs" />
     <Compile Include="MessageProcessors\BuildTaskOutputProcessor.cs" />
     <Compile Include="ServerService.cs">
       <SubType>Component</SubType>
@@ -124,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
+    <Folder Include="Internal\Packages\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="projects.json" />
