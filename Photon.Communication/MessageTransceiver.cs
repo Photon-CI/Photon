@@ -1,6 +1,8 @@
 ﻿using Photon.Communication.Messages;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -97,19 +99,26 @@ namespace Photon.Communication
         private void MessageReceiver_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
             if (e.Message is IResponseMessage responseMessage) {
-                if (!messageHandles.TryGetValue(responseMessage.RequestMessageId, out var handle))
-                    throw new Exception($"No request message handle found matching '{responseMessage.RequestMessageId}'!");
+                if (!messageHandles.TryGetValue(responseMessage.RequestMessageId, out var handle)) {
+                    OnThreadException(new Exception($"No request message handle found matching '{responseMessage.RequestMessageId}'!"));
+                    return;
+                }
 
                 handle.Complete(responseMessage);
             }
             else if (e.Message is IRequestMessage requestMessage) {
                 var handle = Processor.Process(requestMessage);
+
                 handle.GetResponse().ContinueWith(t => {
                     if (t.IsFaulted) {
-                        var exceptionResponse = new ExceptionResponseMessage {
+                        var error = t.Exception?.Flatten();
+
+                        var exceptionResponse = new ResponseMessageBase {
                             MessageId = Guid.NewGuid().ToString("N"),
                             RequestMessageId = requestMessage.MessageId,
-                            Exception = t.Exception?.Message,
+                            ExceptionMessage = UnfoldMessages(error),
+                            Exception = error?.ToString(),
+                            Successful = false,
                         };
 
                         messageSender.Send(exceptionResponse);
@@ -126,13 +135,27 @@ namespace Photon.Communication
             }
             else {
                 var messageType = e.Message.GetType();
-                throw new Exception($"Unknown message type '{messageType.Name}'!");
+                OnThreadException(new Exception($"Unknown message type '{messageType.Name}'!"));
             }
         }
 
         private void MessageReceiver_OnThreadException(object sender, UnhandledExceptionEventArgs e)
         {
             OnThreadException(e.ExceptionObject);
+        }
+
+        private static string UnfoldMessages(Exception error)
+        {
+            return string.Join(" ", UnfoldExceptions(error).Select(e => e.Message));
+        }
+
+        private static IEnumerable<Exception> UnfoldExceptions(Exception error)
+        {
+            var e = error;
+            while (e != null) {
+                yield return e;
+                e = e.InnerException;
+            }
         }
     }
 }

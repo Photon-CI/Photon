@@ -21,17 +21,26 @@ namespace Photon.Communication
 
         public async Task<IResponseMessage> GetResponseAsync()
         {
-            return await completionEvent.Task;
+            var response = await completionEvent.Task;
+
+            if (!(response?.Successful ?? false))
+                throw new Exception(response?.ExceptionMessage ?? "An unknown error occurred!");
+
+            return response;
         }
 
         public async Task<T> GetResponseAsync<T>()
+            where T : class, IResponseMessage
         {
             var response = await completionEvent.Task;
 
-            if (response is ExceptionResponseMessage exceptionResponse)
-                throw new ApplicationException($"Failed to send message! {exceptionResponse.Exception}");
+            if (!(response?.Successful ?? false))
+                throw new Exception(response?.ExceptionMessage ?? "An unknown error occurred!");
 
-            return (T)response;
+            if (!(response is T tResponse))
+                throw new Exception($"Unable to cast response type '{response.GetType().Name}' to '{typeof(T).Name}'!");
+
+            return tResponse;
         }
 
         internal void Complete(IResponseMessage message)

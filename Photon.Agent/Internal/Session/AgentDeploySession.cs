@@ -1,4 +1,5 @@
 ﻿using Photon.Communication;
+using Photon.Framework.Agent;
 using Photon.Framework.Packages;
 using Photon.Framework.Tasks;
 using Photon.Framework.TcpMessages;
@@ -13,9 +14,13 @@ namespace Photon.Agent.Internal.Session
         public ProjectPackage Metadata {get; private set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
+        public string ApplicationsDirectory {get; set;}
 
 
-        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId) {}
+        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId)
+        {
+            ApplicationsDirectory = Configuration.ApplicationsDirectory;
+        }
 
         public override async Task InitializeAsync()
         {
@@ -33,11 +38,14 @@ namespace Photon.Agent.Internal.Session
                 ProjectPackageVersion = ProjectPackageVersion,
             };
 
-            var packageResponse = await Transceiver.Send(packageRequest)
-                .GetResponseAsync<ProjectPackagePullResponse>();
-
-            if (!packageResponse.Successful)
-                throw new ApplicationException($"Failed to download package '{ProjectPackageId}.{ProjectPackageVersion}'! {packageResponse.Exception}");
+            ProjectPackagePullResponse packageResponse;
+            try {
+                packageResponse = await Transceiver.Send(packageRequest)
+                    .GetResponseAsync<ProjectPackagePullResponse>();
+            }
+            catch (Exception error) {
+                throw new ApplicationException($"Failed to download package '{ProjectPackageId}.{ProjectPackageVersion}'! {error.Message}");
+            }
 
             try {
                 Metadata = await ProjectPackageTools.UnpackAsync(packageResponse.Filename, BinDirectory);
@@ -82,7 +90,9 @@ namespace Photon.Agent.Internal.Session
                 WorkDirectory = WorkDirectory,
                 ContentDirectory = ContentDirectory,
                 BinDirectory = BinDirectory,
+                ApplicationsDirectory = ApplicationsDirectory,
                 Output = Output.Writer,
+                Packages = PackageClient,
             };
 
             return await Domain.RunDeployTask(context);

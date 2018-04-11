@@ -1,6 +1,7 @@
-﻿using Photon.Framework.Scripts;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Photon.Framework.Pooling;
+using Photon.Framework.Server;
 
 namespace Photon.Framework.Sessions
 {

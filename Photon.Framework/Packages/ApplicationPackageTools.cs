@@ -50,25 +50,32 @@ namespace Photon.Framework.Packages
             return package;
         }
 
-        public static ApplicationPackage Unpack(string package, string path)
+        public static async Task<ApplicationPackage> UnpackAsync(string filename, string path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
-            throw new NotImplementedException();
+            ApplicationPackage metadata = null;
+
+            await PackageTools.ReadArchive(filename, async archive => {
+                metadata = await PackageTools.ParseMetadataAsync<ApplicationPackage>(archive);
+
+                await PackageTools.UnpackBin(archive, path);
+            });
+
+            return metadata;
         }
 
         private static void AppendMetadata(ZipArchive archive, PackageDefinition definition, string version)
         {
-            var projectPackage = new ApplicationPackage {
+            var metadata = new ApplicationPackage {
                 Id = definition.Id,
-                //Name = definition.Name,
+                Name = definition.Name,
                 Description = definition.Description,
-                //AssemblyFilename = definition.Assembly,
                 Version = version,
             };
 
-            PackageTools.AppendMetadata(archive, projectPackage, version);
+            PackageTools.AppendMetadata(archive, metadata, version);
         }
     }
 }

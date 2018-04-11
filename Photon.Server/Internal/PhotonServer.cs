@@ -7,7 +7,6 @@ using Photon.Framework.Packages;
 using Photon.Library;
 using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.Sessions;
-using Photon.Server.Internal.Tasks;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
@@ -27,11 +26,11 @@ namespace Photon.Server.Internal
         public ServerDefinition Definition {get; private set;}
         public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
-        public ServerTaskRunnerManager TaskRunners {get;}
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
         public string WorkPath {get;}
         public ProjectPackageManager ProjectPackages {get;}
+        public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
 
 
@@ -39,12 +38,15 @@ namespace Photon.Server.Internal
         {
             Projects = new ProjectManager();
             Sessions = new ServerSessionManager();
-            TaskRunners = new ServerTaskRunnerManager();
             ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
+            };
+
+            ApplicationPackages = new ApplicationPackageManager {
+                PackageDirectory = Configuration.ApplicationPackageDirectory,
             };
 
             Queue = new ScriptQueue {
@@ -58,7 +60,6 @@ namespace Photon.Server.Internal
         {
             if (isStarted) Stop();
 
-            TaskRunners?.Dispose();
             Sessions?.Dispose();
             receiver?.Dispose();
             receiver = null;
@@ -87,7 +88,6 @@ namespace Photon.Server.Internal
             // TODO: Cache Project Package Index?
             //ProjectPackages.Initialize();
 
-            TaskRunners.Start();
             Sessions.Start();
             Queue.Start();
 
@@ -98,7 +98,6 @@ namespace Photon.Server.Internal
         {
             Queue.Stop();
             Sessions.Stop();
-            TaskRunners.Stop();
 
             try {
                 receiver?.Dispose();

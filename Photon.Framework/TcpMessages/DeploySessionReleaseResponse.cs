@@ -2,10 +2,7 @@
 
 namespace Photon.Framework.TcpMessages
 {
-    public class DeploySessionReleaseResponse : IResponseMessage
+    public class DeploySessionReleaseResponse : ResponseMessageBase
     {
-        public string MessageId {get; set;}
-        public string RequestMessageId {get; set;}
-        public bool Successful {get; set;}
     }
 }

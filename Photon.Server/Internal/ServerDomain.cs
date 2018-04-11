@@ -1,5 +1,5 @@
 ﻿using Photon.Framework.Domain;
-using Photon.Framework.Scripts;
+using Photon.Framework.Server;
 using Photon.Library.Session;
 using System.Threading.Tasks;
 

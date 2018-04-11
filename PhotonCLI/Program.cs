@@ -1,7 +1,8 @@
-﻿using Photon.CLI.Commands;
+﻿using AnsiConsole;
+using Photon.CLI.Commands;
 using Photon.CLI.Internal;
+using Photon.Framework.Extensions;
 using System;
-using AnsiConsole;
 
 #if DEBUG
 using System.Diagnostics;
@@ -27,9 +28,7 @@ namespace Photon.CLI
                 return 0;
             }
             catch (ApplicationException error) {
-                ConsoleEx.Out
-                    .Write("An error has occurred! ", ConsoleColor.Red)
-                    .WriteLine(error.Message, ConsoleColor.DarkRed);
+                ConsoleEx.Out.WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                 return 1;
             }

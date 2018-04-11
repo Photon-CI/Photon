@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using Photon.Framework.Agent;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Tasks
 {
     public interface IBuildTask
     {
-        Task<TaskResult> RunAsync(IAgentBuildContext context);
+        IAgentBuildContext Context {get; set;}
+
+        Task<TaskResult> RunAsync();
     }
 }

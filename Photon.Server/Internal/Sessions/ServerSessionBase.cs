@@ -1,6 +1,6 @@
 ﻿using log4net;
 using Photon.Framework;
-using Photon.Framework.Scripts;
+using Photon.Framework.Server;
 using Photon.Framework.Sessions;
 using System;
 using System.IO;
@@ -69,7 +69,9 @@ namespace Photon.Server.Internal.Sessions
 
             Complete = true;
             utcReleased = DateTime.UtcNow;
-            Domain?.Unload(true);
+
+            if (Domain != null)
+                await Domain.Unload(true);
 
             var workDirectory = WorkDirectory;
             try {

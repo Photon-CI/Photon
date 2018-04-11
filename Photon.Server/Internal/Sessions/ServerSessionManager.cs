@@ -2,6 +2,7 @@
 using Photon.Library;
 using System;
 using System.Threading.Tasks;
+using Photon.Framework.Pooling;
 
 namespace Photon.Server.Internal.Sessions
 {

@@ -44,6 +44,8 @@
     <Compile Include="Commands\HelpPrinter.cs" />
     <Compile Include="Commands\ICommandParser.cs" />
     <Compile Include="ConfigurationReader.cs" />
+    <Compile Include="HttpMessages\HttpBuildResultRequest.cs" />
+    <Compile Include="HttpMessages\HttpBuildResultResponse.cs" />
     <Compile Include="HttpMessages\HttpDeployStartResponse.cs" />
     <Compile Include="HttpMessages\HttpBuildStartResponse.cs" />
     <Compile Include="ILibraryAssembly.cs" />
@@ -51,14 +53,8 @@
     <Compile Include="TcpMessages\BuildSessionBeginResponse.cs" />
     <Compile Include="TcpMessages\BuildSessionReleaseRequest.cs" />
     <Compile Include="TcpMessages\BuildSessionReleaseResponse.cs" />
-    <Compile Include="TcpMessages\ProjectPackagePushResponse.cs" />
-    <Compile Include="TcpMessages\ProjectPackagePushRequest.cs" />
     <Compile Include="TcpMessages\BuildTaskCompleteMessage.cs" />
-    <Compile Include="TcpMessages\BuildTaskRunRequest.cs" />
-    <Compile Include="TcpMessages\BuildTaskRunResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReferencePool.cs" />
-    <Compile Include="LifespanReferenceItem.cs" />
     <Compile Include="Session\SessionDomainBase.cs" />
   </ItemGroup>
   <ItemGroup>

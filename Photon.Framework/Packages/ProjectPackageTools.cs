@@ -68,7 +68,7 @@ namespace Photon.Framework.Packages
 
         private static void AppendMetadata(ZipArchive archive, PackageDefinition definition, string version)
         {
-            var projectPackage = new ProjectPackage {
+            var metadata = new ProjectPackage {
                 Id = definition.Id,
                 Name = definition.Name,
                 Description = definition.Description,
@@ -77,7 +77,7 @@ namespace Photon.Framework.Packages
                 Version = version,
             };
 
-            PackageTools.AppendMetadata(archive, projectPackage, version);
+            PackageTools.AppendMetadata(archive, metadata, version);
         }
     }
 }

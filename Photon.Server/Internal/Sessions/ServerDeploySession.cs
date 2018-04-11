@@ -1,6 +1,6 @@
 ﻿using Photon.Framework.Packages;
 using Photon.Framework.Projects;
-using Photon.Framework.Scripts;
+using Photon.Framework.Server;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -38,6 +38,8 @@ namespace Photon.Server.Internal.Sessions
 
             var context = new ServerDeployContext {
                 Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
+                ProjectPackages = PhotonServer.Instance.ProjectPackages,
+                ApplicationPackages = PhotonServer.Instance.ApplicationPackages,
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
                 ScriptName = ScriptName,
@@ -45,7 +47,6 @@ namespace Photon.Server.Internal.Sessions
                 BinDirectory = BinDirectory,
                 ContentDirectory = ContentDirectory,
                 Output = Output,
-                ProjectPackages = PhotonServer.Instance.ProjectPackages,
             };
 
             var result = await Domain.RunDeployScript(context);

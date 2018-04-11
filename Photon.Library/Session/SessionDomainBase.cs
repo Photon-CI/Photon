@@ -73,7 +73,7 @@ namespace Photon.Library.Session
                 isUnloaded = true;
             }
 
-            if (wait) await Task.Delay(2000);
+            if (wait) await Task.Delay(400);
         }
     }
 }

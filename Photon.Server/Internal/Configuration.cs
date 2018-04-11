@@ -16,12 +16,14 @@ namespace Photon.Server.Internal
         private static string WorkPath => ConfigurationReader.AppSetting("work", "Work");
         private static string ProjectDataPath => ConfigurationReader.AppSetting("projectData", "ProjectData");
         private static string ProjectPackagePath => ConfigurationReader.AppSetting("projectPackages", "ProjectPackages");
+        private static string ApplicationPackagePath => ConfigurationReader.AppSetting("applicationPackages", "ApplicationPackages");
 
         public static string ServerFile => FullPath(Directory, ServerFilePath);
         public static string ProjectsFile => FullPath(Directory, ProjectsFilePath);
         public static string WorkDirectory => FullPath(Directory, WorkPath);
         public static string ProjectDataDirectory => FullPath(Directory, ProjectDataPath);
         public static string ProjectPackageDirectory => FullPath(Directory, ProjectPackagePath);
+        public static string ApplicationPackageDirectory => FullPath(Directory, ApplicationPackagePath);
 
 
         static Configuration()

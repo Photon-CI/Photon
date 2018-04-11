@@ -17,6 +17,7 @@ namespace Photon.CLI.Actions
         public string ServerName {get; set;}
         public string GitRefspec {get; set;}
         public string StartFile {get; set;}
+        public HttpBuildResultResponse Result {get; set;}
 
 
         public async Task Run(CommandContext context)
@@ -46,6 +47,8 @@ namespace Photon.CLI.Actions
 
                 ConsoleEx.Out.WriteLine(data.NewText, ConsoleColor.Gray);
             }
+
+            Result = await GetResult(server, sessionId);
         }
 
         private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server)
@@ -55,24 +58,24 @@ namespace Photon.CLI.Actions
                     refspec = GitRefspec,
                 });
 
-            var request = WebRequest.CreateHttp(url);
-            request.Method = "POST";
-            request.KeepAlive = true;
-
-            using (var stream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
-                request.ContentLength = stream.Length;
-
-                using (var requestStream = request.GetRequestStream()) {
-                    await stream.CopyToAsync(requestStream);
-                }
-            }
-
             try {
-                using (var response = (HttpWebResponse)await request.GetResponseAsync()) {
+                var request = WebRequest.CreateHttp(url);
+                request.Method = "POST";
+                request.KeepAlive = true;
+
+                using (var stream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
+                    request.ContentLength = stream.Length;
+
+                    using (var requestStream = request.GetRequestStream()) {
+                        await stream.CopyToAsync(requestStream);
+                    }
+                }
+
+                using (var response = (HttpWebResponse) await request.GetResponseAsync()) {
                     //await response.PrintResponse();
 
                     if (response.StatusCode != HttpStatusCode.OK)
-                        throw new ApplicationException($"Server Responded with [{(int)response.StatusCode}] {response.StatusDescription}");
+                        throw new ApplicationException($"Server Responded with [{(int) response.StatusCode}] {response.StatusDescription}");
 
                     using (var responseStream = response.GetResponseStream()) {
                         if (responseStream == null)
@@ -83,17 +86,14 @@ namespace Photon.CLI.Actions
                     }
                 }
             }
-            catch (WebException error) {
-                if (error.Response is HttpWebResponse response) {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                        throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
+            catch (WebException error) when (error.Response is HttpWebResponse response) {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
 
-                    //await response.PrintResponse();
-
-                    throw new ApplicationException($"Server Responded with [{(int)response.StatusCode}] {response.StatusDescription}");
-                }
-
-                throw;
+                throw new ApplicationException($"Server Responded with [{(int) response.StatusCode}] {response.StatusDescription}");
+            }
+            catch (Exception error) {
+                throw new ApplicationException("Failed to connect to Server instance!", error);
             }
         }
 
@@ -149,6 +149,45 @@ namespace Photon.CLI.Actions
                 }
 
                 throw;
+            }
+        }
+
+        private async Task<HttpBuildResultResponse> GetResult(PhotonServerDefinition server, string sessionId)
+        {
+            var url = NetPath.Combine(server.Url, "script/result")
+                +NetPath.QueryString(new {
+                    session = sessionId,
+                });
+
+            try {
+                var request = WebRequest.CreateHttp(url);
+                request.Method = "GET";
+                request.KeepAlive = false;
+                request.ContentLength = 0;
+
+                using (var response = (HttpWebResponse) await request.GetResponseAsync()) {
+
+                    if (response.StatusCode != HttpStatusCode.OK)
+                        throw new ApplicationException($"Server Responded with [{(int) response.StatusCode}] {response.StatusDescription}");
+
+                    using (var responseStream = response.GetResponseStream()) {
+                        if (responseStream == null)
+                            return null;
+
+                        var serializer = new JsonSerializer();
+                        var responseResult = serializer.Deserialize<HttpBuildResultResponse>(responseStream);
+                        return responseResult;
+                    }
+                }
+            }
+            catch (WebException error) when (error.Response is HttpWebResponse response) {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
+
+                throw new ApplicationException($"Server Responded with [{(int) response.StatusCode}] {response.StatusDescription}");
+            }
+            catch (Exception error) {
+                throw new ApplicationException("Failed to connect to Server instance!", error);
             }
         }
 

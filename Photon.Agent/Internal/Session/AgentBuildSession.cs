@@ -1,7 +1,7 @@
 ﻿using Photon.Communication;
 using Photon.Framework;
+using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
-using Photon.Library.TcpMessages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +11,6 @@ namespace Photon.Agent.Internal.Session
 {
     internal class AgentBuildSession : AgentSessionBase
     {
-        public string TaskName {get; set;}
         public string GitRefspec {get; set;}
         public int BuildNumber {get; set;}
 
@@ -31,7 +30,7 @@ namespace Photon.Agent.Internal.Session
         {
             var context = new AgentBuildContext {
                 Project = Project,
-                AssemblyFile = AssemblyFilename,
+                AssemblyFilename = AssemblyFilename,
                 GitRefspec = GitRefspec,
                 TaskName = taskName,
                 WorkDirectory = WorkDirectory,
@@ -39,10 +38,8 @@ namespace Photon.Agent.Internal.Session
                 BinDirectory = BinDirectory,
                 BuildNumber = BuildNumber,
                 Output = Output.Writer,
+                Packages = PackageClient,
             };
-
-            context.ProjectPackagePushed += Context_OnProjectPackagePushed;
-            context.ApplicationPackagePushed += Context_OnApplicationPackagePushed;
 
             return await Domain.RunBuildTask(context);
         }
@@ -151,32 +148,6 @@ namespace Photon.Agent.Internal.Session
 
             if (result.ExitCode != 0)
                 throw new ApplicationException("Process terminated with a non-zero exit code!");
-        }
-
-        private void Context_OnProjectPackagePushed(object sender, PackagePushEventArgs e)
-        {
-            var message = new ProjectPackagePushRequest {
-                Filename = e.Filename,
-            };
-
-            var response = Transceiver.Send(message)
-                .GetResponseAsync<ProjectPackagePushResponse>()
-                .GetAwaiter().GetResult();
-
-            if (response.Successful) {
-                Output.WriteLine("Project Package pushed successfully.", ConsoleColor.DarkGreen);
-            }
-            else {
-                Output.WriteLine($"Failed to push Project Package! {response.Exception}", ConsoleColor.DarkYellow);
-            }
-        }
-
-        private void Context_OnApplicationPackagePushed(object sender, PackagePushEventArgs e)
-        {
-            //...
-
-            //Transceiver.SendOneWay();
-            throw new NotImplementedException();
         }
     }
 }
