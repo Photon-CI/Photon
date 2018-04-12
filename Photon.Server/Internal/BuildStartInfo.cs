@@ -10,6 +10,9 @@ namespace Photon.Server.Internal
         [JsonProperty("assembly")]
         public string AssemblyFile {get; set;}
 
+        [JsonProperty("preBuild")]
+        public string PreBuild {get; set;}
+
         [JsonProperty("task")]
         public string TaskName {get; set;}
 

@@ -1,8 +1,9 @@
-﻿using Photon.CLI.Commands;
+﻿using AnsiConsole;
+using Photon.CLI.Commands;
 using Photon.CLI.Internal;
+using Photon.Framework.Extensions;
 using System;
-using AnsiConsole;
-
+using Photon.CLI.Internal.Http;
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -26,11 +27,12 @@ namespace Photon.CLI
 
                 return 0;
             }
+            catch (HttpStatusCodeException error) {
+                ConsoleEx.Out.WriteLine(error.Message, ConsoleColor.DarkYellow);
+                return 1;
+            }
             catch (ApplicationException error) {
-                ConsoleEx.Out
-                    .Write("An error has occurred! ", ConsoleColor.Red)
-                    .WriteLine(error.Message, ConsoleColor.DarkRed);
-
+                ConsoleEx.Out.WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
                 return 1;
             }
             catch (Exception error) {

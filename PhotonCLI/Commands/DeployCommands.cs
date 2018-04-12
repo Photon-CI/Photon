@@ -12,9 +12,9 @@ namespace Photon.CLI.Commands
     internal class DeployCommands : CommandDictionary<CommandContext>
     {
         public string ServerName {get; set;}
-        public string ProjectName {get; set;}
-        public string ProjectVersion {get; set;}
-        public string ScriptName {get; set;}
+        public string ProjectPackageId {get; set;}
+        public string ProjectPackageVersion {get; set;}
+        //public string ScriptName {get; set;}
 
 
         public DeployCommands(CommandContext context) : base(context)
@@ -23,9 +23,9 @@ namespace Photon.CLI.Commands
             Map("help", "?").ToAction(OnHelp);
 
             Map("-server").ToProperty(v => ServerName = v);
-            Map("-p", "-project").ToProperty(v => ProjectName = v);
-            Map("-v", "-version").ToProperty(v => ProjectVersion = v);
-            Map("-s", "-script").ToProperty(v => ScriptName = v);
+            Map("-id").ToProperty(v => ProjectPackageId = v);
+            Map("-v", "-version").ToProperty(v => ProjectPackageVersion = v);
+            //Map("-s", "-script").ToProperty(v => ScriptName = v);
         }
 
         private async Task OnHelp(string[] args)
@@ -40,37 +40,33 @@ namespace Photon.CLI.Commands
             if (args.ContainsAny("help", "?")) {
                 await new HelpPrinter("Run", "Runs a project deployment script using the specified package version.")
                     .Add("-server      ", "The name of the Server instance. Defaults to primary server.")
-                    .Add("-project | -p", "The ID of the project.")
+                    .Add("-id          ", "The ID of the project package.")
                     .Add("-version | -v", "The version of the project package.")
-                    .Add("-script  | -s", "The name of the deploy script.")
+                    //.Add("-script  | -s", "The name of the deploy script.")
                     .PrintAsync();
 
                 return;
             }
 
-            if (string.IsNullOrEmpty(ProjectName))
-                throw new ApplicationException("'-project' is undefined!");
+            if (string.IsNullOrEmpty(ProjectPackageId))
+                throw new ApplicationException("'-id' is undefined!");
 
-            if (string.IsNullOrEmpty(ProjectVersion))
+            if (string.IsNullOrEmpty(ProjectPackageVersion))
                 throw new ApplicationException("'-version' is undefined!");
 
-            if (string.IsNullOrEmpty(ScriptName))
-                throw new ApplicationException("'-script' is undefined!");
+            //if (string.IsNullOrEmpty(ScriptName))
+            //    throw new ApplicationException("'-script' is undefined!");
 
             ConsoleEx.Out
-                .Write($"Running deploy script ", ConsoleColor.DarkCyan)
-                .Write(ScriptName, ConsoleColor.Cyan)
-                .Write(" @ ", ConsoleColor.DarkCyan)
-                .Write(ProjectVersion, ConsoleColor.Cyan)
-                .Write(" from project ", ConsoleColor.DarkCyan)
-                .Write(ProjectName, ConsoleColor.Cyan)
+                .Write("Deploying Project Package ", ConsoleColor.DarkCyan)
+                .Write($"{ProjectPackageId}.{ProjectPackageVersion}", ConsoleColor.Cyan)
                 .WriteLine(".", ConsoleColor.DarkCyan);
 
             await new DeployRunAction {
                 ServerName = ServerName,
-                ProjectName = ProjectName,
-                ProjectVersion = ProjectVersion,
-                ScriptName = ScriptName,
+                ProjectPackageId = ProjectPackageId,
+                ProjectPackageVersion = ProjectPackageVersion,
+                //ScriptName = ScriptName,
             }.Run(Context);
 
             ConsoleEx.Out

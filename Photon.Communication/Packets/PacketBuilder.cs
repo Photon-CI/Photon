@@ -126,6 +126,7 @@ namespace Photon.Communication.Packets
 
             if (message is IFileMessage fileMessage) {
                 fileMessage.Filename = tempFilename;
+                streamData?.Close();
             }
 
             return message;

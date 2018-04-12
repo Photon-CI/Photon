@@ -44,11 +44,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Messages\ExceptionResponseMessage.cs" />
+    <Compile Include="Messages\ResponseMessageBase.cs" />
+    <Compile Include="Messages\IFileResponseMessage.cs" />
     <Compile Include="Messages\IMessage.cs" />
     <Compile Include="Messages\IProcessMessage.cs" />
     <Compile Include="Messages\IFileMessage.cs" />
     <Compile Include="Messages\IFileRequestMessage.cs" />
+    <Compile Include="Messages\IStreamResponseMessage.cs" />
     <Compile Include="Messages\IStreamRequestMessage.cs" />
     <Compile Include="Messages\IStreamMessage.cs" />
     <Compile Include="Messages\IRequestMessage.cs" />
@@ -62,7 +64,7 @@
     <Compile Include="MessageProcessorHandle.cs" />
     <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="MessageReceiver.cs" />
-    <Compile Include="MessageRegistry.cs" />
+    <Compile Include="MessageProcessorRegistry.cs" />
     <Compile Include="MessageTransceiver.cs" />
     <Compile Include="Packets\DataPacket.cs" />
     <Compile Include="Packets\HeaderPacket.cs" />

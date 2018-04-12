@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Domain;
+﻿using Photon.Framework.Agent;
+using Photon.Framework.Domain;
 using System;
 using System.Threading.Tasks;
 
@@ -17,11 +18,13 @@ namespace Photon.Framework.Tasks
             object classObject = null;
             try {
                 classObject = Activator.CreateInstance(taskClassType);
-                var task = classObject as IBuildTask;
 
-                if (task == null) throw new Exception($"Invalid BuildTask implementation '{taskClassType.Name}'!");
+                if (!(classObject is IBuildTask task))
+                    throw new Exception($"Invalid BuildTask implementation '{taskClassType.Name}'!");
 
-                return await task.RunAsync(context);
+                task.Context = context;
+
+                return await task.RunAsync();
             }
             finally {
                 (classObject as IDisposable)?.Dispose();

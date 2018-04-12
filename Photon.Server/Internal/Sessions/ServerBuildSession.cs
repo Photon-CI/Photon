@@ -1,91 +1,49 @@
-﻿using Photon.Framework;
-using Photon.Framework.Projects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Photon.Framework.Projects;
+using Photon.Framework.Server;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
 {
     internal class ServerBuildSession : ServerSessionBase
     {
-        private AgentBuildSessionHandle sessionHandle;
+        private IAgentSessionHandle sessionHandle;
 
         public Project Project {get; set;}
         public string AssemblyFile {get; set;}
+        public string PreBuild {get; set;}
         public string TaskName {get; set;}
         public string GitRefspec {get; set;}
         public string[] Roles {get; set;}
         public int BuildNumber {get; set;}
 
 
-        public override void Dispose()
-        {
-            sessionHandle?.Dispose();
-
-            base.Dispose();
-        }
-
         public override async Task RunAsync()
         {
-            using (sessionHandle = RegisterAgent(Roles)) {
-                try {
-                    await sessionHandle.BeginSessionAsync();
-
-                    await sessionHandle.RunTaskAsync();
-                }
-                finally {
-                    await sessionHandle.ReleaseSessionAsync();
-                }
-            }
-        }
-
-        private AgentBuildSessionHandle RegisterAgent(params string[] roles)
-        {
-            if (roles == null) throw new ArgumentNullException(nameof(roles));
-
-            var roleAgents = PhotonServer.Instance.Definition
-                .Agents.Where(a => a.MatchesRoles(roles)).ToArray();
-
-            if (!roleAgents.Any())
-                throw new ApplicationException($"No Agents found in roles '{string.Join("; ", roles)}'!");
-
-            PrintFoundAgents(roleAgents);
-
-            ServerAgentDefinition agent;
-            if (roleAgents.Length == 1) {
-                agent = roleAgents[0];
-            }
-            else {
-                var random = new Random();
-                agent = roleAgents[random.Next(roleAgents.Length)];
-            }
-
-            return new AgentBuildSessionHandle(agent) {
-                ServerSessionId = SessionId,
+            var context = new ServerBuildContext {
+                Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
+                ProjectPackages = PhotonServer.Instance.ProjectPackages,
+                ApplicationPackages = PhotonServer.Instance.ApplicationPackages,
                 Project = Project,
-                AssemblyFile = AssemblyFile,
+                AssemblyFilename = AssemblyFile,
+                PreBuild = PreBuild,
                 TaskName = TaskName,
-                GitRefspec = GitRefspec,
                 BuildNumber = BuildNumber,
+                WorkDirectory = WorkDirectory,
+                ContentDirectory = ContentDirectory,
+                BinDirectory = BinDirectory,
                 Output = Output,
             };
-        }
 
-        private void PrintFoundAgents(IEnumerable<ServerAgentDefinition> agents)
-        {
-            var agentNames = agents.Select(x => x.Name);
-            Output.Append("Found Agents: ", ConsoleColor.DarkCyan);
+            using (sessionHandle = context.RegisterAnyAgent(Roles)) {
+                try {
+                    await sessionHandle.BeginAsync();
 
-            var i = 0;
-            foreach (var name in agentNames) {
-                if (i > 0) Output.Append("; ", ConsoleColor.DarkCyan);
-                i++;
-
-                Output.Append(name, ConsoleColor.Cyan);
+                    await sessionHandle.RunTaskAsync(TaskName);
+                }
+                finally {
+                    await sessionHandle.ReleaseAsync();
+                }
             }
-
-            Output.AppendLine(".", ConsoleColor.DarkCyan);
         }
     }
 }

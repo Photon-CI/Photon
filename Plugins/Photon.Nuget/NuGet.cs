@@ -1,4 +1,4 @@
-﻿namespace Photon.Plugins.Nuget
+﻿namespace Photon.Plugins.NuGet
 {
     public static class NuGet
     {

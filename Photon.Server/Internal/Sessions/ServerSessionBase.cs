@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Photon.Framework;
-using Photon.Framework.Scripts;
+using Photon.Framework.Server;
+using Photon.Framework.Sessions;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -16,8 +17,10 @@ namespace Photon.Server.Internal.Sessions
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
-        protected ServerDomain Domain {get; private set;}
-        public bool Complete {get; set;}
+        public string BinDirectory {get;}
+        public string ContentDirectory {get;}
+        protected ServerDomain Domain {get; set;}
+        public bool IsComplete {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
@@ -35,6 +38,8 @@ namespace Photon.Server.Internal.Sessions
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
+            BinDirectory = Path.Combine(WorkDirectory, "bin");
+            ContentDirectory = Path.Combine(WorkDirectory, "content");
         }
 
         public virtual void Dispose()
@@ -46,9 +51,13 @@ namespace Photon.Server.Internal.Sessions
             Domain = null;
         }
 
-        public virtual void PrepareWorkDirectory()
+        public virtual async Task PrepareWorkDirectoryAsync()
         {
-            Directory.CreateDirectory(WorkDirectory);
+            await Task.Run(() => {
+                Directory.CreateDirectory(WorkDirectory);
+                Directory.CreateDirectory(BinDirectory);
+                Directory.CreateDirectory(ContentDirectory);
+            });
         }
 
         public abstract Task RunAsync();
@@ -57,10 +66,10 @@ namespace Photon.Server.Internal.Sessions
         {
             if (isReleased) return;
             isReleased = true;
-
-            Complete = true;
             utcReleased = DateTime.UtcNow;
-            Domain?.Unload(true);
+
+            if (Domain != null)
+                await Domain.Unload(true);
 
             var workDirectory = WorkDirectory;
             try {
@@ -76,6 +85,12 @@ namespace Photon.Server.Internal.Sessions
                     return false;
                 });
             }
+        }
+
+        public void Complete()
+        {
+            Output.Flush();
+            IsComplete = true;
         }
 
         public bool IsExpired()

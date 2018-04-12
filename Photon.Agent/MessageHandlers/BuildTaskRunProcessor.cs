@@ -1,9 +1,9 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Communication;
-using Photon.Library.Messages;
+using Photon.Communication.Messages;
+using Photon.Framework.TcpMessages;
 using System;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Agent.MessageHandlers
 {
@@ -12,22 +12,11 @@ namespace Photon.Agent.MessageHandlers
         public override async Task<IResponseMessage> Process(BuildTaskRunRequest requestMessage)
         {
             if (!PhotonAgent.Instance.Sessions.TryGetSession(requestMessage.AgentSessionId, out var session))
-                return new BuildTaskRunResponse {
-                    Successful = false,
-                    Exception = $"Session '{requestMessage.AgentSessionId}' not found!",
-                };
+                throw new ApplicationException($"Session '{requestMessage.AgentSessionId}' not found!");
 
-            var response = new BuildTaskRunResponse();
-
-            try {
-                response.Result = await session.RunTaskAsync(requestMessage.TaskName, requestMessage.TaskSessionId);
-                response.Successful = true;
-            }
-            catch (Exception error) {
-                response.Exception = error.ToString();
-            }
-
-            return response;
+            return new BuildTaskRunResponse {
+                Result = await session.RunTaskAsync(requestMessage.TaskName, requestMessage.TaskSessionId),
+            };
         }
     }
 }

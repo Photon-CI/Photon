@@ -1,9 +1,13 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Framework;
+using Photon.Framework.Domain;
+using Photon.Framework.Extensions;
+using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Sessions;
 using Photon.Framework.Tasks;
+using Photon.Framework.TcpMessages;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -18,7 +22,7 @@ namespace Photon.Agent.Internal.Session
         private bool isReleased;
 
         public Project Project {get; set;}
-        public string AssemblyFile {get; set;}
+        public string AssemblyFilename {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
@@ -32,6 +36,8 @@ namespace Photon.Agent.Internal.Session
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
         protected ILog Log => _log.Value;
+
+        protected PackageClient PackageClient {get;}
 
 
         protected AgentSessionBase(MessageTransceiver transceiver, string serverSessionId)
@@ -49,6 +55,12 @@ namespace Photon.Agent.Internal.Session
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
             ContentDirectory = Path.Combine(WorkDirectory, "content");
             BinDirectory = Path.Combine(WorkDirectory, "bin");
+
+            PackageClient = new PackageClient();
+            PackageClient.OnPushProjectPackage += PackageClient_OnPushProjectPackage;
+            PackageClient.OnPushApplicationPackage += PackageClient_OnPushApplicationPackage;
+            PackageClient.OnPullProjectPackage += PackageClient_OnPullProjectPackage;
+            PackageClient.OnPullApplicationPackage += PackageClient_OnPullApplicationPackage;
         }
 
         public virtual void Dispose()
@@ -73,12 +85,14 @@ namespace Photon.Agent.Internal.Session
         public async Task ReleaseAsync()
         {
             utcReleased = DateTime.UtcNow;
-            Domain?.Unload(true);
+
+            if (Domain != null)
+                await Domain.Unload(true);
 
             if (!isReleased) {
-                var workDirectory = WorkDirectory;
                 try {
-                    await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
+                    var _workDirectory = WorkDirectory;
+                    await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
                 }
                 catch (AggregateException errors) {
                     errors.Flatten().Handle(e => {
@@ -87,8 +101,12 @@ namespace Photon.Agent.Internal.Session
                             return true;
                         }
 
-                        return false;
+                        Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
+                        return true;
                     });
+                }
+                catch (Exception error) {
+                    Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
                 }
 
                 isReleased = true;
@@ -105,10 +123,66 @@ namespace Photon.Agent.Internal.Session
             return DateTime.UtcNow - utcCreated > LifeSpan;
         }
 
-        //private void DownloadPackage(string packageName, string version, string outputDirectory)
-        //{
-        //    //...
-        //    throw new NotImplementedException();
-        //}
+        private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        {
+            Task.Run(async () => {
+                var packageRequest = new ProjectPackagePushRequest {
+                    Filename = filename,
+                };
+
+                await Transceiver.Send(packageRequest)
+                    .GetResponseAsync();
+
+                return (object)null;
+            }).ContinueWith(taskHandle.FromTask);
+        }
+
+        private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        {
+            Task.Run(async () => {
+                var packageRequest = new ApplicationPackagePushRequest {
+                    Filename = filename,
+                };
+
+                await Transceiver.Send(packageRequest)
+                    .GetResponseAsync();
+
+                return (object)null;
+            }).ContinueWith(taskHandle.FromTask);
+        }
+
+        private void PackageClient_OnPullProjectPackage(string id, string version, string filename, RemoteTaskCompletionSource<object> taskHandle)
+        {
+            Task.Run(async () => {
+                var packageRequest = new ProjectPackagePullRequest {
+                    ProjectPackageId = id,
+                    ProjectPackageVersion = version,
+                };
+
+                var response = await Transceiver.Send(packageRequest)
+                    .GetResponseAsync<ProjectPackagePullResponse>();
+
+                File.Move(response.Filename, filename);
+
+                return (object)null;
+            }).ContinueWith(taskHandle.FromTask);
+        }
+
+        private void PackageClient_OnPullApplicationPackage(string id, string version, string filename, RemoteTaskCompletionSource<object> taskHandle)
+        {
+            Task.Run(async () => {
+                var packageRequest = new ApplicationPackagePullRequest {
+                    PackageId = id,
+                    PackageVersion = version,
+                };
+
+                var response = await Transceiver.Send(packageRequest)
+                    .GetResponseAsync<ApplicationPackagePullResponse>();
+
+                File.Move(response.Filename, filename);
+
+                return (object)null;
+            }).ContinueWith(taskHandle.FromTask);
+        }
     }
 }

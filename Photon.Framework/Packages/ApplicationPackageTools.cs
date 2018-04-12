@@ -31,7 +31,7 @@ namespace Photon.Framework.Packages
             await PackageTools.WriteArchive(outputFilename, async archive => {
                 AppendMetadata(archive, definition, version);
 
-                foreach (var fileDefinition in definition.Files) {
+                foreach (var fileDefinition in definition.FileList) {
                     var destPath = Path.Combine("bin", fileDefinition.Destination);
 
                     await PackageTools.AddFiles(archive, definitionPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
@@ -44,31 +44,38 @@ namespace Photon.Framework.Packages
             ApplicationPackage package = null;
 
             await PackageTools.ReadArchive(filename, async archive => {
-                package = await PackageTools.ParseMetadata<ApplicationPackage>(archive);
+                package = await PackageTools.ParseMetadataAsync<ApplicationPackage>(archive);
             });
 
             return package;
         }
 
-        public static ApplicationPackage Unpack(string package, string path)
+        public static async Task<ApplicationPackage> UnpackAsync(string filename, string path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
-            throw new NotImplementedException();
+            ApplicationPackage metadata = null;
+
+            await PackageTools.ReadArchive(filename, async archive => {
+                metadata = await PackageTools.ParseMetadataAsync<ApplicationPackage>(archive);
+
+                await PackageTools.UnpackBin(archive, path);
+            });
+
+            return metadata;
         }
 
         private static void AppendMetadata(ZipArchive archive, PackageDefinition definition, string version)
         {
-            var projectPackage = new ApplicationPackage {
+            var metadata = new ApplicationPackage {
                 Id = definition.Id,
-                //Name = definition.Name,
+                Name = definition.Name,
                 Description = definition.Description,
-                //AssemblyFilename = definition.Assembly,
                 Version = version,
             };
 
-            PackageTools.AppendMetadata(archive, projectPackage, version);
+            PackageTools.AppendMetadata(archive, metadata, version);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Photon.Framework.Extensions;
-using Photon.Framework.Scripts;
+using Photon.Framework.Server;
 using System.Linq;
 using System.Reflection;
 

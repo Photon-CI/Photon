@@ -4,6 +4,7 @@ using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Library;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
@@ -23,9 +24,10 @@ namespace Photon.Agent.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
+        public AgentDefinition Definition {get; private set;}
         public string WorkDirectory {get;}
         public AgentSessionManager Sessions {get;}
-        public AgentDefinition Definition {get; private set;}
+        public MessageProcessorRegistry MessageRegistry {get;}
 
 
         public PhotonAgent()
@@ -33,10 +35,15 @@ namespace Photon.Agent.Internal
             WorkDirectory = Configuration.WorkDirectory;
 
             Sessions = new AgentSessionManager();
+            MessageRegistry = new MessageProcessorRegistry();
+            messageListener = new MessageListener(MessageRegistry);
 
-            var messageRegistry = new MessageRegistry();
-            messageRegistry.Scan(Assembly.GetExecutingAssembly());
-            messageListener = new MessageListener(messageRegistry);
+            messageListener.ThreadException += MessageListener_ThreadException;
+        }
+
+        private void MessageListener_ThreadException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Error("Unhandled TCP Message Error!", (Exception)e.ExceptionObject);
         }
 
         public void Dispose()
@@ -63,9 +70,16 @@ namespace Photon.Agent.Internal
                 },
             };
 
+            if (!IPAddress.TryParse(Definition.Tcp.Host, out var _address))
+                throw new Exception($"Invalid TCP Host '{Definition.Tcp.Host}'!");
+
+            MessageRegistry.Scan(Assembly.GetExecutingAssembly());
+            MessageRegistry.Scan(typeof(ILibraryAssembly).Assembly);
+            MessageRegistry.Scan(typeof(IFrameworkAssembly).Assembly);
+            messageListener.Listen(_address, Definition.Tcp.Port);
+
             Sessions.Start();
 
-            messageListener.Listen(IPAddress.Any, 10933);
             StartHttpServer();
         }
 

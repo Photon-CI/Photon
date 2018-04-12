@@ -8,9 +8,6 @@ namespace Photon.Server.HttpHandlers.Session
     [HttpHandler("/session/output")]
     internal class OutputHandler : HttpHandler
     {
-        //private static readonly ILog Log = LogManager.GetLogger(typeof(OutputHandler));
-
-
         public override HttpHandlerResult Get()
         {
             var sessionId = GetQuery("session");
@@ -24,18 +21,17 @@ namespace Photon.Server.HttpHandlers.Session
 
                 if (currentLength <= startPos)
                     return HttpHandlerResult.Status(Context, HttpStatusCode.NotModified)
-                        .SetHeader("X-Complete", session.Complete.ToString());
+                        .SetHeader("X-Complete", session.IsComplete.ToString());
 
                 var newText = session.Output.ToString()
                     .Substring(startPos);
 
                 return Ok()
                     .SetHeader("X-Text-Pos", currentLength.ToString())
-                    .SetHeader("X-Complete", session.Complete.ToString())
+                    .SetHeader("X-Complete", session.IsComplete.ToString())
                     .SetText(newText);
             }
             catch (Exception error) {
-                //Log.Error($"Failed to run Build-Script '{_scriptName}' from Project '{_projectId}' @ '{_gitRefspec}'!", error);
                 return Exception(error);
             }
         }

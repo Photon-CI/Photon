@@ -1,10 +1,9 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
-using Photon.Framework.Messages;
-using System;
-using System.Threading.Tasks;
 using Photon.Communication.Messages;
+using Photon.Library.TcpMessages;
+using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {
@@ -12,29 +11,27 @@ namespace Photon.Agent.MessageHandlers
     {
         public override async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
         {
-            var response = new BuildSessionBeginResponse();
+            var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
+                Project = requestMessage.Project,
+                AssemblyFilename = requestMessage.AssemblyFile,
+                PreBuild = requestMessage.PreBuild,
+                GitRefspec = requestMessage.GitRefspec,
+                BuildNumber = requestMessage.BuildNumber,
+            };
+
+            PhotonAgent.Instance.Sessions.BeginSession(session);
 
             try {
-                var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
-                    Project = requestMessage.Project,
-                    AssemblyFile = requestMessage.AssemblyFile,
-                    GitRefspec = requestMessage.GitRefspec,
-                    TaskName = requestMessage.TaskName,
-                    BuildNumber = requestMessage.BuildNumber,
-                };
-
-                PhotonAgent.Instance.Sessions.BeginSession(session);
-
                 await session.InitializeAsync();
 
-                response.SessionId = session.SessionId;
-                response.Successful = true;
+                return new BuildSessionBeginResponse {
+                    SessionId = session.SessionId,
+                };
             }
-            catch (Exception error) {
-                response.Exception = error.Message;
+            catch {
+                await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(session.SessionId);
+                throw;
             }
-
-            return response;
         }
     }
 }

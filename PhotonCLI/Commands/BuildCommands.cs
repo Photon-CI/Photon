@@ -14,6 +14,7 @@ namespace Photon.CLI.Commands
         public string Server {get; set;}
         public string GitRefspec {get; set;}
         public string StartFile {get; set;}
+        public string DeployPackage {get; set;}
 
 
         public BuildCommands(CommandContext context) : base(context)
@@ -24,22 +25,25 @@ namespace Photon.CLI.Commands
             Map("-s", "-server").ToProperty(v => Server = v);
             Map("-r", "-refspec").ToProperty(v => GitRefspec = v);
             Map("-f", "-file").ToProperty(v => StartFile = v);
+            Map("-d", "-deploy").ToProperty(v => DeployPackage = v);
         }
 
         private async Task OnHelp(string[] args)
         {
             await new HelpPrinter()
-                .Add("Run", "Run a Build Task.")
+                .Add(typeof(BuildCommands), nameof(RunCommand))
                 .PrintAsync();
         }
 
+        [Command("Run", "Runs a project build task using the specified refspec.")]
         public async Task RunCommand(string[] args)
         {
             if (args.ContainsAny("help", "?")) {
-                await new HelpPrinter("Run", "Runs a project build task using the specified refspec.")
-                    .Add("-server   | -s", "The name of the target Photon Server.")
-                    .Add("-refspec  | -r", "The repository branch, commit, or tag.")
-                    .Add("-file     | -f", "A json file specifying the build parameters.")
+                await new HelpPrinter(typeof(BuildCommands), nameof(RunCommand))
+                    .Add("-server  | -s", "The name of the target Photon Server.")
+                    .Add("-refspec | -r", "The repository branch, commit, or tag.")
+                    .Add("-file    | -f", "A json file specifying the build parameters.")
+                    .Add("-deploy  | -d", "The name of the Project Package to deploy after successful build.")
                     .PrintAsync();
 
                 return;
@@ -60,11 +64,23 @@ namespace Photon.CLI.Commands
             ConsoleEx.Out
                 .WriteLine(".", ConsoleColor.DarkCyan);
 
-            await new BuildRunAction {
+            var buildAction = new BuildRunAction {
                 ServerName = Server,
                 GitRefspec = GitRefspec,
                 StartFile = StartFile,
-            }.Run(Context);
+            };
+
+            await buildAction.Run(Context);
+
+            var successful = buildAction.Result != null && (buildAction.Result.Result?.Successful ?? false);
+
+            if (successful && !string.IsNullOrEmpty(DeployPackage)) {
+                await new DeployRunAction {
+                    ServerName = Server,
+                    ProjectPackageId = DeployPackage,
+                    ProjectPackageVersion = buildAction.Result.BuildNumber.ToString(),
+                }.Run(Context);
+            }
 
             ConsoleEx.Out
                 .WriteLine("Build-Script completed successfully.", ConsoleColor.Green);

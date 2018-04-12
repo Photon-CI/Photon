@@ -55,6 +55,7 @@
     <Compile Include="Commands\ProjectCommands.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\CommandContext.cs" />
+    <Compile Include="Internal\Http\HttpClientEx.cs" />
     <Compile Include="Internal\Http\HttpUtility.cs" />
     <Compile Include="Internal\ServerCollection.cs" />
     <Compile Include="Internal\PhotonServerDefinition.cs" />

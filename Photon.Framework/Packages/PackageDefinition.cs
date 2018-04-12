@@ -15,15 +15,18 @@ namespace Photon.Framework.Packages
         public string Description {get; set;}
 
         [JsonProperty("assembly")]
-        public string Assembly {get; set;}
+        public string AssemblyFilename {get; set;}
+
+        [JsonProperty("script")]
+        public string ScriptName {get; set;}
 
         [JsonProperty("files")]
-        public List<PackageFileDefinition> Files {get; set;}
+        public List<PackageFileDefinition> FileList {get; set;}
 
 
         public PackageDefinition()
         {
-            Files = new List<PackageFileDefinition>();
+            FileList = new List<PackageFileDefinition>();
         }
     }
 }

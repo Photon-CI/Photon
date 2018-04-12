@@ -42,13 +42,12 @@ namespace Photon.Framework.Packages
                     }
                     else {
                         foreach (var subPath in GetAllPaths(pathAbs, string.Empty)) {
-                            var subPathName = Path.GetFileName(subPath) ?? string.Empty;
                             var subPathAbs = Path.Combine(pathAbs, subPath);
 
                             foreach (var file in GetPathFiles(subPathAbs, string.Empty, filePart)) {
                                 yield return new PackageFileInfo {
                                     AbsoluteFilename = Path.Combine(subPathAbs, file),
-                                    RelativeFilename = Path.Combine(destPath, subPathName, file),
+                                    RelativeFilename = Path.Combine(destPath, subPath, file),
                                 };
                             }
                         }

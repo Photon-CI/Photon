@@ -1,46 +1,47 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Framework;
-using Photon.Framework.Messages;
-using Photon.Framework.Projects;
-using Photon.Framework.Scripts;
-using Photon.Server.Internal.Tasks;
+using Photon.Framework.Server;
+using Photon.Framework.Tasks;
+using Photon.Library.TcpMessages;
 using System;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
 {
-    public class AgentBuildSessionHandle : IDisposable
+    public class AgentBuildSessionHandle : IAgentSessionHandle
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AgentBuildSessionHandle));
 
+        private readonly IServerBuildContext context;
         private readonly ServerAgentDefinition definition;
         private readonly MessageClient messageClient;
 
-        private string agentSessionId;
-
-        public string ServerSessionId {get; set;}
-        public Project Project {get; set;}
-        public string TaskName {get; set;}
-        public string AssemblyFile {get; set;}
-        public string GitRefspec {get; set;}
-        public int BuildNumber {get; set;}
-        public ScriptOutput Output {get; set;}
+        public TaskRunnerManager Tasks {get;}
+        public string AgentSessionId {get; private set;}
 
 
-        public AgentBuildSessionHandle(ServerAgentDefinition agentDefinition)
+        public AgentBuildSessionHandle(IServerBuildContext context, ServerAgentDefinition agentDefinition, MessageProcessorRegistry registry)
         {
+            this.context = context;
             this.definition = agentDefinition;
 
-            messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry);
+            Tasks = new TaskRunnerManager();
+
+            messageClient = new MessageClient(registry) {
+                Context = context,
+            };
+
+            messageClient.ThreadException += MessageClient_OnThreadException;
         }
 
         public void Dispose()
         {
+            Tasks?.Dispose();
             messageClient?.Dispose();
         }
 
-        public async Task BeginSessionAsync()
+        public async Task BeginAsync()
         {
             try {
                 await messageClient.ConnectAsync(definition.TcpHost, definition.TcpPort);
@@ -52,72 +53,85 @@ namespace Photon.Server.Internal.Sessions
             }
 
             var message = new BuildSessionBeginRequest {
-                ServerSessionId = ServerSessionId,
-                Project = Project,
-                AssemblyFile = AssemblyFile,
-                GitRefspec = GitRefspec,
-                BuildNumber = BuildNumber,
-                TaskName = TaskName,
+                ServerSessionId = context.ServerSessionId,
+                Project = context.Project,
+                AssemblyFile = context.AssemblyFilename,
+                PreBuild = context.PreBuild,
+                GitRefspec = context.GitRefspec,
+                BuildNumber = context.BuildNumber,
             };
 
-            var handle = messageClient.Send(message);
-            var response = await handle.GetResponseAsync<BuildSessionBeginResponse>();
+            try {
+                var response = await messageClient.Send(message)
+                    .GetResponseAsync<BuildSessionBeginResponse>();
 
-            if (!response.Successful)
-                throw new ApplicationException($"Failed to start Agent Session! {response.Exception}");
+                AgentSessionId = response.SessionId;
+            }
+            catch (Exception error) {
+                throw new ApplicationException($"Failed to start Agent Session! {error.Message}");
+            }                
 
-            agentSessionId = response.SessionId;
-            if (string.IsNullOrEmpty(agentSessionId))
-                throw new ApplicationException("Failed to begin agent session!");
+            Tasks.Start();
         }
 
-        public async Task ReleaseSessionAsync()
+        public async Task ReleaseAsync()
         {
             // TODO: Locking on sessionId and isActive
 
+            Tasks.Stop();
+
             if (messageClient.IsConnected) {
-                var message = new BuildSessionReleaseRequest {
-                    SessionId = agentSessionId,
-                };
+                if (!string.IsNullOrEmpty(AgentSessionId)) {
+                    var message = new BuildSessionReleaseRequest {
+                        SessionId = AgentSessionId,
+                    };
 
-                var handle = messageClient.Send(message);
-                var response = await handle.GetResponseAsync<BuildSessionReleaseResponse>();
-
-                if (!(response?.Successful ?? false))
-                    throw new ApplicationException("Failed to release agent session!");
+                    try {
+                        await messageClient.Send(message)
+                            .GetResponseAsync();
+                    }
+                    catch (Exception error) {
+                        Log.Error($"Failed to release Agent Session '{AgentSessionId}'! {error.Message}");
+                    }
+                }
 
                 await messageClient.DisconnectAsync();
             }
         }
 
-        public async Task RunTaskAsync()
+        public async Task RunTaskAsync(string taskName)
         {
-            Output
-                .Append("Running Task ", ConsoleColor.DarkCyan)
-                .Append(TaskName, ConsoleColor.Cyan)
+            context.Output
+                .Append("Running Build-Task ", ConsoleColor.DarkCyan)
+                .Append(taskName, ConsoleColor.Cyan)
                 .Append(" on Agent ", ConsoleColor.DarkCyan)
                 .Append(definition.Name, ConsoleColor.Cyan)
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
-            var runner = new TaskRunner(messageClient, agentSessionId);
+            var runner = new TaskRunner(messageClient, AgentSessionId);
             runner.OutputEvent += (o, e) => {
-                Output.AppendRaw(e.Text);
+                context.Output.AppendRaw(e.Text);
             };
 
-            PhotonServer.Instance.TaskRunners.Add(runner);
+            Tasks.Add(runner);
 
-            var result = await runner.Run(TaskName);
+            var result = await runner.Run(taskName);
 
             if (!result.Successful) {
-                Output
-                    .AppendLine($"Task '{TaskName}' Failed!", ConsoleColor.Red)
+                context.Output
+                    .AppendLine($"Build-Task '{taskName}' Failed!", ConsoleColor.Red)
                     .AppendLine(result.Message, ConsoleColor.DarkYellow);
             }
 
-            Output
-                .Append("Task ", ConsoleColor.DarkGreen)
-                .Append(TaskName, ConsoleColor.Green)
+            context.Output
+                .Append("Build-Task ", ConsoleColor.DarkGreen)
+                .Append(taskName, ConsoleColor.Green)
                 .Append(" completed successfully.", ConsoleColor.DarkGreen);
+        }
+
+        private void MessageClient_OnThreadException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Error("Unhandled TCP Message Error!", (Exception)e.ExceptionObject);
         }
     }
 }

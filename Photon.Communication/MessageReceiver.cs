@@ -10,6 +10,7 @@ namespace Photon.Communication
     internal class MessageReceiver : IDisposable
     {
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public event UnhandledExceptionEventHandler ThreadException;
 
         private PacketReceiver packetReceiver;
         private CancellationTokenSource tokenSource;
@@ -37,8 +38,16 @@ namespace Photon.Communication
                     try {
                         await packetReceiver.ReadPacket();
                     }
-                    catch (EndOfStreamException) {
+                    catch (IOException error) when (error.HResult == -2146232800 && (error.InnerException?.HResult ?? 0) == -2147467259) {
+                        // Client Disconnected
                         return;
+                    }
+                    catch (EndOfStreamException) {
+                        // Stream Closed
+                        return;
+                    }
+                    catch (Exception error) {
+                        OnThreadException(error);
                     }
                 }
             });
@@ -62,6 +71,11 @@ namespace Photon.Communication
         protected virtual void OnMessageReceived(IMessage message)
         {
             MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
+        }
+
+        protected virtual void OnThreadException(object exceptionObject)
+        {
+            ThreadException?.Invoke(this, new UnhandledExceptionEventArgs(exceptionObject, false));
         }
     }
 }

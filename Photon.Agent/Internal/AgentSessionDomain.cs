@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Domain;
+﻿using Photon.Framework.Agent;
+using Photon.Framework.Domain;
 using Photon.Framework.Tasks;
 using Photon.Library.Session;
 using System.Threading.Tasks;
@@ -19,8 +20,9 @@ namespace Photon.Agent.Internal
 
         public async Task<TaskResult> RunBuildTask(AgentBuildContext context)
         {
-            Sponsor.Register(context);
+            //Sponsor.Register(context);
             Sponsor.Register(context.Output);
+            Sponsor.Register(context.Packages);
 
             TaskResult result;
             try {
@@ -29,8 +31,9 @@ namespace Photon.Agent.Internal
                 result = await completeEvent.Task;
             }
             finally {
+                Sponsor.Unregister(context.Packages);
                 Sponsor.Unregister(context.Output);
-                Sponsor.Unregister(context);
+                //Sponsor.Unregister(context);
             }
 
             return result;
@@ -38,8 +41,9 @@ namespace Photon.Agent.Internal
 
         public async Task<TaskResult> RunDeployTask(AgentDeployContext context)
         {
-            Sponsor.Register(context);
+            //Sponsor.Register(context);
             Sponsor.Register(context.Output);
+            Sponsor.Register(context.Packages);
 
             TaskResult result;
             try {
@@ -48,8 +52,9 @@ namespace Photon.Agent.Internal
                 result = await completeEvent.Task;
             }
             finally {
+                Sponsor.Unregister(context.Packages);
                 Sponsor.Unregister(context.Output);
-                Sponsor.Unregister(context);
+                //Sponsor.Unregister(context);
             }
 
             return result;

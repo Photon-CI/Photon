@@ -20,11 +20,5 @@ namespace Photon.Framework.Projects
 
         [JsonProperty("sourcePath")]
         public string SourcePath {get; set;}
-
-        [JsonProperty("preBuild")]
-        public string PreBuild {get; set;}
-
-        [JsonProperty("postBuild")]
-        public string PostBuild {get; set;}
     }
 }

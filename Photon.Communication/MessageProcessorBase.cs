@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Photon.Communication.Messages;
+﻿using Photon.Communication.Messages;
+using System.Threading.Tasks;
 
 namespace Photon.Communication
 {

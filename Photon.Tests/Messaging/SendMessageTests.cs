@@ -1,12 +1,12 @@
 ﻿using NUnit.Framework;
 using Photon.Communication;
+using Photon.Communication.Messages;
 using Photon.Tests.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using Photon.Communication.Messages;
 
 namespace Photon.Tests.Messaging
 {
@@ -20,7 +20,7 @@ namespace Photon.Tests.Messaging
 
         public SendMessageTests()
         {
-            var registry = new MessageRegistry();
+            var registry = new MessageProcessorRegistry();
             registry.Register(typeof(TestMessageProcessor));
             registry.Register(typeof(TestMessageOneWayProcessor));
 
@@ -114,10 +114,8 @@ namespace Photon.Tests.Messaging
             public int Value {get; set;}
         }
 
-        private class TestResponseMessage : IResponseMessage
+        private class TestResponseMessage : ResponseMessageBase
         {
-            public string MessageId {get; set;}
-            public string RequestMessageId {get; set;}
             public int Value {get; set;}
         }
 

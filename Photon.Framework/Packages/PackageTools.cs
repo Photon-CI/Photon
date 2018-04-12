@@ -3,6 +3,7 @@ using Photon.Framework.Extensions;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Packages
@@ -43,7 +44,7 @@ namespace Photon.Framework.Packages
             }
         }
 
-        public static async Task<T> ParseMetadata<T>(ZipArchive archive)
+        public static async Task<T> ParseMetadataAsync<T>(ZipArchive archive)
         {
             var entry = archive.GetEntry("metadata.json");
             if (entry == null) throw new Exception("Project Package metadata.json not found!");
@@ -68,6 +69,31 @@ namespace Photon.Framework.Packages
                 using (var fileStream = File.Open(file.AbsoluteFilename, FileMode.Open, FileAccess.Read))
                 using (var entryStream = entry.Open()) {
                     await fileStream.CopyToAsync(entryStream);
+                }
+            }
+        }
+
+        public static async Task UnpackBin(ZipArchive archive, string destPath)
+        {
+            foreach (var entry in archive.Entries) {
+                var entryPath = Path.GetDirectoryName(entry.FullName) ?? string.Empty;
+                var entryPathParts = entryPath.Split(Path.DirectorySeparatorChar);
+                var entryPathRoot = entryPathParts.FirstOrDefault();
+
+                if (!string.Equals(entryPathRoot, "bin")) continue;
+
+                var entryPathDestParts = entryPathParts.Skip(1).ToArray();
+                var entryPathDest = Path.Combine(entryPathDestParts);
+
+                var entryDestPath = Path.Combine(destPath, entryPathDest);
+                var entryDestFilename = Path.Combine(entryDestPath, entry.Name);
+
+                if (!Directory.Exists(entryDestPath))
+                    Directory.CreateDirectory(entryDestPath);
+
+                using (var entryStream = entry.Open())
+                using (var fileStream = File.Open(entryDestFilename, FileMode.Create, FileAccess.Write)) {
+                    await entryStream.CopyToAsync(fileStream);
                 }
             }
         }
