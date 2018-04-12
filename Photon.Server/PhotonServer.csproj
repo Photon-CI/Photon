@@ -118,9 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
-    <Folder Include="Internal\Packages\" />
-    <Folder Include="Internal\Tasks\" />
-    <Folder Include="MessageProcessors\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="projects.json" />

@@ -22,6 +22,7 @@ namespace Photon.Agent.Internal
         {
             //Sponsor.Register(context);
             Sponsor.Register(context.Output);
+            Sponsor.Register(context.Packages);
 
             TaskResult result;
             try {
@@ -30,6 +31,7 @@ namespace Photon.Agent.Internal
                 result = await completeEvent.Task;
             }
             finally {
+                Sponsor.Unregister(context.Packages);
                 Sponsor.Unregister(context.Output);
                 //Sponsor.Unregister(context);
             }
@@ -41,6 +43,7 @@ namespace Photon.Agent.Internal
         {
             //Sponsor.Register(context);
             Sponsor.Register(context.Output);
+            Sponsor.Register(context.Packages);
 
             TaskResult result;
             try {
@@ -49,6 +52,7 @@ namespace Photon.Agent.Internal
                 result = await completeEvent.Task;
             }
             finally {
+                Sponsor.Unregister(context.Packages);
                 Sponsor.Unregister(context.Output);
                 //Sponsor.Unregister(context);
             }

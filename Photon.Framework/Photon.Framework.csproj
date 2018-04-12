@@ -54,6 +54,7 @@
     <Compile Include="ContextAgentDefinition.cs" />
     <Compile Include="Domain\DomainAgentBase.cs" />
     <Compile Include="Domain\DomainAgentTask.cs" />
+    <Compile Include="Domain\IDomainContext.cs" />
     <Compile Include="Domain\ServerDomainAgent.cs" />
     <Compile Include="Domain\AgentDomainAgent.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />

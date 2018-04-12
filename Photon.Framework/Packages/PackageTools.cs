@@ -77,18 +77,22 @@ namespace Photon.Framework.Packages
         {
             foreach (var entry in archive.Entries) {
                 var entryPath = Path.GetDirectoryName(entry.FullName) ?? string.Empty;
-                var entryPathParts = entryPath.Split(Path.PathSeparator);
+                var entryPathParts = entryPath.Split(Path.DirectorySeparatorChar);
                 var entryPathRoot = entryPathParts.FirstOrDefault();
 
                 if (!string.Equals(entryPathRoot, "bin")) continue;
 
                 var entryPathDestParts = entryPathParts.Skip(1).ToArray();
-                var entryPathDest = string.Join(Path.PathSeparator.ToString(), entryPathDestParts);
+                var entryPathDest = Path.Combine(entryPathDestParts);
 
-                var entryFilename = Path.Combine(destPath, entryPathDest, entry.Name);
+                var entryDestPath = Path.Combine(destPath, entryPathDest);
+                var entryDestFilename = Path.Combine(entryDestPath, entry.Name);
+
+                if (!Directory.Exists(entryDestPath))
+                    Directory.CreateDirectory(entryDestPath);
 
                 using (var entryStream = entry.Open())
-                using (var fileStream = File.Open(entryFilename, FileMode.Create, FileAccess.Write)) {
+                using (var fileStream = File.Open(entryDestFilename, FileMode.Create, FileAccess.Write)) {
                     await entryStream.CopyToAsync(fileStream);
                 }
             }

@@ -2,6 +2,7 @@
 using log4net.Config;
 using Photon.Agent.Commands;
 using Photon.Agent.Internal;
+using Photon.Framework.Extensions;
 using System;
 using System.ServiceProcess;
 using System.Threading.Tasks;
@@ -74,14 +75,29 @@ namespace Photon.Agent
                 Console.WriteLine();
                 return 0;
             }
-            catch (Exception error) {
-                Log.Fatal("Unhandled Exception!", error);
+            catch (ApplicationException error) {
+                Log.Fatal("Application Exception!", error);
 
+                Console.WriteLine();
                 Console.ResetColor();
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey(true);
 
                 return 1;
+            }
+            catch (Exception error) {
+                Log.Fatal("Unhandled Exception!", error);
+                LogManager.Flush(200);
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine(error.UnfoldMessages());
+
+                Console.WriteLine();
+                Console.ResetColor();
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey(true);
+
+                return 2;
             }
         }
     }

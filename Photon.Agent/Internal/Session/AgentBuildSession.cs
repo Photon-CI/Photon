@@ -11,6 +11,7 @@ namespace Photon.Agent.Internal.Session
 {
     internal class AgentBuildSession : AgentSessionBase
     {
+        public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
         public int BuildNumber {get; set;}
 
@@ -70,7 +71,7 @@ namespace Photon.Agent.Internal.Session
             var errorList = new Lazy<List<Exception>>();
             var abort = false;
 
-            var preBuildCommand = Project.PreBuild;
+            var preBuildCommand = PreBuild;
             if (!string.IsNullOrWhiteSpace(preBuildCommand)) {
                 Output.WriteLine("Running Pre-Build Command...", ConsoleColor.DarkCyan);
 

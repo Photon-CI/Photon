@@ -56,10 +56,10 @@ namespace Photon.Server.Internal.Sessions
                 ServerSessionId = context.ServerSessionId,
                 Project = context.Project,
                 AssemblyFile = context.AssemblyFilename,
+                PreBuild = context.PreBuild,
                 GitRefspec = context.GitRefspec,
                 BuildNumber = context.BuildNumber,
             };
-
 
             try {
                 var response = await messageClient.Send(message)
@@ -70,9 +70,6 @@ namespace Photon.Server.Internal.Sessions
             catch (Exception error) {
                 throw new ApplicationException($"Failed to start Agent Session! {error.Message}");
             }                
-
-            //if (string.IsNullOrEmpty(AgentSessionId))
-            //    throw new ApplicationException("Failed to begin agent session!");
 
             Tasks.Start();
         }

@@ -41,6 +41,7 @@ namespace Photon.Server.HttpHandlers
                 var session = new ServerBuildSession {
                     Project = project,
                     AssemblyFile = startInfo.AssemblyFile,
+                    PreBuild = startInfo.PreBuild,
                     TaskName = startInfo.TaskName,
                     GitRefspec = _gitRefspec,
                     BuildNumber = buildNumber,

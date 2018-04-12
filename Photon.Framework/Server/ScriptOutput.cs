@@ -1,7 +1,7 @@
-﻿using System;
+﻿using AnsiConsole;
+using System;
 using System.IO;
 using System.Text;
-using AnsiConsole;
 
 namespace Photon.Framework.Server
 {
@@ -86,6 +86,11 @@ namespace Photon.Framework.Server
             }
 
             return this;
+        }
+
+        public void Flush()
+        {
+            writer.Flush();
         }
 
         protected virtual void OnChanged()

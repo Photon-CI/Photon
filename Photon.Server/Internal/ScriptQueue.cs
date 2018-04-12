@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Photon.Framework.Extensions;
 
 namespace Photon.Server.Internal
 {
@@ -62,25 +63,55 @@ namespace Photon.Server.Internal
         {
             Log.Debug($"Processing Script Session '{session.SessionId}'.");
 
+            var abort = false;
             var errorList = new List<Exception>();
 
             try {
-                session.Output.AppendLine("Preparing working directory...");
-                await session.PrepareWorkDirectoryAsync();
+                session.Output
+                    .AppendLine("Preparing working directory...", ConsoleColor.DarkCyan);
 
-                session.Output.AppendLine("Running script...");
-                await session.RunAsync();
+                await session.PrepareWorkDirectoryAsync();
             }
             catch (Exception error) {
-                session.Output.AppendLine($"An unhandled exception occurred!\n{error}");
+                session.Output
+                    .Append("Failed to prepare working directory! ", ConsoleColor.DarkRed)
+                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+
+                abort = true;
                 errorList.Add(error);
             }
+
+            if (!abort) {
+                try {
+                    session.Output
+                        .AppendLine("Running script...", ConsoleColor.DarkCyan);
+
+                    await session.RunAsync();
+                }
+                catch (Exception error) {
+                    session.Output
+                        .Append("Script Failed! ", ConsoleColor.DarkRed)
+                        .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+
+                    //abort = true;
+                    errorList.Add(error);
+                }
+            }
+
+            session.Output
+                .AppendLine("Destroying working directory...", ConsoleColor.DarkCyan);
 
             try {
                 await session.ReleaseAsync();
             }
             catch (Exception error) {
+                session.Output
+                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+
                 errorList.Add(error);
+            }
+            finally {
+                session.Complete();
             }
 
             if (errorList.Count > 1)

@@ -3,7 +3,7 @@ using Photon.CLI.Commands;
 using Photon.CLI.Internal;
 using Photon.Framework.Extensions;
 using System;
-
+using Photon.CLI.Internal.Http;
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -27,9 +27,12 @@ namespace Photon.CLI
 
                 return 0;
             }
+            catch (HttpStatusCodeException error) {
+                ConsoleEx.Out.WriteLine(error.Message, ConsoleColor.DarkYellow);
+                return 1;
+            }
             catch (ApplicationException error) {
                 ConsoleEx.Out.WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
-
                 return 1;
             }
             catch (Exception error) {

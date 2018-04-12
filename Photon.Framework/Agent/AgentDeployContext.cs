@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Photon.Framework.Agent
 {
@@ -13,7 +14,7 @@ namespace Photon.Framework.Agent
 
         public string GetApplicationDirectory(string applicationName, string applicationVersion)
         {
-            return NetPath.Combine(ApplicationsDirectory, applicationName, applicationVersion);
+            return Path.Combine(ApplicationsDirectory, applicationName, applicationVersion);
         }
     }
 }

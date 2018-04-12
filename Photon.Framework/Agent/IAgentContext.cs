@@ -1,18 +1,10 @@
-﻿using Photon.Framework.Projects;
-using Photon.Framework.Server;
+﻿using Photon.Framework.Domain;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Agent
 {
-    public interface IAgentContext
+    public interface IAgentContext : IDomainContext
     {
-        Project Project {get;}
-        string AssemblyFilename {get;}
-        string WorkDirectory {get;}
-        string ContentDirectory {get;}
-        string BinDirectory {get;}
-        ScriptOutput Output {get;}
-
         void RunCommandLine(string command);
         void RunCommandLine(string command, params string[] args);
         Task PushProjectPackageAsync(string filename);

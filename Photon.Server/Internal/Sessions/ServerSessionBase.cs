@@ -20,7 +20,7 @@ namespace Photon.Server.Internal.Sessions
         public string BinDirectory {get;}
         public string ContentDirectory {get;}
         protected ServerDomain Domain {get; set;}
-        public bool Complete {get; set;}
+        public bool IsComplete {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
@@ -66,8 +66,6 @@ namespace Photon.Server.Internal.Sessions
         {
             if (isReleased) return;
             isReleased = true;
-
-            Complete = true;
             utcReleased = DateTime.UtcNow;
 
             if (Domain != null)
@@ -87,6 +85,12 @@ namespace Photon.Server.Internal.Sessions
                     return false;
                 });
             }
+        }
+
+        public void Complete()
+        {
+            Output.Flush();
+            IsComplete = true;
         }
 
         public bool IsExpired()

@@ -3,6 +3,7 @@ using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using System;
+using System.Runtime.Remoting.Lifetime;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Agent
@@ -21,30 +22,30 @@ namespace Photon.Framework.Agent
 
         public async Task PushProjectPackageAsync(string filename)
         {
-            var taskHandle = new RemoteTaskCompletionSource<object>();
-            Packages.PushProjectPackage(filename, taskHandle);
-            await taskHandle.Task;
+            await RunRemoteTask(task => {
+                Packages.PushProjectPackage(filename, task);
+            });
         }
 
         public async Task PushApplicationPackageAsync(string filename)
         {
-            var taskHandle = new RemoteTaskCompletionSource<object>();
-            Packages.PushApplicationPackage(filename, taskHandle);
-            await taskHandle.Task;
+            await RunRemoteTask(task => {
+                Packages.PushApplicationPackage(filename, task);
+            });
         }
 
         public async Task PullProjectPackageAsync(string id, string version, string filename)
         {
-            var taskHandle = new RemoteTaskCompletionSource<object>();
-            Packages.PullProjectPackage(id, version, filename, taskHandle);
-            await taskHandle.Task;
+            await RunRemoteTask(task => {
+                Packages.PullProjectPackage(id, version, filename, task);
+            });
         }
 
         public async Task PullApplicationPackageAsync(string id, string version, string filename)
         {
-            var taskHandle = new RemoteTaskCompletionSource<object>();
-            Packages.PullApplicationPackage(id, version, filename, taskHandle);
-            await taskHandle.Task;
+            await RunRemoteTask(task => {
+                Packages.PullApplicationPackage(id, version, filename, task);
+            });
         }
 
         public void RunCommandLine(string command)
@@ -66,6 +67,22 @@ namespace Photon.Framework.Agent
         {
             var argString = string.Join(" ", args);
             RunCommandLine($"{command} {argString}");
+        }
+
+        private static async Task RunRemoteTask(Action<RemoteTaskCompletionSource<object>> action)
+        {
+            var sponsor = new ClientSponsor();
+
+            try {
+                var taskHandle = new RemoteTaskCompletionSource<object>();
+                sponsor.Register(taskHandle);
+
+                action(taskHandle);
+                await taskHandle.Task;
+            }
+            finally {
+                sponsor.Close();
+            }
         }
     }
 }

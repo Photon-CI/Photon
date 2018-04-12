@@ -10,6 +10,7 @@ namespace Photon.Server.Internal.Sessions
 
         public Project Project {get; set;}
         public string AssemblyFile {get; set;}
+        public string PreBuild {get; set;}
         public string TaskName {get; set;}
         public string GitRefspec {get; set;}
         public string[] Roles {get; set;}
@@ -24,6 +25,7 @@ namespace Photon.Server.Internal.Sessions
                 ApplicationPackages = PhotonServer.Instance.ApplicationPackages,
                 Project = Project,
                 AssemblyFilename = AssemblyFile,
+                PreBuild = PreBuild,
                 TaskName = TaskName,
                 BuildNumber = BuildNumber,
                 WorkDirectory = WorkDirectory,
