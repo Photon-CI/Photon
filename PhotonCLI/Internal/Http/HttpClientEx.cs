@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Photon.Framework;
+﻿using Photon.Framework;
 using Photon.Framework.Extensions;
 using System;
 using System.IO;
@@ -51,13 +50,12 @@ namespace Photon.CLI.Internal.Http
             ResponseBase = await GetResponse(RequestBase);
         }
 
-        public T ParseResponse<T>()
+        public T ParseJsonResponse<T>()
         {
             using (var responseStream = ResponseBase.GetResponseStream()) {
                 if (responseStream == null) return default(T);
 
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<T>(responseStream);
+                return JsonSettings.Serializer.Deserialize<T>(responseStream);
             }
         }
 

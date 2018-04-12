@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Photon.Framework;
 using Photon.Framework.Extensions;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,6 @@ namespace Photon.CLI.Internal
     {
         private string filename;
 
-        [JsonProperty("definitions")]
         public List<PhotonServerDefinition> Definitions {get;}
 
 
@@ -29,8 +28,7 @@ namespace Photon.CLI.Internal
         {
             ServerCollection collection;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
-                var serializer = new JsonSerializer();
-                collection = serializer.Deserialize<ServerCollection>(stream);
+                collection = JsonSettings.Serializer.Deserialize<ServerCollection>(stream);
             }
 
             collection.filename = filename;
@@ -45,8 +43,7 @@ namespace Photon.CLI.Internal
                 Directory.CreateDirectory(filePath);
 
             using (var stream = File.Open(filename, FileMode.Create, FileAccess.Write)) {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(stream, this);
+                JsonSettings.Serializer.Serialize(stream, this);
             }
         }
 
@@ -82,11 +79,6 @@ namespace Photon.CLI.Internal
         {
             return Definitions.RemoveAll(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)) > 0;
         }
-
-        //public PhotonServerDefinition GetPrimary()
-        //{
-        //    return Definitions.FirstOrDefault(x => x.Primary);
-        //}
 
         public void SetPrimary(string name)
         {

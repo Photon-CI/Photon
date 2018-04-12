@@ -12,6 +12,8 @@ namespace Photon.CLI.Actions
 {
     internal class BuildRunAction
     {
+        private const int PollIntervalMs = 400;
+
         public string ServerName {get; set;}
         public string GitRefspec {get; set;}
         public string StartFile {get; set;}
@@ -37,7 +39,7 @@ namespace Photon.CLI.Actions
                 if (data.IsComplete) break;
 
                 if (!data.IsModified) {
-                    await Task.Delay(400);
+                    await Task.Delay(PollIntervalMs);
                     continue;
                 }
 
@@ -61,7 +63,7 @@ namespace Photon.CLI.Actions
                     await fileStream.CopyToAsync(requestStream);
                 }
 
-                var url = NetPath.Combine(server.Url, "build");
+                var url = NetPath.Combine(server.Url, "build/start");
 
                 client = HttpClientEx.Post(url, new {
                     refspec = GitRefspec,
@@ -74,10 +76,10 @@ namespace Photon.CLI.Actions
 
                 if (client.ResponseBase.StatusCode == HttpStatusCode.BadRequest) {
                     var text = await client.GetResponseTextAsync();
-                    throw new ApplicationException($"Bad Build-Start Request! {text}");
+                    throw new ApplicationException($"Bad Build Request! {text}");
                 }
 
-                return client.ParseResponse<HttpBuildStartResponse>();
+                return client.ParseJsonResponse<HttpBuildStartResponse>();
             }
             catch (HttpStatusCodeException error) {
                 if (error.HttpCode == HttpStatusCode.NotFound)
@@ -148,15 +150,15 @@ namespace Photon.CLI.Actions
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "script/result");
+                var url = NetPath.Combine(server.Url, "build/result");
 
-                client = HttpClientEx.Post(url, new {
+                client = HttpClientEx.Get(url, new {
                     session = sessionId,
                 });
 
                 await client.Send();
 
-                return client.ParseResponse<HttpBuildResultResponse>();
+                return client.ParseJsonResponse<HttpBuildResultResponse>();
             }
             catch (HttpStatusCodeException error) {
                 if (error.HttpCode == HttpStatusCode.NotFound)

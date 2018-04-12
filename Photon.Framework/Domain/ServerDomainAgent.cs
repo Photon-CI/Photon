@@ -1,5 +1,6 @@
 ﻿using Photon.Framework.Extensions;
 using Photon.Framework.Server;
+using Photon.Framework.Tasks;
 using System.Linq;
 using System.Reflection;
 
@@ -27,7 +28,7 @@ namespace Photon.Framework.Domain
             return deployScriptRegistry.AllNames.ToArray();
         }
 
-        public void RunDeployScript(IServerDeployContext context, RemoteTaskCompletionSource<ScriptResult> completeEvent)
+        public void RunDeployScript(IServerDeployContext context, RemoteTaskCompletionSource<TaskResult> completeEvent)
         {
             deployScriptRegistry.ExecuteScript(context)
                 .ContinueWith(completeEvent.FromTask);

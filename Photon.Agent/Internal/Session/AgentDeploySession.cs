@@ -2,7 +2,7 @@
 using Photon.Framework.Agent;
 using Photon.Framework.Packages;
 using Photon.Framework.Tasks;
-using Photon.Framework.TcpMessages;
+using Photon.Library.TcpMessages;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,7 +17,7 @@ namespace Photon.Agent.Internal.Session
         public string ApplicationsDirectory {get; set;}
 
 
-        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId)
+        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId) : base(transceiver, serverSessionId, sessionClientId)
         {
             ApplicationsDirectory = Configuration.ApplicationsDirectory;
         }

@@ -7,6 +7,7 @@ namespace Photon.Library.TcpMessages
     {
         public string MessageId {get; set;}
         public string ServerSessionId {get; set;}
+        public string SessionClientId {get; set;}
         public Project Project {get; set;}
         public string AssemblyFile {get; set;}
         public string PreBuild {get; set;}

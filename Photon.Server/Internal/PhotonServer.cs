@@ -1,10 +1,9 @@
 ﻿using log4net;
-using Newtonsoft.Json;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Framework.Packages;
 using Photon.Library;
+using Photon.Library.Packages;
 using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
@@ -122,8 +121,7 @@ namespace Photon.Server.Internal
             }
 
             using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<ServerDefinition>(stream);
+                return JsonSettings.Serializer.Deserialize<ServerDefinition>(stream);
             }
         }
 

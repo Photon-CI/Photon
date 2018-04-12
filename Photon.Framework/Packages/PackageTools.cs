@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Photon.Framework.Extensions;
+﻿using Photon.Framework.Extensions;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -29,8 +28,7 @@ namespace Photon.Framework.Packages
         public static T LoadDefinition<T>(string filename)
         {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<T>(stream);
+                return JsonSettings.Serializer.Deserialize<T>(stream);
             }
         }
 
@@ -39,8 +37,7 @@ namespace Photon.Framework.Packages
             var entry = archive.CreateEntry("metadata.json");
 
             using (var entryStream = entry.Open()) {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(entryStream, definition);
+                JsonSettings.Serializer.Serialize(entryStream, definition);
             }
         }
 
@@ -56,8 +53,7 @@ namespace Photon.Framework.Packages
 
                 dataStream.Seek(0, SeekOrigin.Begin);
 
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<T>(dataStream);
+                return JsonSettings.Serializer.Deserialize<T>(dataStream);
             }
         }
 

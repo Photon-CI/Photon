@@ -5,9 +5,8 @@ using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
-using Photon.Framework.Sessions;
 using Photon.Framework.Tasks;
-using Photon.Framework.TcpMessages;
+using Photon.Library.TcpMessages;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -21,29 +20,29 @@ namespace Photon.Agent.Internal.Session
         private DateTime? utcReleased;
         private bool isReleased;
 
+        public string SessionId {get;}
+        public string ServerSessionId {get;}
+        public string SessionClientId {get;}
+        public string WorkDirectory {get;}
+        public string ContentDirectory {get;}
+        public string BinDirectory {get;}
         public Project Project {get; set;}
         public string AssemblyFilename {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
         protected AgentSessionDomain Domain {get; set;}
-
-        public string SessionId {get;}
-        public string ServerSessionId {get;}
-        public string WorkDirectory {get;}
-        public string ContentDirectory {get;}
-        public string BinDirectory {get;}
+        protected DomainPackageClient PackageClient {get;}
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
         protected ILog Log => _log.Value;
 
-        protected PackageClient PackageClient {get;}
 
-
-        protected AgentSessionBase(MessageTransceiver transceiver, string serverSessionId)
+        protected AgentSessionBase(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
         {
             this.Transceiver = transceiver;
             this.ServerSessionId = serverSessionId;
+            this.SessionClientId = sessionClientId;
 
             SessionId = Guid.NewGuid().ToString("N");
             utcCreated = DateTime.UtcNow;
@@ -51,12 +50,12 @@ namespace Photon.Agent.Internal.Session
             LifeSpan = TimeSpan.FromHours(8);
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
-            Output = new SessionOutput(transceiver, serverSessionId);
+            Output = new SessionOutput(transceiver, ServerSessionId, SessionClientId);
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
             ContentDirectory = Path.Combine(WorkDirectory, "content");
             BinDirectory = Path.Combine(WorkDirectory, "bin");
 
-            PackageClient = new PackageClient();
+            PackageClient = new DomainPackageClient();
             PackageClient.OnPushProjectPackage += PackageClient_OnPushProjectPackage;
             PackageClient.OnPushApplicationPackage += PackageClient_OnPushApplicationPackage;
             PackageClient.OnPullProjectPackage += PackageClient_OnPullProjectPackage;
@@ -127,6 +126,7 @@ namespace Photon.Agent.Internal.Session
         {
             Task.Run(async () => {
                 var packageRequest = new ProjectPackagePushRequest {
+                    ServerSessionId = ServerSessionId,
                     Filename = filename,
                 };
 
@@ -151,7 +151,7 @@ namespace Photon.Agent.Internal.Session
             }).ContinueWith(taskHandle.FromTask);
         }
 
-        private void PackageClient_OnPullProjectPackage(string id, string version, string filename, RemoteTaskCompletionSource<object> taskHandle)
+        private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
         {
             Task.Run(async () => {
                 var packageRequest = new ProjectPackagePullRequest {
@@ -162,13 +162,11 @@ namespace Photon.Agent.Internal.Session
                 var response = await Transceiver.Send(packageRequest)
                     .GetResponseAsync<ProjectPackagePullResponse>();
 
-                File.Move(response.Filename, filename);
-
-                return (object)null;
+                return response.Filename;
             }).ContinueWith(taskHandle.FromTask);
         }
 
-        private void PackageClient_OnPullApplicationPackage(string id, string version, string filename, RemoteTaskCompletionSource<object> taskHandle)
+        private void PackageClient_OnPullApplicationPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
         {
             Task.Run(async () => {
                 var packageRequest = new ApplicationPackagePullRequest {
@@ -179,9 +177,7 @@ namespace Photon.Agent.Internal.Session
                 var response = await Transceiver.Send(packageRequest)
                     .GetResponseAsync<ApplicationPackagePullResponse>();
 
-                File.Move(response.Filename, filename);
-
-                return (object)null;
+                return response.Filename;
             }).ContinueWith(taskHandle.FromTask);
         }
     }

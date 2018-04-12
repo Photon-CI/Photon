@@ -11,7 +11,7 @@ namespace Photon.Agent.MessageHandlers
     {
         public override async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
         {
-            var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId) {
+            var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId, requestMessage.SessionClientId) {
                 Project = requestMessage.Project,
                 AssemblyFilename = requestMessage.AssemblyFile,
                 PreBuild = requestMessage.PreBuild,
@@ -25,7 +25,7 @@ namespace Photon.Agent.MessageHandlers
                 await session.InitializeAsync();
 
                 return new BuildSessionBeginResponse {
-                    SessionId = session.SessionId,
+                    AgentSessionId = session.SessionId,
                 };
             }
             catch {

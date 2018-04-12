@@ -16,7 +16,7 @@ namespace Photon.Agent.Internal.Session
         public int BuildNumber {get; set;}
 
 
-        public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId) : base(transceiver, serverSessionId) {}
+        public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId) : base(transceiver, serverSessionId, sessionClientId) {}
 
         public override async Task InitializeAsync()
         {

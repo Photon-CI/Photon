@@ -1,7 +1,8 @@
-﻿using Photon.Framework.Packages;
+﻿using Photon.Framework;
+using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
-using System;
+using Photon.Framework.Tasks;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -17,6 +18,11 @@ namespace Photon.Server.Internal.Sessions
         public string ProjectPackageFilename {get; set;}
 
 
+        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent)
+        {
+            return new DomainAgentDeploySessionHost(this, agent);
+        }
+
         public override async Task PrepareWorkDirectoryAsync()
         {
             await base.PrepareWorkDirectoryAsync();
@@ -27,7 +33,7 @@ namespace Photon.Server.Internal.Sessions
             ScriptName = metadata.ScriptName;
         }
 
-        public override async Task RunAsync()
+        public override async Task<TaskResult> RunAsync()
         {
             var assemblyFilename = Path.Combine(BinDirectory, AssemblyFilename);
             if (!File.Exists(assemblyFilename))
@@ -38,19 +44,18 @@ namespace Photon.Server.Internal.Sessions
 
             var context = new ServerDeployContext {
                 Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
-                ProjectPackages = PhotonServer.Instance.ProjectPackages,
-                ApplicationPackages = PhotonServer.Instance.ApplicationPackages,
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
                 ScriptName = ScriptName,
                 WorkDirectory = WorkDirectory,
                 BinDirectory = BinDirectory,
                 ContentDirectory = ContentDirectory,
+                Packages = PackageClient,
+                ConnectionFactory = ConnectionFactory,
                 Output = Output,
             };
 
-            var result = await Domain.RunDeployScript(context);
-            if (!result.Successful) throw new ApplicationException(result.Message);
+            return await Domain.RunDeployScript(context);
         }
     }
 }

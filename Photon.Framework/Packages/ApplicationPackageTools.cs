@@ -31,7 +31,7 @@ namespace Photon.Framework.Packages
             await PackageTools.WriteArchive(outputFilename, async archive => {
                 AppendMetadata(archive, definition, version);
 
-                foreach (var fileDefinition in definition.FileList) {
+                foreach (var fileDefinition in definition.Files) {
                     var destPath = Path.Combine("bin", fileDefinition.Destination);
 
                     await PackageTools.AddFiles(archive, definitionPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());

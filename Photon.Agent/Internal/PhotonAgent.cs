@@ -1,5 +1,4 @@
 ﻿using log4net;
-using Newtonsoft.Json;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
@@ -39,11 +38,6 @@ namespace Photon.Agent.Internal
             messageListener = new MessageListener(MessageRegistry);
 
             messageListener.ThreadException += MessageListener_ThreadException;
-        }
-
-        private void MessageListener_ThreadException(object sender, UnhandledExceptionEventArgs e)
-        {
-            Log.Error("Unhandled TCP Message Error!", (Exception)e.ExceptionObject);
         }
 
         public void Dispose()
@@ -109,8 +103,7 @@ namespace Photon.Agent.Internal
             }
 
             using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<AgentDefinition>(stream);
+                return JsonSettings.Serializer.Deserialize<AgentDefinition>(stream);
             }
         }
 
@@ -149,6 +142,11 @@ namespace Photon.Agent.Internal
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);
             }
+        }
+
+        private void MessageListener_ThreadException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Error("Unhandled TCP Message Error!", (Exception)e.ExceptionObject);
         }
     }
 }

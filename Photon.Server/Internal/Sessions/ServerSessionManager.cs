@@ -1,19 +1,17 @@
-﻿using Photon.Framework.Sessions;
-using Photon.Library;
+﻿using Photon.Framework.Pooling;
 using System;
 using System.Threading.Tasks;
-using Photon.Framework.Pooling;
 
 namespace Photon.Server.Internal.Sessions
 {
     internal class ServerSessionManager : IDisposable
     {
-        private readonly ReferencePool<IServerSession> pool;
+        private readonly ReferencePool<ServerSessionBase> pool;
 
 
         public ServerSessionManager()
         {
-            pool = new ReferencePool<IServerSession> {
+            pool = new ReferencePool<ServerSessionBase> {
                 //Lifespan = 3600_000, // 60 minutes
                 PruneInterval = 60_000 // 1 minute
             };
@@ -34,12 +32,12 @@ namespace Photon.Server.Internal.Sessions
             pool.Stop();
         }
 
-        public void BeginSession(IServerSession session)
+        public void BeginSession(ServerSessionBase session)
         {
             pool.Add(session);
         }
 
-        public bool TryGetSession(string sessionId, out IServerSession session)
+        public bool TryGet(string sessionId, out ServerSessionBase session)
         {
             return pool.TryGet(sessionId, out session);
         }

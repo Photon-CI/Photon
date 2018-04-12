@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Domain;
+using Photon.Framework.Tasks;
 using System;
 using System.Threading.Tasks;
 
@@ -6,7 +7,7 @@ namespace Photon.Framework.Server
 {
     internal class DeployScriptRegistry : TypeRegistry<IDeployScript>
     {
-        public async Task<ScriptResult> ExecuteScript(IServerDeployContext context)
+        public async Task<TaskResult> ExecuteScript(IServerDeployContext context)
         {
             if (!map.TryGetValue(context.ScriptName, out var scriptClassType))
                 throw new Exception($"Deploy Script '{context.ScriptName}' was not found!");
