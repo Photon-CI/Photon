@@ -7,7 +7,7 @@ pipeline {
 		stage('Build') {
 			steps {
 				bat """
-					nuget restore
+					\"%nuget_exe%\" restore
 
 					CALL bin\\msbuild_where.cmd \"Photon.sln\" /m ^
 						/p:Configuration=\"Release\" ^
