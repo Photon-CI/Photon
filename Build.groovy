@@ -7,7 +7,7 @@ pipeline {
 		stage('Build') {
 			steps {
 				bat """
-					nuget restore
+					\"%nuget_exe%\" restore
 
 					CALL bin\\msbuild_where.cmd \"Photon.sln\" /m ^
 						/p:Configuration=\"Release\" ^
@@ -19,7 +19,7 @@ pipeline {
 		stage('Test') {
 			steps {
 				bat """
-					nunit3-console \"Photon.Tests\\bin\\Release\\Photon.Tests.dll\" ^
+					\"%nunit3_exe%\" \"Photon.Tests\\bin\\Release\\Photon.Tests.dll\" ^
 						--result=\"Photon.Tests\\bin\\Release\\TestResults.xml\" ^
 						--where=\"cat == 'unit'\"
 				"""
