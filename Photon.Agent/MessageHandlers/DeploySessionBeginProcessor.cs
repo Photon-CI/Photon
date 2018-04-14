@@ -2,7 +2,7 @@
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Communication.Messages;
-using Photon.Framework.TcpMessages;
+using Photon.Library.TcpMessages;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
@@ -13,7 +13,7 @@ namespace Photon.Agent.MessageHandlers
         {
             var response = new DeploySessionBeginResponse();
 
-            var session = new AgentDeploySession(Transceiver, requestMessage.ServerSessionId) {
+            var session = new AgentDeploySession(Transceiver, requestMessage.ServerSessionId, requestMessage.SessionClientId) {
                 Project = null, // TODO: Store ProjectId in package
                 ProjectPackageId = requestMessage.ProjectPackageId,
                 ProjectPackageVersion = requestMessage.ProjectPackageVersion,

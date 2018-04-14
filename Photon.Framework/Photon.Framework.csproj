@@ -36,9 +36,6 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json.Bson, Version=1.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.Bson.1.0.1\lib\net45\Newtonsoft.Json.Bson.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -53,7 +50,11 @@
     <Compile Include="ContextDefinition.cs" />
     <Compile Include="ContextAgentDefinition.cs" />
     <Compile Include="Domain\DomainAgentBase.cs" />
+    <Compile Include="Domain\DomainAgentSessionClient.cs" />
+    <Compile Include="Domain\DomainAgentSessionHandle.cs" />
     <Compile Include="Domain\DomainAgentTask.cs" />
+    <Compile Include="Domain\DomainConnectionFactory.cs" />
+    <Compile Include="Domain\DomainContextBase.cs" />
     <Compile Include="Domain\IDomainContext.cs" />
     <Compile Include="Domain\ServerDomainAgent.cs" />
     <Compile Include="Domain\AgentDomainAgent.cs" />
@@ -64,38 +65,19 @@
     <Compile Include="Extensions\RemoteTaskExtensions.cs" />
     <Compile Include="FileUtils.cs" />
     <Compile Include="IFrameworkAssembly.cs" />
-    <Compile Include="MessageProcessors\BuildTaskOutputProcessor.cs" />
-    <Compile Include="MessageProcessors\ApplicationPackagePullProcessor.cs" />
-    <Compile Include="MessageProcessors\ApplicationPackagePushProcessor.cs" />
-    <Compile Include="MessageProcessors\ProjectPackagePushProcessor.cs" />
-    <Compile Include="Packages\PackageClient.cs" />
-    <Compile Include="Packages\ApplicationPackageManager.cs" />
+    <Compile Include="JsonSettings.cs" />
+    <Compile Include="Packages\DomainPackageClient.cs" />
+    <Compile Include="Packages\PackageReference.cs" />
     <Compile Include="Pooling\IReferenceItem.cs" />
     <Compile Include="Pooling\LifespanReferenceItem.cs" />
-    <Compile Include="MessageProcessors\AgentSessionOutputProcessor.cs" />
-    <Compile Include="MessageProcessors\ProjectPackagePullProcessor.cs" />
     <Compile Include="Packages\IPackageMetadata.cs" />
-    <Compile Include="Packages\PackageManagerBase.cs" />
-    <Compile Include="Packages\ProjectPackageManager.cs" />
     <Compile Include="Pooling\ReferencePool.cs" />
     <Compile Include="Server\IServerContext.cs" />
     <Compile Include="Server\IServerBuildContext.cs" />
-    <Compile Include="Server\BuildScriptResult.cs" />
     <Compile Include="Server\ServerContextBase.cs" />
-    <Compile Include="Sessions\IServerSession.cs" />
-    <Compile Include="Tasks\TaskRunner.cs" />
-    <Compile Include="Tasks\TaskRunnerManager.cs" />
-    <Compile Include="TcpMessages\BuildTaskRunRequest.cs" />
-    <Compile Include="TcpMessages\BuildTaskRunResponse.cs" />
-    <Compile Include="TcpMessages\DeploySessionReleaseRequest.cs" />
-    <Compile Include="TcpMessages\DeploySessionReleaseResponse.cs" />
-    <Compile Include="TcpMessages\DeploySessionBeginResponse.cs" />
-    <Compile Include="TcpMessages\AgentSessionOutputMessage.cs" />
-    <Compile Include="TcpMessages\BuildTaskOutputMessage.cs" />
     <Compile Include="NetPath.cs" />
     <Compile Include="Packages\FilePatternMatching.cs" />
     <Compile Include="Packages\PackageFileDefinition.cs" />
-    <Compile Include="Packages\PackageFilterCollection.cs" />
     <Compile Include="Packages\ApplicationPackageTools.cs" />
     <Compile Include="Packages\ProjectPackageTools.cs" />
     <Compile Include="Packages\PackageTools.cs" />
@@ -105,20 +87,16 @@
     <Compile Include="ProcessResult.cs" />
     <Compile Include="ProcessRunner.cs" />
     <Compile Include="Projects\Project.cs" />
-    <Compile Include="Server\AgentDeploySessionHandle.cs" />
     <Compile Include="Server\DeployScriptRegistry.cs" />
-    <Compile Include="Server\IAgentSessionHandle.cs" />
     <Compile Include="Server\IDeployScript.cs" />
     <Compile Include="Server\IServerDeployContext.cs" />
     <Compile Include="Server\AgentSessionHandleCollection.cs" />
     <Compile Include="Domain\TypeRegistry.cs" />
     <Compile Include="Server\ScriptOutput.cs" />
-    <Compile Include="Server\ScriptResult.cs" />
     <Compile Include="Server\ServerDeployContext.cs" />
     <Compile Include="ServerAgentDefinition.cs" />
     <Compile Include="ServerDefinition.cs" />
     <Compile Include="ServerHttpDefinition.cs" />
-    <Compile Include="Sessions\SessionOutput.cs" />
     <Compile Include="Agent\AgentBuildContext.cs" />
     <Compile Include="Agent\AgentDeployContext.cs" />
     <Compile Include="Tasks\DeployTaskRegistry.cs" />
@@ -134,26 +112,13 @@
     <Compile Include="Tasks\TaskResult.cs" />
     <Compile Include="ContextTaskDefinition.cs" />
     <Compile Include="ContextProjectDefinition.cs" />
-    <Compile Include="TcpMessages\DeploySessionBeginRequest.cs" />
-    <Compile Include="TcpMessages\ApplicationPackagePullRequest.cs" />
-    <Compile Include="TcpMessages\ProjectPackagePullRequest.cs" />
-    <Compile Include="TcpMessages\ApplicationPackagePullResponse.cs" />
-    <Compile Include="TcpMessages\ProjectPackagePullResponse.cs" />
-    <Compile Include="TcpMessages\ApplicationPackagePushRequest.cs" />
-    <Compile Include="TcpMessages\ProjectPackagePushRequest.cs" />
-    <Compile Include="TcpMessages\ApplicationPackagePushResponse.cs" />
-    <Compile Include="TcpMessages\ProjectPackagePushResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\Photon.Communication\Photon.Communication.csproj">
-      <Project>{E167A349-7691-4406-9F4B-989BD5E6E12F}</Project>
-      <Name>Photon.Communication</Name>
-    </ProjectReference>
+    <Folder Include="Sessions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

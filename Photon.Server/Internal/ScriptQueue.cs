@@ -1,10 +1,11 @@
 ﻿using log4net;
-using Photon.Framework.Sessions;
+using Photon.Framework.Extensions;
+using Photon.Framework.Tasks;
+using Photon.Server.Internal.Sessions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Photon.Framework.Extensions;
 
 namespace Photon.Server.Internal
 {
@@ -81,12 +82,13 @@ namespace Photon.Server.Internal
                 errorList.Add(error);
             }
 
+            TaskResult result = null;
             if (!abort) {
                 try {
                     session.Output
                         .AppendLine("Running script...", ConsoleColor.DarkCyan);
 
-                    await session.RunAsync();
+                    result = await session.RunAsync();
                 }
                 catch (Exception error) {
                     session.Output
@@ -111,7 +113,7 @@ namespace Photon.Server.Internal
                 errorList.Add(error);
             }
             finally {
-                session.Complete();
+                session.Complete(result);
             }
 
             if (errorList.Count > 1)

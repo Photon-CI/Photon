@@ -14,7 +14,7 @@ namespace Photon.Server.HttpHandlers.Session
             var startPos = GetQuery<int>("start");
 
             try {
-                if (!PhotonServer.Instance.Sessions.TryGetSession(sessionId, out var session))
+                if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
                     return BadRequest().SetText($"Session '{sessionId}' not found!");
 
                 var currentLength = session.Output.Length;

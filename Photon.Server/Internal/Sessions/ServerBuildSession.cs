@@ -1,15 +1,14 @@
-﻿using Photon.Framework.Projects;
-using Photon.Framework.Server;
+﻿using Photon.Framework;
+using Photon.Framework.Projects;
+using Photon.Framework.Tasks;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
 {
     internal class ServerBuildSession : ServerSessionBase
     {
-        private IAgentSessionHandle sessionHandle;
-
         public Project Project {get; set;}
-        public string AssemblyFile {get; set;}
+        public string AssemblyFilename {get; set;}
         public string PreBuild {get; set;}
         public string TaskName {get; set;}
         public string GitRefspec {get; set;}
@@ -17,33 +16,38 @@ namespace Photon.Server.Internal.Sessions
         public int BuildNumber {get; set;}
 
 
-        public override async Task RunAsync()
+        public override async Task<TaskResult> RunAsync()
         {
             var context = new ServerBuildContext {
                 Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
-                ProjectPackages = PhotonServer.Instance.ProjectPackages,
-                ApplicationPackages = PhotonServer.Instance.ApplicationPackages,
                 Project = Project,
-                AssemblyFilename = AssemblyFile,
+                AssemblyFilename = AssemblyFilename,
                 PreBuild = PreBuild,
                 TaskName = TaskName,
                 BuildNumber = BuildNumber,
                 WorkDirectory = WorkDirectory,
                 ContentDirectory = ContentDirectory,
                 BinDirectory = BinDirectory,
+                Packages = PackageClient,
+                ConnectionFactory = ConnectionFactory,
                 Output = Output,
             };
 
-            using (sessionHandle = context.RegisterAnyAgent(Roles)) {
+            using (var sessionHandle = context.RegisterAnyAgent(Roles)) {
                 try {
                     await sessionHandle.BeginAsync();
 
-                    await sessionHandle.RunTaskAsync(TaskName);
+                    return await sessionHandle.RunTaskAsync(TaskName);
                 }
                 finally {
                     await sessionHandle.ReleaseAsync();
                 }
             }
+        }
+
+        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent)
+        {
+            return new DomainAgentBuildSessionHost(this, agent);
         }
     }
 }

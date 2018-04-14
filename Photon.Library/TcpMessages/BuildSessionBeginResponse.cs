@@ -4,6 +4,6 @@ namespace Photon.Library.TcpMessages
 {
     public class BuildSessionBeginResponse : ResponseMessageBase
     {
-        public string SessionId {get; set;}
+        public string AgentSessionId {get; set;}
     }
 }

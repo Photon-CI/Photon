@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Photon.Framework.Tasks;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Server
 {
     public interface IDeployScript
     {
-        Task<ScriptResult> RunAsync(IServerDeployContext context);
+        Task<TaskResult> RunAsync(IServerDeployContext context);
     }
 }

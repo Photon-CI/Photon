@@ -1,6 +1,4 @@
-﻿using Photon.Communication;
-using Photon.Framework.Packages;
-using Photon.Framework.Projects;
+﻿using Photon.Framework.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,34 +7,26 @@ using System.Runtime.Serialization;
 namespace Photon.Framework.Server
 {
     [Serializable]
-    public abstract class ServerContextBase : IServerContext
+    public abstract class ServerContextBase : DomainContextBase, IServerContext
     {
         public ServerAgentDefinition[] Agents {get; set;}
+        public DomainConnectionFactory ConnectionFactory {get; set;}
 
         [NonSerialized]
-        private List<IAgentSessionHandle> agentSessions;
-
-        public ProjectPackageManager ProjectPackages {get; set;}
-        public ApplicationPackageManager ApplicationPackages {get; set;}
+        private List<DomainAgentSessionHandle> agentSessions;
 
         public string ServerSessionId {get; set;}
-        public Project Project {get; set;}
-        public string AssemblyFilename {get; set;}
-        public string WorkDirectory {get; set;}
-        public string BinDirectory {get; set;}
-        public string ContentDirectory {get; set;}
-        public ScriptOutput Output {get; set;}
 
 
         protected ServerContextBase()
         {
-            agentSessions = new List<IAgentSessionHandle>();
+            agentSessions = new List<DomainAgentSessionHandle>();
         }
 
         [OnDeserializing]
         private void OnDeserializing(StreamingContext c)
         {
-            agentSessions = new List<IAgentSessionHandle>();
+            agentSessions = new List<DomainAgentSessionHandle>();
         }
 
         public virtual void Dispose()
@@ -47,12 +37,21 @@ namespace Photon.Framework.Server
             agentSessions.Clear();
         }
 
-        public IAgentSessionHandle GetAgentSession(string sessionId)
+        public DomainAgentSessionHandle ConnectToAgent(ServerAgentDefinition agent)
         {
-            return agentSessions.FirstOrDefault(x => string.Equals(x.AgentSessionId, sessionId));
+            var sessionClient = ConnectionFactory.RequestConnection(agent);
+
+            var sessionHandle = new DomainAgentSessionHandle(sessionClient);
+            agentSessions.Add(sessionHandle);
+            return sessionHandle;
         }
 
-        public IAgentSessionHandle RegisterAnyAgent(params string[] roles)
+        //public DomainAgentSessionHandle GetAgentSession(string sessionId)
+        //{
+        //    return agentSessions.FirstOrDefault(x => string.Equals(x.AgentSessionId, sessionId));
+        //}
+
+        public DomainAgentSessionHandle RegisterAnyAgent(params string[] roles)
         {
             if (Agents == null)
                 throw new Exception("No agents have been defined!");
@@ -71,13 +70,8 @@ namespace Photon.Framework.Server
 
             PrintFoundAgents(agent);
 
-            var registry = new MessageProcessorRegistry();
-            registry.Scan(typeof(IFrameworkAssembly).Assembly);
-
-            var handle = CreateSessionHandle(agent, registry);
-
+            var handle = ConnectToAgent(agent);
             agentSessions.Add(handle);
-
             return handle;
         }
 
@@ -91,19 +85,14 @@ namespace Photon.Framework.Server
 
             PrintFoundAgents(roleAgents);
 
-            var registry = new MessageProcessorRegistry();
-            registry.Scan(typeof(IFrameworkAssembly).Assembly);
-
             var roleAgentHandles = roleAgents.Select(a => {
-                var handle = CreateSessionHandle(a, registry);
+                var handle = ConnectToAgent(a);
                 agentSessions.Add(handle);
                 return handle;
             });
 
             return new AgentSessionHandleCollection(this, roleAgentHandles);
         }
-
-        protected abstract IAgentSessionHandle CreateSessionHandle(ServerAgentDefinition agent, MessageProcessorRegistry registry);
 
         private void PrintFoundAgents(params ServerAgentDefinition[] agents)
         {

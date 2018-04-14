@@ -11,6 +11,6 @@ namespace Photon.Framework.Server
 
         Task BeginAsync();
         Task ReleaseAsync();
-        Task RunTaskAsync(string taskName);
+        Task<TaskResult> RunTaskAsync(string taskName);
     }
 }

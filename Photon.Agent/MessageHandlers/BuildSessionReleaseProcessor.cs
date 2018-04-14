@@ -10,7 +10,7 @@ namespace Photon.Agent.MessageHandlers
     {
         public override async Task<IResponseMessage> Process(BuildSessionReleaseRequest requestMessage)
         {
-            await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.SessionId);
+            await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
 
             return new BuildSessionReleaseResponse {
                 Successful = true,

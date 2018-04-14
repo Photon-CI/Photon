@@ -1,5 +1,6 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Photon.Framework;
 using Photon.Framework.Extensions;
 using System;
 using System.IO;
@@ -11,7 +12,6 @@ namespace Photon.Server.Internal.Projects
         private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectData));
 
         private readonly object buildNumberLock;
-        private int lastBuildNumber;
 
         [JsonIgnore]
         public string DataPath {get; private set;}
@@ -19,10 +19,8 @@ namespace Photon.Server.Internal.Projects
         [JsonIgnore]
         public string Filename {get; private set;}
 
-        [JsonProperty("projectId")]
         public string ProjectId {get; set;}
 
-        [JsonProperty("lastBuild")]
         public ProjectDataLastBuild LastBuild {get; set;}
 
 
@@ -62,8 +60,7 @@ namespace Photon.Server.Internal.Projects
         public void Save()
         {
             using (var stream = File.Open(Filename, FileMode.Create, FileAccess.Write)) {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(stream, this);
+                JsonSettings.Serializer.Serialize(stream, this);
             }
         }
 
@@ -84,13 +81,11 @@ namespace Photon.Server.Internal.Projects
         {
             ProjectData projectData;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
-                var serializer = new JsonSerializer();
-                projectData = serializer.Deserialize<ProjectData>(stream);
+                projectData = JsonSettings.Serializer.Deserialize<ProjectData>(stream);
             }
 
             projectData.Filename = filename;
             projectData.DataPath = Path.GetDirectoryName(filename);
-            projectData.lastBuildNumber = projectData.LastBuild?.Number ?? 0;
 
             return projectData;
         }

@@ -14,7 +14,7 @@ namespace Photon.CLI.Commands
         public string Server {get; set;}
         public string GitRefspec {get; set;}
         public string StartFile {get; set;}
-        public string DeployPackage {get; set;}
+        public bool Deploy {get; set;}
 
 
         public BuildCommands(CommandContext context) : base(context)
@@ -25,7 +25,7 @@ namespace Photon.CLI.Commands
             Map("-s", "-server").ToProperty(v => Server = v);
             Map("-r", "-refspec").ToProperty(v => GitRefspec = v);
             Map("-f", "-file").ToProperty(v => StartFile = v);
-            Map("-d", "-deploy").ToProperty(v => DeployPackage = v);
+            Map("-d", "-deploy").ToProperty(v => Deploy = v, true);
         }
 
         private async Task OnHelp(string[] args)
@@ -43,7 +43,7 @@ namespace Photon.CLI.Commands
                     .Add("-server  | -s", "The name of the target Photon Server.")
                     .Add("-refspec | -r", "The repository branch, commit, or tag.")
                     .Add("-file    | -f", "A json file specifying the build parameters.")
-                    .Add("-deploy  | -d", "The name of the Project Package to deploy after successful build.")
+                    .Add("-deploy  | -d", "Deploy all published Project Packages upon successful build.")
                     .PrintAsync();
 
                 return;
@@ -51,10 +51,6 @@ namespace Photon.CLI.Commands
 
             if (string.IsNullOrEmpty(StartFile))
                 throw new ApplicationException("'-file' is undefined!");
-
-            ConsoleEx.Out
-                .Write("Running Build-Task using file ", ConsoleColor.DarkCyan)
-                .Write(StartFile, ConsoleColor.Cyan);
 
             if (!string.IsNullOrEmpty(GitRefspec))
                 ConsoleEx.Out
@@ -74,16 +70,19 @@ namespace Photon.CLI.Commands
 
             var successful = buildAction.Result != null && (buildAction.Result.Result?.Successful ?? false);
 
-            if (successful && !string.IsNullOrEmpty(DeployPackage)) {
-                await new DeployRunAction {
-                    ServerName = Server,
-                    ProjectPackageId = DeployPackage,
-                    ProjectPackageVersion = buildAction.Result.BuildNumber.ToString(),
-                }.Run(Context);
-            }
+            if (successful && Deploy) {
+                foreach (var package in buildAction.Result.ProjectPackages) {
+                    ConsoleEx.Out
+                        .ResetColor()
+                        .WriteLine();
 
-            ConsoleEx.Out
-                .WriteLine("Build-Script completed successfully.", ConsoleColor.Green);
+                    await new DeployRunAction {
+                        ServerName = Server,
+                        ProjectPackageId = package.PackageId,
+                        ProjectPackageVersion = package.PackageVersion,
+                    }.Run(Context);
+                }
+            }
         }
     }
 }

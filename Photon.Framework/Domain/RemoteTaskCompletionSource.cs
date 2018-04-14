@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting.Lifetime;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
@@ -28,6 +29,22 @@ namespace Photon.Framework.Domain
         public void SetException(Exception error)
         {
             taskEvent.SetException(error);
+        }
+
+        public static async Task<T> Run(Action<RemoteTaskCompletionSource<T>, ISponsor> action)
+        {
+            var sponsor = new ClientSponsor();
+
+            try {
+                var taskHandle = new RemoteTaskCompletionSource<T>();
+                sponsor.Register(taskHandle);
+
+                action(taskHandle, sponsor);
+                return await taskHandle.Task;
+            }
+            finally {
+                sponsor.Close();
+            }
         }
     }
 }

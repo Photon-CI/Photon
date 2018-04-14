@@ -3,5 +3,5 @@
 namespace Photon.Tests.Internal
 {
     [TestFixture, Category("unit")]
-    public class UnitTestFixture {}
+    public abstract class UnitTestFixture {}
 }

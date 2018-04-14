@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,17 +10,17 @@ namespace Photon.Framework.Server
     public class AgentSessionHandleCollection
     {
         private readonly IServerContext context;
-        private readonly IAgentSessionHandle[] agentSessionList;
+        private readonly DomainAgentSessionHandle[] agentSessionList;
 
         public string ProjectPackageId;
         public string ProjectPackageVersion;
 
 
-        public AgentSessionHandleCollection(IServerContext context, IEnumerable<IAgentSessionHandle> agentSessions)
+        public AgentSessionHandleCollection(IServerContext context, IEnumerable<DomainAgentSessionHandle> agentSessions)
         {
             this.context = context;
 
-            this.agentSessionList = agentSessions as IAgentSessionHandle[] ?? agentSessions?.ToArray()
+            this.agentSessionList = agentSessions as DomainAgentSessionHandle[] ?? agentSessions?.ToArray()
                 ?? throw new ArgumentNullException(nameof(agentSessions));
         }
 

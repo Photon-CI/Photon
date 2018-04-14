@@ -95,7 +95,7 @@ namespace Photon.Framework.Server
             }
         }
 
-        public async Task RunTaskAsync(string taskName)
+        public async Task<TaskResult> RunTaskAsync(string taskName)
         {
             context.Output
                 .Append("Running Deploy-Task ", ConsoleColor.DarkCyan)
@@ -123,6 +123,8 @@ namespace Photon.Framework.Server
                 .Append("Deploy-Task ", ConsoleColor.DarkGreen)
                 .Append(taskName, ConsoleColor.Green)
                 .AppendLine(" completed successfully.", ConsoleColor.DarkGreen);
+
+            return result;
         }
 
         public TaskRunner GetTaskRunner(string agentTaskId)

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Framework.Projects;
 using System.Collections.Generic;
@@ -23,8 +23,7 @@ namespace Photon.Server.Internal.Projects
 
             Project[] _projects;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
-                var serializer = new JsonSerializer();
-                _projects = serializer.Deserialize<Project[]>(stream);
+                _projects = JsonSettings.Serializer.Deserialize<Project[]>(stream);
             }
 
             foreach (var project in _projects)

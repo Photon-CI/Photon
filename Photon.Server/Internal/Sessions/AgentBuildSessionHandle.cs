@@ -17,7 +17,7 @@ namespace Photon.Server.Internal.Sessions
         private readonly ServerAgentDefinition definition;
         private readonly MessageClient messageClient;
 
-        public TaskRunnerManager Tasks {get;}
+        public BuildTaskRunnerManager BuildTasks {get;}
         public string AgentSessionId {get; private set;}
 
 
@@ -26,7 +26,7 @@ namespace Photon.Server.Internal.Sessions
             this.context = context;
             this.definition = agentDefinition;
 
-            Tasks = new TaskRunnerManager();
+            BuildTasks = new BuildTaskRunnerManager();
 
             messageClient = new MessageClient(registry) {
                 Context = context,
@@ -37,7 +37,7 @@ namespace Photon.Server.Internal.Sessions
 
         public void Dispose()
         {
-            Tasks?.Dispose();
+            BuildTasks?.Dispose();
             messageClient?.Dispose();
         }
 
@@ -71,14 +71,14 @@ namespace Photon.Server.Internal.Sessions
                 throw new ApplicationException($"Failed to start Agent Session! {error.Message}");
             }                
 
-            Tasks.Start();
+            BuildTasks.Start();
         }
 
         public async Task ReleaseAsync()
         {
             // TODO: Locking on sessionId and isActive
 
-            Tasks.Stop();
+            BuildTasks.Stop();
 
             if (messageClient.IsConnected) {
                 if (!string.IsNullOrEmpty(AgentSessionId)) {
@@ -99,7 +99,7 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        public async Task RunTaskAsync(string taskName)
+        public async Task<TaskResult> RunTaskAsync(string taskName)
         {
             context.Output
                 .Append("Running Build-Task ", ConsoleColor.DarkCyan)
@@ -108,12 +108,12 @@ namespace Photon.Server.Internal.Sessions
                 .Append(definition.Name, ConsoleColor.Cyan)
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
-            var runner = new TaskRunner(messageClient, AgentSessionId);
+            var runner = new BuildTaskRunner(messageClient, AgentSessionId);
             runner.OutputEvent += (o, e) => {
                 context.Output.AppendRaw(e.Text);
             };
 
-            Tasks.Add(runner);
+            BuildTasks.Add(runner);
 
             var result = await runner.Run(taskName);
 
@@ -127,6 +127,8 @@ namespace Photon.Server.Internal.Sessions
                 .Append("Build-Task ", ConsoleColor.DarkGreen)
                 .Append(taskName, ConsoleColor.Green)
                 .Append(" completed successfully.", ConsoleColor.DarkGreen);
+
+            return result;
         }
 
         private void MessageClient_OnThreadException(object sender, UnhandledExceptionEventArgs e)
