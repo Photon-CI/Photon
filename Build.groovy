@@ -19,7 +19,7 @@ pipeline {
 		stage('Test') {
 			steps {
 				bat """
-					nunit3-console \"Photon.Tests\\bin\\Release\\Photon.Tests.dll\" ^
+					\"%nunit3_exe%\" \"Photon.Tests\\bin\\Release\\Photon.Tests.dll\" ^
 						--result=\"Photon.Tests\\bin\\Release\\TestResults.xml\" ^
 						--where=\"cat == 'unit'\"
 				"""
