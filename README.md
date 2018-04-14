@@ -5,19 +5,7 @@ Photon packages your custom .NET library with your applications, allowing users 
 
 Since standard .NET libraries are used, you can leverage the full user experience of Visual Studio when editing your pipelines. By decorating your scripts and tasks with test attributes, you can even make your tasks directly runnable and debuggable using your favorite testing platform.
 
-## Installation
-
-Though Photon is primarily designed for Windows, it is fully compatible with the [MONO](http://www.mono-project.com) Runtime; Which currently† supports Linux, OS X, BSD, and Windows. It can even be run on the [Raspberry Pi](https://www.raspberrypi.org/)!  
-† _04/2018_
-
-**Photon Server**  
-To begin using Photon, you will first need to create and define your primary Server responsible for managing all application packages and delegating Agent operations.
-
-**Photon Agent**  
-Agents can be used to perform Tasks remotely, such as Building, Testing, and Deploying of packages; and should be installed on the remote servers you plan to perform work/deployments upon.
-
-**Photon CLI**
-An optional command-line executable for creating packages, executing scripts, and calling into the Photon Server HTTP API.
+Visit the [Official Website](http://photon.null511.info) to download releases and view the documentation.
 
 ## Usage example
 
@@ -50,8 +38,6 @@ public class DeployScript : IScript
         finally {
             await agents.ReleaseAllAsync();
         }
-
-        return ScriptResult.Ok();
     }
 }
 
@@ -61,71 +47,68 @@ Tasks are run on Agents. By specifying the `[Roles]` attribute, tasks can be lim
 
 ```c#
 [Roles(Configuration.Roles.Deploy.Web)]
-class UnpackPhotonSampleWeb : ITask
+internal class UnpackPhotonSampleWeb : IDeployTask
 {
-    public TaskResult Run(TaskContext context)
-    {
-        // Download package to working directory
-        var packageFilename = context.DownloadPackage("photon.sample.web", context.ReleaseVersion, context.WorkDirectory);
+    public IAgentDeployContext Context {get; set;}
 
+    public async Task<TaskResult> RunAsync()
+    {
         // Get the versioned application path
-        var applicationPath = context.GetApplicationDirectory(Configuration.Apps.Web, context.ReleaseVersion);
+        var applicationPath = Context.GetApplicationDirectory(Configuration.Apps.Web.AppName, Context.ProjectPackageVersion);
+
+        // Download Package to temp file
+        var packageFilename = await Context.PullApplicationPackageAsync(Configuration.Apps.Web.PackageId, Context.ProjectPackageVersion);
 
         // Unpackage contents to application path
-        PackageTools.Unpackage(packageFilename, applicationPath);
-
-        return TaskResult.Ok();
+        await ApplicationPackageTools.UnpackAsync(packageFilename, applicationPath);
     }
 }
+
 ```
 
 ```c#
 [Roles(Configuration.Roles.Deploy.Web)]
-class UpdatePhotonSampleWeb : ITask
+internal class UpdatePhotonSampleWeb : IDeployTask
 {
-    public async Task<TaskResult> RunAsync(TaskContextBase context)
+    public IAgentDeployContext Context {get; set;}
+
+    public async Task RunAsync()
     {
         // Get the versioned application path
-        var applicationPath = context.GetApplicationDirectory(Configuration.Apps.Web, context.ReleaseVersion);
+        var applicationPath = Context.GetApplicationDirectory(Configuration.Apps.Web.AppName, Context.ProjectPackageVersion);
 
-        var iis = new IISTools();
+        using (var iis = new IISTools(Context)) {
+            // Configure and start AppPool
+            iis.ApplicationPool.Configure(Configuration.AppPoolName, pool => {
+                pool.AutoStart = true;
+                pool.ManagedPipelineMode = ManagedPipelineMode.Integrated;
+                pool.ManagedRuntimeVersion = "v4.0";
 
-        iis.ConfigureAppPool(Configuration.AppPoolName, pool => {
-            // Configure AppPool
-            pool.AutoStart = true;
-            pool.ManagedPipelineMode = ManagedPipelineMode.Integrated;
-            pool.ManagedRuntimeVersion = "v4.0";
+                if (pool.State == ObjectState.Stopped)
+                    pool.Start();
+            });
 
-            // Start AppPool
-            if (pool.State == ObjectState.Stopped)
-                pool.Start();
-        });
+            // Configure and start Website
+            iis.WebSite.Configure("Photon Web", 8086, site => {
+                site.ApplicationDefaults.ApplicationPoolName = Configuration.AppPoolName;
+                site.ServerAutoStart = true;
 
-        iis.ConfigureWebSite("Photon Web", site => {
-            // Configure Website
-            site.ApplicationDefaults.ApplicationPoolName = Configuration.AppPoolName;
-            site.ServerAutoStart = true;
+                // Set Bindings
+                site.Bindings.Clear();
+                site.Bindings.Add("*:8086:localhost", "http");
 
-            // Set Bindings
-            site.Bindings.Clear();
-            site.Bindings.Add("*:80:localhost", "http");
+                // Update Virtual Path
+                site.Applications[0]
+                    .VirtualDirectories["/"]
+                    .PhysicalPath = applicationPath;
 
-            // Update Virtual Path
-            site.Applications[0]
-                .VirtualDirectories["/"]
-                .PhysicalPath = applicationPath;
-
-            // Start Website
-            if (site.State == ObjectState.Stopped)
-                site.Start();
-        });
-
-        return TaskResult.Ok();
+                if (site.State == ObjectState.Stopped)
+                    site.Start();
+            });
+        }
     }
 }
 ```
-
-_For more examples and usage, please refer to the [Wiki][wiki]._
 
 ## Release History
 
@@ -134,11 +117,9 @@ _For more examples and usage, please refer to the [Wiki][wiki]._
 
 ## Meta
 
-Joshua Miller – null511@outlook.com
+Joshua Miller - [null511@GitHub](https://github.com/null511) – <mailto:null511@outlook.com>
 
 Distributed under the MIT license. See ``LICENSE`` for more information.
-
-[https://github.com/null511](https://github.com/null511)
 
 ## Contributing
 
@@ -147,6 +128,3 @@ Distributed under the MIT license. See ``LICENSE`` for more information.
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
-
-
-[wiki]: https://github.com/null511/Photon/wiki
