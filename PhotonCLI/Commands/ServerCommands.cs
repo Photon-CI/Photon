@@ -13,12 +13,13 @@ namespace Photon.CLI.Commands
     {
         public string ServerName {get; set;}
         public string ServerUrl {get; set;}
-        public bool ServerPrimary {get; set;}
+        public bool? ServerPrimary {get; set;}
 
 
         public ServerCommands(CommandContext context) : base(context)
         {
             Map("add").ToAction(AddCommand);
+            Map("edit").ToAction(EditCommand);
             Map("remove").ToAction(RemoveCommand);
             Map("list").ToAction(ListCommand);
             Map("help", "?").ToAction(OnHelp);
@@ -31,16 +32,18 @@ namespace Photon.CLI.Commands
         private async Task OnHelp(string[] args)
         {
             await new HelpPrinter()
-                .Add("Add", "Add a new Photon Server definition.")
-                .Add("Remove", "Remove an existing Photon Server definition.")
-                .Add("List", "List all defined Photon Server definitions.")
+                .Add(typeof(ServerCommands), nameof(AddCommand))
+                .Add(typeof(ServerCommands), nameof(EditCommand))
+                .Add(typeof(ServerCommands), nameof(RemoveCommand))
+                .Add(typeof(ServerCommands), nameof(ListCommand))
                 .PrintAsync();
         }
 
+        [Command("Add", "Add a new Photon Server definition.")]
         public async Task AddCommand(string[] args)
         {
             if (args.ContainsAny("help", "?")) {
-                await new HelpPrinter("Add", "Add a new Photon Server definition.")
+                await new HelpPrinter(typeof(ServerCommands), nameof(AddCommand))
                     .Add("-name    | -n", "The name of the Server.")
                     .Add("-url     | -u", "The URL of the Server.")
                     .Add("-primary | -p", "Make this the primary server.")
@@ -72,10 +75,47 @@ namespace Photon.CLI.Commands
             }
         }
 
+        [Command("Edit", "Edit an existing Photon Server definition.")]
+        public async Task EditCommand(string[] args)
+        {
+            if (args.ContainsAny("help", "?")) {
+                await new HelpPrinter(typeof(ServerCommands), nameof(EditCommand))
+                    .Add("-name    | -n", "The name of the Server.")
+                    .Add("-url     | -u", "The URL of the Server.")
+                    .Add("-primary | -p", "Make this the primary server.")
+                    .PrintAsync();
+
+                return;
+            }
+
+            if (string.IsNullOrEmpty(ServerName))
+                throw new ApplicationException("'-name' is undefined!");
+
+            if (string.IsNullOrEmpty(ServerUrl) && !ServerPrimary.HasValue)
+                throw new ApplicationException("No changes were specified!");
+
+            try {
+                await new ServerEditAction {
+                    ServerName = ServerName,
+                    ServerUrl = ServerUrl,
+                    ServerPrimary = ServerPrimary,
+                }.Run(Context);
+
+                ConsoleEx.Out
+                    .WriteLine("Server definition modified successfully.", ConsoleColor.Green);
+            }
+            catch (Exception error) {
+                ConsoleEx.Out
+                    .WriteLine("Failed to modify server definition!", ConsoleColor.Red)
+                    .WriteLine(error.ToString(), ConsoleColor.DarkRed);
+            }
+        }
+
+        [Command("Remove", "Remove an existing Photon Server definition.")]
         public async Task RemoveCommand(string[] args)
         {
             if (args.ContainsAny("help", "?")) {
-                await new HelpPrinter("Add", "Remove an existing Photon Server definition.")
+                await new HelpPrinter(typeof(ServerCommands), nameof(RemoveCommand))
                     .Add("-name | -n", "The name of the Server.")
                     .PrintAsync();
 
@@ -100,10 +140,11 @@ namespace Photon.CLI.Commands
             }
         }
 
+        [Command("List", "List all defined Photon Server definitions.")]
         public async Task ListCommand(string[] args)
         {
             if (args.ContainsAny("help", "?")) {
-                await new HelpPrinter("List", "List all defined Photon Server definitions.")
+                await new HelpPrinter(typeof(ServerCommands), nameof(ListCommand))
                     .PrintAsync();
 
                 return;

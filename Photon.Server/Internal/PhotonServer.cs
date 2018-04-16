@@ -59,6 +59,7 @@ namespace Photon.Server.Internal
         {
             if (isStarted) Stop();
 
+            Queue?.Dispose();
             Sessions?.Dispose();
             receiver?.Dispose();
             receiver = null;
@@ -72,7 +73,7 @@ namespace Photon.Server.Internal
             Definition = ParseServerDefinition() ?? new ServerDefinition {
                 Http = {
                     Host = "localhost",
-                    Port = 8088,
+                    Port = 8082,
                     Path = "/photon/server",
                 },
             };
@@ -97,6 +98,20 @@ namespace Photon.Server.Internal
         {
             Queue.Stop();
             Sessions.Stop();
+
+            try {
+                receiver?.Dispose();
+                receiver = null;
+            }
+            catch (Exception error) {
+                Log.Error("Failed to stop HTTP Receiver!", error);
+            }
+        }
+
+        public void Abort()
+        {
+            Queue.Abort();
+            Sessions.Abort();
 
             try {
                 receiver?.Dispose();
@@ -138,8 +153,8 @@ namespace Photon.Server.Internal
                 },
             };
 
-            var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
-            context.Views.AddFolderFromExternal(viewPath);
+            var assembly = Assembly.GetExecutingAssembly();
+            context.Views.AddAllFromAssembly(assembly, "Photon.Server.Views");
 
             var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
 
@@ -156,7 +171,7 @@ namespace Photon.Server.Internal
             try {
                 receiver.Start();
 
-                Log.Info($"HTTP Server listening at http://{httpPrefix}");
+                Log.Info($"HTTP Server listening at {httpPrefix}");
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);

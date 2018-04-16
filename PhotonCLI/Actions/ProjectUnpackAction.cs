@@ -10,9 +10,11 @@ namespace Photon.CLI.Actions
         public string OutputPath {get; set;}
 
 
-        public async Task Run()
+        public Task Run()
         {
             throw new NotImplementedException();
+
+            return Task.CompletedTask;
         }
     }
 }

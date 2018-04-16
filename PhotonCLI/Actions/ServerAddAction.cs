@@ -7,7 +7,7 @@ namespace Photon.CLI.Actions
     {
         public string ServerName {get; set;}
         public string ServerUrl {get; set;}
-        public bool ServerPrimary {get; set;}
+        public bool? ServerPrimary {get; set;}
 
 
         public async Task Run(CommandContext context)
@@ -15,12 +15,12 @@ namespace Photon.CLI.Actions
             var definition = new PhotonServerDefinition {
                 Name = ServerName,
                 Url = ServerUrl,
-                Primary = ServerPrimary,
+                Primary = ServerPrimary ?? false,
             };
 
             context.Servers.Add(definition);
 
-            if (ServerPrimary)
+            if (ServerPrimary ?? false)
                 context.Servers.SetPrimary(ServerName);
 
             await Task.Run(() => context.Servers.Save());

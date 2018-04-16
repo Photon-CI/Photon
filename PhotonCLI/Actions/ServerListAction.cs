@@ -7,7 +7,7 @@ namespace Photon.CLI.Actions
 {
     internal class ServerListAction
     {
-        public async Task Run(CommandContext context)
+        public Task Run(CommandContext context)
         {
             var i = 0;
             foreach (var definition in context.Servers.Definitions) {
@@ -21,6 +21,8 @@ namespace Photon.CLI.Actions
                     .Write("URL     : ", ConsoleColor.Gray).WriteLine(definition.Url, ConsoleColor.White)
                     .Write("Primary : ", ConsoleColor.Gray).WriteLine(definition.Primary, ConsoleColor.White);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

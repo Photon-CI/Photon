@@ -32,6 +32,11 @@ namespace Photon.Server.Internal.Sessions
             pool.Stop();
         }
 
+        public void Abort()
+        {
+            throw new NotImplementedException();
+        }
+
         public void BeginSession(ServerSessionBase session)
         {
             pool.Add(session);

@@ -59,7 +59,7 @@ namespace Photon.Agent.Internal
             Definition = ParseAgentDefinition() ?? new AgentDefinition {
                 Http = {
                     Host = "localhost",
-                    Port = 8088,
+                    Port = 8082,
                     Path = "/photon/agent",
                 },
             };
@@ -120,10 +120,11 @@ namespace Photon.Agent.Internal
                 },
             };
 
-            var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
-            context.Views.AddFolderFromExternal(viewPath);
+            var assembly = Assembly.GetExecutingAssembly();
+            context.Views.AddAllFromAssembly(assembly, "Photon.Agent.Views");
 
             var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
+
             if (!string.IsNullOrEmpty(Definition.Http.Path))
                 httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
 

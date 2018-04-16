@@ -52,14 +52,6 @@ namespace Photon.CLI.Commands
             if (string.IsNullOrEmpty(StartFile))
                 throw new ApplicationException("'-file' is undefined!");
 
-            if (!string.IsNullOrEmpty(GitRefspec))
-                ConsoleEx.Out
-                    .Write(" @ ", ConsoleColor.DarkCyan)
-                    .Write(GitRefspec, ConsoleColor.Cyan);
-
-            ConsoleEx.Out
-                .WriteLine(".", ConsoleColor.DarkCyan);
-
             var buildAction = new BuildRunAction {
                 ServerName = Server,
                 GitRefspec = GitRefspec,

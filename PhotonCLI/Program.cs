@@ -43,11 +43,14 @@ namespace Photon.CLI
                 return 2;
             }
             finally {
+                Console.Out.Flush();
                 ConsoleEx.Out.ResetColor();
 
 #if DEBUG
-                if (Debugger.IsAttached)
+                if (Debugger.IsAttached) {
+                    ConsoleEx.Out.WriteLine("Press any key to exit...");
                     Console.ReadKey(true);
+                }
 #endif
             }
         }

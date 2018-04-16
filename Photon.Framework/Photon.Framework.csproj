@@ -63,7 +63,6 @@
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\RemoteTaskExtensions.cs" />
-    <Compile Include="FileUtils.cs" />
     <Compile Include="IFrameworkAssembly.cs" />
     <Compile Include="JsonSettings.cs" />
     <Compile Include="Packages\DomainPackageClient.cs" />

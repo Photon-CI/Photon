@@ -44,6 +44,7 @@
     <Compile Include="Commands\HelpPrinter.cs" />
     <Compile Include="Commands\ICommandParser.cs" />
     <Compile Include="ConfigurationReader.cs" />
+    <Compile Include="FileUtils.cs" />
     <Compile Include="HttpMessages\HttpBuildStartRequest.cs" />
     <Compile Include="HttpMessages\HttpDeployResultResponse.cs" />
     <Compile Include="HttpMessages\HttpDeployResultRequest.cs" />

@@ -16,7 +16,7 @@ namespace Photon.CLI.Internal
         public void Initialize()
         {
             var commonDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            var appDataPath = Path.Combine(commonDataPath, "Photon", "Server");
+            var appDataPath = Path.Combine(commonDataPath, "Photon", "CLI");
 
             var serverDefinitionsFilename = Path.Combine(appDataPath, "servers.json");
             Servers = File.Exists(serverDefinitionsFilename)

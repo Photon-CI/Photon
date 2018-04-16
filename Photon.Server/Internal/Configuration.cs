@@ -1,6 +1,6 @@
 ﻿using Photon.Library;
-using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Photon.Server.Internal
@@ -31,17 +31,26 @@ namespace Photon.Server.Internal
             var assembly = Assembly.GetExecutingAssembly();
             AssemblyPath = Path.GetDirectoryName(assembly.Location);
 
-            var _appData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            var defaultDirectory = Path.Combine(_appData, "Photon", "Server");
-
-            var _dir = ConfigurationReader.AppSetting("directory", defaultDirectory);
-            Directory = _dir == "." ? AssemblyPath : Path.GetFullPath(_dir);
+            var _dir = ConfigurationReader.AppSetting("directory", AssemblyPath);
+            Directory = Path.GetFullPath(GetRootDirectory(_dir));
         }
 
         private static string FullPath(params string[] paths)
         {
             var path = Path.Combine(paths);
             return Path.GetFullPath(path);
+        }
+
+        private static string GetRootDirectory(string path)
+        {
+            var pathParts = path.Split(Path.DirectorySeparatorChar).ToList();
+
+            if (pathParts.Count >= 1 && pathParts[0] == ".") {
+                pathParts[0] = AssemblyPath;
+                return Path.Combine(pathParts.ToArray());
+            }
+
+            return path;
         }
     }
 }

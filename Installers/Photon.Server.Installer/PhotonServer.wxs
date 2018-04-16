@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="Photon Server" Language="1033" Version="0.0.1" Manufacturer="Joshua Miller" UpgradeCode="1b9734e8-64b0-4035-9956-dc8e74a45c28">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon Server." />
+
+    <Media Id="1" Cabinet="Photon.Server.cab" EmbedCab="yes"/>
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of Photon Server is already installed." />
+
+		<Feature Id="Complete" Title="Photon Server" Description="Install Photon Server." Level="1" Display="expand" ConfigurableDirectory="INSTALLDIR">
+      <Feature Id="ServerExecutable" Title="Photon Server" Description="Photon Server application." Level="1">
+        <ComponentGroupRef Id="ProductComponents" />
+        <ComponentGroupRef Id="ServerTemplates" />
+      </Feature>
+		</Feature>
+
+    <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
+    <CustomAction Id="SetPhotonUrl" BinaryKey="ConfigTools" DllEntry="LoadServerUrl" Impersonate="yes" />
+
+    <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
+	  <CustomAction Id="LaunchServerConfiguration" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
+	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Server Configuration" />
+	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    
+	  <WixVariable Id="WixUILicenseRtf" Value="Content\gpl-3.0.rtf" />
+
+	  <UI>
+	    <UIRef Id="WixUI_InstallDir" />
+	    <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="SetPhotonUrl" Order="1">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+	    <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchServerConfiguration" Order="2">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+	  </UI>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+		  <Directory Id="CommonAppDataFolder">
+		    <Directory Id="CommonAppDataManufacturerFolder" Name="Photon">
+		      <Directory Id="INSTALLDIR" Name="Server">
+		        <Directory Id="InstallBin" Name="bin" />
+		      </Directory>
+		    </Directory>
+		  </Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
+			<Component Id="Product_Exe" Guid="*">
+		    <File Source="$(var.PhotonServer.TargetDir)PhotonServer.exe" />
+			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal"/>
+			  <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Server" Wait="yes" />
+      </Component>
+      <Component Id="Product_Config" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)PhotonServer.exe.config" />
+		  </Component>
+		  <Component Id="Product_PiServerLite" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)PiServerLite.dll" />
+		  </Component>
+		  <Component Id="Product_DataflowTpl" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)System.Threading.Tasks.Dataflow.dll" />
+		  </Component>
+		  <Component Id="Product_PhotonLib" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)Photon.Library.dll" />
+		  </Component>
+		  <Component Id="Product_PhotonFramework" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)Photon.Framework.dll" />
+		  </Component>
+		  <Component Id="Product_PhotonComm" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)Photon.Communication.dll" />
+		  </Component>
+		  <Component Id="Product_NewtonsoftJson" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)Newtonsoft.Json.dll" />
+		  </Component>
+		  <Component Id="Product_NewtonsoftBson" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)Newtonsoft.Json.Bson.dll" />
+		  </Component>
+		  <Component Id="Product_log4net" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)log4net.dll" />
+		  </Component>
+		  <Component Id="Product_ansiconsole" Guid="*">
+			  <File Source="$(var.PhotonServer.TargetDir)AnsiConsole.dll" />
+		  </Component>
+		</ComponentGroup>
+    <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
+      <Component Id="ServerConfigTemplate" Guid="5C49B3D6-11BE-4C51-8076-89AB38718A7F" NeverOverwrite="yes">
+        <File Source="$(var.ProjectDir)Content\server.json" KeyPath="yes" />
+      </Component>
+      <Component Id="ServerProjectTemplate" Guid="E058F72E-1161-4C53-A19C-3AFDA192D474" NeverOverwrite="yes">
+        <File Source="$(var.ProjectDir)Content\projects.json" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+	</Fragment>
+</Wix>

@@ -60,6 +60,8 @@ namespace Photon.Server
             Console.ResetColor();
 
             try {
+                Console.CancelKeyPress += Console_OnCancelKeyPress;
+
                 PhotonServer.Instance.Start();
 
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -99,6 +101,11 @@ namespace Photon.Server
 
                 return 2;
             }
+        }
+
+        private static void Console_OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            PhotonServer.Instance.Abort();
         }
     }
 }

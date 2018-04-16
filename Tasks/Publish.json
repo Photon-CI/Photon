@@ -1,0 +1,10 @@
+{
+	"project": "photon",
+	"assembly": "Photon.Publishing\\bin\\Debug\\Photon.Publishing.dll",
+    "preBuild": "bin\\msbuild.cmd \"Photon.Publishing\\Photon.Publishing.csproj\" /t:Rebuild /p:Configuration=Debug /p:Platform=\"Any CPU\" /p:OutputPath=\"bin\\Debug\" /v:m",
+	"refspec": "master",
+	"task": "PublishTask",
+	"roles": [
+		"build"
+	]
+}

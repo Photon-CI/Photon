@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Photon.Framework
+namespace Photon.Library
 {
     public static class FileUtils
     {
