@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.1")]
-[assembly: AssemblyFileVersion("0.0.1")]
+[assembly: AssemblyVersion("0.0.2")]
+[assembly: AssemblyFileVersion("0.0.2")]
 
 [assembly: AssemblyTitle("Photon Server")]
-[assembly: AssemblyDescription("Primary application for Photon.")]
+[assembly: AssemblyDescription("Primary service for Photon.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Joshua Miller")]
 [assembly: AssemblyProduct("Photon")]

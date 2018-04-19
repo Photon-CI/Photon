@@ -30,21 +30,21 @@ namespace Photon.NuGetPlugin
             sourceRepository = new SourceRepository(packageSource, providers);
         }
 
-        public async Task<Version[]> GetAllVersions(string packageId, CancellationToken token)
+        public async Task<string[]> GetAllVersions(string packageId, CancellationToken token)
         {
             var filter = new SearchFilter(true);
 
             var searchResource = await sourceRepository.GetResourceAsync<PackageSearchResource>(token);
             var searchMetadata = await searchResource.SearchAsync(packageId, filter, 0, 100, null, token);
 
-            var resultList = new List<Version>();
+            var resultList = new List<string>();
 
             foreach (var result in searchMetadata) {
                 if (!string.Equals(result.Identity.Id, packageId, StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 var versionList = (await result.GetVersionsAsync())
-                    .Select(resultVersion => resultVersion.Version.Version);
+                    .Select(resultVersion => resultVersion.Version.ToString());
 
                 resultList.AddRange(versionList);
             }

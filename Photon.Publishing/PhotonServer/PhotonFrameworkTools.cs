@@ -43,7 +43,7 @@ namespace Photon.Publishing.PhotonServer
             await PushPackage(currentVersion, token);
         }
 
-        private Version GetCurrentVersion()
+        private string GetCurrentVersion()
         {
             var binDirectory = Path.Combine(Context.ContentDirectory, "Photon.Framework", "bin", "Release");
             var assemblyFilename = Path.Combine(binDirectory, "Photon.Framework.dll");

@@ -13,7 +13,8 @@
       </Feature>
 		</Feature>
 
-	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Property Id="ADD_TO_PATH" Value="1" />
     
 	  <WixVariable Id="WixUILicenseRtf" Value="Content\gpl-3.0.rtf" />
 
@@ -36,10 +37,10 @@
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
-			<Component Id="Product_Exe" Guid="*">
+			<Component Id="Product_Exe" Guid="B9F36964-0494-485F-992D-BF7E5018FEF0">
 		    <File Source="$(var.PhotonCLI.TargetDir)PhotonCLI.exe" />
       </Component>
-      <Component Id="Product_Config" Guid="*">
+      <Component Id="Product_Config" Guid="0FAE7640-75F9-4F65-AA75-686175A5AE6F">
 			  <File Source="$(var.PhotonCLI.TargetDir)PhotonCLI.exe.config" />
 		  </Component>
 		  <Component Id="Product_DataflowTpl" Guid="*">
@@ -60,6 +61,11 @@
 		  <Component Id="Product_NewtonsoftBson" Guid="*">
 			  <File Source="$(var.PhotonCLI.TargetDir)Newtonsoft.Json.Bson.dll" />
 		  </Component>
+      <Component Id="Product_AddPath" Guid="CADB0AB5-BD9A-4BCC-B1A6-10C954C80DB2">
+        <CreateFolder />
+        <Environment Id="PATH" Name="PATH" Value="[InstallBin]" Permanent="no" Part="last" Action="set" System="yes" />
+        <Condition>ADD_TO_PATH = 1</Condition>
+      </Component>
 		</ComponentGroup>
 	</Fragment>
 </Wix>

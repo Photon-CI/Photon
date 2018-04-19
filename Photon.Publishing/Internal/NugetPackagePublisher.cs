@@ -14,7 +14,7 @@ namespace Photon.Publishing.Internal
         private readonly NuGetTools client;
 
         public string PackageId {get; set;}
-        public Version AssemblyVersion {get; set;}
+        public string AssemblyVersion {get; set;}
         public string PackageDirectory {get; set;}
         public string ProjectFile {get; set;}
         public string Configuration {get; set;}
@@ -35,13 +35,18 @@ namespace Photon.Publishing.Internal
 
         public async Task PublishAsync(CancellationToken token)
         {
+            context.Output
+                .Append("Updating Package ", ConsoleColor.DarkCyan)
+                .Append(PackageId, ConsoleColor.Cyan)
+                .AppendLine("...", ConsoleColor.DarkCyan);
+
             var versionList = await client.GetAllVersions(PackageId, token);
             var packageVersion = versionList.Any() ? versionList.Max() : null;
 
-            if (packageVersion != null && packageVersion >= AssemblyVersion) {
+            if (!HasUpdates(packageVersion, AssemblyVersion)) {
                 context.Output
-                    .Append($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkYellow)
-                    .AppendLine(packageVersion, ConsoleColor.Yellow);
+                    .Append($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
+                    .AppendLine(packageVersion, ConsoleColor.Blue);
 
                 return;
             }
@@ -57,6 +62,21 @@ namespace Photon.Publishing.Internal
                 $"\"{packageFile}\"",
                 $"-Source \"{Source}\"",
                 "-NonInteractive");
+
+            context.Output
+                .Append("Package ", ConsoleColor.DarkGreen)
+                .Append(PackageId, ConsoleColor.Green)
+                .AppendLine(" pushed successfully.", ConsoleColor.DarkGreen);
+        }
+
+        private static bool HasUpdates(string currentVersion, string newVersion)
+        {
+            if (string.IsNullOrEmpty(currentVersion)) return true;
+
+            var _current = new Version(currentVersion);
+            var _new = new Version(newVersion);
+
+            return _new > _current;
         }
     }
 }

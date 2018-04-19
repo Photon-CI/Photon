@@ -1,13 +1,12 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Diagnostics;
 
 namespace Photon.Framework.Tools
 {
     public static class AssemblyTools
     {
-        public static Version GetVersion(string assemblyInfoFilename)
+        public static string GetVersion(string assemblyInfoFilename)
         {
-            return AssemblyName.GetAssemblyName(assemblyInfoFilename).Version;
+            return FileVersionInfo.GetVersionInfo(assemblyInfoFilename).ProductVersion;
         }
     }
 }
