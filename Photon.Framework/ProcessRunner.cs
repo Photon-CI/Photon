@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Photon.Framework.Server;
@@ -17,10 +18,16 @@ namespace Photon.Framework
 
         public static ProcessResult Run(string workDir, string filename, string arguments, ScriptOutput output)
         {
-            var _file = Path.Combine(workDir, filename);
+            var parts = filename.Split(Path.DirectorySeparatorChar);
+            var firstPart = parts.FirstOrDefault();
+
+            if (firstPart == "." || firstPart == "..") {
+                filename = Path.Combine(workDir, filename);
+                filename = Path.GetFullPath(filename);
+            }
 
             var startInfo = new ProcessStartInfo {
-                FileName = _file,
+                FileName = filename,
                 Arguments = arguments,
                 WorkingDirectory = workDir,
                 UseShellExecute = false,

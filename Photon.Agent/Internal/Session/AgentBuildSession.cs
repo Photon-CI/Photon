@@ -1,7 +1,6 @@
 ﻿using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
-using Photon.Framework.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +26,7 @@ namespace Photon.Agent.Internal.Session
             LoadProjectAssembly();
         }
 
-        public override async Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId)
+        public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
             var context = new AgentBuildContext {
                 Project = Project,
@@ -40,9 +39,10 @@ namespace Photon.Agent.Internal.Session
                 BuildNumber = BuildNumber,
                 Output = Output.Writer,
                 Packages = PackageClient,
+                ServerVariables = ServerVariables,
             };
 
-            return await Domain.RunBuildTask(context);
+            await Domain.RunBuildTask(context);
         }
 
         private void LoadProjectSource()

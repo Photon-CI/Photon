@@ -9,8 +9,12 @@ using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using Photon.Framework.Variables;
 
 namespace Photon.Server.Internal
 {
@@ -27,10 +31,11 @@ namespace Photon.Server.Internal
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
-        public string WorkPath {get;}
+        //public string WorkPath {get;}
         public ProjectPackageManager ProjectPackages {get;}
         public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
+        public VariableSetCollection Variables {get;}
 
 
         public PhotonServer()
@@ -39,6 +44,7 @@ namespace Photon.Server.Internal
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();
+            Variables = new VariableSetCollection();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
@@ -52,7 +58,7 @@ namespace Photon.Server.Internal
                 MaxDegreeOfParallelism = Configuration.Parallelism,
             };
 
-            WorkPath = Configuration.WorkDirectory;
+            //WorkPath = Configuration.WorkDirectory;
         }
 
         public void Dispose()
@@ -68,6 +74,8 @@ namespace Photon.Server.Internal
         public void Start()
         {
             isStarted = true;
+
+            LoadVariables();
 
             // Load existing or default server configuration
             Definition = ParseServerDefinition() ?? new ServerDefinition {
@@ -138,6 +146,38 @@ namespace Photon.Server.Internal
             using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 return JsonSettings.Serializer.Deserialize<ServerDefinition>(stream);
             }
+        }
+
+        private void LoadVariables()
+        {
+            var filename = Path.Combine(Configuration.Directory, "variables.json");
+            var errorList = new List<Exception>();
+
+            if (File.Exists(filename)) {
+                try {
+                    Variables.GlobalJson = File.ReadAllText(filename);
+                }
+                catch (Exception error) {
+                    errorList.Add(error);
+                }
+            }
+
+            if (Directory.Exists(Configuration.VariablesDirectory)) {
+                var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
+                Parallel.ForEach(fileEnum, file => {
+                    var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
+
+                    try {
+                        var json = File.ReadAllText(file);
+                        Variables.JsonList[file_name] = json;
+                    }
+                    catch (Exception error) {
+                        errorList.Add(error);
+                    }
+                });
+            }
+
+            if (errorList.Any()) throw new AggregateException(errorList);
         }
 
         private void StartHttpServer()

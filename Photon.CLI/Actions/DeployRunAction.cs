@@ -1,5 +1,4 @@
-﻿using AnsiConsole;
-using Photon.CLI.Internal;
+﻿using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
 using Photon.Library.HttpMessages;

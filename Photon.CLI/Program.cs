@@ -1,9 +1,9 @@
-﻿using AnsiConsole;
-using Photon.CLI.Commands;
+﻿using Photon.CLI.Commands;
 using Photon.CLI.Internal;
 using Photon.Framework.Extensions;
 using System;
 using Photon.CLI.Internal.Http;
+
 #if DEBUG
 using System.Diagnostics;
 #endif

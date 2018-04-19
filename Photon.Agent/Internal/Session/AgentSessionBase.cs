@@ -4,7 +4,7 @@ using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
-using Photon.Framework.Tasks;
+using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.TcpMessages;
 using System;
@@ -35,6 +35,7 @@ namespace Photon.Agent.Internal.Session
         protected DomainPackageClient PackageClient {get;}
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
+        public VariableSetCollection ServerVariables {get; set;}
         protected ILog Log => _log.Value;
 
 
@@ -79,7 +80,7 @@ namespace Photon.Agent.Internal.Session
             });
         }
 
-        public abstract Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId);
+        public abstract Task RunTaskAsync(string taskName, string taskSessionId);
 
         public async Task ReleaseAsync()
         {

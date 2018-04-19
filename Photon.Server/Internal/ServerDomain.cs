@@ -1,7 +1,7 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Server;
-using Photon.Framework.Tasks;
 using Photon.Library.Session;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
@@ -13,11 +13,11 @@ namespace Photon.Server.Internal
             return Agent.GetDeployScripts();
         }
 
-        public async Task<TaskResult> RunDeployScript(IServerDeployContext context)
+        public async Task RunDeployScript(IServerDeployContext context, CancellationToken token)
         {
-            var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
+            var completeEvent = new RemoteTaskCompletionSource(token);
             Agent.RunDeployScript(context, completeEvent);
-            return await completeEvent.Task;
+            await completeEvent.Task;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Photon.Communication.Messages;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication
@@ -19,8 +20,9 @@ namespace Photon.Communication
             completionEvent = new TaskCompletionSource<IResponseMessage>();
         }
 
-        public async Task<IResponseMessage> GetResponseAsync()
+        public async Task<IResponseMessage> GetResponseAsync(CancellationToken token)
         {
+            token.Register(() => completionEvent.SetCanceled());
             var response = await completionEvent.Task;
 
             if (!(response?.Successful ?? false))
@@ -29,9 +31,15 @@ namespace Photon.Communication
             return response;
         }
 
-        public async Task<T> GetResponseAsync<T>()
+        public async Task<IResponseMessage> GetResponseAsync()
+        {
+            return await GetResponseAsync(CancellationToken.None);
+        }
+
+        public async Task<T> GetResponseAsync<T>(CancellationToken token)
             where T : class, IResponseMessage
         {
+            token.Register(() => completionEvent.SetCanceled());
             var response = await completionEvent.Task;
 
             if (!(response?.Successful ?? false))
@@ -41,6 +49,12 @@ namespace Photon.Communication
                 throw new Exception($"Unable to cast response type '{response.GetType().Name}' to '{typeof(T).Name}'!");
 
             return tResponse;
+        }
+
+        public async Task<T> GetResponseAsync<T>()
+            where T : class, IResponseMessage
+        {
+            return await GetResponseAsync<T>(CancellationToken.None);
         }
 
         internal void Complete(IResponseMessage message)

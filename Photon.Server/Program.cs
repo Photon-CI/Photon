@@ -105,7 +105,12 @@ namespace Photon.Server
 
         private static void Console_OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            PhotonServer.Instance.Abort();
+            try {
+                PhotonServer.Instance.Abort();
+            }
+            catch (Exception error) {
+                Log.Error("An error occurred while aborting the service!", error);
+            }
         }
     }
 }

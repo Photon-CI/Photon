@@ -1,9 +1,9 @@
 ﻿using Photon.Framework.Agent;
+using Photon.Framework.Tools;
 using Photon.NuGetPlugin;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,18 +13,21 @@ namespace Photon.Publishing.PhotonServer
     {
         private const string PackageId = "Photon.Framework";
 
+        private readonly NuGetTools client;
         public IAgentBuildContext Context {get;}
 
 
         public PhotonFrameworkTools(IAgentBuildContext context)
         {
             this.Context = context;
+
+            client = new NuGetTools(context);
         }
 
-        public async Task Publish()
+        public async Task Publish(CancellationToken token)
         {
             var currentVersion = GetCurrentVersion();
-            var latestVersion = await GetLatestVersionAsync();
+            var latestVersion = await GetLatestVersionAsync(token);
 
             if (currentVersion == null)
                 throw new ApplicationException("Unable to determine version of current assembly!");
@@ -37,27 +40,33 @@ namespace Photon.Publishing.PhotonServer
                 return;
             }
 
-            await PushPackage();
+            await PushPackage(currentVersion, token);
         }
 
         private Version GetCurrentVersion()
         {
             var binDirectory = Path.Combine(Context.ContentDirectory, "Photon.Framework", "bin", "Release");
-            var assemblyInfoFilename = Path.Combine(binDirectory, "Photon.Framework.dll");
-            var assemblyName = AssemblyName.GetAssemblyName(assemblyInfoFilename);
-            return assemblyName.Version;
+            var assemblyFilename = Path.Combine(binDirectory, "Photon.Framework.dll");
+            return AssemblyTools.GetVersion(assemblyFilename);
         }
 
-        private async Task<Version> GetLatestVersionAsync()
+        private async Task<Version> GetLatestVersionAsync(CancellationToken token)
         {
-            var client = new NuGetTools();
-            var versionList = await client.GetAllVersions(PackageId, CancellationToken.None);
-            return versionList.Max();
+            var versionList = await client.GetAllVersions(PackageId, token);
+            return versionList.Any() ? versionList.Max() : null;
         }
 
-        private async Task PushPackage()
+        private async Task PushPackage(Version version, CancellationToken token)
         {
-            throw new NotImplementedException();
+            var nuspecFilename = Path.Combine(Context.ContentDirectory, "Photon.Framework", "Photon.Framework.nuspec");
+            var packageFilename = Path.Combine(Context.WorkDirectory, $"Photon.Framework.{version}.nupkg");
+
+            client.Pack(nuspecFilename, packageFilename);
+
+            var globalVars = Context.ServerVariables.Global;
+            var apiKey = (Func<string, string>)(x => globalVars.GetValue<string>("nuget.apiKey"));
+
+            await client.PushAsync(packageFilename, apiKey, token);
         }
     }
 }

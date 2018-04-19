@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Server
@@ -27,7 +28,7 @@ namespace Photon.Framework.Server
         public async Task InitializeAsync()
         {
             var taskList = agentSessionList
-                .Select(x => x.BeginAsync())
+                .Select(x => x.BeginAsync(CancellationToken.None))
                 .ToArray();
 
             await Task.WhenAll(taskList);
@@ -38,7 +39,7 @@ namespace Photon.Framework.Server
             if (agentSessionList == null) return;
 
             var taskList = agentSessionList
-                .Select(x => x.ReleaseAsync())
+                .Select(x => x.ReleaseAsync(CancellationToken.None))
                 .ToArray();
 
             await Task.WhenAll(taskList);
@@ -51,7 +52,7 @@ namespace Photon.Framework.Server
             var taskList = new List<Task>();
             foreach (var task in taskNames) {
                 foreach (var session in agentSessionList) {
-                    taskList.Add(session.RunTaskAsync(task));
+                    taskList.Add(session.RunTaskAsync(task, CancellationToken.None));
                 }
             }
 

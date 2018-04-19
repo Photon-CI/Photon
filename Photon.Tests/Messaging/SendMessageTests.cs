@@ -6,11 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Tests.Messaging
 {
-    public class SendMessageTests : IntegrationTestFixture, IDisposable
+    [IntegrationTestFixture]
+    public class SendMessageTests : IDisposable
     {
         private const int Port = 10933;
 
@@ -39,7 +41,7 @@ namespace Photon.Tests.Messaging
         {
             listener.Listen(IPAddress.Any, Port);
 
-            await client.ConnectAsync("localhost", Port);
+            await client.ConnectAsync("localhost", Port, CancellationToken.None);
         }
 
         [OneTimeTearDown]

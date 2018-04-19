@@ -2,7 +2,6 @@
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
-using Photon.Framework.Tasks;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -20,7 +19,7 @@ namespace Photon.Server.Internal.Sessions
 
         protected override DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent)
         {
-            return new DomainAgentDeploySessionHost(this, agent);
+            return new DomainAgentDeploySessionHost(this, agent, TokenSource.Token);
         }
 
         public override async Task PrepareWorkDirectoryAsync()
@@ -33,7 +32,7 @@ namespace Photon.Server.Internal.Sessions
             ScriptName = metadata.ScriptName;
         }
 
-        public override async Task<TaskResult> RunAsync()
+        public override async Task RunAsync()
         {
             var assemblyFilename = Path.Combine(BinDirectory, AssemblyFilename);
             if (!File.Exists(assemblyFilename))
@@ -53,9 +52,10 @@ namespace Photon.Server.Internal.Sessions
                 Packages = PackageClient,
                 ConnectionFactory = ConnectionFactory,
                 Output = Output,
+                ServerVariables = Variables,
             };
 
-            return await Domain.RunDeployScript(context);
+            await Domain.RunDeployScript(context, TokenSource.Token);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Photon.Communication;
 using Photon.Framework.Pooling;
-using Photon.Framework.Tasks;
 using System;
 using System.Threading.Tasks;
 
@@ -13,6 +12,6 @@ namespace Photon.Agent.Internal.Session
 
         Task InitializeAsync();
         Task ReleaseAsync();
-        Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId);
+        Task RunTaskAsync(string taskName, string taskSessionId);
     }
 }

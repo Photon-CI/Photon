@@ -79,9 +79,6 @@
 		  <Component Id="Product_log4net" Guid="*">
 			  <File Source="$(var.PhotonServer.TargetDir)log4net.dll" />
 		  </Component>
-		  <Component Id="Product_ansiconsole" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)AnsiConsole.dll" />
-		  </Component>
 		</ComponentGroup>
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
       <Component Id="ServerConfigTemplate" Guid="5C49B3D6-11BE-4C51-8076-89AB38718A7F" NeverOverwrite="yes">

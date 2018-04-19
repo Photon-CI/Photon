@@ -34,7 +34,8 @@ namespace Photon.Server.Internal.Sessions
 
         public void Abort()
         {
-            throw new NotImplementedException();
+            foreach (var session in pool.Items)
+                session.Abort();
         }
 
         public void BeginSession(ServerSessionBase session)

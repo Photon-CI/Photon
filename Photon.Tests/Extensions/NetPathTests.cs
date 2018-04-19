@@ -4,7 +4,8 @@ using Photon.Tests.Internal;
 
 namespace Photon.Tests.Extensions
 {
-    public class NetPathTests : UnitTestFixture
+    [UnitTestFixture]
+    public class NetPathTests
     {
         [Test]
         public void JoinsNoSlash()

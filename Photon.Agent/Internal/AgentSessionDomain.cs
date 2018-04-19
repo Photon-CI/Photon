@@ -1,7 +1,7 @@
 ﻿using Photon.Framework.Agent;
 using Photon.Framework.Domain;
-using Photon.Framework.Tasks;
 using Photon.Library.Session;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal
@@ -18,46 +18,36 @@ namespace Photon.Agent.Internal
             return Agent.GetDeployTasks();
         }
 
-        public async Task<TaskResult> RunBuildTask(AgentBuildContext context)
+        public async Task RunBuildTask(AgentBuildContext context)
         {
-            //Sponsor.Register(context);
             Sponsor.Register(context.Output);
             Sponsor.Register(context.Packages);
 
-            TaskResult result;
             try {
-                var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
+                var completeEvent = new RemoteTaskCompletionSource<object>();
                 Agent.RunBuildTask(context, completeEvent);
-                result = await completeEvent.Task;
+                await completeEvent.Task;
             }
             finally {
                 Sponsor.Unregister(context.Packages);
                 Sponsor.Unregister(context.Output);
-                //Sponsor.Unregister(context);
             }
-
-            return result;
         }
 
-        public async Task<TaskResult> RunDeployTask(AgentDeployContext context)
+        public async Task RunDeployTask(AgentDeployContext context, CancellationToken token)
         {
-            //Sponsor.Register(context);
             Sponsor.Register(context.Output);
             Sponsor.Register(context.Packages);
 
-            TaskResult result;
             try {
-                var completeEvent = new RemoteTaskCompletionSource<TaskResult>();
+                var completeEvent = new RemoteTaskCompletionSource<object>();
                 Agent.RunDeployTask(context, completeEvent);
-                result = await completeEvent.Task;
+                await completeEvent.Task;
             }
             finally {
                 Sponsor.Unregister(context.Packages);
                 Sponsor.Unregister(context.Output);
-                //Sponsor.Unregister(context);
             }
-
-            return result;
         }
     }
 }

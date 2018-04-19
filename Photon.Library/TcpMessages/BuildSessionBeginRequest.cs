@@ -1,5 +1,6 @@
 ﻿using Photon.Communication.Messages;
 using Photon.Framework.Projects;
+using Photon.Framework.Variables;
 
 namespace Photon.Library.TcpMessages
 {
@@ -13,5 +14,6 @@ namespace Photon.Library.TcpMessages
         public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
         public int BuildNumber {get; set;}
+        public VariableSetCollection Variables {get; set;}
     }
 }

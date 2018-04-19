@@ -3,9 +3,9 @@ using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
-using Photon.Framework.Tasks;
 using System;
 using System.Runtime.Remoting.Lifetime;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
@@ -14,6 +14,7 @@ namespace Photon.Server.Internal.Sessions
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DomainAgentSessionHostBase));
 
+        protected readonly CancellationToken Token;
         private readonly ServerAgentDefinition agent;
         private readonly ClientSponsor sponsor;
         public DomainAgentSessionClient SessionClient {get;}
@@ -24,9 +25,10 @@ namespace Photon.Server.Internal.Sessions
         public string SessionClientId => SessionClient.Id;
 
 
-        protected DomainAgentSessionHostBase(IServerSession sessionBase, ServerAgentDefinition agent)
+        protected DomainAgentSessionHostBase(IServerSession sessionBase, ServerAgentDefinition agent, CancellationToken token)
         {
             this.agent = agent;
+            this.Token = token;
 
             Tasks = new TaskRunnerManager();
 
@@ -58,18 +60,19 @@ namespace Photon.Server.Internal.Sessions
 
         protected abstract void OnSessionOutput(string text);
 
-        private void SessionClient_OnSessionBegin(RemoteTaskCompletionSource<object> taskHandle)
+        private void SessionClient_OnSessionBegin(RemoteTaskCompletionSource taskHandle)
         {
             Task.Run(async () => {
-                await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort);
+                await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
                 await OnBeginSession();
 
                 Tasks.Start();
                 return (object)null;
-            }).ContinueWith(taskHandle.FromTask);
+            }, Token)
+                .ContinueWith(taskHandle.FromTask, Token);
         }
 
-        private void SessionClient_OnSessionRelease(RemoteTaskCompletionSource<object> taskHandle)
+        private void SessionClient_OnSessionRelease(RemoteTaskCompletionSource taskHandle)
         {
             Task.Run(async () => {
                 Tasks.Stop();
@@ -87,12 +90,11 @@ namespace Photon.Server.Internal.Sessions
 
                     await MessageClient.DisconnectAsync();
                 }
-
-                return (object)null;
-            }).ContinueWith(taskHandle.FromTask);
+            }, Token)
+                .ContinueWith(taskHandle.FromTask, Token);
         }
 
-        private void SessionClient_OnSessionRunTask(string taskName, RemoteTaskCompletionSource<TaskResult> taskHandle)
+        private void SessionClient_OnSessionRunTask(string taskName, RemoteTaskCompletionSource taskHandle)
         {
             Task.Run(async () => {
                 var runner = new TaskRunner(MessageClient, AgentSessionId);
@@ -102,8 +104,9 @@ namespace Photon.Server.Internal.Sessions
 
                 Tasks.Add(runner);
 
-                return await runner.Run(taskName);
-            }).ContinueWith(taskHandle.FromTask);
+                await runner.Run(taskName, Token);
+            }, Token)
+                .ContinueWith(taskHandle.FromTask, Token);
         }
 
         private void MessageClient_OnThreadException(object sender, UnhandledExceptionEventArgs e)

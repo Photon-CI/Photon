@@ -1,6 +1,5 @@
 ﻿using Photon.Framework;
 using Photon.Framework.Projects;
-using Photon.Framework.Tasks;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
@@ -16,7 +15,7 @@ namespace Photon.Server.Internal.Sessions
         public int BuildNumber {get; set;}
 
 
-        public override async Task<TaskResult> RunAsync()
+        public override async Task RunAsync()
         {
             var context = new ServerBuildContext {
                 Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
@@ -31,23 +30,24 @@ namespace Photon.Server.Internal.Sessions
                 Packages = PackageClient,
                 ConnectionFactory = ConnectionFactory,
                 Output = Output,
+                ServerVariables = Variables,
             };
 
             using (var sessionHandle = context.RegisterAnyAgent(Roles)) {
                 try {
-                    await sessionHandle.BeginAsync();
+                    await sessionHandle.BeginAsync(TokenSource.Token);
 
-                    return await sessionHandle.RunTaskAsync(TaskName);
+                    await sessionHandle.RunTaskAsync(TaskName, TokenSource.Token);
                 }
                 finally {
-                    await sessionHandle.ReleaseAsync();
+                    await sessionHandle.ReleaseAsync(TokenSource.Token);
                 }
             }
         }
 
         protected override DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent)
         {
-            return new DomainAgentBuildSessionHost(this, agent);
+            return new DomainAgentBuildSessionHost(this, agent, TokenSource.Token);
         }
     }
 }

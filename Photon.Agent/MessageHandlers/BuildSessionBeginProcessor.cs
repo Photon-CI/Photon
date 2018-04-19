@@ -17,6 +17,7 @@ namespace Photon.Agent.MessageHandlers
                 PreBuild = requestMessage.PreBuild,
                 GitRefspec = requestMessage.GitRefspec,
                 BuildNumber = requestMessage.BuildNumber,
+                ServerVariables = requestMessage.Variables,
             };
 
             PhotonAgent.Instance.Sessions.BeginSession(session);

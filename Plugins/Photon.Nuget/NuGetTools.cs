@@ -1,8 +1,12 @@
 ﻿using NuGet.Configuration;
+using NuGet.Packaging;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using Photon.Framework.Domain;
+using Photon.Framework.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,11 +15,14 @@ namespace Photon.NuGetPlugin
 {
     public class NuGetTools
     {
+        private readonly IDomainContext context;
         private readonly SourceRepository sourceRepository;
 
 
-        public NuGetTools()
+        public NuGetTools(IDomainContext context)
         {
+            this.context = context;
+
             var providers = new List<Lazy<INuGetResourceProvider>>();
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
             //providers.AddRange(Repository.Provider.GetCoreV2());  // Add v2 API support
@@ -45,17 +52,55 @@ namespace Photon.NuGetPlugin
             return resultList.ToArray();
         }
 
-        public async Task PushAsync(string packageFilename, CancellationToken token)
+        public void Pack(string nuspecFilename, string packageFilename)
         {
-            //var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            //var nugetPath = Path.Combine(appDataPath, "NuGet");
-            //var settings = Settings.LoadDefaultSettings(nugetPath);
+            Manifest nuspec;
+            try {
+                using (var nuspecStream = File.Open(nuspecFilename, FileMode.Open, FileAccess.Read)) {
+                    nuspec = Manifest.ReadFrom(nuspecStream, true);
+                }
+            }
+            catch (FileNotFoundException) {
+                context.Output.AppendLine($"Package definition '{nuspecFilename}' not found!", ConsoleColor.DarkYellow);
+                throw;
+            }
+            catch (Exception error) {
+                context.Output.AppendLine($"Failed to load package definition '{nuspecFilename}'! {error.UnfoldMessages()}", ConsoleColor.DarkRed);
+                throw;
+            }
 
-            var apiKey = (Func<string, string>)(x => "?");
-            var symbolApiKey = (Func<string, string>)(x => null);
+            context.Output.AppendLine($"Creating package '{packageFilename}'...", ConsoleColor.DarkCyan);
 
-            var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
-            await updateResource.Push(packageFilename, null, 60, false, apiKey, symbolApiKey, null);
+            try {
+                var builder = new PackageBuilder();
+                builder.Populate(nuspec.Metadata);
+
+                using (var packageStream = File.Open(packageFilename, FileMode.Create, FileAccess.Write)) {
+                    builder.Save(packageStream);
+                }
+
+                context.Output.AppendLine($"Package '{packageFilename}' created successfully.", ConsoleColor.DarkGreen);
+            }
+            catch (Exception error) {
+                context.Output.AppendLine($"Failed to create package '{packageFilename}'! {error.UnfoldMessages()}", ConsoleColor.DarkRed);
+                throw;
+            }
+        }
+
+        public async Task PushAsync(string packageFilename, Func<string, string> apiKeyFunc, CancellationToken token)
+        {
+            context.Output.AppendLine($"Pushing package '{packageFilename}'...", ConsoleColor.DarkCyan);
+
+            try {
+                var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
+                await updateResource.Push(packageFilename, null, 60, false, apiKeyFunc, null, null);
+
+                context.Output.AppendLine($"Package '{packageFilename}' pushed successfully.", ConsoleColor.DarkGreen);
+            }
+            catch (Exception error) {
+                context.Output.AppendLine($"Failed to push package '{packageFilename}'! {error.UnfoldMessages()}", ConsoleColor.DarkRed);
+                throw;
+            }
         }
     }
 }

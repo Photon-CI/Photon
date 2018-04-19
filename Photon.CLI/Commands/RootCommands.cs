@@ -1,5 +1,4 @@
-﻿using AnsiConsole;
-using Photon.CLI.Internal;
+﻿using Photon.CLI.Internal;
 using Photon.Library.Commands;
 using System.Threading.Tasks;
 

@@ -112,15 +112,17 @@ namespace Photon.Server.Internal
                     session.Output
                         .AppendLine("Running script...", ConsoleColor.DarkCyan);
 
-                    result = await session.RunAsync();
+                    await session.RunAsync();
+                    result = TaskResult.Ok();
                 }
                 catch (Exception error) {
+                    result = TaskResult.Error(error);
+                    errorList.Add(error);
+                    //abort = true;
+
                     session.Output
                         .Append("Script Failed! ", ConsoleColor.DarkRed)
                         .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
-
-                    //abort = true;
-                    errorList.Add(error);
                 }
             }
 

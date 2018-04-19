@@ -1,10 +1,10 @@
 ﻿using Photon.Communication;
 using Photon.Framework.Agent;
 using Photon.Framework.Packages;
-using Photon.Framework.Tasks;
 using Photon.Library.TcpMessages;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Session
@@ -79,7 +79,7 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        public override async Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId)
+        public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
             var context = new AgentDeployContext {
                 Project = Project,
@@ -93,9 +93,10 @@ namespace Photon.Agent.Internal.Session
                 ApplicationsDirectory = ApplicationsDirectory,
                 Output = Output.Writer,
                 Packages = PackageClient,
+                ServerVariables = ServerVariables,
             };
 
-            return await Domain.RunDeployTask(context);
+            await Domain.RunDeployTask(context, CancellationToken.None);
         }
     }
 }
