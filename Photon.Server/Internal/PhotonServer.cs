@@ -73,6 +73,7 @@ namespace Photon.Server.Internal
 
         public void Start()
         {
+            if (isStarted) throw new Exception("Server has already been started!");
             isStarted = true;
 
             LoadVariables();

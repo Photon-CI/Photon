@@ -14,6 +14,7 @@ namespace Photon.Framework.Domain
         string BinDirectory {get;}
         ScriptOutput Output {get;}
         VariableSetCollection ServerVariables {get;}
+        VariableSetCollection AgentVariables {get;}
 
         void RunCommandLine(string command);
         void RunCommandLine(string command, params string[] args);

@@ -20,6 +20,7 @@ namespace Photon.Framework.Domain
         public ScriptOutput Output {get; set;}
         public DomainPackageClient Packages {get; set;}
         public VariableSetCollection ServerVariables {get; set;}
+        public VariableSetCollection AgentVariables {get; set;}
 
 
         public void RunCommandLine(string command)

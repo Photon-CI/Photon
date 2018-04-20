@@ -11,7 +11,7 @@ namespace Photon.Framework.Variables
         public Dictionary<string, string> JsonList {get;}
         public string GlobalJson {get; set;}
 
-        public VariableSet Global => new VariableSet(GlobalJson);
+        public VariableSet Global => CreateSet(GlobalJson);
 
 
         public VariableSetCollection()

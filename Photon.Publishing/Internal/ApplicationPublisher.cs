@@ -29,7 +29,7 @@ namespace Photon.Publishing.Internal
             this.context = context;
         }
 
-        public async Task PublishAsync(string packageName, string fileName)
+        public async Task PublishAsync(string packageName, string packageId)
         {
             context.Output
                 .Append("Updating Application ", ConsoleColor.DarkCyan)
@@ -58,14 +58,17 @@ namespace Photon.Publishing.Internal
             // Publish
 
             // Create ZIP
-            var zipFilename = Path.Combine(PackagePath, $"{packageName}.zip");
+            if (!Directory.Exists(PackagePath))
+                Directory.CreateDirectory(PackagePath);
+
+            var zipFilename = Path.Combine(PackagePath, $"{packageId}.zip");
             await CreateZip(BinPath, zipFilename);
 
             // Create Version Directory
             await CreateWebPath(assemblyVersion);
 
-            var webMsiName = $"{fileName}.{assemblyVersion}.msi";
-            var webZipName = $"{fileName}.{assemblyVersion}.zip";
+            var webMsiName = $"{packageId}.{assemblyVersion}.msi";
+            var webZipName = $"{packageId}.{assemblyVersion}.zip";
             var msiWebUrl = NetPath.Combine(UploadPath, assemblyVersion, webMsiName);
             var zipWebUrl = NetPath.Combine(UploadPath, assemblyVersion, webZipName);
 
@@ -198,7 +201,7 @@ namespace Photon.Publishing.Internal
             var path_abs = Path.GetFullPath(sourcePath);
 
             using (var stream = File.Open(filename, FileMode.Create, FileAccess.Write))
-            using (var archive = new ZipArchive(stream)) {
+            using (var archive = new ZipArchive(stream, ZipArchiveMode.Create)) {
                 foreach (var file in Directory.EnumerateFiles(path_abs, "*.*", SearchOption.AllDirectories)) {
                     var localName = file;
 

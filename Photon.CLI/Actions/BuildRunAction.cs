@@ -48,6 +48,19 @@ namespace Photon.CLI.Actions
             }
 
             Result = await GetResult(server, sessionId);
+
+            if (Result.Result?.Successful ?? false) {
+                ConsoleEx.Out.WriteLine("Build completed successfully.", ConsoleColor.DarkGreen);
+            }
+            else if (Result.Result?.Cancelled ?? false) {
+                ConsoleEx.Out.WriteLine("Build cancelled.", ConsoleColor.DarkYellow);
+            }
+            else {
+                ConsoleEx.Out.WriteLine("Build failed!", ConsoleColor.Red);
+
+                if (!string.IsNullOrEmpty(Result.Result?.Message))
+                    ConsoleEx.Out.WriteLine(Result.Result.Message, ConsoleColor.DarkRed);
+            }
         }
 
         private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server)

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="Photon Server" Language="1033" Version="0.0.1" Manufacturer="Joshua Miller" UpgradeCode="1b9734e8-64b0-4035-9956-dc8e74a45c28">
+  <?define EXE=$(var.PhotonServer.TargetFileName)?>
+  <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
+  <Product Id="*" Name="Photon Server $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="1b9734e8-64b0-4035-9956-dc8e74a45c28">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon Server." />
 
     <Media Id="1" Cabinet="Photon.Server.cab" EmbedCab="yes"/>
@@ -47,12 +49,12 @@
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
-			<Component Id="Product_Exe" Guid="*">
+			<Component Id="Product_Exe" Guid="46A2F17D-1100-45F5-87F1-C81DDE3D39A3">
 		    <File Source="$(var.PhotonServer.TargetDir)PhotonServer.exe" />
 			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal"/>
 			  <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Server" Wait="yes" />
       </Component>
-      <Component Id="Product_Config" Guid="*">
+      <Component Id="Product_Config" Guid="DC3003A3-9558-4E52-9806-6C09DD09527F">
 			  <File Source="$(var.PhotonServer.TargetDir)PhotonServer.exe.config" />
 		  </Component>
 		  <Component Id="Product_PiServerLite" Guid="*">
@@ -81,10 +83,10 @@
 		  </Component>
 		</ComponentGroup>
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
-      <Component Id="ServerConfigTemplate" Guid="5C49B3D6-11BE-4C51-8076-89AB38718A7F" NeverOverwrite="yes">
+      <Component Id="ServerConfigTemplate" Guid="">
         <File Source="$(var.ProjectDir)Content\server.json" KeyPath="yes" />
       </Component>
-      <Component Id="ServerProjectTemplate" Guid="E058F72E-1161-4C53-A19C-3AFDA192D474" NeverOverwrite="yes">
+      <Component Id="ServerProjectTemplate" Guid="">
         <File Source="$(var.ProjectDir)Content\projects.json" KeyPath="yes" />
       </Component>
     </ComponentGroup>

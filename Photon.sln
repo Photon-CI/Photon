@@ -37,6 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Publishing", "Photon
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E05F3184-6762-4786-84B0-A592BB8EFE55}"
 	ProjectSection(SolutionItems) = preProject
+		Tasks\Build.json = Tasks\Build.json
 		Tasks\Publish.json = Tasks\Publish.json
 	EndProjectSection
 EndProject

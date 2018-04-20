@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="Photon CLI" Language="1033" Version="0.0.1" Manufacturer="Joshua Miller" UpgradeCode="1487B751-2679-414F-9A00-D814DA938C62">
+  <?define EXE=$(var.PhotonCLI.TargetFileName)?>
+  <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
+	<Product Id="*" Name="Photon CLI $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="1487B751-2679-414F-9A00-D814DA938C62">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon CLI." />
 
     <Media Id="1" Cabinet="Photon.CLI.cab" EmbedCab="yes"/>

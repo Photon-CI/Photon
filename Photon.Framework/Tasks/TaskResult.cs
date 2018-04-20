@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Extensions;
+using System;
 
 namespace Photon.Framework.Tasks
 {
@@ -42,7 +43,7 @@ namespace Photon.Framework.Tasks
             return new TaskResult {
                 Successful = false,
                 Cancelled = false,
-                Message = error?.Message ?? "Error!",
+                Message = error?.UnfoldMessages(),
             };
         }
     }

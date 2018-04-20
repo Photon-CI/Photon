@@ -13,6 +13,7 @@ namespace Photon.Publishing.Internal
         private readonly IDomainContext context;
         private readonly NuGetTools client;
 
+        public string NugetExe {get; set;}
         public string PackageId {get; set;}
         public string AssemblyVersion {get; set;}
         public string PackageDirectory {get; set;}
@@ -20,12 +21,14 @@ namespace Photon.Publishing.Internal
         public string Configuration {get; set;}
         public string Platform {get; set;}
         public string Source {get; set;}
+        public string ApiKey {get; set;}
 
 
         public NugetPackagePublisher(IDomainContext context)
         {
             this.context = context;
 
+            NugetExe = "nuget";
             Source = "https://www.nuget.org/api/v2/package";
             Configuration = "Release";
             Platform = "AnyCPU";
@@ -53,15 +56,16 @@ namespace Photon.Publishing.Internal
 
             var packageFile = Path.Combine(PackageDirectory, $"{PackageId}.*.nupkg");
 
-            await context.RunCommandLineAsync("nuget", "pack",
+            await context.RunCommandLineAsync(NugetExe, "pack",
                 $"\"{ProjectFile}\"",
                 $"-Prop \"Configuration={Configuration};Platform={Platform}\"",
                 $"-OutputDirectory \"{PackageDirectory}\"");
 
-            await context.RunCommandLineAsync("nuget", "push",
+            await context.RunCommandLineAsync(NugetExe, "push",
                 $"\"{packageFile}\"",
                 $"-Source \"{Source}\"",
-                "-NonInteractive");
+                "-NonInteractive",
+                $"-ApiKey \"{ApiKey}\"");
 
             context.Output
                 .Append("Package ", ConsoleColor.DarkGreen)
