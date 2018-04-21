@@ -1,14 +1,19 @@
-﻿using Photon.Agent.Internal;
+﻿using log4net;
+using Photon.Agent.Internal;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Library.TcpMessages;
+using System;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {
     public class BuildSessionBeginProcessor : MessageProcessorBase<BuildSessionBeginRequest>
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(BuildSessionBeginProcessor));
+
+
         public override async Task<IResponseMessage> Process(BuildSessionBeginRequest requestMessage)
         {
             var session = new AgentBuildSession(Transceiver, requestMessage.ServerSessionId, requestMessage.SessionClientId) {
@@ -29,9 +34,10 @@ namespace Photon.Agent.MessageHandlers
                     AgentSessionId = session.SessionId,
                 };
             }
-            catch {
+            catch (Exception error) {
+                Log.Error("Failed to initialize Build Session!", error);
                 await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(session.SessionId);
-                throw;
+                throw new ApplicationException("Failed to initialize Build Session!", error);
             }
         }
     }

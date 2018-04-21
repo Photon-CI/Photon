@@ -35,6 +35,14 @@ namespace Photon.Agent.Internal.Git
             using (var repo = new Repository(Source.RepositoryPath)) {
                 var branch = repo.Branches[refspec];
 
+                if (branch == null) {
+                    output.Write("Git Refspec ", ConsoleColor.DarkYellow)
+                        .Write(refspec, ConsoleColor.Yellow)
+                        .WriteLine(" was not found!", ConsoleColor.DarkYellow);
+                    
+                    throw new ApplicationException($"Git Refspec '{refspec}' was not found!");
+                }
+
                 if (branch.IsRemote) {
                     var local_branch = repo.CreateBranch(branch.FriendlyName, branch.Tip);
                     repo.Branches.Update(local_branch, b => b.TrackedBranch = branch.CanonicalName);
