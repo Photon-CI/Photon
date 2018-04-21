@@ -17,6 +17,7 @@ namespace Photon.Agent.MessageHandlers
                 Project = null, // TODO: Store ProjectId in package
                 ProjectPackageId = requestMessage.ProjectPackageId,
                 ProjectPackageVersion = requestMessage.ProjectPackageVersion,
+                ServerVariables = requestMessage.Variables,
             };
 
             PhotonAgent.Instance.Sessions.BeginSession(session);

@@ -1,11 +1,12 @@
 ﻿using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
-using Photon.Framework.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using Photon.Agent.Internal.Git;
 
 namespace Photon.Agent.Internal.Session
 {
@@ -27,7 +28,7 @@ namespace Photon.Agent.Internal.Session
             LoadProjectAssembly();
         }
 
-        public override async Task<TaskResult> RunTaskAsync(string taskName, string taskSessionId)
+        public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
             var context = new AgentBuildContext {
                 Project = Project,
@@ -40,9 +41,11 @@ namespace Photon.Agent.Internal.Session
                 BuildNumber = BuildNumber,
                 Output = Output.Writer,
                 Packages = PackageClient,
+                ServerVariables = ServerVariables,
+                AgentVariables = PhotonAgent.Instance.Variables,
             };
 
-            return await Domain.RunBuildTask(context);
+            await Domain.RunBuildTask(context);
         }
 
         private void LoadProjectSource()
@@ -57,13 +60,42 @@ namespace Photon.Agent.Internal.Session
             }
 
             if (string.Equals(sourceType, "git")) {
-                Output.WriteLine("Cloning Git Repository '...' to work content directory.", ConsoleColor.DarkCyan);
+                Output.WriteLine($"Cloning Git Repository '{Project.SourceUrl}' to work content directory.", ConsoleColor.DarkCyan);
 
-                // TODO: Load Repository
-                throw new NotImplementedException();
+                RepositoryHandle handle = null;
+                try {
+                    handle = GetRepositoryHandle(Project.SourceUrl, TimeSpan.FromMinutes(1))
+                        .GetAwaiter().GetResult();
+
+                    handle.Checkout(Output, GitRefspec);
+
+                    Output.WriteLine("Copying repository to work content directory.", ConsoleColor.DarkCyan);
+                    CopyDirectory(handle.Source.RepositoryPath, ContentDirectory);
+                    Output.WriteLine("Copy completed successfully.", ConsoleColor.DarkGreen);
+                }
+                finally {
+                    handle?.Dispose();
+                }
+                return;
             }
 
             throw new ApplicationException($"Unknown source type '{sourceType}'!");
+        }
+
+        private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout)
+        {
+            var repositorySource = PhotonAgent.Instance.RepositorySources.GetOrCreate(url);
+
+            using (var startTokenSource = new CancellationTokenSource(timeout)) {
+                while (!startTokenSource.IsCancellationRequested) {
+                    if (repositorySource.TryBegin(out var handle))
+                        return handle;
+
+                    await Task.Delay(200, startTokenSource.Token);
+                }
+            }
+
+            throw new TimeoutException("A timeout occurred waiting for the repository.");
         }
 
         private void LoadProjectAssembly()
@@ -71,17 +103,17 @@ namespace Photon.Agent.Internal.Session
             var errorList = new Lazy<List<Exception>>();
             var abort = false;
 
-            var preBuildCommand = PreBuild;
-            if (!string.IsNullOrWhiteSpace(preBuildCommand)) {
-                Output.WriteLine("Running Pre-Build Command...", ConsoleColor.DarkCyan);
+            var preBuildScript = PreBuild;
+            if (!string.IsNullOrWhiteSpace(preBuildScript)) {
+                Output.WriteLine("Running Pre-Build Script...", ConsoleColor.DarkCyan);
 
                 try {
-                    RunCommandLine(preBuildCommand);
+                    RunCommandScript(preBuildScript);
                 }
                 catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script Pre-Build command failed! [{SessionId}]", error));
+                    errorList.Value.Add(new ApplicationException($"Script Pre-Build failed! [{SessionId}]", error));
                     //Log.Error($"Script Pre-Build command failed! [{Id}]", error);
-                    Output.WriteLine($"An error occurred while executing the script Pre-Build command! {error.Message} [{SessionId}]", ConsoleColor.DarkYellow);
+                    Output.WriteLine($"An error occurred while executing the Pre-Build script! {error.Message} [{SessionId}]", ConsoleColor.DarkYellow);
                     abort = true;
                 }
             }
@@ -126,6 +158,12 @@ namespace Photon.Agent.Internal.Session
 
         private void CopyDirectory(string sourcePath, string destPath)
         {
+            if (string.IsNullOrEmpty(sourcePath))
+                throw new ArgumentNullException(nameof(sourcePath));
+
+            if (string.IsNullOrEmpty(destPath))
+                throw new ArgumentNullException(nameof(destPath));
+
             foreach (var path in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories)) {
                 var newPath = path.Replace(sourcePath, destPath);
                 Directory.CreateDirectory(newPath);
@@ -143,8 +181,9 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        protected void RunCommandLine(string command)
+        protected void RunCommandScript(string filename)
         {
+            var command = $"cmd.exe /c \"{filename}\"";
             var result = ProcessRunner.Run(ContentDirectory, command, Output.Writer);
 
             if (result.ExitCode != 0)

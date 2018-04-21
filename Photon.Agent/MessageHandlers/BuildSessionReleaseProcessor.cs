@@ -12,9 +12,7 @@ namespace Photon.Agent.MessageHandlers
         {
             await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
 
-            return new BuildSessionReleaseResponse {
-                Successful = true,
-            };
+            return new BuildSessionReleaseResponse();
         }
     }
 }

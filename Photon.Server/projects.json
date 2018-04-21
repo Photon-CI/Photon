@@ -4,6 +4,13 @@
     "name": "Photon Sample",
     "description": "Photon sample application for Build and Deploy scripts.",
     "sourceType": "fs",
-    "sourcePath": "Z:\\Photon.Sample",
+    "sourcePath": "Z:\\Photon.Sample"
+  },
+  {
+    "id": "photon",
+    "name": "Photon",
+    "description": "Photon builds, tests, and publishes itself!",
+    "sourceType": "fs",
+    "sourcePath": "Z:\\Photon"
   }
 ]

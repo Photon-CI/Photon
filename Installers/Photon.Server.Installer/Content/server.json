@@ -1,0 +1,15 @@
+{
+  "name": "Photon Server",
+  "http": {
+    "host": "localhost",
+    "port": 8082,
+    "path": "/photon/server"
+  },
+  "agents":  [
+    {
+      "name":  "Default Photon Agent",
+      "tcpHost":  "localhost",
+      "tcpPort":  8083 
+    }
+  ] 
+}

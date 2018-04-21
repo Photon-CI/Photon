@@ -9,8 +9,12 @@ using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using Photon.Framework.Variables;
 
 namespace Photon.Server.Internal
 {
@@ -27,10 +31,11 @@ namespace Photon.Server.Internal
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
-        public string WorkPath {get;}
+        //public string WorkPath {get;}
         public ProjectPackageManager ProjectPackages {get;}
         public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
+        public VariableSetCollection Variables {get;}
 
 
         public PhotonServer()
@@ -39,6 +44,7 @@ namespace Photon.Server.Internal
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();
+            Variables = new VariableSetCollection();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
@@ -52,13 +58,14 @@ namespace Photon.Server.Internal
                 MaxDegreeOfParallelism = Configuration.Parallelism,
             };
 
-            WorkPath = Configuration.WorkDirectory;
+            //WorkPath = Configuration.WorkDirectory;
         }
 
         public void Dispose()
         {
             if (isStarted) Stop();
 
+            Queue?.Dispose();
             Sessions?.Dispose();
             receiver?.Dispose();
             receiver = null;
@@ -66,13 +73,16 @@ namespace Photon.Server.Internal
 
         public void Start()
         {
+            if (isStarted) throw new Exception("Server has already been started!");
             isStarted = true;
+
+            LoadVariables();
 
             // Load existing or default server configuration
             Definition = ParseServerDefinition() ?? new ServerDefinition {
                 Http = {
                     Host = "localhost",
-                    Port = 8088,
+                    Port = 8082,
                     Path = "/photon/server",
                 },
             };
@@ -107,6 +117,20 @@ namespace Photon.Server.Internal
             }
         }
 
+        public void Abort()
+        {
+            Queue.Abort();
+            Sessions.Abort();
+
+            try {
+                receiver?.Dispose();
+                receiver = null;
+            }
+            catch (Exception error) {
+                Log.Error("Failed to stop HTTP Receiver!", error);
+            }
+        }
+
         private ServerDefinition ParseServerDefinition()
         {
             var file = Configuration.ServerFile ?? "server.json";
@@ -125,6 +149,38 @@ namespace Photon.Server.Internal
             }
         }
 
+        private void LoadVariables()
+        {
+            var filename = Path.Combine(Configuration.Directory, "variables.json");
+            var errorList = new List<Exception>();
+
+            if (File.Exists(filename)) {
+                try {
+                    Variables.GlobalJson = File.ReadAllText(filename);
+                }
+                catch (Exception error) {
+                    errorList.Add(error);
+                }
+            }
+
+            if (Directory.Exists(Configuration.VariablesDirectory)) {
+                var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
+                Parallel.ForEach(fileEnum, file => {
+                    var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
+
+                    try {
+                        var json = File.ReadAllText(file);
+                        Variables.JsonList[file_name] = json;
+                    }
+                    catch (Exception error) {
+                        errorList.Add(error);
+                    }
+                });
+            }
+
+            if (errorList.Any()) throw new AggregateException(errorList);
+        }
+
         private void StartHttpServer()
         {
             var context = new HttpReceiverContext {
@@ -138,8 +194,8 @@ namespace Photon.Server.Internal
                 },
             };
 
-            var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
-            context.Views.AddFolderFromExternal(viewPath);
+            var assembly = Assembly.GetExecutingAssembly();
+            context.Views.AddAllFromAssembly(assembly, "Photon.Server.Views");
 
             var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
 
@@ -156,7 +212,7 @@ namespace Photon.Server.Internal
             try {
                 receiver.Start();
 
-                Log.Info($"HTTP Server listening at http://{httpPrefix}");
+                Log.Info($"HTTP Server listening at {httpPrefix}");
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);

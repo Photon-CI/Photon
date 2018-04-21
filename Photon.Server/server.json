@@ -2,7 +2,7 @@
   "name": "Photon Server",
   "http": {
     "host": "localhost",
-    "port": 8088,
+    "port": 8082,
     "path": "/photon/server"
   },
   "agents": [
@@ -10,7 +10,7 @@
       "name": "Build Agent",
       "url": "http://localhost/photon/build",
       "tcpHost": "localhost",
-      "tcpPort": 10933,
+      "tcpPort": 8083,
       "roles": [
         "build",
         "deploy.web",
@@ -20,7 +20,7 @@
       "name": "Deploy Agent",
       "url": "http://localhost/photon/deploy",
       "tcpHost": "localhost",
-      "tcpPort": 10934,
+      "tcpPort": 8083,
       "roles": [
         "deploy"
       ]

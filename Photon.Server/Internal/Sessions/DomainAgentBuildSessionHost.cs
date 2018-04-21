@@ -1,5 +1,6 @@
 ﻿using Photon.Framework;
 using Photon.Library.TcpMessages;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
@@ -9,7 +10,7 @@ namespace Photon.Server.Internal.Sessions
         private readonly ServerBuildSession session;
 
 
-        public DomainAgentBuildSessionHost(ServerBuildSession session, ServerAgentDefinition agent) : base(session, agent)
+        public DomainAgentBuildSessionHost(ServerBuildSession session, ServerAgentDefinition agent, CancellationToken token) : base(session, agent, token)
         {
             this.session = session;
         }
@@ -24,6 +25,7 @@ namespace Photon.Server.Internal.Sessions
                 PreBuild = session.PreBuild,
                 GitRefspec = session.GitRefspec,
                 BuildNumber = session.BuildNumber,
+                Variables = session.Variables,
             };
 
             var response = await MessageClient.Send(message)

@@ -1,5 +1,5 @@
-﻿using Photon.Framework.Tasks;
-using System;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
@@ -22,25 +22,25 @@ namespace Photon.Framework.Domain
             Client = null;
         }
 
-        public async Task BeginAsync()
+        public async Task BeginAsync(CancellationToken token)
         {
-            await RemoteTaskCompletionSource<object>.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run((task, sponsor) => {
                 Client.Begin(task);
-            });
+            }, token);
         }
 
-        public async Task ReleaseAsync()
+        public async Task ReleaseAsync(CancellationToken token)
         {
-            await RemoteTaskCompletionSource<object>.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run((task, sponsor) => {
                 Client.ReleaseAsync(task);
-            });
+            }, token);
         }
 
-        public async Task<TaskResult> RunTaskAsync(string taskName)
+        public async Task RunTaskAsync(string taskName, CancellationToken token)
         {
-            return await RemoteTaskCompletionSource<TaskResult>.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run((task, sponsor) => {
                 Client.RunTaskAsync(taskName, task);
-            });
+            }, token);
         }
     }
 }

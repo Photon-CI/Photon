@@ -4,15 +4,17 @@ using Photon.Framework.Tasks;
 using Photon.Server.Internal.Sessions;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
 namespace Photon.Server.Internal
 {
-    internal class ScriptQueue
+    internal class ScriptQueue : IDisposable
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ScriptQueue));
 
+        private readonly CancellationTokenSource tokenSource;
         private ActionBlock<IServerSession> queue;
         private bool isStarted;
 
@@ -22,6 +24,13 @@ namespace Photon.Server.Internal
         public ScriptQueue()
         {
             MaxDegreeOfParallelism = 1;
+
+            tokenSource = new CancellationTokenSource();
+        }
+
+        public void Dispose()
+        {
+            tokenSource?.Dispose();
         }
 
         public void Start()
@@ -33,6 +42,7 @@ namespace Photon.Server.Internal
 
             var queueOptions = new ExecutionDataflowBlockOptions {
                 MaxDegreeOfParallelism = MaxDegreeOfParallelism,
+                CancellationToken = tokenSource.Token,
             };
 
             queue = new ActionBlock<IServerSession>(OnProcess, queueOptions);
@@ -51,6 +61,20 @@ namespace Photon.Server.Internal
             queue.Completion.GetAwaiter().GetResult();
 
             Log.Debug("Script Queue stopped.");
+        }
+
+        public void Abort()
+        {
+            if (!isStarted) return;
+            isStarted = false;
+
+            Log.Debug("Aborting Script Queue...");
+
+            tokenSource.Cancel();
+            queue.Complete();
+            queue.Completion.GetAwaiter().GetResult();
+
+            Log.Debug("Script Queue aborted.");
         }
 
         public void Add(IServerSession session)
@@ -88,15 +112,17 @@ namespace Photon.Server.Internal
                     session.Output
                         .AppendLine("Running script...", ConsoleColor.DarkCyan);
 
-                    result = await session.RunAsync();
+                    await session.RunAsync();
+                    result = TaskResult.Ok();
                 }
                 catch (Exception error) {
+                    result = TaskResult.Error(error);
+                    errorList.Add(error);
+                    //abort = true;
+
                     session.Output
                         .Append("Script Failed! ", ConsoleColor.DarkRed)
                         .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
-
-                    //abort = true;
-                    errorList.Add(error);
                 }
             }
 

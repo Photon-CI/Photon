@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Agent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Tasks
@@ -7,6 +8,6 @@ namespace Photon.Framework.Tasks
     {
         IAgentDeployContext Context {get; set;}
 
-        Task<TaskResult> RunAsync();
+        Task RunAsync(CancellationToken token);
     }
 }

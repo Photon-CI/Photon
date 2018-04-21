@@ -7,9 +7,14 @@ using Photon.Library;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
+using Photon.Agent.Internal.Git;
+using Photon.Framework.Variables;
 
 namespace Photon.Agent.Internal
 {
@@ -27,6 +32,8 @@ namespace Photon.Agent.Internal
         public string WorkDirectory {get;}
         public AgentSessionManager Sessions {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
+        public VariableSetCollection Variables {get;}
+        public RepositorySourceManager RepositorySources {get;}
 
 
         public PhotonAgent()
@@ -35,8 +42,11 @@ namespace Photon.Agent.Internal
 
             Sessions = new AgentSessionManager();
             MessageRegistry = new MessageProcessorRegistry();
+            Variables = new VariableSetCollection();
+            RepositorySources = new RepositorySourceManager();
             messageListener = new MessageListener(MessageRegistry);
 
+            RepositorySources.RepositorySourceDirectory = Configuration.RepositoryDirectory;
             messageListener.ThreadException += MessageListener_ThreadException;
         }
 
@@ -55,11 +65,13 @@ namespace Photon.Agent.Internal
             if (isStarted) throw new Exception("Agent has already been started!");
             isStarted = true;
 
+            LoadVariables();
+
             // Load existing or default agent configuration
             Definition = ParseAgentDefinition() ?? new AgentDefinition {
                 Http = {
                     Host = "localhost",
-                    Port = 8088,
+                    Port = 8082,
                     Path = "/photon/agent",
                 },
             };
@@ -75,6 +87,8 @@ namespace Photon.Agent.Internal
             Sessions.Start();
 
             StartHttpServer();
+
+            RepositorySources.Initialize();
         }
 
         public void Stop()
@@ -107,6 +121,38 @@ namespace Photon.Agent.Internal
             }
         }
 
+        private void LoadVariables()
+        {
+            var filename = Path.Combine(Configuration.Directory, "variables.json");
+            var errorList = new List<Exception>();
+
+            if (File.Exists(filename)) {
+                try {
+                    Variables.GlobalJson = File.ReadAllText(filename);
+                }
+                catch (Exception error) {
+                    errorList.Add(error);
+                }
+            }
+
+            if (Directory.Exists(Configuration.VariablesDirectory)) {
+                var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
+                Parallel.ForEach(fileEnum, file => {
+                    var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
+
+                    try {
+                        var json = File.ReadAllText(file);
+                        Variables.JsonList[file_name] = json;
+                    }
+                    catch (Exception error) {
+                        errorList.Add(error);
+                    }
+                });
+            }
+
+            if (errorList.Any()) throw new AggregateException(errorList);
+        }
+
         private void StartHttpServer()
         {
             var context = new HttpReceiverContext {
@@ -120,10 +166,11 @@ namespace Photon.Agent.Internal
                 },
             };
 
-            var viewPath = Path.Combine(Configuration.AssemblyPath, "Views");
-            context.Views.AddFolderFromExternal(viewPath);
+            var assembly = Assembly.GetExecutingAssembly();
+            context.Views.AddAllFromAssembly(assembly, "Photon.Agent.Views");
 
             var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
+
             if (!string.IsNullOrEmpty(Definition.Http.Path))
                 httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
 

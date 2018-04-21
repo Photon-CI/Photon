@@ -1,9 +1,9 @@
 ﻿using Photon.Communication;
 using Photon.Framework.Pooling;
-using Photon.Framework.Tasks;
 using Photon.Library.TcpMessages;
 using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
@@ -26,7 +26,7 @@ namespace Photon.Server.Internal
             output = new StringBuilder();
         }
 
-        public async Task<TaskResult> Run(string taskName)
+        public async Task Run(string taskName, CancellationToken token)
         {
             var runRequest = new TaskRunRequest {
                 AgentSessionId = agentSessionId,
@@ -34,16 +34,8 @@ namespace Photon.Server.Internal
                 TaskName = taskName,
             };
 
-            TaskRunResponse startResponse;
-            try {
-                startResponse = await messageClient.Send(runRequest)
-                    .GetResponseAsync<TaskRunResponse>();
-            }
-            catch (Exception error) {
-                throw new Exception($"Failed to run task '{taskName}'! {error.Message}");
-            }
-
-            return startResponse.Result;
+            await messageClient.Send(runRequest)
+                .GetResponseAsync<TaskRunResponse>(token);
         }
 
         public void AppendOutput(string text)

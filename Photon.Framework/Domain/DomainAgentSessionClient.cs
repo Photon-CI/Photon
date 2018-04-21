@@ -1,11 +1,10 @@
-﻿using Photon.Framework.Tasks;
-using System;
+﻿using System;
 
 namespace Photon.Framework.Domain
 {
-    public delegate void SessionBeginFunc(RemoteTaskCompletionSource<object> taskHandle);
-    public delegate void SessionReleaseFunc(RemoteTaskCompletionSource<object> taskHandle);
-    public delegate void SessionRunTaskFunc(string taskName, RemoteTaskCompletionSource<TaskResult> taskHandle);
+    public delegate void SessionBeginFunc(RemoteTaskCompletionSource taskHandle);
+    public delegate void SessionReleaseFunc(RemoteTaskCompletionSource taskHandle);
+    public delegate void SessionRunTaskFunc(string taskName, RemoteTaskCompletionSource taskHandle);
     public delegate void SessionDisposedFunc();
 
     public class DomainAgentSessionClient : MarshalByRefObject
@@ -22,17 +21,17 @@ namespace Photon.Framework.Domain
             Id = Guid.NewGuid().ToString("N");
         }
 
-        public void Begin(RemoteTaskCompletionSource<object> taskHandle)
+        public void Begin(RemoteTaskCompletionSource taskHandle)
         {
             OnSessionBegin?.Invoke(taskHandle);
         }
 
-        public void ReleaseAsync(RemoteTaskCompletionSource<object> taskHandle)
+        public void ReleaseAsync(RemoteTaskCompletionSource taskHandle)
         {
             OnSessionRelease?.Invoke(taskHandle);
         }
 
-        public void RunTaskAsync(string taskName, RemoteTaskCompletionSource<TaskResult> taskHandle)
+        public void RunTaskAsync(string taskName, RemoteTaskCompletionSource taskHandle)
         {
             OnSessionRunTask?.Invoke(taskName, taskHandle);
         }

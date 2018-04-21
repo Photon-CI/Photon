@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define EXE=$(var.PhotonAgent.TargetFileName)?>
+  <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
+  <Product Id="*" Name="Photon Agent $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="06ac1f64-d492-40c4-9de6-3ada579880a8">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon Agent." />
+
+	  <Media Id="1" Cabinet="Photon.Server.cab" EmbedCab="yes"/>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Photon Agent is already installed." />
+
+		<Feature Id="Complete" Title="Photon Agent" Description="Install Photon Agent." Level="1" Display="expand" ConfigurableDirectory="INSTALLDIR">
+      <Feature Id="AgentExecutable" Title="Photon Agent" Description="Photon Agent application." Level="1">
+        <ComponentGroupRef Id="ProductComponents" />
+        <ComponentGroupRef Id="AgentTemplates" />
+      </Feature>
+		</Feature>
+
+	  <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
+	  <CustomAction Id="SetPhotonUrl" BinaryKey="ConfigTools" DllEntry="LoadAgentUrl" Impersonate="yes" />
+
+	  <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
+	  <CustomAction Id="LaunchAgentConfiguration" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Agent Configuration" />
+	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+
+	  <WixVariable Id="WixUILicenseRtf" Value="Content\gpl-3.0.rtf" />
+
+	  <UI>
+	    <UIRef Id="WixUI_InstallDir" />
+	    <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="SetPhotonUrl" Order="1">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+	    <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchAgentConfiguration" Order="2">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+	  </UI>
+	</Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="CommonAppDataManufacturerFolder" Name="Photon">
+          <Directory Id="INSTALLDIR" Name="Agent">
+            <Directory Id="InstallBin" Name="bin" />
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
+		  <Component Id="Product_Exe" Guid="F2B920DC-36A4-462D-BA80-5E62D58EFEE6">
+		    <File Source="$(var.PhotonAgent.TargetDir)PhotonAgent.exe" KeyPath="yes" />
+		    <ServiceInstall Id="ServiceInstaller" Name="Photon.Agent" Type="ownProcess" DisplayName="Photon Agent" Description="Agent instance for Photon." Start="auto" ErrorControl="normal" Account="[LocalSystem]" />
+		    <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Agent" Wait="yes" />
+		  </Component>
+		  <Component Id="Product_Config" Guid="ACD072AC-A8EA-4039-B062-E93F52763708">
+		    <File Source="$(var.PhotonAgent.TargetDir)PhotonAgent.exe.config" />
+		  </Component>
+		  <Component Id="Product_PiServerLite" Guid="*">
+		    <File Source="$(var.PhotonAgent.TargetDir)PiServerLite.dll" />
+		  </Component>
+      <Component Id="Product_DataflowTpl" Guid="*">
+        <File Source="$(var.PhotonAgent.TargetDir)System.Threading.Tasks.Dataflow.dll" />
+      </Component>
+      <Component Id="Product_PhotonLib" Guid="*">
+        <File Source="$(var.PhotonAgent.TargetDir)Photon.Library.dll" />
+      </Component>
+      <Component Id="Product_PhotonFramework" Guid="*">
+        <File Source="$(var.PhotonAgent.TargetDir)Photon.Framework.dll" />
+      </Component>
+      <Component Id="Product_PhotonComm" Guid="*">
+        <File Source="$(var.PhotonAgent.TargetDir)Photon.Communication.dll" />
+      </Component>
+		  <Component Id="Product_NewtonsoftJson" Guid="*">
+		    <File Source="$(var.PhotonAgent.TargetDir)Newtonsoft.Json.dll" />
+		  </Component>
+      <Component Id="Product_NewtonsoftBson" Guid="*">
+        <File Source="$(var.PhotonAgent.TargetDir)Newtonsoft.Json.Bson.dll" />
+      </Component>
+      <Component Id="Product_log4net" Guid="*">
+        <File Source="$(var.PhotonAgent.TargetDir)log4net.dll" />
+      </Component>
+    </ComponentGroup>
+	  <ComponentGroup Id="AgentTemplates" Directory="INSTALLDIR">
+	    <Component Id="AgentConfigTemplate" Guid="">
+	      <File Source="$(var.ProjectDir)Content\agent.json" KeyPath="yes" />
+	    </Component>
+	  </ComponentGroup>
+	</Fragment>
+</Wix>

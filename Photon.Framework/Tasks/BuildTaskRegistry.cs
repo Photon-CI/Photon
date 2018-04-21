@@ -1,13 +1,14 @@
 ﻿using Photon.Framework.Agent;
 using Photon.Framework.Domain;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Tasks
 {
     internal class BuildTaskRegistry : TypeRegistry<IBuildTask>
     {
-        public async Task<TaskResult> ExecuteTask(IAgentBuildContext context)
+        public async Task ExecuteTask(IAgentBuildContext context, CancellationToken token)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (string.IsNullOrEmpty(context.TaskName)) throw new ArgumentException("TaskName is undefined!");
@@ -24,7 +25,7 @@ namespace Photon.Framework.Tasks
 
                 task.Context = context;
 
-                return await task.RunAsync();
+                await task.RunAsync(token);
             }
             finally {
                 (classObject as IDisposable)?.Dispose();

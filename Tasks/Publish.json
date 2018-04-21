@@ -1,0 +1,10 @@
+{
+	"project": "photon",
+	"assembly": "Photon.Publishing\\bin\\Debug\\Photon.Publishing.dll",
+    "preBuild": "bin\\PreBuild.cmd",
+	"refspec": "master",
+	"task": "PublishTask",
+	"roles": [
+		"build"
+	]
+}

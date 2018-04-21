@@ -16,9 +16,8 @@ namespace Photon.Server.Internal.Sessions
         TaskResult Result {get;}
         bool IsComplete {get;}
 
-        //DomainAgentSessionHostBase GetAgentSession(string agentSessionId);
         Task PrepareWorkDirectoryAsync();
-        Task<TaskResult> RunAsync();
+        Task RunAsync();
         Task ReleaseAsync();
         void Complete(TaskResult result);
     }

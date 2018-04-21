@@ -46,22 +46,24 @@ namespace Photon.Framework.Server
             return sessionHandle;
         }
 
-        //public DomainAgentSessionHandle GetAgentSession(string sessionId)
-        //{
-        //    return agentSessions.FirstOrDefault(x => string.Equals(x.AgentSessionId, sessionId));
-        //}
-
         public DomainAgentSessionHandle RegisterAnyAgent(params string[] roles)
         {
-            if (Agents == null)
-                throw new Exception("No agents have been defined!");
+            if (Agents == null) {
+                Output.AppendLine("No agents are defined!", ConsoleColor.DarkRed);
+                throw new ApplicationException("No agents have been defined!");
+            }
 
             var roleAgents = Agents
                 .Where(a => a.MatchesRoles(roles)).ToArray();
 
+            if (!roleAgents.Any()) {
+                PrintNotFoundAgents(roles);
+                throw new ApplicationException($"No agents were found in roles '{string.Join(", ", roles)}'!");
+            }
+
             ServerAgentDefinition agent;
             if (roleAgents.Length <= 1) {
-                agent = roleAgents.FirstOrDefault();
+                agent = roleAgents.First();
             }
             else {
                 var random = new Random();
@@ -78,7 +80,7 @@ namespace Photon.Framework.Server
         public AgentSessionHandleCollection RegisterAllAgents(params string[] roles)
         {
             if (Agents == null)
-                throw new Exception("No agents have been defined!");
+                throw new ApplicationException("No agents have been defined!");
 
             var roleAgents = Agents
                 .Where(a => a.MatchesRoles(roles)).ToArray();
@@ -92,6 +94,19 @@ namespace Photon.Framework.Server
             });
 
             return new AgentSessionHandleCollection(this, roleAgentHandles);
+        }
+
+        private void PrintNotFoundAgents(params string[] roles)
+        {
+            Output.Append("No agents were found in roles ", ConsoleColor.DarkYellow);
+
+            var i = 0;
+            foreach (var role in roles) {
+                if (i > 0) Output.Append(", ", ConsoleColor.DarkYellow);
+                Output.Append(role, ConsoleColor.Yellow);
+            }
+
+            Output.AppendLine("!", ConsoleColor.DarkYellow);
         }
 
         private void PrintFoundAgents(params ServerAgentDefinition[] agents)

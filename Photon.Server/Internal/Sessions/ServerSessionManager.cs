@@ -32,6 +32,12 @@ namespace Photon.Server.Internal.Sessions
             pool.Stop();
         }
 
+        public void Abort()
+        {
+            foreach (var session in pool.Items)
+                session.Abort();
+        }
+
         public void BeginSession(ServerSessionBase session)
         {
             pool.Add(session);

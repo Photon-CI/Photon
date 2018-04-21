@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.1")]
-[assembly: AssemblyFileVersion("0.0.1")]
+[assembly: AssemblyVersion("0.0.4")]
+[assembly: AssemblyFileVersion("0.0.4")]
 
-[assembly: AssemblyTitle("Photon.Framework")]
-[assembly: AssemblyDescription("Framework for Photon.")]
+[assembly: AssemblyTitle("Photon Framework")]
+[assembly: AssemblyDescription("Framework for Photon projects and plugins.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Joshua Miller")]
-[assembly: AssemblyProduct("Photon.Framework")]
+[assembly: AssemblyProduct("Photon")]
 [assembly: AssemblyCopyright("Copyright © Joshua Miller 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

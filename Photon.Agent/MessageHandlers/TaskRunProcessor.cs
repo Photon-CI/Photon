@@ -14,9 +14,9 @@ namespace Photon.Agent.MessageHandlers
             if (!PhotonAgent.Instance.Sessions.TryGetSession(requestMessage.AgentSessionId, out var session))
                 throw new ApplicationException($"Session '{requestMessage.AgentSessionId}' not found!");
 
-            return new TaskRunResponse {
-                Result = await session.RunTaskAsync(requestMessage.TaskName, requestMessage.TaskSessionId),
-            };
+            await session.RunTaskAsync(requestMessage.TaskName, requestMessage.TaskSessionId);
+
+            return new TaskRunResponse();
         }
     }
 }

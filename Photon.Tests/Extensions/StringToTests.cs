@@ -5,7 +5,8 @@ using Photon.Tests.Internal;
 namespace Photon.Tests.Extensions
 {
     [Parallelizable(ParallelScope.All)]
-    public class StringToTests : UnitTestFixture
+    [UnitTestFixture]
+    public class StringToTests
     {
         [Test]
         public void Null_To_String()

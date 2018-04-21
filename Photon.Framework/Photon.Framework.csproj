@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AnsiConsole, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AnsiConsole.0.2.0\lib\net45\AnsiConsole.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -47,12 +44,12 @@
     <Compile Include="AgentHttpDefinition.cs" />
     <Compile Include="Agent\AgentContextBase.cs" />
     <Compile Include="Agent\IAgentContext.cs" />
+    <Compile Include="AnsiWriter.cs" />
     <Compile Include="ContextDefinition.cs" />
     <Compile Include="ContextAgentDefinition.cs" />
     <Compile Include="Domain\DomainAgentBase.cs" />
     <Compile Include="Domain\DomainAgentSessionClient.cs" />
     <Compile Include="Domain\DomainAgentSessionHandle.cs" />
-    <Compile Include="Domain\DomainAgentTask.cs" />
     <Compile Include="Domain\DomainConnectionFactory.cs" />
     <Compile Include="Domain\DomainContextBase.cs" />
     <Compile Include="Domain\IDomainContext.cs" />
@@ -62,8 +59,7 @@
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Extensions\RemoteTaskExtensions.cs" />
-    <Compile Include="FileUtils.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="IFrameworkAssembly.cs" />
     <Compile Include="JsonSettings.cs" />
     <Compile Include="Packages\DomainPackageClient.cs" />
@@ -112,6 +108,9 @@
     <Compile Include="Tasks\TaskResult.cs" />
     <Compile Include="ContextTaskDefinition.cs" />
     <Compile Include="ContextProjectDefinition.cs" />
+    <Compile Include="Tools\AssemblyTools.cs" />
+    <Compile Include="Variables\VariableSet.cs" />
+    <Compile Include="Variables\VariableSetCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

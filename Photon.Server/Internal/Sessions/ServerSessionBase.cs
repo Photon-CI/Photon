@@ -5,11 +5,14 @@ using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Server;
 using Photon.Framework.Tasks;
+using Photon.Framework.Variables;
+using Photon.Library;
 using Photon.Library.Packages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
@@ -37,8 +40,10 @@ namespace Photon.Server.Internal.Sessions
         protected DomainConnectionFactory ConnectionFactory {get;}
         protected DomainPackageClient PackageClient {get;}
         public TaskResult Result {get; private set;}
+        public VariableSetCollection Variables {get;}
         protected ILog Log => _log.Value;
 
+        protected readonly CancellationTokenSource TokenSource;
         private readonly ProjectPackageManager projectPackages;
         private readonly ApplicationPackageManager applicationPackages;
 
@@ -68,6 +73,8 @@ namespace Photon.Server.Internal.Sessions
                 PackageDirectory = Configuration.ApplicationPackageDirectory,
             };
 
+            Variables = PhotonServer.Instance.Variables;
+
             ConnectionFactory = new DomainConnectionFactory();
             ConnectionFactory.OnConnectionRequest += ConnectionFactory_OnConnectionRequest;
 
@@ -76,6 +83,8 @@ namespace Photon.Server.Internal.Sessions
             PackageClient.OnPushApplicationPackage += PackageClient_OnPushApplicationPackage;
             PackageClient.OnPullProjectPackage += PackageClient_OnPullProjectPackage;
             PackageClient.OnPullApplicationPackage += PackageClient_OnPullApplicationPackage;
+
+            TokenSource = new CancellationTokenSource();
         }
 
         public virtual void Dispose()
@@ -83,6 +92,7 @@ namespace Photon.Server.Internal.Sessions
             if (!isReleased)
                 ReleaseAsync().GetAwaiter().GetResult();
 
+            TokenSource?.Dispose();
             Domain?.Dispose();
             Domain = null;
         }
@@ -98,7 +108,7 @@ namespace Photon.Server.Internal.Sessions
             });
         }
 
-        public abstract Task<TaskResult> RunAsync();
+        public abstract Task RunAsync();
 
         public async Task ReleaseAsync()
         {
@@ -140,6 +150,16 @@ namespace Photon.Server.Internal.Sessions
                     return false;
                 });
             }
+        }
+
+        public void Abort()
+        {
+            TokenSource.Cancel();
+
+            //foreach (var host in hostList.Values)
+            //    host.Abort();
+
+            // TODO: Wait?
         }
 
         public void Complete(TaskResult result)

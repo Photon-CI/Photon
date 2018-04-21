@@ -1,6 +1,7 @@
 ﻿using Photon.Communication.Messages;
 using System;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication
@@ -35,8 +36,9 @@ namespace Photon.Communication
             client?.Dispose();
         }
 
-        public async Task ConnectAsync(string hostname, int port)
+        public async Task ConnectAsync(string hostname, int port, CancellationToken token)
         {
+            token.Register(() => client.Close());
             await client.ConnectAsync(hostname, port);
 
             Transceiver = new MessageTransceiver(messageRegistry) {

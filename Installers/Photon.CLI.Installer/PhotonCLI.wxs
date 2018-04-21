@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define EXE=$(var.PhotonCLI.TargetFileName)?>
+  <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
+	<Product Id="*" Name="Photon CLI $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="1487B751-2679-414F-9A00-D814DA938C62">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon CLI." />
+
+    <Media Id="1" Cabinet="Photon.CLI.cab" EmbedCab="yes"/>
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of Photon CLI is already installed." />
+
+		<Feature Id="Complete" Title="Photon CLI" Description="Install Photon CLI." Level="1" Display="expand" ConfigurableDirectory="INSTALLDIR">
+      <Feature Id="CliExecutable" Title="Photon CLI" Description="Photon CLI application." Level="1">
+        <ComponentGroupRef Id="ProductComponents" />
+      </Feature>
+		</Feature>
+
+	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Property Id="ADD_TO_PATH" Value="1" />
+    
+	  <WixVariable Id="WixUILicenseRtf" Value="Content\gpl-3.0.rtf" />
+
+	  <UI>
+	    <UIRef Id="WixUI_InstallDir" />
+	  </UI>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+		  <Directory Id="CommonAppDataFolder">
+		    <Directory Id="CommonAppDataManufacturerFolder" Name="Photon">
+		      <Directory Id="INSTALLDIR" Name="CLI">
+		        <Directory Id="InstallBin" Name="bin" />
+		      </Directory>
+		    </Directory>
+		  </Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
+			<Component Id="Product_Exe" Guid="B9F36964-0494-485F-992D-BF7E5018FEF0">
+		    <File Source="$(var.PhotonCLI.TargetDir)PhotonCLI.exe" />
+      </Component>
+      <Component Id="Product_Config" Guid="0FAE7640-75F9-4F65-AA75-686175A5AE6F">
+			  <File Source="$(var.PhotonCLI.TargetDir)PhotonCLI.exe.config" />
+		  </Component>
+		  <Component Id="Product_DataflowTpl" Guid="*">
+			  <File Source="$(var.PhotonCLI.TargetDir)System.Threading.Tasks.Dataflow.dll" />
+		  </Component>
+		  <Component Id="Product_PhotonLib" Guid="*">
+			  <File Source="$(var.PhotonCLI.TargetDir)Photon.Library.dll" />
+		  </Component>
+		  <Component Id="Product_PhotonFramework" Guid="*">
+			  <File Source="$(var.PhotonCLI.TargetDir)Photon.Framework.dll" />
+		  </Component>
+		  <Component Id="Product_PhotonComm" Guid="*">
+			  <File Source="$(var.PhotonCLI.TargetDir)Photon.Communication.dll" />
+		  </Component>
+		  <Component Id="Product_NewtonsoftJson" Guid="*">
+			  <File Source="$(var.PhotonCLI.TargetDir)Newtonsoft.Json.dll" />
+		  </Component>
+		  <Component Id="Product_NewtonsoftBson" Guid="*">
+			  <File Source="$(var.PhotonCLI.TargetDir)Newtonsoft.Json.Bson.dll" />
+		  </Component>
+      <Component Id="Product_AddPath" Guid="CADB0AB5-BD9A-4BCC-B1A6-10C954C80DB2">
+        <CreateFolder />
+        <Environment Id="PATH" Name="PATH" Value="[InstallBin]" Permanent="no" Part="last" Action="set" System="yes" />
+        <Condition>ADD_TO_PATH = 1</Condition>
+      </Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>
