@@ -32,24 +32,26 @@ namespace Photon.NuGetPlugin
 
         public async Task<string[]> GetAllVersions(string packageId, CancellationToken token)
         {
-            var filter = new SearchFilter(true);
+            var cache = new SourceCacheContext();
+            var searchResource = await sourceRepository.GetResourceAsync<FindPackageByIdResource>(token);
+            var versionList = (await searchResource.GetAllVersionsAsync(packageId, cache, null, token)).ToArray();
 
-            var searchResource = await sourceRepository.GetResourceAsync<PackageSearchResource>(token);
-            var searchMetadata = await searchResource.SearchAsync(packageId, filter, 0, 100, null, token);
+            //var searchResource = await sourceRepository.GetResourceAsync<PackageSearchResource>(token);
+            //var searchMetadata = await searchResource.SearchAsync(packageId, filter, 0, 100, null, token);
 
-            var resultList = new List<string>();
+            //var resultList = new List<string>();
 
-            foreach (var result in searchMetadata) {
-                if (!string.Equals(result.Identity.Id, packageId, StringComparison.OrdinalIgnoreCase))
-                    continue;
+            //foreach (var result in searchMetadata) {
+            //    if (!string.Equals(result.Identity.Id, packageId, StringComparison.OrdinalIgnoreCase))
+            //        continue;
 
-                var versionList = (await result.GetVersionsAsync())
-                    .Select(resultVersion => resultVersion.Version.ToString());
+            //    var versionList = (await result.GetVersionsAsync())
+            //        .Select(resultVersion => resultVersion.Version.ToString());
 
-                resultList.AddRange(versionList);
-            }
+            //    resultList.AddRange(versionList);
+            //}
 
-            return resultList.ToArray();
+            return versionList.Select(x => x.ToString()).ToArray();
         }
 
         public void Pack(string nuspecFilename, string packageFilename)
