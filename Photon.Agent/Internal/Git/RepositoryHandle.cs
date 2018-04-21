@@ -33,8 +33,10 @@ namespace Photon.Agent.Internal.Git
             output.WriteLine($"Checking out commit '{refspec}'...", ConsoleColor.DarkCyan);
 
             using (var repo = new Repository(Source.RepositoryPath)) {
-                var originMaster = repo.Branches[refspec];
-                repo.Reset(ResetMode.Hard, originMaster.Tip);
+                LibGit2Sharp.Commands.Checkout(repo, refspec);
+
+                //var originMaster = repo.Branches[refspec];
+                //repo.Reset(ResetMode.Hard, originMaster.Tip);
 
                 output.WriteLine("Current Commit:", ConsoleColor.DarkBlue)
                     .WriteLine($"  {repo.Head.Tip.Sha}", ConsoleColor.Blue)
