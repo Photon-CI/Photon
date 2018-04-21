@@ -33,10 +33,33 @@ namespace Photon.Agent.Internal.Git
             output.WriteLine($"Checking out commit '{refspec}'...", ConsoleColor.DarkCyan);
 
             using (var repo = new Repository(Source.RepositoryPath)) {
-                LibGit2Sharp.Commands.Checkout(repo, refspec);
+                var branch = repo.Branches[refspec];
 
-                //var originMaster = repo.Branches[refspec];
-                //repo.Reset(ResetMode.Hard, originMaster.Tip);
+                if (branch.IsRemote) {
+                    var local_branch = repo.CreateBranch(branch.FriendlyName, branch.Tip);
+                    repo.Branches.Update(local_branch, b => b.TrackedBranch = branch.CanonicalName);
+
+                    var y = new CheckoutOptions {
+                        CheckoutModifiers = CheckoutModifiers.Force,
+                    };
+
+                    LibGit2Sharp.Commands.Checkout(repo, local_branch, y);
+                }
+                else {
+                    if (!branch.IsCurrentRepositoryHead) {
+                        var y = new CheckoutOptions {
+                            CheckoutModifiers = CheckoutModifiers.Force,
+                        };
+
+                        LibGit2Sharp.Commands.Checkout(repo, branch, y);
+                    }
+                }
+
+                var sign = new Signature("photon", "photon@localhost.com", DateTimeOffset.Now);
+
+                var z = new PullOptions();
+
+                LibGit2Sharp.Commands.Pull(repo, sign, z);
 
                 output.WriteLine("Current Commit:", ConsoleColor.DarkBlue)
                     .WriteLine($"  {repo.Head.Tip.Sha}", ConsoleColor.Blue)
