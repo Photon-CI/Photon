@@ -35,6 +35,11 @@ namespace Photon.Agent.Internal.Git
             using (var repo = new Repository(Source.RepositoryPath)) {
                 var originMaster = repo.Branches[refspec];
                 repo.Reset(ResetMode.Hard, originMaster.Tip);
+
+                output.WriteLine("Current Commit:", ConsoleColor.DarkBlue)
+                    .WriteLine($"  {repo.Head.Tip.Sha}", ConsoleColor.Blue)
+                    .WriteLine($"  {repo.Head.Tip.Author?.Name}", ConsoleColor.Blue)
+                    .WriteLine(repo.Head.Tip.Message, ConsoleColor.Cyan);
             }
         }
     }
