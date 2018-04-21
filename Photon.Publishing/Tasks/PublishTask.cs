@@ -45,6 +45,13 @@ namespace Photon.Publishing.Tasks
 
         private async Task BuildSolution()
         {
+            var nugetExe = Context.AgentVariables.Global["nuget.exe"];
+            var solutionFile = Path.Combine(Context.ContentDirectory, "Photon.sln");
+
+            await Context.RunCommandLineAsync(
+                nugetExe, "restore",
+                $"\"{solutionFile}\"");
+
             await Context.RunCommandLineAsync(
                 ".\\bin\\msbuild.cmd", "/m", "/v:m",
                 "Photon.sln",

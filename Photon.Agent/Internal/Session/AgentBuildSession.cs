@@ -103,17 +103,17 @@ namespace Photon.Agent.Internal.Session
             var errorList = new Lazy<List<Exception>>();
             var abort = false;
 
-            var preBuildCommand = PreBuild;
-            if (!string.IsNullOrWhiteSpace(preBuildCommand)) {
-                Output.WriteLine("Running Pre-Build Command...", ConsoleColor.DarkCyan);
+            var preBuildScript = PreBuild;
+            if (!string.IsNullOrWhiteSpace(preBuildScript)) {
+                Output.WriteLine("Running Pre-Build Script...", ConsoleColor.DarkCyan);
 
                 try {
-                    RunCommandLine(preBuildCommand);
+                    RunCommandScript(preBuildScript);
                 }
                 catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script Pre-Build command failed! [{SessionId}]", error));
+                    errorList.Value.Add(new ApplicationException($"Script Pre-Build failed! [{SessionId}]", error));
                     //Log.Error($"Script Pre-Build command failed! [{Id}]", error);
-                    Output.WriteLine($"An error occurred while executing the script Pre-Build command! {error.Message} [{SessionId}]", ConsoleColor.DarkYellow);
+                    Output.WriteLine($"An error occurred while executing the Pre-Build script! {error.Message} [{SessionId}]", ConsoleColor.DarkYellow);
                     abort = true;
                 }
             }
@@ -181,8 +181,9 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        protected void RunCommandLine(string command)
+        protected void RunCommandScript(string filename)
         {
+            var command = $"cmd.exe /c \"{filename}\"";
             var result = ProcessRunner.Run(ContentDirectory, command, Output.Writer);
 
             if (result.ExitCode != 0)
