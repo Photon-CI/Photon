@@ -26,7 +26,8 @@ namespace Photon.Framework.Server
         {
             builder = new StringBuilder();
             writer = new StringWriter(builder);
-            ansiWriter = new AnsiWriter(writer);
+            var x = TextWriter.Synchronized(writer);
+            ansiWriter = new AnsiWriter(x);
             lockHandle = new object();
 
             writer.NewLine = "\n";

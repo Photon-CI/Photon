@@ -33,41 +33,64 @@ namespace Photon.Agent.Internal.Git
             output.WriteLine($"Checking out commit '{refspec}'...", ConsoleColor.DarkCyan);
 
             using (var repo = new Repository(Source.RepositoryPath)) {
-                var branch = repo.Branches[refspec];
+                //var branch = LibGit2Sharp.Commands.Checkout(repo, refspec);
 
-                if (branch == null) {
-                    output.Write("Git Refspec ", ConsoleColor.DarkYellow)
-                        .Write(refspec, ConsoleColor.Yellow)
-                        .WriteLine(" was not found!", ConsoleColor.DarkYellow);
-                    
-                    throw new ApplicationException($"Git Refspec '{refspec}' was not found!");
-                }
+                var fetchSpec = new[] {"+refs/heads/*:refs/remotes/origin/*"};
+                var fetchOptions = new FetchOptions();
 
-                if (branch.IsRemote) {
-                    var local_branch = repo.CreateBranch(branch.FriendlyName, branch.Tip);
-                    repo.Branches.Update(local_branch, b => b.TrackedBranch = branch.CanonicalName);
+                LibGit2Sharp.Commands.Fetch(repo, "origin", fetchSpec, fetchOptions, null);
 
-                    var y = new CheckoutOptions {
-                        CheckoutModifiers = CheckoutModifiers.Force,
-                    };
+                var localBranch = repo.Branches[$"refs/heads/origin/{refspec}"];
 
-                    LibGit2Sharp.Commands.Checkout(repo, local_branch, y);
-                }
-                else {
-                    if (!branch.IsCurrentRepositoryHead) {
-                        var y = new CheckoutOptions {
+                if (localBranch != null) {
+                    if (!localBranch.IsCurrentRepositoryHead) {
+                        var checkoutOptions = new CheckoutOptions {
                             CheckoutModifiers = CheckoutModifiers.Force,
                         };
 
-                        LibGit2Sharp.Commands.Checkout(repo, branch, y);
+                        LibGit2Sharp.Commands.Checkout(repo, localBranch, checkoutOptions);
                     }
+
+                    if (!localBranch.IsTracking) {
+                        var remoteBranch = repo.Branches[$"refs/remotes/origin/{refspec}"];
+
+                        if (remoteBranch == null) {
+                            output.Write("Git Refspec ", ConsoleColor.DarkYellow)
+                                .Write(refspec, ConsoleColor.Yellow)
+                                .WriteLine(" was not found!", ConsoleColor.DarkYellow);
+                    
+                            throw new ApplicationException($"Git Refspec '{refspec}' was not found!");
+                        }
+
+                        repo.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
+                    }
+
+                    var sign = new Signature("photon", "photon@localhost.com", DateTimeOffset.Now);
+
+                    var z = new PullOptions();
+
+                    LibGit2Sharp.Commands.Pull(repo, sign, z);
                 }
+                else {
+                    var remoteBranch = repo.Branches[$"refs/remotes/origin/{refspec}"];
 
-                var sign = new Signature("photon", "photon@localhost.com", DateTimeOffset.Now);
+                    if (remoteBranch == null) {
+                        output.Write("Git Refspec ", ConsoleColor.DarkYellow)
+                            .Write(refspec, ConsoleColor.Yellow)
+                            .WriteLine(" was not found!", ConsoleColor.DarkYellow);
+                    
+                        throw new ApplicationException($"Git Refspec '{refspec}' was not found!");
+                    }
 
-                var z = new PullOptions();
+                    localBranch = repo.CreateBranch(remoteBranch.FriendlyName, remoteBranch.Tip);
+                    repo.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
 
-                LibGit2Sharp.Commands.Pull(repo, sign, z);
+                    var checkoutOptions = new CheckoutOptions {
+                        CheckoutModifiers = CheckoutModifiers.Force,
+                    };
+
+                    LibGit2Sharp.Commands.Checkout(repo, localBranch, checkoutOptions);
+                }
 
                 output.WriteLine("Current Commit:", ConsoleColor.DarkBlue)
                     .WriteLine($"  {repo.Head.Tip.Sha}", ConsoleColor.Blue)

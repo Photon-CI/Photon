@@ -174,10 +174,12 @@ namespace Photon.Framework
         /// </summary>
         public AnsiWriter SetForegroundColor(ConsoleColor color)
         {
-            if (AnsiEnabled)
+            if (AnsiEnabled) {
                 Writer.Write(GetColorChars(color));
-            else
+            }
+            else {
                 Console.ForegroundColor = color;
+            }
 
             return this;
         }
@@ -187,10 +189,12 @@ namespace Photon.Framework
         /// </summary>
         public AnsiWriter ResetColor()
         {
-            if (AnsiEnabled)
+            if (AnsiEnabled) {
                 Writer.Write("\x1b[0m");
-            else
+            }
+            else {
                 Console.ResetColor();
+            }
 
             return this;
         }
