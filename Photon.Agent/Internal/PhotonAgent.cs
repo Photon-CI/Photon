@@ -47,7 +47,13 @@ namespace Photon.Agent.Internal
             messageListener = new MessageListener(MessageRegistry);
 
             RepositorySources.RepositorySourceDirectory = Configuration.RepositoryDirectory;
+            messageListener.ConnectionReceived += MessageListener_ConnectionReceived;
             messageListener.ThreadException += MessageListener_ThreadException;
+        }
+
+        private void MessageListener_ConnectionReceived(object sender, TcpConnectionReceivedEventArgs e)
+        {
+            Log.Info($"TCP Connection received from '{e.Host}:{e.Port}'.");
         }
 
         public void Dispose()

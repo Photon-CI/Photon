@@ -14,6 +14,7 @@ namespace Photon.Communication
     /// </summary>
     public class MessageListener : IDisposable
     {
+        public event EventHandler<TcpConnectionReceivedEventArgs> ConnectionReceived;
         public event UnhandledExceptionEventHandler ThreadException;
 
         private readonly MessageProcessorRegistry messageRegistry;
@@ -54,7 +55,7 @@ namespace Photon.Communication
             listener = new TcpListener(address, port);
             listener.Start();
 
-            listener.BeginAcceptTcpClient(ConnectionReceived, new object());
+            listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
         }
 
         public async Task StopAsync()
@@ -70,20 +71,21 @@ namespace Photon.Communication
             await Task.WhenAll(tasks.ToArray());
         }
 
-        private void ConnectionReceived(IAsyncResult result)
+        private void Listener_OnConnectionReceived(IAsyncResult result)
         {
             if (!isListening) return;
 
             TcpClient client;
             try {
                 client = listener.EndAcceptTcpClient(result);
+                OnConnectionReceived(client);
             }
             catch (Exception error) {
                 OnThreadException(error);
                 return;
             }
             finally {
-                listener.BeginAcceptTcpClient(ConnectionReceived, new object());
+                listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
             }
 
             var host = new MessageHost(client, messageRegistry);
@@ -104,9 +106,27 @@ namespace Photon.Communication
             host.Dispose();
         }
 
+        protected virtual void OnConnectionReceived(TcpClient client)
+        {
+            var remote = (IPEndPoint)client.Client.RemoteEndPoint;
+            ConnectionReceived?.Invoke(this, new TcpConnectionReceivedEventArgs(remote.Address.ToString(), remote.Port));
+        }
+
         protected virtual void OnThreadException(object exceptionObject)
         {
             ThreadException?.Invoke(this, new UnhandledExceptionEventArgs(exceptionObject, false));
+        }
+    }
+
+    public class TcpConnectionReceivedEventArgs : EventArgs
+    {
+        public string Host {get;}
+        public int Port {get;}
+
+        public TcpConnectionReceivedEventArgs(string host, int port)
+        {
+            this.Host = host;
+            this.Port = port;
         }
     }
 }

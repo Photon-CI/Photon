@@ -63,7 +63,17 @@ namespace Photon.Server.Internal.Sessions
         private void SessionClient_OnSessionBegin(RemoteTaskCompletionSource taskHandle)
         {
             Task.Run(async () => {
-                await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
+                Log.Debug($"Connecting to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'...");
+
+                try {
+                    await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
+                    Log.Info($"Connected to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'.");
+                }
+                catch (Exception error) {
+                    Log.Error($"Failed to connect to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'!", error);
+                    throw;
+                }
+
                 await OnBeginSession();
 
                 Tasks.Start();
