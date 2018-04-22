@@ -33,8 +33,16 @@ namespace Photon.NuGetPlugin
         public async Task<string[]> GetAllVersions(string packageId, CancellationToken token)
         {
             var cache = new SourceCacheContext();
+            cache.DirectDownload = true;
+            cache.NoCache = true;
+
             var searchResource = await sourceRepository.GetResourceAsync<FindPackageByIdResource>(token);
-            var versionList = (await searchResource.GetAllVersionsAsync(packageId, cache, null, token)).ToArray();
+
+            if (searchResource == null) throw new ApplicationException("Unable to retrieve package locator resource!");
+
+            var versionList = (await searchResource.GetAllVersionsAsync(packageId, cache, null, token))?.ToArray();
+
+            if (versionList == null) throw new ApplicationException("Unable to retrieve version list!");
 
             //var searchResource = await sourceRepository.GetResourceAsync<PackageSearchResource>(token);
             //var searchMetadata = await searchResource.SearchAsync(packageId, filter, 0, 100, null, token);
