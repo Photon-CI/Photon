@@ -52,7 +52,15 @@ namespace Photon.Communication
                 isListening = true;
             }
 
-            listener = new TcpListener(address, port);
+            listener = new TcpListener(address, port) {
+                ExclusiveAddressUse = false,
+                Server = {
+                    NoDelay = true,
+                    ExclusiveAddressUse = false,
+                }
+            };
+
+            listener.AllowNatTraversal(true);
             listener.Start();
 
             listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());

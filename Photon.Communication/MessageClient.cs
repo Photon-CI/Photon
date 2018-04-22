@@ -27,7 +27,14 @@ namespace Photon.Communication
         {
             messageRegistry = registry;
 
-            client = new TcpClient();
+            client = new TcpClient {
+                NoDelay = true,
+                ExclusiveAddressUse = false,
+                Client = {
+                    NoDelay = true,
+                    ExclusiveAddressUse = false
+                },
+            };
         }
 
         public void Dispose()
