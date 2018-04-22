@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Common;
 
 namespace Photon.NuGetPlugin
 {
@@ -40,7 +41,8 @@ namespace Photon.NuGetPlugin
 
             if (searchResource == null) throw new ApplicationException("Unable to retrieve package locator resource!");
 
-            var versionList = (await searchResource.GetAllVersionsAsync(packageId, cache, null, token))?.ToArray();
+            var logger = new NullLogger();
+            var versionList = (await searchResource.GetAllVersionsAsync(packageId, cache, logger, token))?.ToArray();
 
             if (versionList == null) throw new ApplicationException("Unable to retrieve version list!");
 
