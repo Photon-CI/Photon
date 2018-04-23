@@ -9,6 +9,8 @@ namespace Photon.Agent.Internal.Git
         private readonly Action disposeAction;
 
         public RepositorySource Source {get;}
+        public string Username {get; set;}
+        public string Password {get; set;}
 
 
         public RepositoryHandle(RepositorySource source, Action disposeAction)
@@ -27,7 +29,10 @@ namespace Photon.Agent.Internal.Git
             if (!Repository.IsValid(Source.RepositoryPath)) {
                 output.WriteLine("Cloning Repository...", ConsoleColor.DarkCyan);
 
-                Repository.Clone(Source.RepositoryUrl, Source.RepositoryPath);
+                var cloneOptions = new CloneOptions();
+                cloneOptions.CredentialsProvider += CredentialsProvider;
+
+                Repository.Clone(Source.RepositoryUrl, Source.RepositoryPath, cloneOptions);
             }
 
             output.WriteLine($"Checking out commit '{refspec}'...", ConsoleColor.DarkCyan);
@@ -37,6 +42,7 @@ namespace Photon.Agent.Internal.Git
 
                 var fetchSpec = new[] {"+refs/heads/*:refs/remotes/origin/*"};
                 var fetchOptions = new FetchOptions();
+                fetchOptions.CredentialsProvider += CredentialsProvider;
 
                 LibGit2Sharp.Commands.Fetch(repo, "origin", fetchSpec, fetchOptions, null);
 
@@ -67,9 +73,10 @@ namespace Photon.Agent.Internal.Git
 
                     var sign = new Signature("photon", "photon@localhost.com", DateTimeOffset.Now);
 
-                    var z = new PullOptions();
+                    var pullOptions = new PullOptions();
+                    pullOptions.FetchOptions.CredentialsProvider += CredentialsProvider;
 
-                    LibGit2Sharp.Commands.Pull(repo, sign, z);
+                    LibGit2Sharp.Commands.Pull(repo, sign, pullOptions);
                 }
                 else {
                     var remoteBranch = repo.Branches[$"refs/remotes/origin/{refspec}"];
@@ -97,6 +104,14 @@ namespace Photon.Agent.Internal.Git
                     .WriteLine($"  {repo.Head.Tip.Author?.Name}", ConsoleColor.Blue)
                     .WriteLine(repo.Head.Tip.Message, ConsoleColor.Cyan);
             }
+        }
+
+        private Credentials CredentialsProvider(string url, string usernameFromUrl, SupportedCredentialTypes types)
+        {
+            return new UsernamePasswordCredentials {
+                Username = Username,
+                Password = Password,
+            };
         }
     }
 }

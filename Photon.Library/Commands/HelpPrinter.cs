@@ -45,7 +45,11 @@ namespace Photon.Library.Commands
 
         public HelpPrinter Add(Type classType, string methodName)
         {
+            if (classType == null) throw new ArgumentNullException(nameof(classType));
+
             var name = CommandAttribute.GetName(classType, methodName);
+            if (string.IsNullOrEmpty(name)) throw new ApplicationException($"Method '{methodName}' was not found on class '{classType.Name}'!");
+
             optionList[name] = CommandAttribute.GetDescription(classType, methodName);
             return this;
         }

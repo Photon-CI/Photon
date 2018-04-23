@@ -11,5 +11,7 @@ namespace Photon.Framework.Projects
         public string SourceType {get; set;}
         public string SourcePath {get; set;}
         public string SourceUrl {get; set;}
+        public string SourceUsername {get; set;}
+        public string SourcePassword {get; set;}
     }
 }

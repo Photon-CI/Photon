@@ -67,6 +67,9 @@ namespace Photon.Agent.Internal.Session
                     handle = GetRepositoryHandle(Project.SourceUrl, TimeSpan.FromMinutes(1))
                         .GetAwaiter().GetResult();
 
+                    handle.Username = Project.SourceUsername;
+                    handle.Password = Project.SourcePassword;
+
                     handle.Checkout(Output, GitRefspec);
 
                     Output.WriteLine("Copying repository to work content directory.", ConsoleColor.DarkCyan);

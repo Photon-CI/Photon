@@ -39,6 +39,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\UpdateRunAction.cs" />
     <Compile Include="Actions\ServerEditAction.cs" />
     <Compile Include="Actions\ServerListAction.cs" />
     <Compile Include="Actions\ServerRemoveAction.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="Actions\ProjectPackageAction.cs" />
     <Compile Include="Actions\DeployRunAction.cs" />
     <Compile Include="Actions\BuildRunAction.cs" />
+    <Compile Include="Commands\UpdateCommands.cs" />
     <Compile Include="Commands\BuildCommands.cs" />
     <Compile Include="Commands\DeployCommands.cs" />
     <Compile Include="Commands\ServerCommands.cs" />
