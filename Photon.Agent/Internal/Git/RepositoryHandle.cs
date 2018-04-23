@@ -73,8 +73,9 @@ namespace Photon.Agent.Internal.Git
 
                     var sign = new Signature("photon", "photon@localhost.com", DateTimeOffset.Now);
 
-                    var pullOptions = new PullOptions();
-                    pullOptions.FetchOptions.CredentialsProvider += CredentialsProvider;
+                    var pullOptions = new PullOptions {
+                        FetchOptions = fetchOptions,
+                    };
 
                     LibGit2Sharp.Commands.Pull(repo, sign, pullOptions);
                 }
