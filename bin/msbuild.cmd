@@ -1,4 +1,4 @@
-@echo off
+@echo on off
 
 for /f "usebackq tokens=*" %%i in (`%~dp0vswhere -latest -requires Microsoft.Component.MSBuild -property installationPath`) do (
   set InstallDir=%%i
@@ -6,7 +6,7 @@ for /f "usebackq tokens=*" %%i in (`%~dp0vswhere -latest -requires Microsoft.Com
 
 if exist "%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe" (
   "%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe" %*
-  if not %errorlevel% == 0 exit %errorlevel%
+  exit %errorlevel%
 )
 
 echo "MSBuild not found!"
