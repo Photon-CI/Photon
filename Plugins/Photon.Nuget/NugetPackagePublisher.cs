@@ -56,6 +56,7 @@ namespace Photon.NuGetPlugin
             //var packageFile = Path.Combine(PackageDirectory, $"{PackageId}.{Version}.nupkg");
 
             //client.Pack(PackageDefinition, packageFile);
+
             var packageFilename = Directory
                 .GetFiles(PackageDirectory, $"{PackageId}.*.nupkg")
                 .FirstOrDefault();

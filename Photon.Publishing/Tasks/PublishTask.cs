@@ -55,8 +55,9 @@ namespace Photon.Publishing.Tasks
             if (!Directory.Exists(nugetPackageDir))
                 Directory.CreateDirectory(nugetPackageDir);
 
-            await PublishFramework(token);
-            await PublishPlugin_IIS(token);
+            await PublishPluginPackage("Photon.Framework", token);
+            await PublishPluginPackage("Photon.IIS", token);
+            await PublishPluginPackage("Photon.NuGet", token);
         }
 
         private async Task BuildSolution()
@@ -123,32 +124,16 @@ namespace Photon.Publishing.Tasks
             await publisher.PublishAsync("Photon CLI", "Photon.CLI");
         }
 
-        private async Task PublishFramework(CancellationToken token)
+        private async Task PublishPluginPackage(string id, CancellationToken token)
         {
-            var projectPath = Path.Combine(Context.ContentDirectory, "Photon.Framework");
-            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.Framework.dll");
+            var projectPath = Path.Combine(Context.ContentDirectory, "Plugins", id);
+            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", $"{id}.dll");
 
             var publisher = new NuGetPackagePublisher(nugetClient) {
-                PackageId = "Photon.Framework",
+                PackageId = id,
                 Version = AssemblyTools.GetVersion(assemblyFilename),
                 PackageDirectory = nugetPackageDir,
-                PackageDefinition = Path.Combine(projectPath, "Photon.Framework.csproj"),
-                ExeFilename = nugetExe,
-            };
-
-            await publisher.PublishAsync(token);
-        }
-
-        private async Task PublishPlugin_IIS(CancellationToken token)
-        {
-            var projectPath = Path.Combine(Context.ContentDirectory, "Plugins", "Photon.IIS");
-            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.IIS.dll");
-
-            var publisher = new NuGetPackagePublisher(nugetClient) {
-                PackageId = "Photon.IIS",
-                Version = AssemblyTools.GetVersion(assemblyFilename),
-                PackageDirectory = nugetPackageDir,
-                PackageDefinition = Path.Combine(projectPath, "Photon.IIS.csproj"),
+                PackageDefinition = Path.Combine(projectPath, $"{id}.csproj"),
                 ExeFilename = nugetExe,
             };
 

@@ -66,10 +66,6 @@ namespace Photon.NuGetPlugin
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
             try {
-                //var apiKeyFunc = (Func<string, string>)(x => ApiKey);
-                //var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
-                //await updateResource.Push(packageFilename, null, PushTimeout, false, apiKeyFunc, null, Logger);
-
                 var name = Path.GetFileName(packageFilename);
                 var path = Path.GetDirectoryName(packageFilename);
 
