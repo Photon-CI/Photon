@@ -85,7 +85,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NuGetPackagePublisher.cs" />
-    <Compile Include="NuGetTools.cs" />
+    <Compile Include="NuGetCommandLine.cs" />
+    <Compile Include="NuGetCore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

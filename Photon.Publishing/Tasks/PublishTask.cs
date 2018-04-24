@@ -13,9 +13,10 @@ namespace Photon.Publishing.Tasks
 {
     public class PublishTask : IBuildTask
     {
-        private NuGetTools nugetClient;
+        private NuGetCore nugetClient;
         private string nugetPackageDir;
         private string nugetApiKey;
+        private string nugetExe;
         private string apiUrl;
         private string ftpUrl;
         private string ftpUser;
@@ -33,13 +34,13 @@ namespace Photon.Publishing.Tasks
 
             nugetPackageDir = Path.Combine(Context.WorkDirectory, "Packages");
             nugetApiKey = Context.ServerVariables.Global["nuget.apiKey"];
+            nugetExe = Context.AgentVariables.Global["nuget.exe"];
             apiUrl = photonVars["apiUrl"];
             ftpUrl = photonVars["ftp.url"];
             ftpUser = photonVars["ftp.user"];
             ftpPass = photonVars["ftp.pass"];
 
-            nugetClient = new NuGetTools {
-                //NugetExe = Context.AgentVariables.Global["nuget.exe"],
+            nugetClient = new NuGetCore {
                 EnableV3 = true,
                 Output = Context.Output,
                 ApiKey = nugetApiKey,
@@ -125,6 +126,7 @@ namespace Photon.Publishing.Tasks
             var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.Framework.dll");
 
             var publisher = new NuGetPackagePublisher(nugetClient) {
+                ExeFilename = nugetExe,
                 PackageId = "Photon.Framework",
                 Version = AssemblyTools.GetVersion(assemblyFilename),
                 PackageDirectory = nugetPackageDir,

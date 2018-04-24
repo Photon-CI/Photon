@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Photon.NuGetPlugin
 {
-    public class NuGetTools
+    public class NuGetCore
     {
         private SourceRepository sourceRepository;
 
@@ -30,7 +30,7 @@ namespace Photon.NuGetPlugin
         public int PushTimeout {get; set;}
 
 
-        public NuGetTools()
+        public NuGetCore()
         {
             SourceUrl = "https://api.nuget.org/v3/index.json";
             PushTimeout = 60;

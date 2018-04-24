@@ -8,8 +8,9 @@ namespace Photon.NuGetPlugin
 {
     public class NuGetPackagePublisher
     {
-        private readonly NuGetTools client;
+        private readonly NuGetCore client;
 
+        public string ExeFilename {get; set;}
         public string PackageId {get; set;}
         public string Version {get; set;}
         public string PackageDirectory {get; set;}
@@ -18,7 +19,7 @@ namespace Photon.NuGetPlugin
         public string Platform {get; set;}
 
 
-        public NuGetPackagePublisher(NuGetTools client)
+        public NuGetPackagePublisher(NuGetCore client)
         {
             this.client = client;
 
@@ -44,11 +45,22 @@ namespace Photon.NuGetPlugin
                 return;
             }
 
-            var packageFile = Path.Combine(PackageDirectory, $"{PackageId}.{Version}.nupkg");
+            var cl = new NuGetCommandLine {
+                ExeFilename = ExeFilename,
+                ApiKey = client.ApiKey,
+                Output = client.Output,
+            };
 
-            client.Pack(PackageDefinition, packageFile);
+            cl.Pack(PackageDefinition, PackageDirectory);
 
-            await client.PushAsync(packageFile, token);
+            //var packageFile = Path.Combine(PackageDirectory, $"{PackageId}.{Version}.nupkg");
+
+            //client.Pack(PackageDefinition, packageFile);
+            var packageFilename = Directory
+                .GetFiles(PackageDirectory, $"{PackageId}.*.nupkg")
+                .FirstOrDefault();
+
+            await client.PushAsync(packageFilename, token);
         }
 
         private static bool HasUpdates(string currentVersion, string newVersion)
