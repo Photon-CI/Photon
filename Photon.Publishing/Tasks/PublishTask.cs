@@ -121,13 +121,14 @@ namespace Photon.Publishing.Tasks
 
         private async Task PublishFramework(CancellationToken token)
         {
-            var assemblyFilename = Path.Combine(Context.ContentDirectory, "Photon.Framework", "bin", "Release", "Photon.Framework.dll");
+            var projectPath = Path.Combine(Context.ContentDirectory, "Photon.Framework");
+            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.Framework.dll");
 
             var publisher = new NuGetPackagePublisher(nugetClient) {
                 PackageId = "Photon.Framework",
                 Version = AssemblyTools.GetVersion(assemblyFilename),
                 PackageDirectory = nugetPackageDir,
-                PackageDefinition = Path.Combine("Photon.Framework", "Photon.Framework.csproj"),
+                PackageDefinition = Path.Combine(projectPath, "Photon.Framework.csproj"),
             };
 
             await publisher.PublishAsync(token);
@@ -135,13 +136,14 @@ namespace Photon.Publishing.Tasks
 
         private async Task PublishPlugin_IIS(CancellationToken token)
         {
-            var assemblyFilename = Path.Combine(Context.ContentDirectory, "Plugins", "Photon.IIS", "bin", "Release", "Photon.IIS.dll");
+            var projectPath = Path.Combine(Context.ContentDirectory, "Plugins", "Photon.IIS");
+            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.IIS.dll");
 
             var publisher = new NuGetPackagePublisher(nugetClient) {
-                PackageId = "Photon.Framework",
+                PackageId = "Photon.IIS",
                 Version = AssemblyTools.GetVersion(assemblyFilename),
                 PackageDirectory = nugetPackageDir,
-                PackageDefinition = Path.Combine("Photon.Framework", "Photon.Framework.csproj"),
+                PackageDefinition = Path.Combine(projectPath, "Photon.IIS.csproj"),
             };
 
             await publisher.PublishAsync(token);
