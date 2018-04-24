@@ -8,12 +8,12 @@ using PiServerLite.Http.Handlers;
 using System;
 using System.IO;
 
-namespace Photon.Server.HttpHandlers.Update
+namespace Photon.Server.HttpHandlers.Api.Update
 {
-    [HttpHandler("/update/start")]
-    internal class UpdateStartHandler : HttpHandler
+    [HttpHandler("/api/update/agent/start")]
+    internal class UpdateAgentStartHandler : HttpHandler
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateStartHandler));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateAgentStartHandler));
 
 
         public override HttpHandlerResult Post()
@@ -24,7 +24,7 @@ namespace Photon.Server.HttpHandlers.Update
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
 
-                var response = new HttpUpdateStartResponse {
+                var response = new HttpAgentUpdateStartResponse {
                     SessionId = session.SessionId,
                 };
 

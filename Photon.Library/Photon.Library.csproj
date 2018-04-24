@@ -44,10 +44,11 @@
     <Compile Include="Commands\HelpPrinter.cs" />
     <Compile Include="Commands\ICommandParser.cs" />
     <Compile Include="ConfigurationReader.cs" />
+    <Compile Include="DownloadTools.cs" />
     <Compile Include="FileUtils.cs" />
-    <Compile Include="HttpMessages\HttpUpdateResultResponse.cs" />
+    <Compile Include="HttpMessages\HttpAgentUpdateResultResponse.cs" />
     <Compile Include="HttpMessages\HttpBuildStartRequest.cs" />
-    <Compile Include="HttpMessages\HttpUpdateStartResponse.cs" />
+    <Compile Include="HttpMessages\HttpAgentUpdateStartResponse.cs" />
     <Compile Include="HttpMessages\HttpDeployResultResponse.cs" />
     <Compile Include="HttpMessages\HttpDeployResultRequest.cs" />
     <Compile Include="HttpMessages\HttpBuildResultRequest.cs" />

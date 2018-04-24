@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Photon.Framework.Variables;
 
@@ -31,7 +32,6 @@ namespace Photon.Server.Internal
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
-        //public string WorkPath {get;}
         public ProjectPackageManager ProjectPackages {get;}
         public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
@@ -57,8 +57,6 @@ namespace Photon.Server.Internal
             Queue = new ScriptQueue {
                 MaxDegreeOfParallelism = Configuration.Parallelism,
             };
-
-            //WorkPath = Configuration.WorkDirectory;
         }
 
         public void Dispose()
@@ -114,6 +112,23 @@ namespace Photon.Server.Internal
             }
             catch (Exception error) {
                 Log.Error("Failed to stop HTTP Receiver!", error);
+            }
+        }
+
+        public async Task Shutdown(TimeSpan timeout)
+        {
+            using (var tokenSource = new CancellationTokenSource(timeout)) {
+                var token = tokenSource.Token;
+
+                token.Register(() => {
+                    Queue.Abort();
+                    Sessions.Abort();
+                });
+
+                await Task.Run(() => {
+                    Queue.Stop();
+                    Sessions.Stop();
+                }, token);
             }
         }
 

@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using Photon.Communication;
+﻿using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using Photon.Library;
 using Photon.Library.TcpMessages;
 using System;
@@ -25,13 +25,7 @@ namespace Photon.Server.Internal.Sessions
 
         public override async Task RunAsync()
         {
-            string agentIndexJson;
-            using (var webClient = new WebClient()) {
-                var indexUrl = "http://photon.null511.info/api/agent/index";
-                agentIndexJson = await webClient.DownloadStringTaskAsync(indexUrl);
-            }
-
-            dynamic agentIndex = JsonConvert.DeserializeObject(agentIndexJson);
+            var agentIndex = await DownloadTools.GetLatestAgentIndex();
             LatestAgentVersion = (string)agentIndex.Version;
             LatestAgentMsiFilename = (string)agentIndex.MsiFilename;
 
@@ -76,7 +70,7 @@ namespace Photon.Server.Internal.Sessions
                 var agentVersionResponse = await messageClient.Send(agentVersionRequest)
                     .GetResponseAsync<AgentGetVersionResponse>(CancellationToken.None);
 
-                if (!HasUpdates(agentVersionResponse.Version, LatestAgentVersion)) {
+                if (!VersionTools.HasUpdates(agentVersionResponse.Version, LatestAgentVersion)) {
                     Output.Append("Agent ", ConsoleColor.DarkBlue)
                         .Append(agent.Name, ConsoleColor.Blue)
                         .AppendLine(" is up-to-date.", ConsoleColor.DarkBlue);
@@ -167,7 +161,7 @@ namespace Photon.Server.Internal.Sessions
                     var versionResponse = await client.Send(versionRequest)
                         .GetResponseAsync<AgentGetVersionResponse>(token);
 
-                    if (!HasUpdates(versionResponse.Version, LatestAgentVersion))
+                    if (!VersionTools.HasUpdates(versionResponse.Version, LatestAgentVersion))
                         break;
                 }
                 catch (SocketException) {
@@ -176,14 +170,6 @@ namespace Photon.Server.Internal.Sessions
             }
 
             return client;
-        }
-
-        private static bool HasUpdates(string versionCurrent, string versionLatest)
-        {
-            var _current = new Version(versionCurrent);
-            var _latest = new Version(versionLatest);
-
-            return _latest > _current;
         }
     }
 }

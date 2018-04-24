@@ -1,6 +1,6 @@
 ﻿namespace Photon.Library.HttpMessages
 {
-    public class HttpUpdateResultResponse
+    public class HttpAgentUpdateResultResponse
     {
         //...
     }

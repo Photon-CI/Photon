@@ -10,13 +10,13 @@ namespace Photon.Framework
 {
     public static class ProcessRunner
     {
-        public static ProcessResult Run(string workDir, string command, ScriptOutput output)
+        public static ProcessResult Run(string workDir, string command, ScriptOutput output = null)
         {
             SplitCommand(command, out var _file, out var _args);
             return Run(workDir, _file, _args, output);
         }
 
-        public static ProcessResult Run(string workDir, string filename, string arguments, ScriptOutput output)
+        public static ProcessResult Run(string workDir, string filename, string arguments, ScriptOutput output = null)
         {
             if (filename == null) throw new ArgumentNullException(nameof(filename));
 
@@ -64,7 +64,7 @@ namespace Photon.Framework
                 var line = await reader.ReadLineAsync();
 
                 builder.AppendLine(line);
-                output.AppendLine(line, color);
+                output?.AppendLine(line, color);
             }
 
             return builder.ToString();

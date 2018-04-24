@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Tools;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -37,7 +38,7 @@ namespace Photon.NuGetPlugin
             var versionList = await client.GetAllPackageVersions(PackageId, token);
             var packageVersion = versionList.Any() ? versionList.Max() : null;
 
-            if (!HasUpdates(packageVersion, Version)) {
+            if (!VersionTools.HasUpdates(packageVersion, Version)) {
                 client.Output?
                     .Append($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
                     .AppendLine(packageVersion, ConsoleColor.Blue);
@@ -62,16 +63,6 @@ namespace Photon.NuGetPlugin
                 .FirstOrDefault();
 
             await client.PushAsync(packageFilename, token);
-        }
-
-        private static bool HasUpdates(string currentVersion, string newVersion)
-        {
-            if (string.IsNullOrEmpty(currentVersion)) return true;
-
-            var _current = new Version(currentVersion);
-            var _new = new Version(newVersion);
-
-            return _new > _current;
         }
     }
 }

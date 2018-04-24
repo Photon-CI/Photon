@@ -23,7 +23,7 @@ namespace Photon.Server.HttpHandlers.Update
                 if (!(session is ServerUpdateSession updateSession))
                     throw new Exception($"Session '{sessionId}' is not a valid update session!");
 
-                var response = new HttpUpdateResultResponse();
+                var response = new HttpAgentUpdateResultResponse();
 
                 var memStream = new MemoryStream();
 

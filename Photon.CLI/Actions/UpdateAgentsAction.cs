@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Photon.CLI.Actions
 {
-    internal class UpdateRunAction
+    internal class UpdateAgentsAction
     {
         private const int PollIntervalMs = 400;
 
         public string ServerName {get; set;}
-        public HttpUpdateResultResponse Result {get; set;}
+        public HttpAgentUpdateResultResponse Result {get; set;}
 
 
         public async Task Run(CommandContext context)
@@ -63,12 +63,12 @@ namespace Photon.CLI.Actions
             //}
         }
 
-        private async Task<HttpUpdateStartResponse> StartSession(PhotonServerDefinition server)
+        private async Task<HttpAgentUpdateStartResponse> StartSession(PhotonServerDefinition server)
         {
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "update/start");
+                var url = NetPath.Combine(server.Url, "api/agent/update/start");
 
                 client = HttpClientEx.Post(url);
 
@@ -79,7 +79,7 @@ namespace Photon.CLI.Actions
                     throw new ApplicationException($"Bad Update Request! {text}");
                 }
 
-                return client.ParseJsonResponse<HttpUpdateStartResponse>();
+                return client.ParseJsonResponse<HttpAgentUpdateStartResponse>();
             }
             catch (HttpStatusCodeException error) {
                 if (error.HttpCode == HttpStatusCode.NotFound)
@@ -97,7 +97,7 @@ namespace Photon.CLI.Actions
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "session/output");
+                var url = NetPath.Combine(server.Url, "api/session/output");
 
                 client = HttpClientEx.Get(url, new {
                     session = sessionId,
@@ -144,12 +144,12 @@ namespace Photon.CLI.Actions
             }
         }
 
-        private async Task<HttpUpdateResultResponse> GetResult(PhotonServerDefinition server, string sessionId)
+        private async Task<HttpAgentUpdateResultResponse> GetResult(PhotonServerDefinition server, string sessionId)
         {
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "update/result");
+                var url = NetPath.Combine(server.Url, "api/agent/update/result");
 
                 client = HttpClientEx.Get(url, new {
                     session = sessionId,
@@ -157,7 +157,7 @@ namespace Photon.CLI.Actions
 
                 await client.Send();
 
-                return client.ParseJsonResponse<HttpUpdateResultResponse>();
+                return client.ParseJsonResponse<HttpAgentUpdateResultResponse>();
             }
             catch (HttpStatusCodeException error) {
                 if (error.HttpCode == HttpStatusCode.NotFound)

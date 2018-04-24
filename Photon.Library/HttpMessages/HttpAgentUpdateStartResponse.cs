@@ -1,6 +1,6 @@
 ﻿namespace Photon.Library.HttpMessages
 {
-    public class HttpUpdateStartResponse
+    public class HttpAgentUpdateStartResponse
     {
         public string SessionId {get; set;}
     }
