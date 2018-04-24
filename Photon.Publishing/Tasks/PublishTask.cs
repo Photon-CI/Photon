@@ -126,11 +126,11 @@ namespace Photon.Publishing.Tasks
             var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.Framework.dll");
 
             var publisher = new NuGetPackagePublisher(nugetClient) {
-                ExeFilename = nugetExe,
                 PackageId = "Photon.Framework",
                 Version = AssemblyTools.GetVersion(assemblyFilename),
                 PackageDirectory = nugetPackageDir,
-                PackageDefinition = Path.Combine(projectPath, "Photon.Framework.nuspec"),
+                PackageDefinition = Path.Combine(projectPath, "Photon.Framework.csproj"),
+                ExeFilename = nugetExe,
             };
 
             await publisher.PublishAsync(token);
@@ -145,7 +145,8 @@ namespace Photon.Publishing.Tasks
                 PackageId = "Photon.IIS",
                 Version = AssemblyTools.GetVersion(assemblyFilename),
                 PackageDirectory = nugetPackageDir,
-                PackageDefinition = Path.Combine(projectPath, "Photon.IIS.nuspec"),
+                PackageDefinition = Path.Combine(projectPath, "Photon.IIS.csproj"),
+                ExeFilename = nugetExe,
             };
 
             await publisher.PublishAsync(token);
