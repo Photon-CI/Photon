@@ -44,6 +44,7 @@ namespace Photon.Publishing.Tasks
                 Output = Context.Output,
                 ApiKey = nugetApiKey,
             };
+            nugetClient.Initialize();
 
             await BuildSolution();
             await PublishServer();
