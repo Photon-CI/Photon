@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>photon.framework</id>
+    <id>Photon.Framework</id>
     <title>Photon Framework</title>
     <version>$version$</version>
     <authors>null511</authors>

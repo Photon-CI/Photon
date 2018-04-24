@@ -33,7 +33,8 @@ namespace Photon.Publishing.Internal
             Configuration = "Release";
             Platform = "AnyCPU";
 
-            client = new NuGetTools(context);
+            client = new NuGetTools();
+            client.EnableV3 = true;
         }
 
         public async Task PublishAsync(CancellationToken token)
@@ -43,7 +44,7 @@ namespace Photon.Publishing.Internal
                 .Append(PackageId, ConsoleColor.Cyan)
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
-            var versionList = await client.GetAllVersions(PackageId, token);
+            var versionList = await client.GetAllPackageVersions(PackageId, token);
             var packageVersion = versionList.Any() ? versionList.Max() : null;
 
             if (!HasUpdates(packageVersion, AssemblyVersion)) {
