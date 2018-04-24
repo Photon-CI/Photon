@@ -104,6 +104,11 @@ namespace Photon.NuGetPlugin
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
             try {
+                var outputPath = Path.GetDirectoryName(packageFilename);
+
+                if (!string.IsNullOrEmpty(outputPath) && !Directory.Exists(outputPath))
+                    Directory.CreateDirectory(outputPath);
+
                 var builder = new PackageBuilder();
                 builder.Populate(nuspec.Metadata);
 
