@@ -111,6 +111,15 @@ namespace Photon.NuGetPlugin
                     builder.Save(packageStream);
                 }
 
+                //var path = Path.GetDirectoryName(nuspecFilename);
+                //var name = Path.GetFileName(nuspecFilename);
+
+                //var args = string.Join(
+                //    "pack", $"\"{name}\"",
+                //    $"-OutputDirectory \"{PackageDirectory}\"");
+
+                //ProcessRunner.Run(path, NugetExe, args, Output);
+
                 Output?.Append("Package ", ConsoleColor.DarkGreen)
                     .Append(packageName, ConsoleColor.Green)
                     .AppendLine(" created successfully.", ConsoleColor.DarkGreen);
@@ -123,11 +132,6 @@ namespace Photon.NuGetPlugin
 
                 throw;
             }
-
-            //await context.RunCommandLineAsync(NugetExe, "pack",
-            //    $"\"{ProjectFile}\"",
-            //    $"-Prop \"Configuration={Configuration};Platform={Platform}\"",
-            //    $"-OutputDirectory \"{PackageDirectory}\"");
         }
 
         public async Task PushAsync(string packageFilename, CancellationToken token)
