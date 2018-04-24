@@ -34,9 +34,14 @@ namespace Photon.NuGetPlugin
 
                 var args = string.Join(" ",
                     "pack", $"\"{name}\"", "-NonInteractive",
+                    "-Prop Configuration=Release",
+                    "-Prop Platform=AnyCPU",
                     $"-OutputDirectory \"{outputPath}\"");
 
-                ProcessRunner.Run(path, ExeFilename, args, Output);
+                var result = ProcessRunner.Run(path, ExeFilename, args, Output);
+
+                if (result.ExitCode != 0)
+                    throw new ApplicationException($"NuGet Pack failed with exit code {result.ExitCode}!");
 
                 Output?.Append("Package ", ConsoleColor.DarkGreen)
                     .Append(packageName, ConsoleColor.Green)
@@ -73,7 +78,10 @@ namespace Photon.NuGetPlugin
                     $"-Source \"{SourceUrl}\"",
                     $"-ApiKey \"{ApiKey}\"");
 
-                ProcessRunner.Run(path, ExeFilename, args, Output);
+                var result = ProcessRunner.Run(path, ExeFilename, args, Output);
+
+                if (result.ExitCode != 0)
+                    throw new ApplicationException($"NuGet Push failed with exit code {result.ExitCode}!");
 
                 Output?.Append("Package ", ConsoleColor.DarkGreen)
                     .Append(packageName, ConsoleColor.Green)
