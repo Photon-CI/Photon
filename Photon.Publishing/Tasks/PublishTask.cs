@@ -58,6 +58,8 @@ namespace Photon.Publishing.Tasks
             await PublishPluginPackage("Photon.Framework", token);
             await PublishPluginPackage("Photon.IIS", token);
             await PublishPluginPackage("Photon.NuGet", token);
+            await PublishPluginPackage("Photon.WindowsServices", token);
+            await PublishPluginPackage("Photon.Config", token);
         }
 
         private async Task BuildSolution()

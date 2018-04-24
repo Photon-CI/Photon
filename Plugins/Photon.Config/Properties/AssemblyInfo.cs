@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.0.1")]
 [assembly: AssemblyFileVersion("0.0.1")]
 
-[assembly: AssemblyTitle("Photon.WindowsServices")]
-[assembly: AssemblyDescription("Windows Service plugin for Photon.")]
+[assembly: AssemblyTitle("Photon.Config")]
+[assembly: AssemblyDescription("App/Web configuration plugin for Photon.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Joshua Miller")]
 [assembly: AssemblyProduct("Photon")]
@@ -14,4 +14,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
-[assembly: Guid("afb32103-38a3-41bd-886f-93ae354464ea")]
+[assembly: Guid("dbebe942-c5dc-47db-a472-3fff8c965285")]
