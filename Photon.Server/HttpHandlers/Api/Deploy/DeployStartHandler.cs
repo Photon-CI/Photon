@@ -8,9 +8,9 @@ using PiServerLite.Http.Handlers;
 using System;
 using System.IO;
 
-namespace Photon.Server.HttpHandlers.Deploy
+namespace Photon.Server.HttpHandlers.Api.Deploy
 {
-    [HttpHandler("/deploy/start")]
+    [HttpHandler("api/deploy/start")]
     internal class DeployHandler : HttpHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DeployHandler));

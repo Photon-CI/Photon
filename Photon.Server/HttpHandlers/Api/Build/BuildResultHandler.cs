@@ -8,9 +8,9 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Photon.Server.HttpHandlers.Build
+namespace Photon.Server.HttpHandlers.Api.Build
 {
-    [HttpHandler("/build/result")]
+    [HttpHandler("api/build/result")]
     internal class BuildResultHandler : HttpHandler
     {
         public override HttpHandlerResult Get()

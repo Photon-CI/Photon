@@ -1,4 +1,5 @@
-﻿using Photon.Framework;
+﻿using log4net;
+using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
@@ -7,23 +8,25 @@ using PiServerLite.Http.Handlers;
 using System;
 using System.IO;
 
-namespace Photon.Server.HttpHandlers.Update
+namespace Photon.Server.HttpHandlers.Api.Agent
 {
-    [HttpHandler("/update/result")]
-    internal class UpdateResultHandler : HttpHandler
+    [HttpHandler("api/agent/update/start")]
+    internal class UpdateAgentStartHandler : HttpHandler
     {
-        public override HttpHandlerResult Get()
+        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateAgentStartHandler));
+
+
+        public override HttpHandlerResult Post()
         {
-            var sessionId = GetQuery("session");
-
             try {
-                if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
-                    return BadRequest().SetText($"Server Session '{sessionId}' was not found!");
+                var session = new ServerUpdateSession();
 
-                if (!(session is ServerUpdateSession updateSession))
-                    throw new Exception($"Session '{sessionId}' is not a valid update session!");
+                PhotonServer.Instance.Sessions.BeginSession(session);
+                PhotonServer.Instance.Queue.Add(session);
 
-                var response = new HttpAgentUpdateResultResponse();
+                var response = new HttpAgentUpdateStartResponse {
+                    SessionId = session.SessionId,
+                };
 
                 var memStream = new MemoryStream();
 
@@ -40,6 +43,7 @@ namespace Photon.Server.HttpHandlers.Update
                     .SetContent(memStream);
             }
             catch (Exception error) {
+                Log.Error("Failed to run Update-Task!", error);
                 return Exception(error);
             }
         }

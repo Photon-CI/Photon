@@ -55,7 +55,7 @@ namespace Photon.CLI.Actions
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "deploy/start");
+                var url = NetPath.Combine(server.Url, "api/deploy/start");
 
                 client = HttpClientEx.Post(url, new {
                     id = ProjectPackageId,
@@ -87,7 +87,7 @@ namespace Photon.CLI.Actions
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "session/output");
+                var url = NetPath.Combine(server.Url, "api/session/output");
 
                 client = HttpClientEx.Get(url, new {
                     session = sessionId,
@@ -139,7 +139,7 @@ namespace Photon.CLI.Actions
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "deploy/result");
+                var url = NetPath.Combine(server.Url, "api/deploy/result");
 
                 client = HttpClientEx.Get(url, new {
                     session = sessionId,

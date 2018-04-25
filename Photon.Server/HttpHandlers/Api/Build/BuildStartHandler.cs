@@ -8,9 +8,9 @@ using PiServerLite.Http.Handlers;
 using System;
 using System.IO;
 
-namespace Photon.Server.HttpHandlers.Build
+namespace Photon.Server.HttpHandlers.Api.Build
 {
-    [HttpHandler("/build/start")]
+    [HttpHandler("api/build/start")]
     internal class BuildStartHandler : HttpHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BuildStartHandler));

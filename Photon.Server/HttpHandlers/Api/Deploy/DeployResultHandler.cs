@@ -7,9 +7,9 @@ using PiServerLite.Http.Handlers;
 using System;
 using System.IO;
 
-namespace Photon.Server.HttpHandlers.Deploy
+namespace Photon.Server.HttpHandlers.Api.Deploy
 {
-    [HttpHandler("/deploy/result")]
+    [HttpHandler("api/deploy/result")]
     internal class DeployResultHandler : HttpHandler
     {
         public override HttpHandlerResult Get()

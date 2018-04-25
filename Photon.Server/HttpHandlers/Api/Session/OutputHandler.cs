@@ -3,9 +3,9 @@ using PiServerLite.Http.Handlers;
 using System;
 using System.Net;
 
-namespace Photon.Server.HttpHandlers.Session
+namespace Photon.Server.HttpHandlers.Api.Session
 {
-    [HttpHandler("/session/output")]
+    [HttpHandler("api/session/output")]
     internal class OutputHandler : HttpHandler
     {
         public override HttpHandlerResult Get()

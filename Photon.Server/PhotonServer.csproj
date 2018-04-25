@@ -57,9 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\RootCommands.cs" />
-    <Compile Include="HttpHandlers\Api\Update\UpdateAgentResultHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Update\UpdateServerStartHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Update\UpdateAgentStartHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Agent\UpdateAgentResultHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Server\UpdateServerStartHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Agent\UpdateAgentStartHandler.cs" />
     <Compile Include="HttpHandlers\Api\Build\BuildResultHandler.cs" />
     <Compile Include="HttpHandlers\Api\Deploy\DeployResultHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\OutputHandler.cs" />

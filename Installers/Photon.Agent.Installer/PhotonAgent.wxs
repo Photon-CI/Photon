@@ -27,15 +27,15 @@
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Agent Configuration" />
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
 
-    <Property Id='CONFIGSRCEXISTS'>
-      <DirectorySearch Id='ConfigSrcDirSearch' Path='[SOURCEDIR]' Depth='0'>
-        <FileSearch Id='ConfigSrcFileSearch' Name="agent.json" />
+    <Property Id="CONFIGSRCEXISTS">
+      <DirectorySearch Id="ConfigSrcDirSearch" Path="[SOURCEDIR]" Depth="0">
+        <FileSearch Id="ConfigSrcFileSearch" Name="agent.json" />
       </DirectorySearch>
     </Property>
 
-    <Property Id='CONFIGDESTEXISTS'>
-      <DirectorySearch Id='ConfigDestDirSearch' Path='[INSTALLDIR]' Depth='0'>
-        <FileSearch Id='ConfigDestFileSearch' Name="agent.json" />
+    <Property Id="CONFIGDESTEXISTS">
+      <DirectorySearch Id="ConfigDestDirSearch" Path="[INSTALLDIR]" Depth="0">
+        <FileSearch Id="ConfigDestFileSearch" Name="agent.json" />
       </DirectorySearch>
     </Property>
 

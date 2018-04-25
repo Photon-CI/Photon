@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Photon.Server.HttpHandlers.Api
 {
-    [HttpHandler("/api/version")]
+    [HttpHandler("api/version")]
     internal class VersionHandler : HttpHandler
     {
         public override HttpHandlerResult Get()

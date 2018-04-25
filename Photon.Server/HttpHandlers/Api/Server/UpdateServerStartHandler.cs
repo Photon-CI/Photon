@@ -8,9 +8,9 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Photon.Server.HttpHandlers.Api.Update
+namespace Photon.Server.HttpHandlers.Api.Server
 {
-    [HttpHandler("/api/update/server/start")]
+    [HttpHandler("api/server/update")]
     internal class UpdateServerStartHandler : HttpHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateServerStartHandler));
