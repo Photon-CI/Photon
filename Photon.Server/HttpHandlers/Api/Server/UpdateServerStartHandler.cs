@@ -23,11 +23,21 @@ namespace Photon.Server.HttpHandlers.Api.Server
 
             try {
                 var updatePath = Path.Combine(Configuration.Directory, "Updates");
+                var zipFilename = Path.Combine(updatePath, "Photon.Server.zip");
                 var msiFilename = Path.Combine(updatePath, "Photon.Server.msi");
                 var configFilename = Path.Combine(updatePath, "server.json");
 
+                if (!Directory.Exists(updatePath))
+                    Directory.CreateDirectory(updatePath);
+
                 if (HttpContext.Request.ContentType == "application/zip") {
-                    using (var archive = new ZipArchive(HttpContext.Request.InputStream)) {
+                    using (var fileStream = File.Open(zipFilename, FileMode.Create, FileAccess.Write)) {
+                        await HttpContext.Request.InputStream.CopyToAsync(fileStream);
+                    }
+                    HttpContext.Request.InputStream.Close();
+
+                    using (var zipStream = File.Open(zipFilename, FileMode.Open, FileAccess.Read))
+                    using (var archive = new ZipArchive(zipStream)) {
                         var msiEntry = archive.Entries.FirstOrDefault(x => {
                             var ext = Path.GetExtension(x.Name);
                             return string.Equals(".msi", ext, StringComparison.OrdinalIgnoreCase);
@@ -36,7 +46,7 @@ namespace Photon.Server.HttpHandlers.Api.Server
                         if (msiEntry == null)
                             return BadRequest().SetText("No MSI file was found in the archive!");
 
-                        using (var entryStream = msiEntry.Open()) 
+                        using (var entryStream = msiEntry.Open())
                         using (var fileStream = File.Open(msiFilename, FileMode.Create, FileAccess.Write)) {
                             await entryStream.CopyToAsync(fileStream);
                         }
@@ -45,7 +55,7 @@ namespace Photon.Server.HttpHandlers.Api.Server
                             string.Equals("server.json", x.Name, StringComparison.OrdinalIgnoreCase));
 
                         if (configEntry != null) {
-                            using (var entryStream = configEntry.Open()) 
+                            using (var entryStream = configEntry.Open())
                             using (var fileStream = File.Open(configFilename, FileMode.Create, FileAccess.Write)) {
                                 await entryStream.CopyToAsync(fileStream);
                             }
@@ -71,7 +81,7 @@ namespace Photon.Server.HttpHandlers.Api.Server
                 }
 
                 try {
-                    var cmd = $"msiexec.exe /i \"{msiFilename}\" /quiet /passive /qn /L*V \"log.txt\"";
+                    var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /qn /L*V \"log.txt\"";
 
                     ProcessRunner.Run(updatePath, cmd);
                 }

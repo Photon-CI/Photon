@@ -50,7 +50,14 @@ namespace Photon.CLI.Actions
 
             await Task.Delay(3000);
 
-            await Reconnect(server, latestServerVersion, TimeSpan.FromMinutes(2));
+            var timeout = TimeSpan.FromMinutes(2);
+
+            try {
+                await Reconnect(server, latestServerVersion, timeout);
+            }
+            catch (TaskCanceledException) {
+                throw new ApplicationException($"Server failed to restart within timeout '{timeout}'.");
+            }
         }
 
         private async Task BeginServerUpdate(PhotonServerDefinition server, HttpPackageIndex index)
@@ -62,9 +69,6 @@ namespace Photon.CLI.Actions
 
                 using (var client = HttpClientEx.Get(url)) {
                     await client.Send();
-
-                    if (client.ResponseBase.StatusCode != HttpStatusCode.OK)
-                        throw new ApplicationException($"Failed to download Photon.Server update! HTTP.{(int)client.ResponseBase.StatusCode} {client.ResponseBase.StatusDescription}");
 
                     var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
                     updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
@@ -90,7 +94,7 @@ namespace Photon.CLI.Actions
                 var url = NetPath.Combine(server.Url, "api/server/update");
 
                 using (var client = HttpClientEx.Post(url)) {
-                    client.RequestBase.ContentType = "application/zip";
+                    client.ContentType = "application/octet-stream";
                     client.BodyFunc = () => File.Open(updateFilename, FileMode.Open, FileAccess.Read);
 
                     await client.Send();
@@ -124,7 +128,7 @@ namespace Photon.CLI.Actions
                         if (!VersionTools.HasUpdates(version, latestVersion))
                             break;
                     }
-                    catch (SocketException) {
+                    catch (Exception error) when (error is SocketException || error is WebException) {
                         await Task.Delay(1000, tokenSource.Token);
                     }
                 }
