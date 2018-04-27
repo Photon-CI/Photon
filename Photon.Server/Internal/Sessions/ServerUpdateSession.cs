@@ -115,7 +115,7 @@ namespace Photon.Server.Internal.Sessions
 
                 Output.Append("Updating agent ", ConsoleColor.DarkBlue)
                     .Append(agent.Name, ConsoleColor.Blue)
-                    .AppendLine(" from version ", ConsoleColor.DarkBlue)
+                    .Append(" from version ", ConsoleColor.DarkBlue)
                     .Append(agentVersion, ConsoleColor.Blue)
                     .AppendLine("...", ConsoleColor.DarkBlue);
 
@@ -159,9 +159,7 @@ namespace Photon.Server.Internal.Sessions
             messageClient = null;
 
             try {
-                messageClient = await Reconnect(agent, TimeSpan.FromSeconds(60));
-
-                await messageClient.DisconnectAsync();
+                messageClient = await Reconnect(agent, TimeSpan.FromMinutes(2));
             }
             finally {
                 messageClient?.Dispose();
@@ -188,6 +186,20 @@ namespace Photon.Server.Internal.Sessions
 
                 try {
                     await client.ConnectAsync(agent.TcpHost, agent.TcpPort, tokenSource.Token);
+
+                    var handshakeRequest = new HandshakeRequest {
+                        Key = Guid.NewGuid().ToString(),
+                        ServerVersion = Configuration.Version,
+                    };
+
+                    var handshakeTimeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
+                    var handshakeResponse = await client.Handshake<HandshakeResponse>(handshakeRequest, handshakeTimeout, TokenSource.Token);
+
+                    if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
+                        throw new ApplicationException("Handshake Failed! An invalid key was returned.");
+
+                    if (!handshakeResponse.PasswordMatch)
+                        throw new ApplicationException("Handshake Failed! Unauthorized.");
 
                     var versionRequest = new AgentGetVersionRequest();
 

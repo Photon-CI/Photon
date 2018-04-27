@@ -72,7 +72,7 @@ namespace Photon.CLI.Actions
         {
             var info = new ProcessStartInfo {
                 FileName = "msiexec.exe",
-                Arguments = $"/I \"{updateFilename}\" /passive",
+                Arguments = $"/I \"{updateFilename}\" /passive /fe /L*V \"log.txt\"",
             };
 
             using (var _ = Process.Start(info)) {}

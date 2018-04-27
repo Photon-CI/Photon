@@ -30,8 +30,8 @@ namespace Photon.Agent.MessageHandlers
         private static void Run(string msiFilename)
         {
             var info = new ProcessStartInfo {
-                FileName = msiFilename,
-                Arguments = "/passive",
+                FileName = "msiexec.exe",
+                Arguments = $"/I \"{msiFilename}\" /passive /fe /L*V \"log.txt\"",
             };
 
             SysProcess.Start(info);
