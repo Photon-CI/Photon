@@ -1,5 +1,6 @@
 ﻿using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
+using Photon.Framework;
 using Photon.Framework.Tools;
 using Photon.Library;
 using Photon.Library.HttpMessages;
@@ -50,7 +51,7 @@ namespace Photon.CLI.Actions
                 Directory.CreateDirectory(updateDirectory);
 
             try {
-                var url = $"http://download.photon.null511.info/server/{index.Version}/{index.MsiFilename}";
+                var url = NetPath.Combine(Configuration.DownloadUrl, "CLI", index.Version, index.MsiFilename);
 
                 using (var client = HttpClientEx.Get(url)) {
                     await client.Send();

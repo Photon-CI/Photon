@@ -55,11 +55,10 @@ namespace Photon.CLI.Actions
 
         private async Task BeginServerUpdate(PhotonServerDefinition server, HttpPackageIndex index)
         {
-            // TODO: download latest msi
             string updateFilename;
 
             try {
-                var url = $"http://download.photon.null511.info/server/{index.Version}/{index.MsiFilename}";
+                var url = NetPath.Combine(Configuration.DownloadUrl, "server", index.Version, index.MsiFilename);
 
                 using (var client = HttpClientEx.Get(url)) {
                     await client.Send();
