@@ -66,7 +66,6 @@
     <Compile Include="HttpHandlers\Api\VersionHandler.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
-    <Compile Include="Internal\ServerUpdateContext.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
     <Compile Include="Internal\TaskRunner.cs" />
     <Compile Include="Internal\ServerBuildContext.cs" />

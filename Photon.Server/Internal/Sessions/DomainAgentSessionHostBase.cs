@@ -81,18 +81,14 @@ namespace Photon.Server.Internal.Sessions
                     ServerVersion = Configuration.Version,
                 };
 
-                using (var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(Token)) {
-                    tokenSource.CancelAfter(TimeSpan.FromSeconds(HandshakeTimeoutSec));
+                var timeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
+                var handshakeResponse = await MessageClient.Handshake<HandshakeResponse>(handshakeRequest, timeout, Token);
 
-                    var handshakeResponse = await MessageClient.Send(handshakeRequest)
-                        .GetResponseAsync<HandshakeResponse>(tokenSource.Token);
+                if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
+                    throw new ApplicationException("Handshake Failed! An invalid key was returned.");
 
-                    if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
-                        throw new ApplicationException("Handshake Failed! An invalid key was returned.");
-
-                    //if (!handshakeResponse.PasswordMatch)
-                    //    throw new ApplicationException("Handshake Failed! Unauthorized.");
-                }
+                if (!handshakeResponse.PasswordMatch)
+                    throw new ApplicationException("Handshake Failed! Unauthorized.");
             }
             catch (Exception error) {
                 Log.Error($"Failed to connect to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'!", error);

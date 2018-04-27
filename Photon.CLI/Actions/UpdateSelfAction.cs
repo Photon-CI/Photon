@@ -24,7 +24,7 @@ namespace Photon.CLI.Actions
             
             if (!VersionTools.HasUpdates(Configuration.Version, latestVersion)) {
                 ConsoleEx.Out
-                    .Write("Server is up-to-date. Version ", ConsoleColor.DarkCyan)
+                    .Write("CLI is up-to-date. Version ", ConsoleColor.DarkCyan)
                     .Write(Configuration.Version, ConsoleColor.Cyan)
                     .WriteLine(".", ConsoleColor.DarkCyan);
 

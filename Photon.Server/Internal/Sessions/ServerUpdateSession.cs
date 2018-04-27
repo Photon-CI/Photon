@@ -16,6 +16,8 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerUpdateSession : ServerSessionBase
     {
+        private const int HandshakeTimeoutSec = 30;
+
         private string LatestAgentVersion;
         private string LatestAgentMsiFilename;
         private string LatestAgentMsiUrl;
@@ -26,8 +28,8 @@ namespace Photon.Server.Internal.Sessions
         public override async Task RunAsync()
         {
             var agentIndex = await DownloadTools.GetLatestAgentIndex();
-            LatestAgentVersion = (string)agentIndex.Version;
-            LatestAgentMsiFilename = (string)agentIndex.MsiFilename;
+            LatestAgentVersion = agentIndex.Version;
+            LatestAgentMsiFilename = agentIndex.MsiFilename;
 
             LatestAgentMsiUrl = NetPath.Combine("http://download.photon.null511.info/agent", LatestAgentVersion, LatestAgentMsiFilename);
 
@@ -46,7 +48,12 @@ namespace Photon.Server.Internal.Sessions
                 return tempFilename;
             });
 
-            var queue = new ActionBlock<ServerAgentDefinition>(AgentAction);
+            var queueOptions = new ExecutionDataflowBlockOptions {
+                MaxDegreeOfParallelism = 8,
+                CancellationToken = TokenSource.Token,
+            };
+
+            var queue = new ActionBlock<ServerAgentDefinition>(AgentAction, queueOptions);
 
             foreach (var agent in PhotonServer.Instance.Definition.Agents)
                 queue.Post(agent);
@@ -63,14 +70,42 @@ namespace Photon.Server.Internal.Sessions
         private async Task AgentAction(ServerAgentDefinition agent)
         {
             using (var messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry)) {
-                await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, CancellationToken.None);
+                string agentVersion;
 
-                var agentVersionRequest = new AgentGetVersionRequest();
+                try {
+                    await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
 
-                var agentVersionResponse = await messageClient.Send(agentVersionRequest)
-                    .GetResponseAsync<AgentGetVersionResponse>(CancellationToken.None);
+                    var agentVersionRequest = new AgentGetVersionRequest();
 
-                if (!VersionTools.HasUpdates(agentVersionResponse.Version, LatestAgentVersion)) {
+                    var handshakeRequest = new HandshakeRequest {
+                        Key = Guid.NewGuid().ToString(),
+                        ServerVersion = Configuration.Version,
+                    };
+
+                    var timeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
+                    var handshakeResponse = await messageClient.Handshake<HandshakeResponse>(handshakeRequest, timeout, TokenSource.Token);
+
+                    if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
+                        throw new ApplicationException("Handshake Failed! An invalid key was returned.");
+
+                    if (!handshakeResponse.PasswordMatch)
+                        throw new ApplicationException("Handshake Failed! Unauthorized.");
+
+                    var agentVersionResponse = await messageClient.Send(agentVersionRequest)
+                        .GetResponseAsync<AgentGetVersionResponse>(TokenSource.Token);
+
+                    agentVersion = agentVersionResponse.Version;
+                }
+                catch (Exception error) {
+                    Output.Append("Failed to connect to agent ", ConsoleColor.DarkRed)
+                        .Append(agent.Name, ConsoleColor.Red)
+                        .AppendLine("!", ConsoleColor.DarkRed)
+                        .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+
+                    return;
+                }
+
+                if (!VersionTools.HasUpdates(agentVersion, LatestAgentVersion)) {
                     Output.Append("Agent ", ConsoleColor.DarkBlue)
                         .Append(agent.Name, ConsoleColor.Blue)
                         .AppendLine(" is up-to-date.", ConsoleColor.DarkBlue);
@@ -81,11 +116,11 @@ namespace Photon.Server.Internal.Sessions
                 Output.Append("Updating agent ", ConsoleColor.DarkBlue)
                     .Append(agent.Name, ConsoleColor.Blue)
                     .AppendLine(" from version ", ConsoleColor.DarkBlue)
-                    .Append(agentVersionResponse.Version, ConsoleColor.Blue)
+                    .Append(agentVersion, ConsoleColor.Blue)
                     .AppendLine("...", ConsoleColor.DarkBlue);
 
                 try {
-                    await UpdateAgent(agent, messageClient, CancellationToken.None);
+                    await UpdateAgent(agent, messageClient, TokenSource.Token);
 
                     Output.Append("Agent ", ConsoleColor.DarkGreen)
                         .Append(agent.Name, ConsoleColor.Green)
@@ -96,8 +131,6 @@ namespace Photon.Server.Internal.Sessions
                         .Append(agent.Name, ConsoleColor.Red)
                         .AppendLine("!", ConsoleColor.DarkRed)
                         .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
-
-                    throw;
                 }
             }
         }

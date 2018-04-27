@@ -58,6 +58,17 @@ namespace Photon.Communication
             Tcp.Close();
         }
 
+        public async Task<TResponse> Handshake<TResponse>(IRequestMessage handshakeRequest, TimeSpan timeout, CancellationToken token)
+            where TResponse : class, IResponseMessage
+        {
+            using (var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token)) {
+                tokenSource.CancelAfter(timeout);
+
+                return await Send(handshakeRequest)
+                    .GetResponseAsync<TResponse>(tokenSource.Token);
+            }
+        }
+
         public MessageHandle Send(IRequestMessage message)
         {
             return Transceiver.Send(message);
