@@ -1,4 +1,5 @@
 ﻿using Photon.Library;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,7 @@ namespace Photon.Server.Internal
     {
         public static string AssemblyPath {get;}
         public static string Directory {get;}
+        public static string Version {get;}
 
         public static int Parallelism => ConfigurationReader.AppSetting("parallelism", 1);
         private static string ServerFilePath => ConfigurationReader.AppSetting("serverFile", "server.json");
@@ -35,6 +37,8 @@ namespace Photon.Server.Internal
 
             var _dir = ConfigurationReader.AppSetting("directory", AssemblyPath);
             Directory = Path.GetFullPath(GetRootDirectory(_dir));
+
+            Version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
         }
 
         private static string FullPath(params string[] paths)

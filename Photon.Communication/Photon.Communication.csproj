@@ -44,6 +44,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\MessageProcessorBase.cs" />
     <Compile Include="Messages\ResponseMessageBase.cs" />
     <Compile Include="Messages\IFileResponseMessage.cs" />
     <Compile Include="Messages\IMessage.cs" />

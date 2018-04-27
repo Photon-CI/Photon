@@ -7,9 +7,12 @@ namespace Photon.Communication
 {
     internal class MessageProcessor
     {
-        private readonly MessageTransceiver transceiver;
         private readonly MessageProcessorRegistry registry;
+        private readonly MessageTransceiver transceiver;
+
         private ActionBlock<MessageProcessorHandle> queue;
+
+        public object Context {get; set;}
 
 
         public MessageProcessor(MessageTransceiver transceiver, MessageProcessorRegistry registry)
@@ -39,7 +42,11 @@ namespace Photon.Communication
         private async Task OnProcess(MessageProcessorHandle handle)
         {
             try {
-                var result = await registry.Process(transceiver, handle.RequestMessage);
+                var messageType = handle.RequestMessage.GetType();
+                if (!registry.TryGet(messageType, out var processFunc))
+                    throw new ApplicationException($"No Message Processor was found matching message type '{messageType.Name}'!");
+
+                var result = await processFunc(transceiver, handle.RequestMessage);
 
                 handle.SetResult(result);
             }

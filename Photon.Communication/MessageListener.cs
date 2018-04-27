@@ -86,7 +86,6 @@ namespace Photon.Communication
             TcpClient client;
             try {
                 client = listener.EndAcceptTcpClient(result);
-                OnConnectionReceived(client);
             }
             catch (Exception error) {
                 OnThreadException(error);
@@ -96,10 +95,17 @@ namespace Photon.Communication
                 listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
             }
 
+            var host = AcceptClient(client);
+            BeginOnConnectionReceived(host);
+        }
+
+        private MessageHost AcceptClient(TcpClient client)
+        {
             var host = new MessageHost(client, messageRegistry);
             host.ThreadException += Host_OnThreadException;
             host.Stopped += Host_Stopped;
             hostList.Add(host);
+            return host;
         }
 
         private void Host_OnThreadException(object sender, UnhandledExceptionEventArgs e)
@@ -114,10 +120,22 @@ namespace Photon.Communication
             host.Dispose();
         }
 
-        protected virtual void OnConnectionReceived(TcpClient client)
+        protected virtual void BeginOnConnectionReceived(MessageHost host)
         {
-            var remote = (IPEndPoint)client.Client.RemoteEndPoint;
-            ConnectionReceived?.Invoke(this, new TcpConnectionReceivedEventArgs(remote.Address.ToString(), remote.Port));
+            if (ConnectionReceived == null) return;
+
+            var args = new TcpConnectionReceivedEventArgs(host);
+            ConnectionReceived?.BeginInvoke(this, args, EndOnConnectionReceived, args);
+        }
+
+        protected virtual void EndOnConnectionReceived(IAsyncResult state)
+        {
+            var args = (TcpConnectionReceivedEventArgs)state.AsyncState;
+
+            if (!args.Accept) {
+                hostList.Remove(args.Host);
+                args.Host.Dispose();
+            }
         }
 
         protected virtual void OnThreadException(object exceptionObject)
@@ -128,13 +146,15 @@ namespace Photon.Communication
 
     public class TcpConnectionReceivedEventArgs : EventArgs
     {
-        public string Host {get;}
-        public int Port {get;}
+        public MessageHost Host {get;}
+        public bool Accept {get; set;}
 
-        public TcpConnectionReceivedEventArgs(string host, int port)
+
+        public TcpConnectionReceivedEventArgs(MessageHost host)
         {
             this.Host = host;
-            this.Port = port;
+
+            Accept = true;
         }
     }
 }

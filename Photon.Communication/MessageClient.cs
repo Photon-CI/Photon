@@ -14,20 +14,15 @@ namespace Photon.Communication
     {
         public event UnhandledExceptionEventHandler ThreadException;
 
-        private readonly TcpClient client;
-        private readonly MessageProcessorRegistry messageRegistry;
-
-        public object Context {get; set;}
-        public MessageTransceiver Transceiver {get; private set;}
+        public TcpClient Tcp {get;}
+        public MessageTransceiver Transceiver {get;}
 
         public bool IsConnected => Transceiver?.IsStarted ?? false;
 
 
         public MessageClient(MessageProcessorRegistry registry)
         {
-            messageRegistry = registry;
-
-            client = new TcpClient {
+            Tcp = new TcpClient {
                 NoDelay = true,
                 ExclusiveAddressUse = false,
                 Client = {
@@ -35,31 +30,32 @@ namespace Photon.Communication
                     ExclusiveAddressUse = false
                 },
             };
+
+            Transceiver = new MessageTransceiver(registry) {
+                Context = this,
+            };
+
+            Transceiver.ThreadException += Transceiver_OnThreadException;
         }
 
         public void Dispose()
         {
             Transceiver?.Dispose();
-            client?.Dispose();
+            Tcp?.Dispose();
         }
 
         public async Task ConnectAsync(string hostname, int port, CancellationToken token)
         {
-            token.Register(() => client.Close());
-            await client.ConnectAsync(hostname, port);
+            token.Register(() => Tcp.Close());
+            await Tcp.ConnectAsync(hostname, port);
 
-            Transceiver = new MessageTransceiver(messageRegistry) {
-                Context = Context,
-            };
-            Transceiver.ThreadException += Transceiver_OnThreadException;
-
-            Transceiver.Start(client);
+            Transceiver.Start(Tcp);
         }
 
         public async Task DisconnectAsync()
         {
             await Transceiver.StopAsync();
-            client.Close();
+            Tcp.Close();
         }
 
         public MessageHandle Send(IRequestMessage message)

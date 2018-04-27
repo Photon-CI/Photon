@@ -28,5 +28,14 @@ namespace Photon.Library
                 return JsonConvert.DeserializeObject<HttpPackageIndex>(json);
             }
         }
+
+        public static async Task<HttpPackageIndex> GetLatestCliIndex()
+        {
+            using (var webClient = new WebClient()) {
+                var indexUrl = NetPath.Combine(ServerUrl, "api/cli/index");
+                var json = await webClient.DownloadStringTaskAsync(indexUrl);
+                return JsonConvert.DeserializeObject<HttpPackageIndex>(json);
+            }
+        }
     }
 }

@@ -49,6 +49,7 @@
     <Compile Include="Actions\ProjectPackageAction.cs" />
     <Compile Include="Actions\DeployRunAction.cs" />
     <Compile Include="Actions\BuildRunAction.cs" />
+    <Compile Include="Actions\UpdateSelfAction.cs" />
     <Compile Include="Actions\UpdateServerAction.cs" />
     <Compile Include="Commands\UpdateCommands.cs" />
     <Compile Include="Commands\BuildCommands.cs" />

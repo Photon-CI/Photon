@@ -1,4 +1,5 @@
 ﻿using Photon.Library;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,7 @@ namespace Photon.CLI.Internal
     {
         public static string AssemblyPath {get;}
         public static string Directory {get;}
+        public static string Version {get;}
 
 
         static Configuration()
@@ -18,6 +20,8 @@ namespace Photon.CLI.Internal
 
             var _dir = ConfigurationReader.AppSetting("directory", AssemblyPath);
             Directory = Path.GetFullPath(GetRootDirectory(_dir));
+
+            Version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
         }
 
         private static string GetRootDirectory(string path)

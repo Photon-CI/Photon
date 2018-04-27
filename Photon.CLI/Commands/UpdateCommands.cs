@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Photon.CLI.Commands
 {
-    [Command("Update", "Automate software updates.")]
+    [Command("Update", "Automated Server, Agent, and CLI software updates.")]
     internal class UpdateCommands : CommandDictionary<CommandContext>
     {
         public string Server {get; set;}
@@ -16,6 +16,7 @@ namespace Photon.CLI.Commands
         {
             Map("server").ToAction(UpdateServerCommand);
             Map("agents").ToAction(UpdateAgentsCommand);
+            Map("self").ToAction(UpdateSelfCommand);
             Map("help", "?").ToAction(OnHelp);
 
             Map("-s", "-server").ToProperty(v => Server = v);
@@ -26,6 +27,7 @@ namespace Photon.CLI.Commands
             await new HelpPrinter()
                 .Add(typeof(UpdateCommands), nameof(UpdateServerCommand))
                 .Add(typeof(UpdateCommands), nameof(UpdateAgentsCommand))
+                .Add(typeof(UpdateCommands), nameof(UpdateSelfCommand))
                 .PrintAsync();
         }
 
@@ -61,6 +63,21 @@ namespace Photon.CLI.Commands
             var updateAction = new UpdateAgentsAction {
                 ServerName = Server,
             };
+
+            await updateAction.Run(Context);
+        }
+
+        [Command("Self", "Updates the CLI application.")]
+        public async Task UpdateSelfCommand(string[] args)
+        {
+            if (args.ContainsAny("help", "?")) {
+                await new HelpPrinter(typeof(UpdateCommands), nameof(UpdateSelfCommand))
+                    .PrintAsync();
+
+                return;
+            }
+
+            var updateAction = new UpdateSelfAction();
 
             await updateAction.Run(Context);
         }
