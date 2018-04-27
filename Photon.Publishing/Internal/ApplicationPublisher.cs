@@ -89,7 +89,9 @@ namespace Photon.Publishing.Internal
             context.Output
                 .Append("Application ", ConsoleColor.DarkGreen)
                 .Append(packageName, ConsoleColor.Green)
-                .AppendLine(" updated successfully.", ConsoleColor.DarkGreen);
+                .Append(" updated successfully. ", ConsoleColor.DarkGreen)
+                .Append("Version ", ConsoleColor.DarkCyan)
+                .AppendLine(webVersion, ConsoleColor.Cyan);
         }
 
         private async Task CreateWebPath(string assemblyVersion)

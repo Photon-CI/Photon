@@ -27,14 +27,18 @@ namespace Photon.Agent.MessageHandlers
             return await Task.FromResult(response);
         }
 
-        private static void Run(string msiFilename)
+        private static async void Run(string msiFilename)
         {
-            var info = new ProcessStartInfo {
-                FileName = "msiexec.exe",
-                Arguments = $"/I \"{msiFilename}\" /passive /fe /L*V \"log.txt\"",
-            };
+            await Task.Run(async () => {
+                await Task.Delay(200);
 
-            SysProcess.Start(info);
+                var info = new ProcessStartInfo {
+                    FileName = "msiexec.exe",
+                    Arguments = $"/I \"{msiFilename}\" /passive /fe /L*V \"log.txt\"",
+                };
+
+                SysProcess.Start(info);
+            });
         }
     }
 }
