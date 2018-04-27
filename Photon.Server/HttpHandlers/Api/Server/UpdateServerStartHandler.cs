@@ -71,30 +71,34 @@ namespace Photon.Server.HttpHandlers.Api.Server
                     return BadRequest().SetText($"Invalid content-type! '{HttpContext.Request.ContentType}'");
                 }
 
-                // TODO: Verify MSI?
-
-                try {
-                    await PhotonServer.Instance.Shutdown(TimeSpan.FromSeconds(30));
-                }
-                catch (Exception error) {
-                    Log.Error("An error occurred while shutting down!", error);
-                }
-
-                try {
-                    var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /qn /L*V \"log.txt\"";
-
-                    ProcessRunner.Run(updatePath, cmd);
-                }
-                catch (Exception error) {
-                    Log.Error("Failed to start server update!", error);
-                    return Exception(new ApplicationException("Failed to start server update!", error));
-                }
+                BeginInstall(updatePath, msiFilename);
 
                 return Ok().SetText("Shutting down and performing update...");
             }
             catch (Exception error) {
                 Log.Error("Failed to run Update-Task!", error);
                 return Exception(error);
+            }
+        }
+
+        private async void BeginInstall(string updatePath, string msiFilename)
+        {
+            // TODO: Verify MSI?
+
+            try {
+                await PhotonServer.Instance.Shutdown(TimeSpan.FromSeconds(30));
+            }
+            catch (Exception error) {
+                Log.Error("An error occurred while shutting down!", error);
+            }
+
+            try {
+                var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /qn /L*V \"log.txt\"";
+
+                ProcessRunner.Run(updatePath, cmd);
+            }
+            catch (Exception error) {
+                Log.Error("Failed to start server update!", error);
             }
         }
     }
