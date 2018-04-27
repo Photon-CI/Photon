@@ -28,7 +28,7 @@
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
 
     <Property Id="CONFIGSRCEXISTS">
-      <DirectorySearch Id="ConfigSrcDirSearch" Path="[SOURCEDIR]" Depth="0">
+      <DirectorySearch Id="ConfigSrcDirSearch" Path="[SourceDir]" Depth="0">
         <FileSearch Id="ConfigSrcFileSearch" Name="agent.json" />
       </DirectorySearch>
     </Property>
@@ -137,7 +137,7 @@
 	      <File Source="$(var.ProjectDir)Content\agent.json" KeyPath="yes" />
 	    </Component>
 	    <Component Id="AgentUserConfigComponent" Guid="">
-	      <Condition>CONFIGSRCEXISTS AND NOT CONFIGDESTEXISTS</Condition>
+	      <Condition>CONFIGSRCEXISTS</Condition>
 	      <CopyFile Id="AgentUserConfig" SourceProperty="CONFIGSRCEXISTS" DestinationProperty="INSTALLDIR" />
 	    </Component>
 	  </ComponentGroup>

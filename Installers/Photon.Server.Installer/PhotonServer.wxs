@@ -27,7 +27,7 @@
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
     
     <Property Id='CONFIGSRCEXISTS'>
-      <DirectorySearch Id='ConfigSrcDirSearch' Path='[SOURCEDIR]' Depth='0'>
+      <DirectorySearch Id='ConfigSrcDirSearch' Path='[SourceDir]' Depth='0'>
         <FileSearch Id='ConfigSrcFileSearch' Name="server.json" />
       </DirectorySearch>
     </Property>
@@ -103,7 +103,7 @@
         <File Source="$(var.ProjectDir)Content\projects.json" KeyPath="yes" />
       </Component>
       <Component Id="ServerUserConfigComponent" Guid="">
-        <Condition>CONFIGSRCEXISTS AND NOT CONFIGDESTEXISTS</Condition>
+        <Condition>CONFIGSRCEXISTS</Condition>
         <CopyFile Id="ServerUserConfig" SourceProperty="CONFIGSRCEXISTS" DestinationProperty="INSTALLDIR" />
       </Component>
     </ComponentGroup>
