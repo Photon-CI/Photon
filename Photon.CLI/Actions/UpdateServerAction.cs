@@ -3,11 +3,13 @@ using Photon.CLI.Internal.Http;
 using Photon.Framework;
 using Photon.Framework.Tools;
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Photon.Library;
+using Photon.Library.HttpMessages;
 
 namespace Photon.CLI.Actions
 {
@@ -27,7 +29,7 @@ namespace Photon.CLI.Actions
             }
 
             var serverIndex = await DownloadTools.GetLatestServerIndex();
-            var latestServerVersion = (string)serverIndex.Version;
+            var latestServerVersion = serverIndex.Version;
             
             if (!VersionTools.HasUpdates(currentVersion, latestServerVersion)) {
                 ConsoleEx.Out
@@ -40,7 +42,7 @@ namespace Photon.CLI.Actions
 
             ConsoleEx.Out.WriteLine("Downloading server update...", ConsoleColor.DarkCyan);
 
-            await BeginServerUpdate(server);
+            await BeginServerUpdate(server, serverIndex);
 
             ConsoleEx.Out
                 .WriteLine("Server update started.", ConsoleColor.Cyan)
@@ -51,20 +53,31 @@ namespace Photon.CLI.Actions
             await Reconnect(server, latestServerVersion, TimeSpan.FromMinutes(2));
         }
 
-        private async Task BeginServerUpdate(PhotonServerDefinition server)
+        private async Task BeginServerUpdate(PhotonServerDefinition server, HttpPackageIndex index)
         {
-            HttpClientEx client = null;
+            // TODO: download latest msi
+            string updateFilename;
 
             try {
-                var url = NetPath.Combine(server.Url, "api/server/update/start");
+                var url = $"http://download.photon.null511.info/server/{index.Version}/{index.MsiFilename}";
 
-                client = HttpClientEx.Post(url);
+                using (var client = HttpClientEx.Get(url)) {
+                    await client.Send();
 
-                await client.Send();
+                    if (client.ResponseBase.StatusCode != HttpStatusCode.OK)
+                        throw new ApplicationException($"Failed to download Photon.Server update! HTTP.{(int)client.ResponseBase.StatusCode} {client.ResponseBase.StatusDescription}");
 
-                if (client.ResponseBase.StatusCode == HttpStatusCode.BadRequest) {
-                    var text = await client.GetResponseTextAsync();
-                    throw new ApplicationException($"Bad Update Request! {text}");
+                    var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
+                    updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
+
+                    if (!Directory.Exists(updateDirectory))
+                        Directory.CreateDirectory(updateDirectory);
+
+                    using (var fileStream = File.Open(updateFilename, FileMode.Create, FileAccess.Write))
+                    using (var responseStream = client.ResponseBase.GetResponseStream()) {
+                        if (responseStream != null)
+                            await responseStream.CopyToAsync(fileStream);
+                    }
                 }
             }
             catch (HttpStatusCodeException error) {
@@ -73,8 +86,27 @@ namespace Photon.CLI.Actions
 
                 throw;
             }
-            finally {
-                client?.Dispose();
+
+            try {
+                var url = NetPath.Combine(server.Url, "api/server/update");
+
+                using (var client = HttpClientEx.Post(url)) {
+                    client.RequestBase.ContentType = "application/zip";
+                    client.BodyFunc = () => File.Open(updateFilename, FileMode.Open, FileAccess.Read);
+
+                    await client.Send();
+
+                    if (client.ResponseBase.StatusCode == HttpStatusCode.BadRequest) {
+                        var text = await client.GetResponseTextAsync();
+                        throw new ApplicationException($"Bad Update Request! {text}");
+                    }
+                }
+            }
+            catch (HttpStatusCodeException error) {
+                if (error.HttpCode == HttpStatusCode.NotFound)
+                    throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
+
+                throw;
             }
         }
 

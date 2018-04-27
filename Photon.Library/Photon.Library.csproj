@@ -55,6 +55,7 @@
     <Compile Include="HttpMessages\HttpBuildResultResponse.cs" />
     <Compile Include="HttpMessages\HttpDeployStartResponse.cs" />
     <Compile Include="HttpMessages\HttpBuildStartResponse.cs" />
+    <Compile Include="HttpMessages\HttpPackageIndex.cs" />
     <Compile Include="HttpMessages\HttpPackageReference.cs" />
     <Compile Include="ILibraryAssembly.cs" />
     <Compile Include="LazyAsync.cs" />
