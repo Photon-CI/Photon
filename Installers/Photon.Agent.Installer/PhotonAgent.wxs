@@ -138,7 +138,7 @@
 	    </Component>
 	    <Component Id="AgentUserConfigComponent" Guid="">
 	      <Condition>CONFIGSRCEXISTS</Condition>
-	      <RemoveFile Id="ServerUserConfig" Name="server.json" On="install" />
+	      <RemoveFile Id="RemoveAgentUserConfig" Name="agent.json" On="install" />
 	      <CopyFile Id="AgentUserConfig" SourceProperty="CONFIGSRCEXISTS" DestinationProperty="INSTALLDIR" />
 	    </Component>
 	  </ComponentGroup>
