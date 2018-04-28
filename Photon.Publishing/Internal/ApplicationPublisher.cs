@@ -45,7 +45,7 @@ namespace Photon.Publishing.Internal
 
             var webVersion = await GetWebVersion();
 
-            if (!HasUpdates(webVersion, assemblyVersion)) {
+            if (!VersionTools.HasUpdates(webVersion, assemblyVersion)) {
                 context.Output
                     .Append("Application ", ConsoleColor.DarkBlue)
                     .Append(packageName, ConsoleColor.Blue)
@@ -89,7 +89,9 @@ namespace Photon.Publishing.Internal
             context.Output
                 .Append("Application ", ConsoleColor.DarkGreen)
                 .Append(packageName, ConsoleColor.Green)
-                .AppendLine(" updated successfully.", ConsoleColor.DarkGreen);
+                .Append(" updated successfully. ", ConsoleColor.DarkGreen)
+                .Append("Version ", ConsoleColor.DarkCyan)
+                .AppendLine(assemblyVersion, ConsoleColor.Cyan);
         }
 
         private async Task CreateWebPath(string assemblyVersion)
@@ -183,17 +185,6 @@ namespace Photon.Publishing.Internal
             using (var _ = (FtpWebResponse)await request.GetResponseAsync()) {
                 //...
             }
-        }
-
-        private static bool HasUpdates(string currentVersion, string newVersion)
-        {
-            if (string.IsNullOrEmpty(currentVersion))
-                return true;
-
-            var _current = new Version(currentVersion);
-            var _new = new Version(newVersion);
-
-            return _new > _current;
         }
 
         private static async Task CreateZip(string sourcePath, string filename)

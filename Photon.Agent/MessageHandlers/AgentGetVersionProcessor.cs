@@ -1,8 +1,7 @@
-﻿using Photon.Communication;
+﻿using Photon.Agent.Internal;
+using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Library.TcpMessages;
-using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
@@ -11,11 +10,8 @@ namespace Photon.Agent.MessageHandlers
     {
         public override async Task<IResponseMessage> Process(AgentGetVersionRequest requestMessage)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var assemblyInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-
             var response = new AgentGetVersionResponse {
-                Version = assemblyInfo.ProductVersion,
+                Version = Configuration.Version,
             };
 
             return await Task.FromResult(response);

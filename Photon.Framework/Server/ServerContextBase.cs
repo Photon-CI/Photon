@@ -77,6 +77,22 @@ namespace Photon.Framework.Server
             return handle;
         }
 
+        public AgentSessionHandleCollection RegisterAllAgents()
+        {
+            if (Agents == null)
+                throw new ApplicationException("No agents have been defined!");
+
+            PrintFoundAgents(Agents);
+
+            var roleAgentHandles = Agents.Select(a => {
+                var handle = ConnectToAgent(a);
+                agentSessions.Add(handle);
+                return handle;
+            });
+
+            return new AgentSessionHandleCollection(this, roleAgentHandles);
+        }
+
         public AgentSessionHandleCollection RegisterAllAgents(params string[] roles)
         {
             if (Agents == null)

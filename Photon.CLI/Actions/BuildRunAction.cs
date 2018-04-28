@@ -75,7 +75,7 @@ namespace Photon.CLI.Actions
                     await fileStream.CopyToAsync(requestStream);
                 }
 
-                var url = NetPath.Combine(server.Url, "build/start");
+                var url = NetPath.Combine(server.Url, "api/build/start");
 
                 client = HttpClientEx.Post(url, new {
                     refspec = GitRefspec,
@@ -110,7 +110,7 @@ namespace Photon.CLI.Actions
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "session/output");
+                var url = NetPath.Combine(server.Url, "api/session/output");
 
                 client = HttpClientEx.Get(url, new {
                     session = sessionId,
@@ -162,7 +162,7 @@ namespace Photon.CLI.Actions
             HttpClientEx client = null;
 
             try {
-                var url = NetPath.Combine(server.Url, "build/result");
+                var url = NetPath.Combine(server.Url, "api/build/result");
 
                 client = HttpClientEx.Get(url, new {
                     session = sessionId,

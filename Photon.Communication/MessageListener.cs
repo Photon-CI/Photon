@@ -14,6 +14,7 @@ namespace Photon.Communication
     /// </summary>
     public class MessageListener : IDisposable
     {
+        public event EventHandler<TcpConnectionReceivedEventArgs> ConnectionReceived;
         public event UnhandledExceptionEventHandler ThreadException;
 
         private readonly MessageProcessorRegistry messageRegistry;
@@ -51,10 +52,18 @@ namespace Photon.Communication
                 isListening = true;
             }
 
-            listener = new TcpListener(address, port);
+            listener = new TcpListener(address, port) {
+                ExclusiveAddressUse = false,
+                Server = {
+                    NoDelay = true,
+                    ExclusiveAddressUse = false,
+                }
+            };
+
+            listener.AllowNatTraversal(true);
             listener.Start();
 
-            listener.BeginAcceptTcpClient(ConnectionReceived, new object());
+            listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
         }
 
         public async Task StopAsync()
@@ -70,7 +79,7 @@ namespace Photon.Communication
             await Task.WhenAll(tasks.ToArray());
         }
 
-        private void ConnectionReceived(IAsyncResult result)
+        private void Listener_OnConnectionReceived(IAsyncResult result)
         {
             if (!isListening) return;
 
@@ -83,13 +92,20 @@ namespace Photon.Communication
                 return;
             }
             finally {
-                listener.BeginAcceptTcpClient(ConnectionReceived, new object());
+                listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
             }
 
+            var host = AcceptClient(client);
+            BeginOnConnectionReceived(host);
+        }
+
+        private MessageHost AcceptClient(TcpClient client)
+        {
             var host = new MessageHost(client, messageRegistry);
             host.ThreadException += Host_OnThreadException;
             host.Stopped += Host_Stopped;
             hostList.Add(host);
+            return host;
         }
 
         private void Host_OnThreadException(object sender, UnhandledExceptionEventArgs e)
@@ -104,9 +120,41 @@ namespace Photon.Communication
             host.Dispose();
         }
 
+        protected virtual void BeginOnConnectionReceived(MessageHost host)
+        {
+            if (ConnectionReceived == null) return;
+
+            var args = new TcpConnectionReceivedEventArgs(host);
+            ConnectionReceived?.BeginInvoke(this, args, EndOnConnectionReceived, args);
+        }
+
+        protected virtual void EndOnConnectionReceived(IAsyncResult state)
+        {
+            var args = (TcpConnectionReceivedEventArgs)state.AsyncState;
+
+            if (!args.Accept) {
+                hostList.Remove(args.Host);
+                args.Host.Dispose();
+            }
+        }
+
         protected virtual void OnThreadException(object exceptionObject)
         {
             ThreadException?.Invoke(this, new UnhandledExceptionEventArgs(exceptionObject, false));
+        }
+    }
+
+    public class TcpConnectionReceivedEventArgs : EventArgs
+    {
+        public MessageHost Host {get;}
+        public bool Accept {get; set;}
+
+
+        public TcpConnectionReceivedEventArgs(MessageHost host)
+        {
+            this.Host = host;
+
+            Accept = true;
         }
     }
 }

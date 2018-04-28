@@ -28,14 +28,9 @@ namespace Photon.Communication
                 Register(classType);
         }
 
-        internal async Task<IResponseMessage> Process(MessageTransceiver transceiver, IRequestMessage requestMessage)
+        internal bool TryGet(Type messageType, out ProcessEvent processFunc)
         {
-            var requestType = requestMessage.GetType();
-
-            if (!processorMap.TryGetValue(requestType, out var processorFunc))
-                throw new Exception($"No processor found matching request type '{requestType.Name}'!");
-
-            return await processorFunc.Invoke(transceiver, requestMessage);
+            return processorMap.TryGetValue(messageType, out processFunc);
         }
 
         public void Register<TProcessor, TRequest>()
@@ -63,29 +58,32 @@ namespace Photon.Communication
                 var method = classInterface.GetMethod("Process");
                 if (method == null) continue;
 
-                processorMap[requestType] = (transceiver, message) =>
-                    OnProcess(transceiver, processorClassType, method, message);
+                processorMap[requestType] = CreateFunc(processorClassType, method);
             }
         }
-
-        private static async Task<IResponseMessage> OnProcess(MessageTransceiver transceiver, Type processorClassType, MethodInfo processMethod, IRequestMessage request)
+        
+        private static ProcessEvent CreateFunc(Type processorClassType, MethodInfo processMethod)
         {
-            object processor = null;
+            return async (transceiver, message) => {
+                object processorObj = null;
 
-            try {
-                processor = Activator.CreateInstance(processorClassType);
+                try {
+                    processorObj = Activator.CreateInstance(processorClassType);
 
-                processorClassType.GetProperty("Transceiver")?.SetValue(processor, transceiver);
+                    if (!(processorObj is IProcessMessage processor))
+                        throw new ApplicationException($"Invalid message processor type '{processorClassType.Name}'!");
 
-                var arguments = new object[] {request};
+                    processor.Transceiver = transceiver;
 
-                var result = processMethod.Invoke(processor, arguments);
+                    var arguments = new object[] {message};
+                    var result = processMethod.Invoke(processorObj, arguments);
 
-                return await (Task<IResponseMessage>)result;
-            }
-            finally {
-                (processor as IDisposable)?.Dispose();
-            }
+                    return await (Task<IResponseMessage>)result;
+                }
+                finally {
+                    (processorObj as IDisposable)?.Dispose();
+                }
+            };
         }
     }
 }

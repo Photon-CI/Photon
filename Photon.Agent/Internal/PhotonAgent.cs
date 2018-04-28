@@ -1,8 +1,10 @@
 ﻿using log4net;
+using Photon.Agent.Internal.Git;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Variables;
 using Photon.Library;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
@@ -12,9 +14,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using Photon.Agent.Internal.Git;
-using Photon.Framework.Variables;
 
 namespace Photon.Agent.Internal
 {
@@ -47,7 +48,22 @@ namespace Photon.Agent.Internal
             messageListener = new MessageListener(MessageRegistry);
 
             RepositorySources.RepositorySourceDirectory = Configuration.RepositoryDirectory;
+            messageListener.ConnectionReceived += MessageListener_ConnectionReceived;
             messageListener.ThreadException += MessageListener_ThreadException;
+        }
+
+        private void MessageListener_ConnectionReceived(object sender, TcpConnectionReceivedEventArgs e)
+        {
+            var remote = (IPEndPoint)e.Host.Tcp.Client.RemoteEndPoint;
+            Log.Info($"TCP Connection received from '{remote.Address}:{remote.Port}'.");
+
+            e.Accept = false;
+            using (var tokenSource = new CancellationTokenSource()) {
+                tokenSource.CancelAfter(TimeSpan.FromSeconds(30));
+
+                if (e.Host.GetHandshakeResult(tokenSource.Token).GetAwaiter().GetResult())
+                    e.Accept = true;
+            }
         }
 
         public void Dispose()
@@ -184,7 +200,7 @@ namespace Photon.Agent.Internal
             try {
                 receiver.Start();
 
-                Log.Info($"HTTP Server listening at http://{httpPrefix}");
+                Log.Info($"HTTP Server listening at {httpPrefix}");
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);

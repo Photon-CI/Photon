@@ -2,6 +2,7 @@
 using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
+using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
 using System;
 using System.IO;
@@ -12,8 +13,10 @@ namespace Photon.Publishing.Tasks
 {
     public class PublishTask : IBuildTask
     {
+        private NuGetCore nugetClient;
         private string nugetPackageDir;
         private string nugetApiKey;
+        private string nugetExe;
         private string apiUrl;
         private string ftpUrl;
         private string ftpUser;
@@ -31,49 +34,42 @@ namespace Photon.Publishing.Tasks
 
             nugetPackageDir = Path.Combine(Context.WorkDirectory, "Packages");
             nugetApiKey = Context.ServerVariables.Global["nuget.apiKey"];
+            nugetExe = Context.AgentVariables.Global["nuget.exe"];
             apiUrl = photonVars["apiUrl"];
             ftpUrl = photonVars["ftp.url"];
             ftpUser = photonVars["ftp.user"];
             ftpPass = photonVars["ftp.pass"];
 
+            nugetClient = new NuGetCore {
+                EnableV3 = true,
+                Output = Context.Output,
+                ApiKey = nugetApiKey,
+            };
+            nugetClient.Initialize();
+
             await BuildSolution();
-            await PublishFramework(token);
             await PublishServer();
             await PublishAgent();
             await PublishCLI();
+
+            if (!Directory.Exists(nugetPackageDir))
+                Directory.CreateDirectory(nugetPackageDir);
+
+            await PublishFrameworkPackage(token);
+            await PublishPluginPackage("Photon.IIS", token);
+            await PublishPluginPackage("Photon.NuGet", token);
+            await PublishPluginPackage("Photon.WindowsServices", token);
+            await PublishPluginPackage("Photon.Config", token);
         }
 
         private async Task BuildSolution()
         {
-            //var nugetExe = Context.AgentVariables.Global["nuget.exe"];
-            //var solutionFile = Path.Combine(Context.ContentDirectory, "Photon.sln");
-
-            //await Context.RunCommandLineAsync(
-            //    nugetExe, "restore",
-            //    $"\"{solutionFile}\"");
-
             await Context.RunCommandLineAsync(
                 ".\\bin\\msbuild.cmd", "/m", "/v:m",
                 "Photon.sln",
                 "/p:Configuration=Release",
                 "/p:Platform=\"Any CPU\"",
                 "/t:Rebuild");
-        }
-
-        private async Task PublishFramework(CancellationToken token)
-        {
-            var assemblyFilename = Path.Combine(Context.ContentDirectory, "Photon.Framework", "bin", "Release", "Photon.Framework.dll");
-
-            var publisher = new NugetPackagePublisher(Context) {
-                NugetExe = Context.AgentVariables.Global["nuget.exe"],
-                ProjectFile = Path.Combine("Photon.Framework", "Photon.Framework.csproj"),
-                AssemblyVersion = AssemblyTools.GetVersion(assemblyFilename),
-                PackageId = "photon.framework",
-                PackageDirectory = nugetPackageDir,
-                ApiKey = nugetApiKey,
-            };
-
-            await publisher.PublishAsync(token);
         }
 
         private async Task PublishServer()
@@ -128,6 +124,39 @@ namespace Photon.Publishing.Tasks
             };
 
             await publisher.PublishAsync("Photon CLI", "Photon.CLI");
+        }
+
+        private async Task PublishFrameworkPackage(CancellationToken token)
+        {
+            var projectPath = Path.Combine(Context.ContentDirectory, "Photon.Framework");
+            var packageDefinition = Path.Combine(projectPath, "Photon.Framework.csproj");
+            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.Framework.dll");
+            var assemblyVersion = AssemblyTools.GetVersion(assemblyFilename);
+
+            await PublishPackage("Photon.Framework", packageDefinition, assemblyVersion, token);
+        }
+
+        private async Task PublishPluginPackage(string id, CancellationToken token)
+        {
+            var projectPath = Path.Combine(Context.ContentDirectory, "Plugins", id);
+            var packageDefinition = Path.Combine(projectPath, $"{id}.csproj");
+            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", $"{id}.dll");
+            var assemblyVersion = AssemblyTools.GetVersion(assemblyFilename);
+
+            await PublishPackage(id, packageDefinition, assemblyVersion, token);
+        }
+
+        private async Task PublishPackage(string packageId, string packageDefinitionFilename, string assemblyVersion, CancellationToken token)
+        {
+            var publisher = new NuGetPackagePublisher(nugetClient) {
+                ExeFilename = nugetExe,
+                PackageDirectory = nugetPackageDir,
+                PackageDefinition = packageDefinitionFilename,
+                PackageId = packageId,
+                Version = assemblyVersion,
+            };
+
+            await publisher.PublishAsync(token);
         }
     }
 }

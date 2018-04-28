@@ -11,60 +11,60 @@ namespace Photon.Server.Internal
 {
     internal class AgentUpdater
     {
-        public string UpdateVersion {get; set;}
-        public string UpdateMsiFilename {get; set;}
+        public MessageClient MessageClient {get; set;}
+        public string MsiFilename {get; set;}
         public ScriptOutput Output {get; set;}
 
 
         public async Task Update(ServerAgentDefinition agent, CancellationToken token)
         {
-            Output
-                .Append("Checking Agent ", ConsoleColor.DarkCyan)
-                .Append(agent.Name, ConsoleColor.Cyan)
-                .AppendLine(" for updates...", ConsoleColor.DarkCyan);
+            //Output
+            //    .Append("Checking Agent ", ConsoleColor.DarkCyan)
+            //    .Append(agent.Name, ConsoleColor.Cyan)
+            //    .AppendLine(" for updates...", ConsoleColor.DarkCyan);
 
-            MessageClient client = null;
+            //MessageClient client = null;
 
             try {
-                client = new MessageClient(PhotonServer.Instance.MessageRegistry) {
-                    //Context = sessionBase,
-                };
+                //client = new MessageClient(PhotonServer.Instance.MessageRegistry) {
+                //    //Context = sessionBase,
+                //};
 
                 //MessageClient.ThreadException += MessageClient_OnThreadException;
 
-                await client.ConnectAsync(agent.TcpHost, agent.TcpPort, token);
+                //await client.ConnectAsync(agent.TcpHost, agent.TcpPort, token);
 
-                var versionRequest = new AgentGetVersionRequest();
+                //var versionRequest = new AgentGetVersionRequest();
 
-                var versionResponse = await client.Send(versionRequest)
-                    .GetResponseAsync<AgentGetVersionResponse>(token);
+                //var versionResponse = await client.Send(versionRequest)
+                //    .GetResponseAsync<AgentGetVersionResponse>(token);
 
-                if (!HasUpdates(versionResponse.Version, UpdateVersion)) {
-                    Output
-                        .Append("Agent ", ConsoleColor.DarkBlue)
-                        .Append(agent.Name, ConsoleColor.Blue)
-                        .AppendLine(" is up-to-date. Version: ", ConsoleColor.DarkBlue)
-                        .AppendLine(versionResponse.Version, ConsoleColor.Blue);
+                //if (!HasUpdates(versionResponse.Version, UpdateVersion)) {
+                //    Output
+                //        .Append("Agent ", ConsoleColor.DarkBlue)
+                //        .Append(agent.Name, ConsoleColor.Blue)
+                //        .AppendLine(" is up-to-date. Version: ", ConsoleColor.DarkBlue)
+                //        .AppendLine(versionResponse.Version, ConsoleColor.Blue);
 
-                    return;
-                }
+                //    return;
+                //}
 
-                Output
-                    .Append("Updating Agent ", ConsoleColor.DarkCyan)
-                    .Append(agent.Name, ConsoleColor.Cyan)
-                    .AppendLine("...", ConsoleColor.DarkCyan);
+                //Output
+                //    .Append("Updating Agent ", ConsoleColor.DarkCyan)
+                //    .Append(agent.Name, ConsoleColor.Cyan)
+                //    .AppendLine("...", ConsoleColor.DarkCyan);
 
                 var message = new AgentUpdateRequest {
-                    Filename = UpdateMsiFilename,
+                    Filename = MsiFilename,
                 };
 
-                await client.Send(message)
+                await MessageClient.Send(message)
                     .GetResponseAsync(token);
 
-                await client.DisconnectAsync();
+                await MessageClient.DisconnectAsync();
             }
             finally {
-                client?.Dispose();
+                MessageClient?.Dispose();
             }
 
             await Task.Delay(3000, token);

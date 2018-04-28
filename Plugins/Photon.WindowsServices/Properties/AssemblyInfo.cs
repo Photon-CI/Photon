@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Windows Service plugin for Photon.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Joshua Miller")]
-[assembly: AssemblyProduct("Photon.WindowsServices")]
+[assembly: AssemblyProduct("Photon")]
 [assembly: AssemblyCopyright("Copyright © Joshua Miller 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

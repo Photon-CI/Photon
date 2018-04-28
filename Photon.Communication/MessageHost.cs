@@ -1,6 +1,7 @@
 ﻿using Photon.Communication.Messages;
 using System;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication
@@ -11,29 +12,34 @@ namespace Photon.Communication
     public class MessageHost
     {
         public event UnhandledExceptionEventHandler ThreadException;
-
         public event EventHandler Stopped;
 
-        private readonly TcpClient client;
-        private readonly MessageTransceiver transceiver;
+        public MessageTransceiver Transceiver {get;}
+        private readonly TaskCompletionSource<bool> handshakeResult;
         private bool isConnected;
+
+        public TcpClient Tcp {get;}
 
 
         public MessageHost(TcpClient client, MessageProcessorRegistry registry)
         {
-            this.client = client;
+            this.Tcp = client;
 
             isConnected = true;
-            transceiver = new MessageTransceiver(registry);
-            transceiver.ThreadException += Transceiver_OnThreadException;
+            handshakeResult = new TaskCompletionSource<bool>();
 
-            transceiver.Start(client);
+            Transceiver = new MessageTransceiver(registry) {
+                Context = this,
+            };
+
+            Transceiver.ThreadException += Transceiver_OnThreadException;
+            Transceiver.Start(client);
         }
 
         public void Dispose()
         {
-            transceiver?.Dispose();
-            client?.Dispose();
+            Transceiver?.Dispose();
+            Tcp?.Dispose();
         }
 
         public async Task StopAsync()
@@ -41,9 +47,11 @@ namespace Photon.Communication
             if (!isConnected) return;
             isConnected = false;
 
+            handshakeResult.TrySetCanceled();
+
             try {
-                await transceiver.StopAsync();
-                client.Close();
+                await Transceiver.StopAsync();
+                Tcp.Close();
             }
             finally {
                 OnStopped();
@@ -52,12 +60,22 @@ namespace Photon.Communication
 
         public void SendOneWay(IRequestMessage message)
         {
-            transceiver.SendOneWay(message);
+            Transceiver.SendOneWay(message);
         }
 
         public MessageHandle Send(IRequestMessage message)
         {
-            return transceiver.Send(message);
+            return Transceiver.Send(message);
+        }
+
+        public async Task<bool> GetHandshakeResult(CancellationToken token)
+        {
+            return await handshakeResult.Task;
+        }
+
+        public void CompleteHandshake(bool result)
+        {
+            handshakeResult.SetResult(result);
         }
 
         protected virtual void OnStopped()

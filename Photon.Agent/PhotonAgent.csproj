@@ -47,8 +47,8 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.1.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.1.8\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.1.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.1.10\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -80,6 +80,7 @@
     <Compile Include="MessageHandlers\DeploySessionBeginProcessor.cs" />
     <Compile Include="MessageHandlers\DeploySessionReleaseProcessor.cs" />
     <Compile Include="MessageHandlers\AgentGetVersionProcessor.cs" />
+    <Compile Include="MessageHandlers\HandshakeProcessor.cs" />
     <Compile Include="MessageHandlers\TaskRunProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionReleaseProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionBeginProcessor.cs" />
@@ -89,7 +90,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="agent.json" />
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
     </None>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Photon.NuGet</id>
+    <title>Photon NuGet Plugin</title>
+    <version>$version$</version>
+    <authors>null511</authors>
+    <projectUrl>http://github.com/null511/Photon</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>https://raw.githubusercontent.com/null511/Photon/master/LICENSE</licenseUrl>
+    <description>A Photon plugin for interacting with NuGet.</description>
+    <copyright>Copyright 2018</copyright>
+    <tags>photon net automation nuget</tags>
+  </metadata>
+</package>

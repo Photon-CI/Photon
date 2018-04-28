@@ -43,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Photon.CLI.Installer", "Installers\Photon.CLI.Installer\Photon.CLI.Installer.wixproj", "{0DEF70A0-E6A9-4761-AD41-032D12D1AFBC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Config", "Plugins\Photon.Config\Photon.Config.csproj", "{DBEBE942-C5DC-47DB-A472-3FFF8C965285}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +169,14 @@ Global
 		{0DEF70A0-E6A9-4761-AD41-032D12D1AFBC}.Release|Any CPU.Build.0 = Release|x86
 		{0DEF70A0-E6A9-4761-AD41-032D12D1AFBC}.Release|x86.ActiveCfg = Release|x86
 		{0DEF70A0-E6A9-4761-AD41-032D12D1AFBC}.Release|x86.Build.0 = Release|x86
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Debug|x86.Build.0 = Debug|Any CPU
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Release|x86.ActiveCfg = Release|Any CPU
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -179,6 +189,7 @@ Global
 		{5430788B-8942-4B4D-9A54-733EA3701916} = {131C0824-D616-439B-B04D-92D720DDC02D}
 		{9160FAA4-CABF-4065-8837-978DEE247E29} = {131C0824-D616-439B-B04D-92D720DDC02D}
 		{0DEF70A0-E6A9-4761-AD41-032D12D1AFBC} = {131C0824-D616-439B-B04D-92D720DDC02D}
+		{DBEBE942-C5DC-47DB-A472-3FFF8C965285} = {E08A45CF-4CA4-42BA-8250-D55D6C33C51F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {16471B2A-9C76-4B4E-942F-5D0860A67320}

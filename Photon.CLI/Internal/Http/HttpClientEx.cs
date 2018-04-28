@@ -31,6 +31,7 @@ namespace Photon.CLI.Internal.Http
         public string Url {get; set;}
         public object Query {get; set;}
         public string Method {get; set;}
+        public string ContentType {get; set;}
         public Stream Body {get; set;}
         public Func<Stream> BodyFunc {get; set;}
         
@@ -80,6 +81,7 @@ namespace Photon.CLI.Internal.Http
             var request = WebRequest.CreateHttp(_url);
             request.Method = Method;
             request.KeepAlive = true;
+            request.ContentType = ContentType;
 
             var requestBody = Body ?? BodyFunc?.Invoke();
 

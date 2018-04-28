@@ -98,12 +98,16 @@ namespace Photon.Server.Internal
                 await session.PrepareWorkDirectoryAsync();
             }
             catch (Exception error) {
+                var _e = error;
+                if (error is AggregateException _ae)
+                    _e = _ae.Flatten();
+
                 session.Output
                     .Append("Failed to prepare working directory! ", ConsoleColor.DarkRed)
-                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    .AppendLine(_e.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                 abort = true;
-                errorList.Add(error);
+                errorList.Add(_e);
             }
 
             TaskResult result = null;

@@ -7,12 +7,15 @@ using System;
 using System.Runtime.Remoting.Lifetime;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Library.TcpMessages;
 
 namespace Photon.Server.Internal.Sessions
 {
     internal abstract class DomainAgentSessionHostBase : IDisposable
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DomainAgentSessionHostBase));
+
+        private const int HandshakeTimeoutSec = 30;
 
         protected readonly CancellationToken Token;
         private readonly ServerAgentDefinition agent;
@@ -40,9 +43,8 @@ namespace Photon.Server.Internal.Sessions
             sponsor = new ClientSponsor();
             sponsor.Register(SessionClient);
 
-            MessageClient = new MessageClient(PhotonServer.Instance.MessageRegistry) {
-                Context = sessionBase,
-            };
+            MessageClient = new MessageClient(PhotonServer.Instance.MessageRegistry);
+            MessageClient.Transceiver.Context = sessionBase;
 
             MessageClient.ThreadException += MessageClient_OnThreadException;
         }
@@ -62,14 +64,42 @@ namespace Photon.Server.Internal.Sessions
 
         private void SessionClient_OnSessionBegin(RemoteTaskCompletionSource taskHandle)
         {
-            Task.Run(async () => {
-                await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
-                await OnBeginSession();
-
-                Tasks.Start();
-                return (object)null;
-            }, Token)
+            Task.Run(ConnectToAgent, Token)
                 .ContinueWith(taskHandle.FromTask, Token);
+        }
+
+        private async Task<object> ConnectToAgent()
+        {
+            Log.Debug($"Connecting to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'...");
+
+            try {
+                await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
+                Log.Info($"Connected to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'.");
+
+                var handshakeRequest = new HandshakeRequest {
+                    Key = Guid.NewGuid().ToString(),
+                    ServerVersion = Configuration.Version,
+                };
+
+                var timeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
+                var handshakeResponse = await MessageClient.Handshake<HandshakeResponse>(handshakeRequest, timeout, Token);
+
+                if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
+                    throw new ApplicationException("Handshake Failed! An invalid key was returned.");
+
+                if (!handshakeResponse.PasswordMatch)
+                    throw new ApplicationException("Handshake Failed! Unauthorized.");
+            }
+            catch (Exception error) {
+                Log.Error($"Failed to connect to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'!", error);
+                MessageClient.Dispose();
+                throw;
+            }
+
+            await OnBeginSession();
+
+            Tasks.Start();
+            return null;
         }
 
         private void SessionClient_OnSessionRelease(RemoteTaskCompletionSource taskHandle)
