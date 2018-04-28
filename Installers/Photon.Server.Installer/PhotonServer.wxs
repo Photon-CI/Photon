@@ -104,6 +104,7 @@
       </Component>
       <Component Id="ServerUserConfigComponent" Guid="">
         <Condition>CONFIGSRCEXISTS</Condition>
+        <RemoveFile Id="ServerUserConfig" Name="server.json" On="install" />
         <CopyFile Id="ServerUserConfig" SourceProperty="CONFIGSRCEXISTS" DestinationProperty="INSTALLDIR" />
       </Component>
     </ComponentGroup>
