@@ -137,13 +137,6 @@ namespace Photon.Server.Internal
                 }
             }
 
-            try {
-                session.OnPostBuildEvent();
-            }
-            catch (Exception error) {
-                Log.Error("Post-Build Event Failed!", error);
-            }
-
             session.Output
                 .AppendLine("Destroying working directory...", ConsoleColor.DarkCyan);
 
@@ -158,6 +151,13 @@ namespace Photon.Server.Internal
             }
             finally {
                 session.Complete(result);
+            }
+
+            try {
+                session.OnPostBuildEvent();
+            }
+            catch (Exception error) {
+                Log.Error("Post-Build Event Failed!", error);
             }
 
             if (errorList.Count > 1)
