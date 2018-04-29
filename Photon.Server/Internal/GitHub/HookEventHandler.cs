@@ -9,12 +9,12 @@ namespace Photon.Server.Internal.GitHub
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(HookEventHandler));
 
-        private static readonly Dictionary<string, Func<string, GithubCommit>> actionMap;
+        private static readonly Dictionary<string, Func<dynamic, GithubCommit>> actionMap;
 
 
         static HookEventHandler()
         {
-            actionMap = new Dictionary<string, Func<string, GithubCommit>> {
+            actionMap = new Dictionary<string, Func<dynamic, GithubCommit>> {
                 ["create"] = ParseCreateEvent,
                 ["pull_request"] = ParsePullRequestEvent,
                 ["push"] = ParsePushEvent,
