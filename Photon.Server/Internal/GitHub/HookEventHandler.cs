@@ -80,10 +80,14 @@ namespace Photon.Server.Internal.GitHub
         {
             Log.Debug("[WEBHOOK] Commit Pushed.");
 
+            var _ref = (string)data.@ref;
+
+            if (_ref.StartsWith("refs/heads/"))
+                _ref = _ref.Substring(11);
+
             return new GithubCommit {
                 RepositoryUrl = data.repository.clone_url,
-                Refspec = data.@ref,
-                //Sha = data.head,
+                Refspec = _ref,
             };
         }
     }
