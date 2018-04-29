@@ -33,12 +33,12 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
         private void StartBuild(GithubCommit commit)
         {
             var project = PhotonServer.Instance.Projects.FirstOrDefault(x =>
-                string.Equals((x.GetSource() as ProjectGithubSource)?.CloneUrl, commit.RepositoryUrl, StringComparison.OrdinalIgnoreCase));
+                string.Equals((x.SourceObject as ProjectGithubSource)?.CloneUrl, commit.RepositoryUrl, StringComparison.OrdinalIgnoreCase));
 
             if (project == null)
                 throw new ApplicationException($"No project found matching git url '{commit.RepositoryUrl}'!");
 
-            var source = (ProjectGithubSource)project.GetSource();
+            var source = (ProjectGithubSource)project.SourceObject;
             var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
             var buildNumber = projectData.StartNewBuild();
 
