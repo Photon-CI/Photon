@@ -92,6 +92,13 @@ namespace Photon.Server.Internal
             var errorList = new List<Exception>();
 
             try {
+                session.OnPreBuildEvent();
+            }
+            catch (Exception error) {
+                Log.Error("Pre-Build Event Failed!", error);
+            }
+
+            try {
                 session.Output
                     .AppendLine("Preparing working directory...", ConsoleColor.DarkCyan);
 
@@ -128,6 +135,13 @@ namespace Photon.Server.Internal
                         .Append("Script Failed! ", ConsoleColor.DarkRed)
                         .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
                 }
+            }
+
+            try {
+                session.OnPostBuildEvent();
+            }
+            catch (Exception error) {
+                Log.Error("Post-Build Event Failed!", error);
             }
 
             session.Output

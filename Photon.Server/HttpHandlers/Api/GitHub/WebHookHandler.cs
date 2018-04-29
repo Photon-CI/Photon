@@ -52,6 +52,44 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
                 Roles = source.HookTaskRoles,
             };
 
+            if (!string.IsNullOrEmpty(commit.Sha)) {
+                var su = new CommitStatusUpdater {
+                    StatusUrl = commit.StatusesUrl,
+                    Sha = commit.Sha,
+                };
+
+                session.PreBuildEvent += (o, e) => {
+                    var status = new CommitStatus {
+                        State = CommitStates.Pending,
+                        Context = "Photon",
+                        Description = "Build in progress..."
+                    };
+
+                    su.Post(status).GetAwaiter().GetResult();
+                };
+
+                session.PostBuildEvent += (o, e) => {
+                    var status = new CommitStatus {
+                        Context = "Photon",
+                    };
+
+                    if (session.Result.Cancelled) {
+                        status.State = CommitStates.Error;
+                        status.Description = "The build was cancelled.";
+                    }
+                    else if (session.Result.Successful) {
+                        status.State = CommitStates.Success;
+                        status.Description = $"Build Successful. {session.Result.Message}";
+                    }
+                    else {
+                        status.State = CommitStates.Failure;
+                        status.Description = $"Build Failed! {session.Result.Message}";
+                    }
+
+                    su.Post(status).GetAwaiter().GetResult();
+                };
+            }
+
             PhotonServer.Instance.Sessions.BeginSession(session);
             PhotonServer.Instance.Queue.Add(session);
         }

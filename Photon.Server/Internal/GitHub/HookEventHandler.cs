@@ -88,6 +88,7 @@ namespace Photon.Server.Internal.GitHub
             return new GithubCommit {
                 RepositoryUrl = data.repository.clone_url,
                 Refspec = _ref,
+                Sha = data.head,
             };
         }
     }
