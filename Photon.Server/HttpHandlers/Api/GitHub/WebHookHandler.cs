@@ -47,7 +47,7 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
                 AssemblyFilename = project.AssemblyFile,
                 PreBuild = project.PreBuild,
                 TaskName = source.HookTaskName,
-                GitRefspec = commit.Refspec ?? commit.Sha,
+                GitRefspec = commit.Refspec,
                 BuildNumber = buildNumber,
                 Roles = source.HookTaskRoles,
             };

@@ -4,6 +4,7 @@
     {
         public string RepositoryUrl {get; set;}
         public string Refspec {get; set;}
-        public string Sha {get; set;}
+        public bool IsTag {get; set;}
+        //public string Sha {get; set;}
     }
 }

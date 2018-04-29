@@ -38,22 +38,23 @@ namespace Photon.Server.Internal.GitHub
 
                     return new GithubCommit {
                         RepositoryUrl = data.repository.clone_url,
-                        Refspec = $"refs/remotes/origin/{data.master_branch}",
+                        Refspec = data.master_branch,
                     };
                 case "branch":
                     Log.Debug("[WEBHOOK] Branch Created.");
 
                     return new GithubCommit {
                         RepositoryUrl = data.repository.clone_url,
-                        Refspec = $"refs/remotes/origin/{data.@ref}",
+                        Refspec = data.@ref,
                     };
-                case "tag":
-                    Log.Debug("[WEBHOOK] Tag Created.");
+                //case "tag":
+                //    Log.Debug("[WEBHOOK] Tag Created.");
 
-                    return new GithubCommit {
-                        RepositoryUrl = data.repository.clone_url,
-                        Refspec = $"refs/tags/{data.@ref}",
-                    };
+                //    return new GithubCommit {
+                //        RepositoryUrl = data.repository.clone_url,
+                //        Refspec = data.@ref,
+                //        IsTag = true,
+                //    };
                 default:
                     return null;
             }
@@ -67,8 +68,8 @@ namespace Photon.Server.Internal.GitHub
 
                     return new GithubCommit {
                         RepositoryUrl = data.repository.clone_url,
-                        Refspec = $"refs/remotes/origin/{data.pull_request.head.@ref}",
-                        Sha = data.pull_request.head.sha,
+                        Refspec = data.pull_request.head.@ref,
+                        //Sha = data.pull_request.head.sha,
                     };
                 default:
                     return null;
@@ -82,7 +83,7 @@ namespace Photon.Server.Internal.GitHub
             return new GithubCommit {
                 RepositoryUrl = data.repository.clone_url,
                 Refspec = data.@ref,
-                Sha = data.head,
+                //Sha = data.head,
             };
         }
     }

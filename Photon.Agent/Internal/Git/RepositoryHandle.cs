@@ -24,7 +24,7 @@ namespace Photon.Agent.Internal.Git
             disposeAction?.Invoke();
         }
 
-        public void Checkout(SessionOutput output, string refspec = "origin/master")
+        public void Checkout(SessionOutput output, string refspec = "master")
         {
             if (!Repository.IsValid(Source.RepositoryPath)) {
                 output.WriteLine("Cloning Repository...", ConsoleColor.DarkCyan);
@@ -41,7 +41,10 @@ namespace Photon.Agent.Internal.Git
                 //var branch = LibGit2Sharp.Commands.Checkout(repo, refspec);
 
                 var fetchSpec = new[] {"+refs/heads/*:refs/remotes/origin/*"};
-                var fetchOptions = new FetchOptions();
+                var fetchOptions = new FetchOptions {
+                    TagFetchMode = TagFetchMode.All,
+                };
+
                 fetchOptions.CredentialsProvider += CredentialsProvider;
 
                 LibGit2Sharp.Commands.Fetch(repo, "origin", fetchSpec, fetchOptions, null);
