@@ -49,9 +49,9 @@ namespace Photon.Server.Internal.Projects
         {
             switch (type.ToLower()) {
                 case "github":
-                    return source.ToObject<ProjectGithubSource>();
+                    return (ProjectGithubSource)source.ToObject<ProjectGithubSource>();
                 case "fs":
-                    return source?.ToObject<ProjectFileSystemSource>();
+                    return (ProjectFileSystemSource)source?.ToObject<ProjectFileSystemSource>();
                 default:
                     throw new ApplicationException($"Unknown source type '{type}'!");
             }
