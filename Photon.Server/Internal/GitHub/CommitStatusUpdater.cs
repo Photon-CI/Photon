@@ -22,7 +22,8 @@ namespace Photon.Server.Internal.GitHub
         {
             var data = status.ToJson();
             var buffer = Encoding.UTF8.GetBytes(data);
-            var url = StatusUrl.Replace("{sha}", Sha);
+            //var url = StatusUrl.Replace("{sha}", Sha);
+            var url = NetPath.Combine(StatusUrl, Sha);
 
             var request = WebRequest.CreateHttp(url);
             request.Method = "POST";
