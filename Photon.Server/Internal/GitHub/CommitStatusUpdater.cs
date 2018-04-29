@@ -32,7 +32,7 @@ namespace Photon.Server.Internal.GitHub
             request.UserAgent = "Photon.Server";
 
             var hasUsername = !string.IsNullOrEmpty(Username);
-            var hasPassword = !string.IsNullOrEmpty(Username);
+            var hasPassword = !string.IsNullOrEmpty(Password);
 
             if (hasUsername || hasPassword)
                 request.Credentials = new NetworkCredential(Username, Password);
