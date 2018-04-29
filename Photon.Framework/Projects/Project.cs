@@ -11,9 +11,7 @@ namespace Photon.Framework.Projects
         public string Description {get; set;}
         public string SourceType {get; set;}
         public string PreBuild {get; set;}
-
-        [JsonIgnore]
-        public IProjectSource Source {get; set;}
+        public object Source {get; set;}
 
         [JsonProperty("assembly")]
         public string AssemblyFile {get; set;}
