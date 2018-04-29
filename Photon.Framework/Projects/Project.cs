@@ -11,9 +11,22 @@ namespace Photon.Framework.Projects
         public string Description {get; set;}
         public string SourceType {get; set;}
         public string PreBuild {get; set;}
-        public object Source {get; set;}
+        public dynamic Source {get; set;}
 
         [JsonProperty("assembly")]
         public string AssemblyFile {get; set;}
+
+
+        public object GetSource()
+        {
+            switch (SourceType.ToLower()) {
+                case "github":
+                    return Source.ToObject<ProjectGithubSource>();
+                case "fs":
+                    return Source?.ToObject<ProjectFileSystemSource>();
+                default:
+                    throw new ApplicationException($"Unknown source type '{SourceType}'!");
+            }
+        }
     }
 }
