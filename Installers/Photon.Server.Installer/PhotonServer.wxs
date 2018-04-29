@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <?define EXE=$(var.PhotonServer.TargetFileName)?>
   <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
   <Product Id="*" Name="Photon Server $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="1b9734e8-64b0-4035-9956-dc8e74a45c28">
@@ -97,10 +97,14 @@
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
       <Component Id="ServerConfigTemplate" Guid="">
         <Condition>NOT CONFIGSRCEXISTS AND NOT CONFIGDESTEXISTS</Condition>
-        <File Source="$(var.ProjectDir)Content\server.json" KeyPath="yes" />
+        <File Source="$(var.ProjectDir)Content\server.json" KeyPath="yes">
+          <util:PermissionEx User="Users" GenericAll="yes" />
+        </File>
       </Component>
       <Component Id="ServerProjectTemplate" Guid="">
-        <File Source="$(var.ProjectDir)Content\projects.json" KeyPath="yes" />
+        <File Source="$(var.ProjectDir)Content\projects.json" KeyPath="yes">
+          <util:PermissionEx User="Users" GenericAll="yes" />
+        </File>
       </Component>
       <Component Id="ServerUserConfigComponent" Guid="">
         <Condition>CONFIGSRCEXISTS</Condition>

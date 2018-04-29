@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Photon.Framework.Projects
 {
@@ -9,9 +10,12 @@ namespace Photon.Framework.Projects
         public string Name {get; set;}
         public string Description {get; set;}
         public string SourceType {get; set;}
-        public string SourcePath {get; set;}
-        public string SourceUrl {get; set;}
-        public string SourceUsername {get; set;}
-        public string SourcePassword {get; set;}
+        public string PreBuild {get; set;}
+
+        [JsonIgnore]
+        public IProjectSource Source {get; set;}
+
+        [JsonProperty("assembly")]
+        public string AssemblyFile {get; set;}
     }
 }

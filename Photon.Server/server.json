@@ -1,7 +1,7 @@
 {
   "name": "Photon Server",
   "http": {
-    "host": "localhost",
+    "host": "*",
     "port": 8082,
     "path": "/photon/server"
   },

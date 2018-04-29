@@ -50,9 +50,11 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\Photon.Server\server.json">
+      <Link>Content\server.json</Link>
+    </Content>
     <Content Include="Content\gpl-3.0.rtf" />
     <Content Include="Content\projects.json" />
-    <Content Include="Content\server.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content" />
