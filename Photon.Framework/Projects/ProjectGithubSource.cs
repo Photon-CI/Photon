@@ -18,9 +18,6 @@ namespace Photon.Framework.Projects
         [JsonProperty("cloneUrl")]
         public string CloneUrl {get; set;}
 
-        [JsonProperty("statusUrl")]
-        public string StatusUrl {get; set;}
-
         [JsonProperty("hookTask")]
         public string HookTaskName {get; set;}
 
