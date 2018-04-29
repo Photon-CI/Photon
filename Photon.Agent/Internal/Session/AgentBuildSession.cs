@@ -51,14 +51,16 @@ namespace Photon.Agent.Internal.Session
 
         private void LoadProjectSource()
         {
-            if (Project.SourceObject is ProjectFileSystemSource fsSource) {
+            var source = Project.GetSourceObject();
+
+            if (source is ProjectFileSystemSource fsSource) {
                 Output.WriteLine($"Copying File-System directory '{fsSource.Path}' to work content directory.", ConsoleColor.DarkCyan);
                 CopyDirectory(fsSource.Path, ContentDirectory);
                 Output.WriteLine("Copy completed successfully.", ConsoleColor.DarkGreen);
                 return;
             }
 
-            if (Project.SourceObject is ProjectGithubSource githubSource) {
+            if (source is ProjectGithubSource githubSource) {
                 Output.WriteLine($"Cloning Git Repository '{githubSource.CloneUrl}' to work content directory.", ConsoleColor.DarkCyan);
 
                 RepositoryHandle handle = null;
