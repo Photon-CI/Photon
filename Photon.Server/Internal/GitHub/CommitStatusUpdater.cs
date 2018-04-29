@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Photon.Framework;
 using System.IO;
 using System.Net;
@@ -35,8 +36,14 @@ namespace Photon.Server.Internal.GitHub
             var hasUsername = !string.IsNullOrEmpty(Username);
             var hasPassword = !string.IsNullOrEmpty(Password);
 
-            if (hasUsername || hasPassword)
-                request.Credentials = new NetworkCredential(Username, Password);
+            if (hasUsername || hasPassword) {
+                //request.Credentials = new NetworkCredential(Username, Password);
+                
+                var encoding = Encoding.GetEncoding("ISO-8859-1");
+                var authBuffer = encoding.GetBytes($"{Username}:{Password}");
+                var authString = Convert.ToBase64String(authBuffer);
+                request.Headers.Add("Authorization", $"Basic {authString}");
+            }
 
             using (var requestStream = request.GetRequestStream()) {
                 await requestStream.WriteAsync(buffer, 0, buffer.Length);
