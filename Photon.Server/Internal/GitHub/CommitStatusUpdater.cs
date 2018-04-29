@@ -27,6 +27,7 @@ namespace Photon.Server.Internal.GitHub
             request.KeepAlive = false;
             request.ContentType = "application/json";
             request.ContentLength = buffer.Length;
+            request.UserAgent = "Photon.Server";
 
             using (var requestStream = request.GetRequestStream()) {
                 await requestStream.WriteAsync(buffer, 0, buffer.Length);
