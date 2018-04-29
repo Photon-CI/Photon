@@ -6,6 +6,9 @@ namespace Photon.Framework.Projects
     [Serializable]
     public class ProjectGithubSource : IProjectSource
     {
+        [JsonProperty("type")]
+        public string Type {get; set;}
+
         [JsonProperty("username")]
         public string Username {get; set;}
 

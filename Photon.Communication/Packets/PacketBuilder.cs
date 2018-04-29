@@ -114,8 +114,8 @@ namespace Photon.Communication.Packets
                 if (messageData == null) throw new Exception("Failed to parse message!");
             }
 
-            var message = messageObject as IMessage;
-            if (message == null) throw new ApplicationException($"Invalid message type '{messageType}'!");
+            if (!(messageObject is IMessage message))
+                throw new ApplicationException($"Invalid message type '{messageType}'!");
 
             if (message is IStreamMessage streamMessage) {
                 streamData.Seek(0, SeekOrigin.Begin);

@@ -1,4 +1,7 @@
 ﻿namespace Photon.Framework.Projects
 {
-    public interface IProjectSource {}
+    public interface IProjectSource
+    {
+        string Type {get; set;}
+    }
 }
