@@ -73,6 +73,7 @@
     <Compile Include="Projects\IProjectSource.cs" />
     <Compile Include="Projects\ProjectFileSystemSource.cs" />
     <Compile Include="Projects\ProjectGithubSource.cs" />
+    <Compile Include="Projects\ProjectSourceSerializer.cs" />
     <Compile Include="Server\IServerContext.cs" />
     <Compile Include="Server\IServerBuildContext.cs" />
     <Compile Include="Server\ServerContextBase.cs" />
