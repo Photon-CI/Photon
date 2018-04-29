@@ -97,7 +97,7 @@
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
       <Component Id="ServerConfigTemplate" Guid="">
         <Condition>NOT CONFIGSRCEXISTS AND NOT CONFIGDESTEXISTS</Condition>
-        <File Source="$(var.ProjectDir)Content\server.json" KeyPath="yes">
+        <File Source="$(var.PhotonServer.ProjectDir)server.json" KeyPath="yes">
           <util:PermissionEx User="Users" GenericAll="yes" />
         </File>
       </Component>

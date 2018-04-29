@@ -54,9 +54,6 @@
     <Folder Include="Content" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\Photon.Agent\agent.json">
-      <Link>Content\agent.json</Link>
-    </Content>
     <Content Include="Content\gpl-3.0.rtf" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />

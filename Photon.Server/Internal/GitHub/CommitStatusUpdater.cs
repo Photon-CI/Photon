@@ -1,6 +1,6 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Photon.Framework;
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -10,9 +10,6 @@ namespace Photon.Server.Internal.GitHub
 {
     public class CommitStatusUpdater
     {
-        //public string GitHubUrl {get; set;}
-        //public string Owner {get; set;}
-        //public string Repository {get; set;}
         public string Username {get; set;}
         public string Password {get; set;}
         public string StatusUrl {get; set;}
@@ -23,7 +20,6 @@ namespace Photon.Server.Internal.GitHub
         {
             var data = status.ToJson();
             var buffer = Encoding.UTF8.GetBytes(data);
-            //var url = StatusUrl.Replace("{sha}", Sha);
             var url = NetPath.Combine(StatusUrl, Sha);
 
             var request = WebRequest.CreateHttp(url);
@@ -37,8 +33,6 @@ namespace Photon.Server.Internal.GitHub
             var hasPassword = !string.IsNullOrEmpty(Password);
 
             if (hasUsername || hasPassword) {
-                //request.Credentials = new NetworkCredential(Username, Password);
-                
                 var encoding = Encoding.GetEncoding("ISO-8859-1");
                 var authBuffer = encoding.GetBytes($"{Username}:{Password}");
                 var authString = Convert.ToBase64String(authBuffer);

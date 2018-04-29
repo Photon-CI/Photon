@@ -134,7 +134,7 @@
 	  <ComponentGroup Id="AgentTemplates" Directory="INSTALLDIR">
 	    <Component Id="AgentConfigTemplate" Guid="">
 	      <Condition>NOT CONFIGSRCEXISTS AND NOT CONFIGDESTEXISTS</Condition>
-        <File Source="$(var.ProjectDir)Content\agent.json" KeyPath="yes">
+        <File Source="$(var.PhotonAgent.ProjectDir)agent.json" KeyPath="yes">
           <util:PermissionEx User="Users" GenericAll="yes" />
         </File>
 	    </Component>

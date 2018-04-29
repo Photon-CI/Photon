@@ -38,8 +38,6 @@ namespace Photon.Agent.Internal.Git
             output.WriteLine($"Checking out commit '{refspec}'...", ConsoleColor.DarkCyan);
 
             using (var repo = new Repository(Source.RepositoryPath)) {
-                //var branch = LibGit2Sharp.Commands.Checkout(repo, refspec);
-
                 var fetchSpec = new[] {"+refs/heads/*:refs/remotes/origin/*"};
                 var fetchOptions = new FetchOptions {
                     TagFetchMode = TagFetchMode.All,
