@@ -12,6 +12,8 @@ namespace Photon.Server.Internal.GitHub
         //public string GitHubUrl {get; set;}
         //public string Owner {get; set;}
         //public string Repository {get; set;}
+        public string Username {get; set;}
+        public string Password {get; set;}
         public string StatusUrl {get; set;}
         public string Sha {get; set;}
 
@@ -28,6 +30,12 @@ namespace Photon.Server.Internal.GitHub
             request.ContentType = "application/json";
             request.ContentLength = buffer.Length;
             request.UserAgent = "Photon.Server";
+
+            var hasUsername = !string.IsNullOrEmpty(Username);
+            var hasPassword = !string.IsNullOrEmpty(Username);
+
+            if (hasUsername || hasPassword)
+                request.Credentials = new NetworkCredential(Username, Password);
 
             using (var requestStream = request.GetRequestStream()) {
                 await requestStream.WriteAsync(buffer, 0, buffer.Length);

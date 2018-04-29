@@ -54,6 +54,8 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
 
             if (!string.IsNullOrEmpty(commit.Sha)) {
                 var su = new CommitStatusUpdater {
+                    Username = source.Username,
+                    Password = source.Password,
                     StatusUrl = commit.StatusesUrl,
                     Sha = commit.Sha,
                 };
