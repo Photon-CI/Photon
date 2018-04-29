@@ -8,6 +8,6 @@ namespace Photon.Server.Internal.GitHub
         public int Id {get; set;}
 
         [JsonProperty("url")]
-        public int Url {get; set;}
+        public string Url {get; set;}
     }
 }
