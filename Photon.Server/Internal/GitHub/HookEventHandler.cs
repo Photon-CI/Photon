@@ -38,6 +38,7 @@ namespace Photon.Server.Internal.GitHub
 
                     return new GithubCommit {
                         RepositoryUrl = data.repository.clone_url,
+                        StatusesUrl = data.repository.statuses_url,
                         Refspec = data.master_branch,
                     };
                 case "branch":
@@ -45,6 +46,7 @@ namespace Photon.Server.Internal.GitHub
 
                     return new GithubCommit {
                         RepositoryUrl = data.repository.clone_url,
+                        StatusesUrl = data.repository.statuses_url,
                         Refspec = data.@ref,
                     };
                 //case "tag":
@@ -68,6 +70,7 @@ namespace Photon.Server.Internal.GitHub
 
                     return new GithubCommit {
                         RepositoryUrl = data.repository.clone_url,
+                        StatusesUrl = data.repository.statuses_url,
                         Refspec = data.pull_request.head.@ref,
                         //Sha = data.pull_request.head.sha,
                     };
@@ -87,6 +90,7 @@ namespace Photon.Server.Internal.GitHub
 
             return new GithubCommit {
                 RepositoryUrl = data.repository.clone_url,
+                StatusesUrl = data.repository.statuses_url,
                 Refspec = _ref,
                 Sha = data.after,
             };
