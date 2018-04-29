@@ -67,6 +67,12 @@
     <Compile Include="HttpHandlers\Api\VersionHandler.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
+    <Compile Include="Internal\GitHub\CommitState.cs" />
+    <Compile Include="Internal\GitHub\CommitStatus.cs" />
+    <Compile Include="Internal\GitHub\CommitStatusResponse.cs" />
+    <Compile Include="Internal\GitHub\CommitStatusUpdater.cs" />
+    <Compile Include="Internal\GitHub\GithubCommit.cs" />
+    <Compile Include="Internal\GitHub\HookEventHandler.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
     <Compile Include="Internal\TaskRunner.cs" />
     <Compile Include="Internal\ServerBuildContext.cs" />

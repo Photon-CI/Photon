@@ -54,7 +54,6 @@
     <Folder Include="Content" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\agent.json" />
     <Content Include="Content\gpl-3.0.rtf" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />

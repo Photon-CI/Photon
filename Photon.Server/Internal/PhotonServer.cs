@@ -2,6 +2,7 @@
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.Packages;
 using Photon.Server.Internal.Projects;
@@ -15,7 +16,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Framework.Variables;
 
 namespace Photon.Server.Internal
 {
@@ -79,7 +79,7 @@ namespace Photon.Server.Internal
             // Load existing or default server configuration
             Definition = ParseServerDefinition() ?? new ServerDefinition {
                 Http = {
-                    Host = "localhost",
+                    Host = "*",
                     Port = 8082,
                     Path = "/photon/server",
                 },

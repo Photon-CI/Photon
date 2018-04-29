@@ -39,8 +39,8 @@ namespace Photon.Server.HttpHandlers.Api.Build
 
                 var session = new ServerBuildSession {
                     Project = project,
-                    AssemblyFilename = startInfo.AssemblyFile,
-                    PreBuild = startInfo.PreBuild,
+                    AssemblyFilename = project.AssemblyFile,
+                    PreBuild = project.PreBuild,
                     TaskName = startInfo.TaskName,
                     GitRefspec = _gitRefspec,
                     BuildNumber = buildNumber,

@@ -1,12 +1,13 @@
-﻿using Photon.Communication;
+﻿using Photon.Agent.Internal.Git;
+using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
+using Photon.Framework.Projects;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Agent.Internal.Git;
 
 namespace Photon.Agent.Internal.Session
 {
@@ -50,25 +51,23 @@ namespace Photon.Agent.Internal.Session
 
         private void LoadProjectSource()
         {
-            var sourceType = Project.SourceType;
-
-            if (string.Equals(sourceType, "fs")) {
-                Output.WriteLine($"Copying File-System directory '{Project.SourcePath}' to work content directory.", ConsoleColor.DarkCyan);
-                CopyDirectory(Project.SourcePath, ContentDirectory);
+            if (Project.Source is ProjectFileSystemSource fsSource) {
+                Output.WriteLine($"Copying File-System directory '{fsSource.Path}' to work content directory.", ConsoleColor.DarkCyan);
+                CopyDirectory(fsSource.Path, ContentDirectory);
                 Output.WriteLine("Copy completed successfully.", ConsoleColor.DarkGreen);
                 return;
             }
 
-            if (string.Equals(sourceType, "git")) {
-                Output.WriteLine($"Cloning Git Repository '{Project.SourceUrl}' to work content directory.", ConsoleColor.DarkCyan);
+            if (Project.Source is ProjectGithubSource githubSource) {
+                Output.WriteLine($"Cloning Git Repository '{githubSource.CloneUrl}' to work content directory.", ConsoleColor.DarkCyan);
 
                 RepositoryHandle handle = null;
                 try {
-                    handle = GetRepositoryHandle(Project.SourceUrl, TimeSpan.FromMinutes(1))
+                    handle = GetRepositoryHandle(githubSource.CloneUrl, TimeSpan.FromMinutes(1))
                         .GetAwaiter().GetResult();
 
-                    handle.Username = Project.SourceUsername;
-                    handle.Password = Project.SourcePassword;
+                    handle.Username = githubSource.Username;
+                    handle.Password = githubSource.Password;
 
                     handle.Checkout(Output, GitRefspec);
 
@@ -82,7 +81,7 @@ namespace Photon.Agent.Internal.Session
                 return;
             }
 
-            throw new ApplicationException($"Unknown source type '{sourceType}'!");
+            throw new ApplicationException($"Unknown source type '{Project.SourceType}'!");
         }
 
         private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout)

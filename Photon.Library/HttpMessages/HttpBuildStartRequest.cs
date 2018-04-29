@@ -7,12 +7,6 @@ namespace Photon.Library.HttpMessages
         [JsonProperty("project")]
         public string ProjectId {get; set;}
 
-        [JsonProperty("assembly")]
-        public string AssemblyFile {get; set;}
-
-        [JsonProperty("preBuild")]
-        public string PreBuild {get; set;}
-
         [JsonProperty("task")]
         public string TaskName {get; set;}
 

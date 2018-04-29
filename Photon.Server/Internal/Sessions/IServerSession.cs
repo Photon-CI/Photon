@@ -20,5 +20,7 @@ namespace Photon.Server.Internal.Sessions
         Task RunAsync();
         Task ReleaseAsync();
         void Complete(TaskResult result);
+        void OnPreBuildEvent();
+        void OnPostBuildEvent();
     }
 }

@@ -22,6 +22,9 @@ namespace Photon.Server.Internal.Sessions
         private readonly ConcurrentDictionary<string, DomainAgentSessionHostBase> hostList;
         internal readonly List<PackageReference> PushedProjectPackageList;
 
+        public event EventHandler PreBuildEvent;
+        public event EventHandler PostBuildEvent;
+
         private readonly Lazy<ILog> _log;
         private readonly DateTime utcCreated;
         private DateTime? utcReleased;
@@ -183,6 +186,16 @@ namespace Photon.Server.Internal.Sessions
         public bool GetAgentSession(string sessionClientId, out DomainAgentSessionHostBase sessionHost)
         {
             return hostList.TryGetValue(sessionClientId, out sessionHost);
+        }
+
+        public void OnPreBuildEvent()
+        {
+            PreBuildEvent?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnPostBuildEvent()
+        {
+            PostBuildEvent?.Invoke(this, EventArgs.Empty);
         }
 
         private DomainAgentSessionClient ConnectionFactory_OnConnectionRequest(ServerAgentDefinition agent)
