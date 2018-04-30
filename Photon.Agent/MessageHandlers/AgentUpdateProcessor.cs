@@ -1,16 +1,21 @@
-﻿using Photon.Agent.Internal;
+﻿using System;
+using Photon.Agent.Internal;
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Library.TcpMessages;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using log4net;
 using SysProcess = System.Diagnostics.Process;
 
 namespace Photon.Agent.MessageHandlers
 {
     public class AgentUpdateProcessor : MessageProcessorBase<AgentUpdateRequest>
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AgentUpdateProcessor));
+
+
         public override async Task<IResponseMessage> Process(AgentUpdateRequest requestMessage)
         {
             var msiFilename = Path.Combine(Configuration.Directory, "Photon.Agent.Installer.msi");
@@ -27,18 +32,24 @@ namespace Photon.Agent.MessageHandlers
             return await Task.FromResult(response);
         }
 
-        private static async void Run(string msiFilename)
+        private static void Run(string msiFilename)
         {
-            await Task.Run(async () => {
-                await Task.Delay(200);
-
+            try {
                 var info = new ProcessStartInfo {
                     FileName = "msiexec.exe",
                     Arguments = $"/i \"{msiFilename}\" /passive /l*vx \"log.txt\"",
                 };
 
                 SysProcess.Start(info);
-            });
+            }
+            catch (Exception error) {
+                Log.Error("Failed to start installation file!", error);
+            }
+
+            //await Task.Run(() => {
+                //await Task.Delay(200);
+
+            //});
         }
     }
 }
