@@ -25,19 +25,7 @@
 	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Server Configuration" />
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
-    
-    <Property Id='CONFIGSRCEXISTS'>
-      <DirectorySearch Id='ConfigSrcDirSearch' Path='[SourceDir]' Depth='0'>
-        <FileSearch Id='ConfigSrcFileSearch' Name="server.json" />
-      </DirectorySearch>
-    </Property>
-    
-    <Property Id='CONFIGDESTEXISTS'>
-      <DirectorySearch Id='ConfigDestDirSearch' Path='[INSTALLDIR]' Depth='0'>
-        <FileSearch Id='ConfigDestFileSearch' Name="server.json" />
-      </DirectorySearch>
-    </Property>
-    
+        
 	  <WixVariable Id="WixUILicenseRtf" Value="Content\gpl-3.0.rtf" />
 
 	  <UI>
@@ -96,20 +84,9 @@
 		</ComponentGroup>
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
       <Component Id="ServerConfigTemplate" Guid="">
-        <Condition>NOT CONFIGSRCEXISTS AND NOT CONFIGDESTEXISTS</Condition>
         <File Source="$(var.PhotonServer.ProjectDir)server.json" KeyPath="yes">
           <util:PermissionEx User="Users" GenericAll="yes" />
         </File>
-      </Component>
-      <Component Id="ServerProjectTemplate" Guid="">
-        <File Source="$(var.ProjectDir)Content\projects.json" KeyPath="yes">
-          <util:PermissionEx User="Users" GenericAll="yes" />
-        </File>
-      </Component>
-      <Component Id="ServerUserConfigComponent" Guid="">
-        <Condition>CONFIGSRCEXISTS</Condition>
-        <RemoveFile Id="RemoveServerUserConfig" Name="server.json" On="install" />
-        <CopyFile Id="ServerUserConfig" SourceProperty="CONFIGSRCEXISTS" DestinationProperty="INSTALLDIR" />
       </Component>
     </ComponentGroup>
 	</Fragment>

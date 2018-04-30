@@ -8,9 +8,7 @@ namespace Photon.CLI.Internal
 {
     internal class Configuration
     {
-        private const string DefaultDownloadUrl = "http://download.photon.null511.info";
-
-        public static string DownloadUrl => ConfigurationReader.AppSetting("url.downloads", DefaultDownloadUrl);
+        public static string DownloadUrl => ConfigurationReader.AppSetting("url.downloads", "http://download.photon.ci");
 
         public static string AssemblyPath {get;}
         public static string Directory {get;}

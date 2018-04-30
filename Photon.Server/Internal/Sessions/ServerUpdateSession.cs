@@ -31,7 +31,7 @@ namespace Photon.Server.Internal.Sessions
             LatestAgentVersion = agentIndex.Version;
             LatestAgentMsiFilename = agentIndex.MsiFilename;
 
-            LatestAgentMsiUrl = NetPath.Combine("http://download.photon.null511.info/agent", LatestAgentVersion, LatestAgentMsiFilename);
+            LatestAgentMsiUrl = NetPath.Combine(Configuration.DownloadUrl, "agent", LatestAgentVersion, LatestAgentMsiFilename);
 
             GetLatestAgentFilename = new LazyAsync<string>(async () => {
                 tempFilename = Path.GetTempFileName();
