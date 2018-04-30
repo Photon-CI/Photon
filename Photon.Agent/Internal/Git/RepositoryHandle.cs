@@ -35,9 +35,9 @@ namespace Photon.Agent.Internal.Git
                 Repository.Clone(Source.RepositoryUrl, Source.RepositoryPath, cloneOptions);
             }
 
-            output.WriteLine($"Checking out commit '{refspec}'...", ConsoleColor.DarkCyan);
-
             using (var repo = new Repository(Source.RepositoryPath)) {
+                output.WriteLine("Fetching updated refs...", ConsoleColor.DarkCyan);
+
                 var fetchSpec = new[] {"+refs/heads/*:refs/remotes/origin/*"};
                 var fetchOptions = new FetchOptions {
                     TagFetchMode = TagFetchMode.All,
@@ -50,7 +50,11 @@ namespace Photon.Agent.Internal.Git
                 var localBranch = repo.Branches[$"refs/heads/origin/{refspec}"];
 
                 if (localBranch != null) {
+                    output.WriteLine($"Found local branch '{localBranch.FriendlyName}'...", ConsoleColor.DarkCyan);
+
                     if (!localBranch.IsCurrentRepositoryHead) {
+                        output.WriteLine($"Checkout local branch '{localBranch.FriendlyName}'...", ConsoleColor.DarkCyan);
+
                         var checkoutOptions = new CheckoutOptions {
                             CheckoutModifiers = CheckoutModifiers.Force,
                         };
@@ -59,6 +63,8 @@ namespace Photon.Agent.Internal.Git
                     }
 
                     if (!localBranch.IsTracking) {
+                        output.WriteLine("Updating branch remote tracking ref...", ConsoleColor.DarkCyan);
+
                         var remoteBranch = repo.Branches[$"refs/remotes/origin/{refspec}"];
 
                         if (remoteBranch == null) {
@@ -71,6 +77,8 @@ namespace Photon.Agent.Internal.Git
 
                         repo.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
                     }
+
+                    output.WriteLine("Pull changes from remote...", ConsoleColor.DarkCyan);
 
                     var sign = new Signature("photon", "photon@localhost.com", DateTimeOffset.Now);
 
@@ -91,8 +99,13 @@ namespace Photon.Agent.Internal.Git
                         throw new ApplicationException($"Git Refspec '{refspec}' was not found!");
                     }
 
+                    output.WriteLine($"Found remote branch '{remoteBranch.FriendlyName}'...", ConsoleColor.DarkCyan);
+                    output.WriteLine("Creating local tracking branch...", ConsoleColor.DarkCyan);
+
                     localBranch = repo.CreateBranch(remoteBranch.FriendlyName, remoteBranch.Tip);
                     repo.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
+
+                    output.WriteLine($"Checkout local tracking branch '{localBranch.FriendlyName}'...", ConsoleColor.DarkCyan);
 
                     var checkoutOptions = new CheckoutOptions {
                         CheckoutModifiers = CheckoutModifiers.Force,
