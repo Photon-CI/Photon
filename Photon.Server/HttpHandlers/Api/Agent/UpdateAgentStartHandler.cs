@@ -6,7 +6,9 @@ using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Photon.Server.HttpHandlers.Api.Agent
 {
@@ -18,8 +20,13 @@ namespace Photon.Server.HttpHandlers.Api.Agent
 
         public override HttpHandlerResult Post()
         {
+            var _names = GetQuery("names");
+
             try {
                 var session = new ServerUpdateSession();
+
+                if (!string.IsNullOrEmpty(_names))
+                    session.AgentNames = ParseNames(_names).ToArray();
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
@@ -46,6 +53,12 @@ namespace Photon.Server.HttpHandlers.Api.Agent
                 Log.Error("Failed to run Update-Task!", error);
                 return Exception(error);
             }
+        }
+
+        private IEnumerable<string> ParseNames(string names)
+        {
+            return names.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim());
         }
     }
 }

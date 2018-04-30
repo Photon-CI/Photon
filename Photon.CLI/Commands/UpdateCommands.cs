@@ -10,6 +10,7 @@ namespace Photon.CLI.Commands
     internal class UpdateCommands : CommandDictionary<CommandContext>
     {
         public string Server {get; set;}
+        public string AgentNames {get; set;}
 
 
         public UpdateCommands(CommandContext context) : base(context)
@@ -20,6 +21,7 @@ namespace Photon.CLI.Commands
             Map("help", "?").ToAction(OnHelp);
 
             Map("-s", "-server").ToProperty(v => Server = v);
+            Map("-n", "-names").ToProperty(v => AgentNames = v);
         }
 
         private async Task OnHelp(string[] args)
@@ -54,7 +56,8 @@ namespace Photon.CLI.Commands
         {
             if (args.ContainsAny("help", "?")) {
                 await new HelpPrinter(typeof(UpdateCommands), nameof(UpdateAgentsCommand))
-                    .Add("-server  | -s", "The name of the target Photon Server.")
+                    .Add("-server | -s", "The name of the target Photon Server.")
+                    .Add("-names  | -n", "An optional list of Agent names, separated by ';'. Supports '*' wildchar.")
                     .PrintAsync();
 
                 return;
@@ -62,6 +65,7 @@ namespace Photon.CLI.Commands
 
             var updateAction = new UpdateAgentsAction {
                 ServerName = Server,
+                AgentNames = AgentNames,
             };
 
             await updateAction.Run(Context);
