@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Agent.Internal.GitHub
+namespace Photon.Library.GitHub
 {
     public class CommitStatus
     {

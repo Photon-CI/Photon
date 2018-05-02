@@ -41,11 +41,13 @@ namespace Photon.Server.Internal
         {
             LoadFile();
 
+            var path = Path.GetDirectoryName(filename);
+
             fsWatcher = new FileSystemWatcher {
-                EnableRaisingEvents = true,
-                NotifyFilter = NotifyFilters.LastWrite,
-                Path = Path.GetDirectoryName(filename),
+                Path = path,
                 Filter = "server.json",
+                NotifyFilter = NotifyFilters.LastWrite,
+                EnableRaisingEvents = true,
             };
 
             fsWatcher.Changed += FsWatcher_OnChanged;

@@ -1,5 +1,4 @@
 ﻿using Photon.Agent.Internal.Git;
-using Photon.Agent.Internal.GitHub;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
@@ -50,7 +49,7 @@ namespace Photon.Agent.Internal.Session
             };
 
             var githubSource = Project?.Source as ProjectGithubSource;
-            var notifyGithub = githubSource != null && Commit != null;
+            var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent && Commit != null;
             CommitStatusUpdater su = null;
 
             if (notifyGithub) {

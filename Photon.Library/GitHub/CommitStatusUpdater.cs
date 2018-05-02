@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Photon.Framework;
 
-namespace Photon.Agent.Internal.GitHub
+namespace Photon.Library.GitHub
 {
     public class CommitStatusUpdater
     {

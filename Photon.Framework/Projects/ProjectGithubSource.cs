@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 
 namespace Photon.Framework.Projects
@@ -23,5 +24,21 @@ namespace Photon.Framework.Projects
 
         [JsonProperty("hookRoles")]
         public string[] HookTaskRoles {get; set;}
+
+        [JsonProperty("notifyOrigin")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public NotifyOrigin NotifyOrigin {get; set;}
+
+
+        public ProjectGithubSource()
+        {
+            NotifyOrigin = NotifyOrigin.Server;
+        }
+    }
+
+    public enum NotifyOrigin
+    {
+        Server,
+        Agent,
     }
 }
