@@ -71,6 +71,9 @@ namespace Photon.Agent.Internal.Session
             Domain?.Dispose();
         }
 
+        public virtual void OnSessionBegin() {}
+        public virtual void OnSessionEnd() {}
+
         public virtual async Task InitializeAsync()
         {
             await Task.Run(() => {

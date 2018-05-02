@@ -1,8 +1,7 @@
 ﻿using log4net;
-using Photon.Library;
+using Photon.Framework.Pooling;
 using System;
 using System.Threading.Tasks;
-using Photon.Framework.Pooling;
 
 namespace Photon.Agent.Internal.Session
 {

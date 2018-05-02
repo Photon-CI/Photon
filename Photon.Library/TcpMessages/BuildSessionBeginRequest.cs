@@ -1,6 +1,7 @@
 ﻿using Photon.Communication.Messages;
 using Photon.Framework.Projects;
 using Photon.Framework.Variables;
+using Photon.Library.GitHub;
 
 namespace Photon.Library.TcpMessages
 {
@@ -15,5 +16,6 @@ namespace Photon.Library.TcpMessages
         public string GitRefspec {get; set;}
         public int BuildNumber {get; set;}
         public VariableSetCollection Variables {get; set;}
+        public GithubCommit Commit {get; set;}
     }
 }

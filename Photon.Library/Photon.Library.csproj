@@ -46,6 +46,7 @@
     <Compile Include="ConfigurationReader.cs" />
     <Compile Include="DownloadTools.cs" />
     <Compile Include="FileUtils.cs" />
+    <Compile Include="GitHub\GithubCommit.cs" />
     <Compile Include="HttpMessages\HttpAgentUpdateResultResponse.cs" />
     <Compile Include="HttpMessages\HttpBuildStartRequest.cs" />
     <Compile Include="HttpMessages\HttpAgentUpdateStartResponse.cs" />

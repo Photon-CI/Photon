@@ -26,6 +26,7 @@ namespace Photon.Server.Internal.Sessions
                 GitRefspec = session.GitRefspec,
                 BuildNumber = session.BuildNumber,
                 Variables = session.Variables,
+                Commit = session.Commit,
             };
 
             var response = await MessageClient.Send(message)

@@ -1,5 +1,6 @@
 ﻿using Photon.Framework;
 using Photon.Framework.Projects;
+using Photon.Library.GitHub;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
@@ -13,12 +14,13 @@ namespace Photon.Server.Internal.Sessions
         public string GitRefspec {get; set;}
         public string[] Roles {get; set;}
         public int BuildNumber {get; set;}
+        public GithubCommit Commit {get; set;}
 
 
         public override async Task RunAsync()
         {
             var context = new ServerBuildContext {
-                Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
+                Agents = PhotonServer.Instance.Definition.Definition.Agents.ToArray(),
                 Project = Project,
                 AssemblyFilename = AssemblyFilename,
                 PreBuild = PreBuild,
@@ -31,6 +33,7 @@ namespace Photon.Server.Internal.Sessions
                 ConnectionFactory = ConnectionFactory,
                 Output = Output,
                 ServerVariables = Variables,
+                //Commit = Commit,
             };
 
             using (var sessionHandle = context.RegisterAnyAgent(Roles)) {

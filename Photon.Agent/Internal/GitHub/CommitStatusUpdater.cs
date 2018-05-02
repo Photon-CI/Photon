@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using Photon.Framework;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Photon.Framework;
 
-namespace Photon.Server.Internal.GitHub
+namespace Photon.Agent.Internal.GitHub
 {
     public class CommitStatusUpdater
     {

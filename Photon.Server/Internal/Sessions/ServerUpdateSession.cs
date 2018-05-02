@@ -31,7 +31,7 @@ namespace Photon.Server.Internal.Sessions
 
         public override async Task RunAsync()
         {
-            var agents = PhotonServer.Instance.Definition.Agents
+            var agents = PhotonServer.Instance.Definition.Definition.Agents
                 .Where(x => IncludesAgent(x.Name)).ToArray();
 
             if (!agents.Any()) throw new ApplicationException("No agents were found!");

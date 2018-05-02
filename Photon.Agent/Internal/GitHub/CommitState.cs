@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Photon.Server.Internal.GitHub
+namespace Photon.Agent.Internal.GitHub
 {
     public static class CommitState
     {
