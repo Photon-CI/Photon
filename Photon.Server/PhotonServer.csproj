@@ -59,6 +59,7 @@
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="HttpHandlers\Api\Agent\UpdateAgentResultHandler.cs" />
     <Compile Include="HttpHandlers\Api\GitHub\WebHookHandler.cs" />
+    <Compile Include="HttpHandlers\Api\LogHandler.cs" />
     <Compile Include="HttpHandlers\Api\Server\UpdateServerStartHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\UpdateAgentStartHandler.cs" />
     <Compile Include="HttpHandlers\Api\Build\BuildResultHandler.cs" />

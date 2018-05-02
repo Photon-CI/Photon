@@ -13,6 +13,7 @@ namespace Photon.CLI.Commands
             Map("project").ToAction(new ProjectCommands(context));
             Map("update").ToAction(new UpdateCommands(context));
             Map("server").ToAction(new ServerCommands(context));
+            Map("log").ToAction(new LogCommands(context));
             Map("help", "?").ToAction(OnHelp);
 
             Map("-ansi").ToProperty(v => ConsoleEx.EnabledAnsi = v, true);
@@ -26,6 +27,7 @@ namespace Photon.CLI.Commands
                 .Add(typeof(UpdateCommands))
                 .Add(typeof(ProjectCommands))
                 .Add(typeof(ServerCommands))
+                .Add(typeof(LogCommands))
                 .PrintAsync();
         }
     }
