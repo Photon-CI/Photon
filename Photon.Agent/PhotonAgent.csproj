@@ -73,6 +73,7 @@
       <DependentUpon>AgentService.cs</DependentUpon>
     </Compile>
     <Compile Include="Commands\RootCommands.cs" />
+    <Compile Include="HttpHandlers\Api\LogHandler.cs" />
     <Compile Include="Internal\Git\RepositoryHandle.cs" />
     <Compile Include="Internal\Git\RepositoryIndex.cs" />
     <Compile Include="Internal\Git\RepositoryIndexEntry.cs" />

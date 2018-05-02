@@ -16,6 +16,8 @@ namespace Photon.Server
 
         public static int Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += Domain_OnUnhandledException;
+
             try {
                 XmlConfigurator.Configure();
 
@@ -111,6 +113,11 @@ namespace Photon.Server
             catch (Exception error) {
                 Log.Error("An error occurred while aborting the service!", error);
             }
+        }
+
+        private static void Domain_OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Fatal("An unhandled exception occurred!", e.ExceptionObject as Exception);
         }
     }
 }
