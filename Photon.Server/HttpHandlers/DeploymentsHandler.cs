@@ -3,16 +3,15 @@ using PiServerLite.Http.Handlers;
 
 namespace Photon.Server.HttpHandlers
 {
-    [HttpHandler("/")]
-    [HttpHandler("/index")]
-    internal class IndexHandler : HttpHandler
+    [HttpHandler("/deployments")]
+    internal class DeploymentsHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
             var vm = new ViewModelBase();
             vm.Build();
 
-            return View("Index.html", vm);
+            return View("Deployments.html", vm);
         }
     }
 }

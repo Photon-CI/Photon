@@ -2,14 +2,14 @@
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
 using Photon.Framework.Tools;
+using Photon.Library;
+using Photon.Library.HttpMessages;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Library;
-using Photon.Library.HttpMessages;
 
 namespace Photon.CLI.Actions
 {
@@ -22,38 +22,39 @@ namespace Photon.CLI.Actions
         {
             var server = context.Servers.Get(ServerName);
 
+            ConsoleEx.Out.WriteLine("Checking server version...", ConsoleColor.DarkCyan);
+
             string currentVersion;
             using (var webClient = new WebClient()) {
                 var currentVersionUrl = NetPath.Combine(server.Url, "api/version");
                 currentVersion = (await webClient.DownloadStringTaskAsync(currentVersionUrl)).Trim();
             }
 
+            ConsoleEx.Out
+                .WriteLine($"Photon Server {currentVersion}", ConsoleColor.DarkBlue)
+                .WriteLine("Checking for updates...", ConsoleColor.DarkCyan);
+
             var serverIndex = await DownloadTools.GetLatestServerIndex();
-            var latestServerVersion = serverIndex.Version;
             
-            if (!VersionTools.HasUpdates(currentVersion, latestServerVersion)) {
+            if (!VersionTools.HasUpdates(currentVersion, serverIndex.Version)) {
                 ConsoleEx.Out
-                    .Write("Server is up-to-date. Version ", ConsoleColor.DarkCyan)
-                    .Write(currentVersion, ConsoleColor.Cyan)
-                    .WriteLine(".", ConsoleColor.DarkCyan);
+                    .Write("Server is up-to-date.", ConsoleColor.DarkBlue);
 
                 return;
             }
 
-            ConsoleEx.Out.WriteLine("Downloading server update...", ConsoleColor.DarkCyan);
-
             await BeginServerUpdate(server, serverIndex);
 
-            ConsoleEx.Out
-                .WriteLine("Server update started.", ConsoleColor.Cyan)
-                .WriteLine("Waiting for restart...", ConsoleColor.DarkCyan);
+            ConsoleEx.Out.Write("Server update started. Waiting for restart...", ConsoleColor.Cyan);
 
             await Task.Delay(3000);
 
             var timeout = TimeSpan.FromMinutes(2);
 
             try {
-                await Reconnect(server, latestServerVersion, timeout);
+                await Reconnect(server, serverIndex.Version, timeout);
+
+                ConsoleEx.Out.Write("Update completed successfully.", ConsoleColor.DarkGreen);
             }
             catch (TaskCanceledException) {
                 throw new ApplicationException($"Server failed to restart within timeout '{timeout}'.");
@@ -62,6 +63,10 @@ namespace Photon.CLI.Actions
 
         private async Task BeginServerUpdate(PhotonServerDefinition server, HttpPackageIndex index)
         {
+            ConsoleEx.Out.Write("Downloading Server update ", ConsoleColor.DarkCyan)
+                .Write(index.Version, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
+
             string updateFilename;
 
             try {
@@ -82,6 +87,8 @@ namespace Photon.CLI.Actions
                             await responseStream.CopyToAsync(fileStream);
                     }
                 }
+
+                ConsoleEx.Out.WriteLine("Download Complete.", ConsoleColor.DarkBlue);
             }
             catch (HttpStatusCodeException error) {
                 if (error.HttpCode == HttpStatusCode.NotFound)
@@ -89,6 +96,8 @@ namespace Photon.CLI.Actions
 
                 throw;
             }
+
+            ConsoleEx.Out.WriteLine("Uploading update to Server...", ConsoleColor.DarkCyan);
 
             try {
                 var url = NetPath.Combine(server.Url, "api/server/update");
@@ -104,6 +113,8 @@ namespace Photon.CLI.Actions
                         throw new ApplicationException($"Bad Update Request! {text}");
                     }
                 }
+
+                ConsoleEx.Out.WriteLine("Upload Complete.", ConsoleColor.DarkBlue);
             }
             catch (HttpStatusCodeException error) {
                 if (error.HttpCode == HttpStatusCode.NotFound)

@@ -184,14 +184,17 @@ namespace Photon.Server.Internal
                 ListenerPath = http.Path,
                 ContentDirectories = {
                     new ContentDirectory {
-                        DirectoryPath = Path.Combine(Configuration.AssemblyPath, "Content"),
+                        DirectoryPath = Configuration.HttpContentDirectory,
                         UrlPath = "/Content/",
                     }
                 },
+                MimeTypes = {
+                    [".svg"] = "image/svg+xml",
+                    [".svgx"] = "image/svg+xml"
+                },
             };
 
-            var assembly = Assembly.GetExecutingAssembly();
-            context.Views.AddAllFromAssembly(assembly, "Photon.Server.Views");
+            context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
             var httpPrefix = $"http://{http.Host}:{http.Port}/";
 
