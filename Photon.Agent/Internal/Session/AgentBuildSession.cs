@@ -3,6 +3,7 @@ using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
 using Photon.Framework.Projects;
+using Photon.Library.GitHub;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,7 @@ namespace Photon.Agent.Internal.Session
         public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
         public int BuildNumber {get; set;}
+        public GithubCommit Commit {get; set;}
 
 
         public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId) : base(transceiver, serverSessionId, sessionClientId) {}
@@ -46,7 +48,52 @@ namespace Photon.Agent.Internal.Session
                 AgentVariables = PhotonAgent.Instance.Variables,
             };
 
-            await Domain.RunBuildTask(context);
+            var githubSource = Project?.Source as ProjectGithubSource;
+            var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent && Commit != null;
+            CommitStatusUpdater su = null;
+
+            if (notifyGithub) {
+                su = new CommitStatusUpdater {
+                    Username = githubSource.Username,
+                    Password = githubSource.Password,
+                    StatusUrl = Commit.StatusesUrl,
+                    Sha = Commit.Sha,
+                };
+
+                var status = new CommitStatus {
+                    State = CommitStates.Pending,
+                    Context = "Photon",
+                    Description = "Build in progress..."
+                };
+
+                await su.Post(status);
+            }
+
+            var success = false;
+
+            try {
+                await Domain.RunBuildTask(context);
+
+                success = true;
+            }
+            finally {
+                if (notifyGithub) {
+                    var status = new CommitStatus {
+                        Context = "Photon",
+                    };
+
+                    if (success) {
+                        status.State = CommitStates.Success;
+                        status.Description = "Build Successful.";
+                    }
+                    else {
+                        status.State = CommitStates.Failure;
+                        status.Description = "Build Failed!";
+                    }
+
+                    await su.Post(status);
+                }
+            }
         }
 
         private void LoadProjectSource()

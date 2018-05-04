@@ -60,7 +60,7 @@ namespace Photon.Communication
                 }
             };
 
-            listener.AllowNatTraversal(true);
+            //listener.AllowNatTraversal(true);
             listener.Start();
 
             listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());

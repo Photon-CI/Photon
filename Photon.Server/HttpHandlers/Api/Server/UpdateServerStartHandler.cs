@@ -93,7 +93,7 @@ namespace Photon.Server.HttpHandlers.Api.Server
             }
 
             try {
-                var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /fe /L*V \"log.txt\"";
+                var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
 
                 ProcessRunner.Run(updatePath, cmd);
             }

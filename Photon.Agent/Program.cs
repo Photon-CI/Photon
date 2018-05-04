@@ -16,6 +16,8 @@ namespace Photon.Agent
 
         public static int Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += Domain_OnUnhandledException;
+
             try {
                 XmlConfigurator.Configure();
 
@@ -99,6 +101,11 @@ namespace Photon.Agent
 
                 return 2;
             }
+        }
+
+        private static void Domain_OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Log.Fatal("An unhandled exception occurred!", e.ExceptionObject as Exception);
         }
     }
 }

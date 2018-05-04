@@ -42,7 +42,7 @@ namespace Photon.Server.Internal.Sessions
             Domain.Initialize(assemblyFilename);
 
             var context = new ServerDeployContext {
-                Agents = PhotonServer.Instance.Definition.Agents.ToArray(),
+                Agents = PhotonServer.Instance.Definition.Definition.Agents.ToArray(),
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
                 ScriptName = ScriptName,

@@ -1,11 +1,12 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Photon.Library.GitHub;
 using System;
 using System.Collections.Generic;
 
 namespace Photon.Server.Internal.GitHub
 {
-    public class HookEventHandler
+    internal class HookEventHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(HookEventHandler));
 

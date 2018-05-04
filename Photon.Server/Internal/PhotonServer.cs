@@ -1,7 +1,6 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Framework;
-using Photon.Framework.Extensions;
 using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.Packages;
@@ -27,7 +26,7 @@ namespace Photon.Server.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public ServerDefinition Definition {get; private set;}
+        public ServerDefinitionWatch Definition {get;}
         public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
@@ -40,6 +39,7 @@ namespace Photon.Server.Internal
 
         public PhotonServer()
         {
+            Definition = new ServerDefinitionWatch();
             Projects = new ProjectManager();
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
@@ -77,13 +77,7 @@ namespace Photon.Server.Internal
             LoadVariables();
 
             // Load existing or default server configuration
-            Definition = ParseServerDefinition() ?? new ServerDefinition {
-                Http = {
-                    Host = "*",
-                    Port = 8082,
-                    Path = "/photon/server",
-                },
-            };
+            Definition.Initialize();
 
             Projects.Initialize();
             ProjectData.Initialize();
@@ -103,6 +97,7 @@ namespace Photon.Server.Internal
 
         public void Stop()
         {
+            Definition.Dispose();
             Queue.Stop();
             Sessions.Stop();
 
@@ -126,6 +121,7 @@ namespace Photon.Server.Internal
                 });
 
                 await Task.Run(() => {
+                    Definition.Dispose();
                     Queue.Stop();
                     Sessions.Stop();
                 }, token);
@@ -134,6 +130,7 @@ namespace Photon.Server.Internal
 
         public void Abort()
         {
+            Definition.Dispose();
             Queue.Abort();
             Sessions.Abort();
 
@@ -143,24 +140,6 @@ namespace Photon.Server.Internal
             }
             catch (Exception error) {
                 Log.Error("Failed to stop HTTP Receiver!", error);
-            }
-        }
-
-        private ServerDefinition ParseServerDefinition()
-        {
-            var file = Configuration.ServerFile ?? "server.json";
-            var path = Path.Combine(Configuration.AssemblyPath, file);
-            path = Path.GetFullPath(path);
-
-            Log.Debug($"Loading Server Definition: {path}");
-
-            if (!File.Exists(path)) {
-                Log.Warn($"Server Definition not found! {path}");
-                return null;
-            }
-
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                return JsonSettings.Serializer.Deserialize<ServerDefinition>(stream);
             }
         }
 
@@ -198,9 +177,11 @@ namespace Photon.Server.Internal
 
         private void StartHttpServer()
         {
+            var http = Definition.Definition.Http;
+
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
-                ListenerPath = Definition.Http.Path,
+                ListenerPath = http.Path,
                 ContentDirectories = {
                     new ContentDirectory {
                         DirectoryPath = Path.Combine(Configuration.AssemblyPath, "Content"),
@@ -212,10 +193,10 @@ namespace Photon.Server.Internal
             var assembly = Assembly.GetExecutingAssembly();
             context.Views.AddAllFromAssembly(assembly, "Photon.Server.Views");
 
-            var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
+            var httpPrefix = $"http://{http.Host}:{http.Port}/";
 
-            if (!string.IsNullOrEmpty(Definition.Http.Path))
-                httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
+            if (!string.IsNullOrEmpty(http.Path))
+                httpPrefix = NetPath.Combine(httpPrefix, http.Path);
 
             if (!httpPrefix.EndsWith("/"))
                 httpPrefix += "/";

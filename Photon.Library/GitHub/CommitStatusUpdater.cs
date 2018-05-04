@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using Photon.Framework;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Photon.Framework;
 
-namespace Photon.Server.Internal.GitHub
+namespace Photon.Library.GitHub
 {
     public class CommitStatusUpdater
     {
@@ -20,7 +20,8 @@ namespace Photon.Server.Internal.GitHub
         {
             var data = status.ToJson();
             var buffer = Encoding.UTF8.GetBytes(data);
-            var url = NetPath.Combine(StatusUrl, Sha);
+            //var url = NetPath.Combine(StatusUrl, Sha);
+            var url = StatusUrl.Replace("{sha}", Sha);
 
             var request = WebRequest.CreateHttp(url);
             request.Method = "POST";

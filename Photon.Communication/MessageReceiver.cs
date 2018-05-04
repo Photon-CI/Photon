@@ -42,6 +42,10 @@ namespace Photon.Communication
                         // Client Disconnected
                         return;
                     }
+                    catch (ObjectDisposedException) {
+                        // Stream Closed
+                        return;
+                    }
                     catch (EndOfStreamException) {
                         // Stream Closed
                         return;

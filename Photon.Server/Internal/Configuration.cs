@@ -13,6 +13,7 @@ namespace Photon.Server.Internal
         public static string Version {get;}
 
         public static int Parallelism => ConfigurationReader.AppSetting("parallelism", 1);
+        public static string DownloadUrl => ConfigurationReader.AppSetting("downloadUrl", "http://download.photon.ci");
         private static string ServerFilePath => ConfigurationReader.AppSetting("serverFile", "server.json");
         private static string ProjectsFilePath => ConfigurationReader.AppSetting("projectsFile", "projects.json");
         private static string WorkPath => ConfigurationReader.AppSetting("work", "Work");

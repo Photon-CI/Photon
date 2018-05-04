@@ -14,6 +14,7 @@ namespace Photon.CLI.Actions
         private const int PollIntervalMs = 400;
 
         public string ServerName {get; set;}
+        public string AgentNames {get; set;}
         public HttpAgentUpdateResultResponse Result {get; set;}
 
 
@@ -58,6 +59,9 @@ namespace Photon.CLI.Actions
                 var url = NetPath.Combine(server.Url, "api/agent/update/start");
 
                 client = HttpClientEx.Post(url);
+                client.Query = new {
+                    names = AgentNames,
+                };
 
                 await client.Send();
 

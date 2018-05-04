@@ -6,8 +6,10 @@ using Photon.Library;
 using Photon.Library.TcpMessages;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -24,14 +26,21 @@ namespace Photon.Server.Internal.Sessions
         private string tempFilename;
         private LazyAsync<string> GetLatestAgentFilename;
 
+        public string[] AgentNames {get; set;}
+
 
         public override async Task RunAsync()
         {
+            var agents = PhotonServer.Instance.Definition.Definition.Agents
+                .Where(x => IncludesAgent(x.Name)).ToArray();
+
+            if (!agents.Any()) throw new ApplicationException("No agents were found!");
+
             var agentIndex = await DownloadTools.GetLatestAgentIndex();
             LatestAgentVersion = agentIndex.Version;
             LatestAgentMsiFilename = agentIndex.MsiFilename;
 
-            LatestAgentMsiUrl = NetPath.Combine("http://download.photon.null511.info/agent", LatestAgentVersion, LatestAgentMsiFilename);
+            LatestAgentMsiUrl = NetPath.Combine(Configuration.DownloadUrl, "agent", LatestAgentVersion, LatestAgentMsiFilename);
 
             GetLatestAgentFilename = new LazyAsync<string>(async () => {
                 tempFilename = Path.GetTempFileName();
@@ -55,7 +64,7 @@ namespace Photon.Server.Internal.Sessions
 
             var queue = new ActionBlock<ServerAgentDefinition>(AgentAction, queueOptions);
 
-            foreach (var agent in PhotonServer.Instance.Definition.Agents)
+            foreach (var agent in agents)
                 queue.Post(agent);
 
             queue.Complete();
@@ -215,6 +224,23 @@ namespace Photon.Server.Internal.Sessions
             }
 
             return client;
+        }
+
+        private bool IncludesAgent(string agentName)
+        {
+            if (!(AgentNames?.Any() ?? false)) return true;
+
+            foreach (var name in AgentNames) {
+                var escapedName = Regex.Escape(name)
+                    .Replace("\\?", ".")
+                    .Replace("\\*", ".*");
+
+                var namePattern = $"^{escapedName}$";
+                if (Regex.IsMatch(agentName, namePattern, RegexOptions.IgnoreCase))
+                    return true;
+            }
+
+            return false;
         }
     }
 }

@@ -1,0 +1,8 @@
+{
+	"project": "photon",
+	"refspec": "master",
+	"task": "PiBuildTask",
+	"roles": [
+		"pi"
+	]
+}
