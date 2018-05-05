@@ -18,12 +18,16 @@ namespace Photon.Agent.Internal
         private static string ApplicationsPath => ConfigurationReader.AppSetting("applications", "Applications");
         private static string VariablesPath => ConfigurationReader.AppSetting("variables", "Variables");
         private static string RepositoryPath => ConfigurationReader.AppSetting("repository", "Repository");
+        private static string HttpContentPath => ConfigurationReader.AppSetting("httpContent", ".\\Content");
+        private static string HttpViewPath => ConfigurationReader.AppSetting("httpViews", ".\\Views");
 
         public static string AgentFile => FullPath(Directory, AgentFilePath);
         public static string WorkDirectory => FullPath(Directory, WorkPath);
         public static string ApplicationsDirectory => FullPath(Directory, ApplicationsPath);
         public static string VariablesDirectory => FullPath(Directory, VariablesPath);
         public static string RepositoryDirectory => FullPath(Directory, RepositoryPath);
+        public static string HttpContentDirectory => FullPath(AssemblyPath, HttpContentPath);
+        public static string HttpViewDirectory => FullPath(AssemblyPath, HttpViewPath);
 
 
         static Configuration()

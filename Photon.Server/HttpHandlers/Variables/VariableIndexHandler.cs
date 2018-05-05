@@ -1,4 +1,4 @@
-﻿using Photon.Server.Internal;
+﻿using Photon.Library;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Server.HttpHandlers.Variables

@@ -176,14 +176,13 @@ namespace Photon.Agent.Internal
                 ListenerPath = Definition.Http.Path,
                 ContentDirectories = {
                     new ContentDirectory {
-                        DirectoryPath = Path.Combine(Configuration.AssemblyPath, "Content"),
+                        DirectoryPath = Configuration.HttpContentDirectory,
                         UrlPath = "/Content/",
                     }
                 },
             };
 
-            var assembly = Assembly.GetExecutingAssembly();
-            context.Views.AddAllFromAssembly(assembly, "Photon.Agent.Views");
+            context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
             var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
 

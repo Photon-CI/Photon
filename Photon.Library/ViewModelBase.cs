@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Photon.Server.Internal
+namespace Photon.Library
 {
-    internal class ViewModelBase
+    public class ViewModelBase
     {
         public string PageTitle {get; set;}
         public string CopyrightYear {get; set;}
@@ -12,7 +12,7 @@ namespace Photon.Server.Internal
 
         public ViewModelBase()
         {
-            PageTitle = "Photon Server";
+            PageTitle = "Photon";
             CopyrightYear = DateTime.Now.Year.ToString();
             Errors = new List<Exception>();
         }

@@ -1,8 +1,22 @@
-﻿<html>
-<head>
-    <title>Photon</title>
-</head>
-<body>
-    <h2>Photon Agent</h2>
-</body>
-</html>
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="dashboard"]').addClass('active');
+    });
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .layout-content {
+        padding: 8px 16px;
+    }
+</style>
+{{#EndStyle}}
+
+<div class="container">
+    <h2 class="my-0">{{Name}} <small class="text-muted">{{Version}}</small></h2>
+    <a href="{{Url}}" class="my-0">{{Url}}</a>
+</div>

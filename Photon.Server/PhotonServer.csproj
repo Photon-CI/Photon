@@ -103,7 +103,6 @@
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\PhotonServer.cs" />
     <Compile Include="Internal\TaskRunnerManager.cs" />
-    <Compile Include="Internal\ViewModelBase.cs" />
     <Compile Include="MessageProcessors\AgentSessionOutputProcessor.cs" />
     <Compile Include="MessageProcessors\ApplicationPackagePullProcessor.cs" />
     <Compile Include="MessageProcessors\ApplicationPackagePushProcessor.cs" />

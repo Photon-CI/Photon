@@ -5,6 +5,7 @@ using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.Packages;
 using Photon.Server.Internal.Projects;
+using Photon.Server.Internal.ServerAgents;
 using Photon.Server.Internal.ServerConfiguration;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
@@ -16,7 +17,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Server.Internal.ServerAgents;
 
 namespace Photon.Server.Internal
 {
