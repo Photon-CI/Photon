@@ -1,4 +1,4 @@
-﻿using Photon.Framework;
+﻿using Photon.Framework.Server;
 using Photon.Library.TcpMessages;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ namespace Photon.Server.Internal.Sessions
         private readonly ServerBuildSession session;
 
 
-        public DomainAgentBuildSessionHost(ServerBuildSession session, ServerAgentDefinition agent, CancellationToken token) : base(session, agent, token)
+        public DomainAgentBuildSessionHost(ServerBuildSession session, ServerAgent agent, CancellationToken token) : base(session, agent, token)
         {
             this.session = session;
         }

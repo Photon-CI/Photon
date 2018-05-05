@@ -42,7 +42,7 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.1.10.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="PiServerLite, Version=0.1.12.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\PiServerLite\PiServerLite\bin\Debug\PiServerLite.dll</HintPath>
     </Reference>
@@ -58,8 +58,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\RootCommands.cs" />
+    <Compile Include="HttpHandlers\Agents\AgentEditHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Agent\AgentDeleteHandler.cs" />
     <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\PackagesHandler.cs" />
+    <Compile Include="HttpHandlers\Packages\PackageIndexHandler.cs" />
     <Compile Include="HttpHandlers\BuildsHandler.cs" />
     <Compile Include="HttpHandlers\DeploymentsHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\UpdateAgentResultHandler.cs" />
@@ -71,11 +73,16 @@
     <Compile Include="HttpHandlers\Api\Deploy\DeployResultHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\OutputHandler.cs" />
     <Compile Include="HttpHandlers\Api\VersionHandler.cs" />
-    <Compile Include="HttpHandlers\AgentsHandler.cs" />
+    <Compile Include="HttpHandlers\Agents\AgentIndexHandler.cs" />
+    <Compile Include="HttpHandlers\Projects\ProjectIndexHandler.cs" />
+    <Compile Include="HttpHandlers\Variables\VariableIndexHandler.cs" />
+    <Compile Include="Internal\ServerAgents\ServerAgentManager.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
     <Compile Include="Internal\GitHub\HookEventHandler.cs" />
-    <Compile Include="Internal\ServerDefinitionWatch.cs" />
+    <Compile Include="Internal\JsonDynamicDocument.cs" />
+    <Compile Include="Internal\ServerConfiguration\ServerConfiguration.cs" />
+    <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
     <Compile Include="Internal\TaskRunner.cs" />
     <Compile Include="Internal\ServerBuildContext.cs" />
@@ -120,7 +127,10 @@
     <Compile Include="HttpHandlers\Api\Build\BuildStartHandler.cs" />
     <Compile Include="HttpHandlers\Api\Deploy\DeployStartHandler.cs" />
     <Compile Include="HttpHandlers\IndexHandler.cs" />
-    <Compile Include="ViewModels\AgentsVM.cs" />
+    <Compile Include="ViewModels\Agents\AgentEditVM.cs" />
+    <Compile Include="ViewModels\Agents\AgentIndexVM.cs" />
+    <Compile Include="ViewModels\IndexVM.cs" />
+    <Compile Include="ViewModels\Projects\ProjectIndexVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -195,6 +205,9 @@
     <None Include="server.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Views\Agents\Edit.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Configuration.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -204,13 +217,19 @@
     <Content Include="Views\Builds.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Packages.html">
+    <Content Include="Views\Packages\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Agents.html">
+    <Content Include="Views\Agents\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Projects\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Variables\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

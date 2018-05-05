@@ -3,7 +3,7 @@
 {{#Script}}
 <script>
     $(function () {
-        $('#layoutNavbarContent [data-link="agents"]').addClass('active');
+        $('#layoutNavbarContent [data-link="variables"]').addClass('active');
     });
 </script>
 {{#EndScript}}
@@ -16,8 +16,4 @@
 </style>
 {{#EndStyle}}
 
-{{#Each Agents.agent}}
-<div class="card">
-    {{agent.Name}}
-</div>
-{{#EndEach}}
+<h2>Variables</h2>

@@ -9,7 +9,7 @@ namespace Photon.Framework.Server
     [Serializable]
     public abstract class ServerContextBase : DomainContextBase, IServerContext
     {
-        public ServerAgentDefinition[] Agents {get; set;}
+        public ServerAgent[] Agents {get; set;}
         public DomainConnectionFactory ConnectionFactory {get; set;}
 
         [NonSerialized]
@@ -37,7 +37,7 @@ namespace Photon.Framework.Server
             agentSessions.Clear();
         }
 
-        public DomainAgentSessionHandle ConnectToAgent(ServerAgentDefinition agent)
+        public DomainAgentSessionHandle ConnectToAgent(ServerAgent agent)
         {
             var sessionClient = ConnectionFactory.RequestConnection(agent);
 
@@ -61,7 +61,7 @@ namespace Photon.Framework.Server
                 throw new ApplicationException($"No agents were found in roles '{string.Join(", ", roles)}'!");
             }
 
-            ServerAgentDefinition agent;
+            ServerAgent agent;
             if (roleAgents.Length <= 1) {
                 agent = roleAgents.First();
             }
@@ -125,7 +125,7 @@ namespace Photon.Framework.Server
             Output.AppendLine("!", ConsoleColor.DarkYellow);
         }
 
-        private void PrintFoundAgents(params ServerAgentDefinition[] agents)
+        private void PrintFoundAgents(params ServerAgent[] agents)
         {
             var agentNames = agents.Select(x => x.Name);
             Output.Append("Found Agents: ", ConsoleColor.DarkCyan);

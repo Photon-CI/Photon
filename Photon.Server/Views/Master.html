@@ -10,15 +10,19 @@
     <style>
         body,html{
             height: 100%;
+            overflow-x: hidden;
         }
-        nav.sidebar.navbar {
-            border-radius: 0;
-        }
-        nav.sidebar, .layout-content {
+        nav.sidebar {
             -webkit-transition: margin 200ms ease-out;
             -moz-transition: margin 200ms ease-out;
             -o-transition: margin 200ms ease-out;
             transition: margin 200ms ease-out;
+        }
+        .layout-content {
+            -webkit-transition: margin 200ms ease-out, width 200ms ease-out;
+            -moz-transition: margin 200ms ease-out, width 200ms ease-out;
+            -o-transition: margin 200ms ease-out, width 200ms ease-out;
+            transition: margin 200ms ease-out, width 200ms ease-out;
         }
         .nav-item-iconholder {
             float: right;
@@ -85,6 +89,7 @@
 
             nav.sidebar:hover + .layout-content {
                 margin-left: 200px;
+                width: calc(100% - 200px);
             }
             nav.sidebar:hover {
                 margin-left: 0;
@@ -136,6 +141,22 @@
                                 <i style="font-size: 16px" class="far fa-hdd"></i>
                             </div>
                             Agents
+                        </a>
+                    </li>
+                    <li class="nav-item" data-link="projects">
+                        <a href="{{#Url Projects}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fab fa-wpforms"></i>
+                            </div>
+                            Projects
+                        </a>
+                    </li>
+                    <li class="nav-item" data-link="variables">
+                        <a href="{{#Url Variables}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-hashtag"></i>
+                            </div>
+                            Variables
                         </a>
                     </li>
                     <li class="nav-item" data-link="packages">
