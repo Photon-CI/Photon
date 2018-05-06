@@ -18,6 +18,19 @@ namespace Photon.Library.GitHub
 
         public async Task<CommitStatusResponse> Post(CommitStatus status)
         {
+            try {
+                return await PostMessage(status);
+            }
+            catch (WebException error) when (error.Response is HttpWebResponse response) {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    throw new ApplicationException($"Status API was not found! [{StatusUrl}]");
+
+                throw;
+            }
+        }
+
+        private async Task<CommitStatusResponse> PostMessage(CommitStatus status)
+        {
             var data = status.ToJson();
             var buffer = Encoding.UTF8.GetBytes(data);
             //var url = NetPath.Combine(StatusUrl, Sha);
