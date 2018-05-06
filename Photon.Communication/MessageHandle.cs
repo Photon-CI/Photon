@@ -23,6 +23,7 @@ namespace Photon.Communication
         public async Task<IResponseMessage> GetResponseAsync(CancellationToken token)
         {
             token.Register(() => completionEvent.SetCanceled());
+
             var response = await completionEvent.Task;
 
             if (!(response?.Successful ?? false))
