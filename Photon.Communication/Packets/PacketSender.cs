@@ -40,7 +40,8 @@ namespace Photon.Communication.Packets
 
         public void Dispose()
         {
-            tokenSource?.Cancel();
+            //try {tokenSource?.Cancel();}
+            //catch {}
 
             foreach (var packetSource in packetSourceList)
                 packetSource.Dispose();

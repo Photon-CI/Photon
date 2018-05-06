@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,6 +19,7 @@ namespace Photon.NuGetPlugin
 {
     public class NuGetCore
     {
+        private readonly Regex existsExp;
         private SourceRepository sourceRepository;
 
         public PackageSource PackageSource {get; private set;}
@@ -40,6 +43,8 @@ namespace Photon.NuGetPlugin
                 DirectDownload = true,
                 NoCache = true,
             };
+
+            existsExp = new Regex(@":\s*409\s*\(A package with ID '\S+' and version '\S+' already exists", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
         public void Initialize()
@@ -116,15 +121,6 @@ namespace Photon.NuGetPlugin
                     builder.Save(packageStream);
                 }
 
-                //var path = Path.GetDirectoryName(nuspecFilename);
-                //var name = Path.GetFileName(nuspecFilename);
-
-                //var args = string.Join(
-                //    "pack", $"\"{name}\"",
-                //    $"-OutputDirectory \"{PackageDirectory}\"");
-
-                //ProcessRunner.Run(path, NugetExe, args, Output);
-
                 Output?.Append("Package ", ConsoleColor.DarkGreen)
                     .Append(packageName, ConsoleColor.Green)
                     .AppendLine(" created successfully.", ConsoleColor.DarkGreen);
@@ -148,13 +144,18 @@ namespace Photon.NuGetPlugin
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
             try {
-                var apiKeyFunc = (Func<string, string>)(x => ApiKey);
+                var apiKeyFunc = (Func<string, string>) (x => ApiKey);
                 var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
                 await updateResource.Push(packageFilename, null, PushTimeout, false, apiKeyFunc, null, Logger);
 
                 Output?.Append("Package ", ConsoleColor.DarkGreen)
                     .Append(packageName, ConsoleColor.Green)
                     .AppendLine(" published successfully.", ConsoleColor.DarkGreen);
+            }
+            catch (HttpRequestException error) when (existsExp.IsMatch(error.Message)) {
+                Output?.Append("Package ", ConsoleColor.DarkYellow)
+                    .Append(packageName, ConsoleColor.Yellow)
+                    .AppendLine(" already exists.", ConsoleColor.DarkYellow);
             }
             catch (Exception error) {
                 Output?.Append("Failed to publish package ", ConsoleColor.DarkRed)
@@ -164,12 +165,6 @@ namespace Photon.NuGetPlugin
 
                 throw;
             }
-
-            //await context.RunCommandLineAsync(NugetExe, "push",
-            //    $"\"{packageFile}\"",
-            //    $"-Source \"{Source}\"",
-            //    "-NonInteractive",
-            //    $"-ApiKey \"{ApiKey}\"");
         }
     }
 }
