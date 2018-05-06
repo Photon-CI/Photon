@@ -52,6 +52,7 @@
   <ItemGroup>
     <Content Include="Content\gpl-3.0.rtf" />
     <Content Include="Content\projects.json" />
+    <Content Include="Photon.Server.Installer.wax" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content" />

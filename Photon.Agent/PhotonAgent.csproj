@@ -119,42 +119,42 @@
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot">
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.ttf">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff2">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.eot">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.eot">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.ttf">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff2">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.eot">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.eot">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.ttf">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff2">
+    </Content>
+    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -2,10 +2,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <?define EXE=$(var.PhotonServer.TargetFileName)?>
   <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
+  <?define PhotonServer_TargetDir=$(var.PhotonServer.TargetDir)?>
   <Product Id="*" Name="Photon Server $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="1b9734e8-64b0-4035-9956-dc8e74a45c28">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon Server." />
 
-    <Media Id="1" Cabinet="Photon.Server.cab" EmbedCab="yes"/>
+    <Media Id="1" Cabinet="Photon.Server.cab" EmbedCab="yes" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of Photon Server is already installed." />
 
@@ -14,6 +15,17 @@
         <ComponentGroupRef Id="ProductComponents" />
         <ComponentGroupRef Id="ServerTemplates" />
       </Feature>
+      <ComponentGroupRef Id="Views_Agents_files" />
+      <ComponentGroupRef Id="Views_files" />
+      <ComponentGroupRef Id="Views_Packages_files" />
+      <ComponentGroupRef Id="Views_Projects_files" />
+      <ComponentGroupRef Id="Views_Variables_files" />
+      <ComponentGroupRef Id="Content_bootstrap_4.1.0_css_files" />
+      <ComponentGroupRef Id="Content_bootstrap_4.1.0_js_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.0.11_css_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.0.11_webfonts_files" />
+      <ComponentGroupRef Id="Content_Images_files" />
+      <ComponentGroupRef Id="Content_files" />
 		</Feature>
 
     <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
@@ -22,7 +34,7 @@
     <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
 	  <CustomAction Id="LaunchServerConfiguration" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
 
-	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Server Configuration" />
 	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
         
@@ -40,7 +52,25 @@
 		  <Directory Id="CommonAppDataFolder">
 		    <Directory Id="CommonAppDataManufacturerFolder" Name="Photon">
 		      <Directory Id="INSTALLDIR" Name="Server">
-		        <Directory Id="InstallBin" Name="bin" />
+		        <Directory Id="InstallBin" Name="bin">
+		          <Directory Id="Content" Name="Content">
+		            <Directory Id="Content_bootstrap_4.1.0" Name="bootstrap-4.1.0">
+		              <Directory Id="Content_bootstrap_4.1.0_css" Name="css" />
+		              <Directory Id="Content_bootstrap_4.1.0_js" Name="js" />
+		            </Directory>
+		            <Directory Id="Content_fontawesome_5.0.11" Name="fontawesome-5.0.11">
+		              <Directory Id="Content_fontawesome_5.0.11_css" Name="css" />
+		              <Directory Id="Content_fontawesome_5.0.11_webfonts" Name="webfonts" />
+		            </Directory>
+		            <Directory Id="Content_Images" Name="Images" />
+		          </Directory>
+		          <Directory Id="Views" Name="Views">
+		            <Directory Id="Views_Agents" Name="Agents" />
+		            <Directory Id="Views_Packages" Name="Packages" />
+		            <Directory Id="Views_Projects" Name="Projects" />
+		            <Directory Id="Views_Variables" Name="Variables" />
+		          </Directory>
+		        </Directory>
 		      </Directory>
 		    </Directory>
 		  </Directory>
@@ -49,38 +79,38 @@
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
-			<Component Id="Product_Exe" Guid="46A2F17D-1100-45F5-87F1-C81DDE3D39A3">
-		    <File Source="$(var.PhotonServer.TargetDir)PhotonServer.exe" />
-			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal"/>
+			<Component Id="PhotonServer.exe" Guid="555abaa8-022d-4288-98a6-0eb32866a342">
+			  <File Id="PhotonServer.exe" Name="PhotonServer.exe" Source="$(var.PhotonServer_TargetDir)PhotonServer.exe" KeyPath="yes" />
+			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal" />
 			  <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Server" Wait="yes" />
-      </Component>
-      <Component Id="Product_Config" Guid="DC3003A3-9558-4E52-9806-6C09DD09527F">
-			  <File Source="$(var.PhotonServer.TargetDir)PhotonServer.exe.config" />
-		  </Component>
-		  <Component Id="Product_PiServerLite" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)PiServerLite.dll" />
-		  </Component>
-		  <Component Id="Product_DataflowTpl" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)System.Threading.Tasks.Dataflow.dll" />
-		  </Component>
-		  <Component Id="Product_PhotonLib" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)Photon.Library.dll" />
-		  </Component>
-		  <Component Id="Product_PhotonFramework" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)Photon.Framework.dll" />
-		  </Component>
-		  <Component Id="Product_PhotonComm" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)Photon.Communication.dll" />
-		  </Component>
-		  <Component Id="Product_NewtonsoftJson" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)Newtonsoft.Json.dll" />
-		  </Component>
-		  <Component Id="Product_NewtonsoftBson" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)Newtonsoft.Json.Bson.dll" />
-		  </Component>
-		  <Component Id="Product_log4net" Guid="*">
-			  <File Source="$(var.PhotonServer.TargetDir)log4net.dll" />
-		  </Component>
+			</Component>
+			<Component Id="PhotonServer.exe.config" Guid="fd623cf8-ddf8-4950-b7b9-7a91b3596794">
+			  <File Id="PhotonServer.exe.config" Name="PhotonServer.exe.config" Source="$(var.PhotonServer_TargetDir)PhotonServer.exe.config" />
+			</Component>
+			<Component Id="log4net.dll" Guid="4472635c-5818-463c-b3be-5971ca8dbd7c">
+			  <File Id="log4net.dll" Name="log4net.dll" Source="$(var.PhotonServer_TargetDir)log4net.dll" />
+			</Component>
+			<Component Id="Newtonsoft.Json.dll" Guid="d0825149-cfa8-4521-81c9-6bc3a464c4e6">
+			  <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.PhotonServer_TargetDir)Newtonsoft.Json.dll" />
+			</Component>
+			<Component Id="PiServerLite.dll" Guid="3d0e76ac-5cea-4f8a-8610-7f62a0663a43">
+			  <File Id="PiServerLite.dll" Name="PiServerLite.dll" Source="$(var.PhotonServer_TargetDir)PiServerLite.dll" />
+			</Component>
+			<Component Id="System.Threading.Tasks.Dataflow.dll" Guid="673568fa-a668-4806-87b5-74630483c0f0">
+			  <File Id="System.Threading.Tasks.Dataflow.dll" Name="System.Threading.Tasks.Dataflow.dll" Source="$(var.PhotonServer_TargetDir)System.Threading.Tasks.Dataflow.dll" />
+			</Component>
+			<Component Id="Newtonsoft.Json.Bson.dll" Guid="11012ea1-5a56-4134-967d-4dd7272ed975">
+			  <File Id="Newtonsoft.Json.Bson.dll" Name="Newtonsoft.Json.Bson.dll" Source="$(var.PhotonServer_TargetDir)Newtonsoft.Json.Bson.dll" />
+			</Component>
+			<Component Id="Photon.Framework.dll" Guid="e56ea86e-fc73-40aa-9f96-2e7345bc8cda">
+			  <File Id="Photon.Framework.dll" Name="Photon.Framework.dll" Source="$(var.PhotonServer_TargetDir)Photon.Framework.dll" />
+			</Component>
+			<Component Id="Photon.Communication.dll" Guid="54c56012-b009-44be-a934-1fb2066f508f">
+			  <File Id="Photon.Communication.dll" Name="Photon.Communication.dll" Source="$(var.PhotonServer_TargetDir)Photon.Communication.dll" />
+			</Component>
+			<Component Id="Photon.Library.dll" Guid="b131f8e8-afd7-4563-885a-d5136c99e4c1">
+			  <File Id="Photon.Library.dll" Name="Photon.Library.dll" Source="$(var.PhotonServer_TargetDir)Photon.Library.dll" />
+			</Component>
 		</ComponentGroup>
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
       <Component Id="ServerConfigTemplate" Guid="">
@@ -90,4 +120,165 @@
       </Component>
     </ComponentGroup>
 	</Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Agents_files" Directory="Views_Agents">
+      <Component Id="Views_Agents_Edit.html" Guid="38f2fc1b-3264-4d88-83c7-aeeca74395c8">
+        <File Id="Views_Agents_Edit.html" Name="Edit.html" Source="$(var.PhotonServer_TargetDir)Views\Agents\Edit.html" />
+      </Component>
+      <Component Id="Views_Agents_Index.html" Guid="467a239f-a30d-4b22-9844-c6fa0f43034b">
+        <File Id="Views_Agents_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Agents\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_files" Directory="Views">
+      <Component Id="Views_Configuration.html" Guid="8e668301-0b6a-4c15-8bee-1bf0a4139eca">
+        <File Id="Views_Configuration.html" Name="Configuration.html" Source="$(var.PhotonServer_TargetDir)Views\Configuration.html" />
+      </Component>
+      <Component Id="Views_Deployments.html" Guid="4e21a669-a7c0-432a-a377-1ff00e0b4b24">
+        <File Id="Views_Deployments.html" Name="Deployments.html" Source="$(var.PhotonServer_TargetDir)Views\Deployments.html" />
+      </Component>
+      <Component Id="Views_Builds.html" Guid="dddaacb2-1a45-42f8-8d39-d8232b8bb6ae">
+        <File Id="Views_Builds.html" Name="Builds.html" Source="$(var.PhotonServer_TargetDir)Views\Builds.html" />
+      </Component>
+      <Component Id="Views_Index.html" Guid="00b3c93f-90c5-48c8-b873-77b8dd3a62d9">
+        <File Id="Views_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Index.html" />
+      </Component>
+      <Component Id="Views_Master.html" Guid="9ad3ccf7-5a97-4e64-9dea-80920112b474">
+        <File Id="Views_Master.html" Name="Master.html" Source="$(var.PhotonServer_TargetDir)Views\Master.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Packages_files" Directory="Views_Packages">
+      <Component Id="Views_Packages_Index.html" Guid="a2140a9e-154b-4d13-9aaf-c8cbd807eac7">
+        <File Id="Views_Packages_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Packages\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Projects_files" Directory="Views_Projects">
+      <Component Id="Views_Projects_Index.html" Guid="6b06fa14-09fe-48fd-baa5-aa64af2fe8bb">
+        <File Id="Views_Projects_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Projects\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Variables_files" Directory="Views_Variables">
+      <Component Id="Views_Variables_Index.html" Guid="1a1c4c42-6b8c-4909-8177-ba34d632aee5">
+        <File Id="Views_Variables_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Variables\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_bootstrap_4.1.0_css_files" Directory="Content_bootstrap_4.1.0_css">
+      <Component Id="Content_bootstrap_4.1.0_css_bootstrap_grid.min.css" Guid="718c072d-046d-4c32-875d-3e256785baa4">
+        <File Id="Content_bootstrap_4.1.0_css_bootstrap_grid.min.css" Name="bootstrap-grid.min.css" Source="$(var.PhotonServer_TargetDir)Content\bootstrap-4.1.0\css\bootstrap-grid.min.css" />
+      </Component>
+      <Component Id="Content_bootstrap_4.1.0_css_bootstrap_reboot.min.css" Guid="372fb9be-37e7-42d8-8ce6-2e5161706b98">
+        <File Id="Content_bootstrap_4.1.0_css_bootstrap_reboot.min.css" Name="bootstrap-reboot.min.css" Source="$(var.PhotonServer_TargetDir)Content\bootstrap-4.1.0\css\bootstrap-reboot.min.css" />
+      </Component>
+      <Component Id="Content_bootstrap_4.1.0_css_bootstrap.min.css" Guid="de0423bd-7b1e-4f61-9178-96e37165f99e">
+        <File Id="Content_bootstrap_4.1.0_css_bootstrap.min.css" Name="bootstrap.min.css" Source="$(var.PhotonServer_TargetDir)Content\bootstrap-4.1.0\css\bootstrap.min.css" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_bootstrap_4.1.0_js_files" Directory="Content_bootstrap_4.1.0_js">
+      <Component Id="Content_bootstrap_4.1.0_js_bootstrap.bundle.min.js" Guid="1fafb227-3aef-48eb-aa30-2b84d2458d85">
+        <File Id="Content_bootstrap_4.1.0_js_bootstrap.bundle.min.js" Name="bootstrap.bundle.min.js" Source="$(var.PhotonServer_TargetDir)Content\bootstrap-4.1.0\js\bootstrap.bundle.min.js" />
+      </Component>
+      <Component Id="Content_bootstrap_4.1.0_js_bootstrap.min.js" Guid="20a11bdb-5c99-42b3-84fa-f0cd8afbdade">
+        <File Id="Content_bootstrap_4.1.0_js_bootstrap.min.js" Name="bootstrap.min.js" Source="$(var.PhotonServer_TargetDir)Content\bootstrap-4.1.0\js\bootstrap.min.js" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.0.11_css_files" Directory="Content_fontawesome_5.0.11_css">
+      <Component Id="Content_fontawesome_5.0.11_css_fa_brands.min.css" Guid="27f71bfb-b31b-43cb-a840-8f4f628bd72e">
+        <File Id="Content_fontawesome_5.0.11_css_fa_brands.min.css" Name="fa-brands.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fa-brands.min.css" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_css_fa_regular.min.css" Guid="9ac39a8f-374d-470a-a778-a34ced82aeae">
+        <File Id="Content_fontawesome_5.0.11_css_fa_regular.min.css" Name="fa-regular.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fa-regular.min.css" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_css_fa_solid.min.css" Guid="6fe823be-1a67-4d42-beae-4368da384770">
+        <File Id="Content_fontawesome_5.0.11_css_fa_solid.min.css" Name="fa-solid.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fa-solid.min.css" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_css_fontawesome_all.min.css" Guid="ae4c0260-ee83-4de8-9881-4647ab4f0ca7">
+        <File Id="Content_fontawesome_5.0.11_css_fontawesome_all.min.css" Name="fontawesome-all.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fontawesome-all.min.css" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_css_fontawesome.min.css" Guid="09d7d896-34a2-4c1c-9e6a-3f2e6eca5ded">
+        <File Id="Content_fontawesome_5.0.11_css_fontawesome.min.css" Name="fontawesome.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fontawesome.min.css" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.0.11_webfonts_files" Directory="Content_fontawesome_5.0.11_webfonts">
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.svg" Guid="e821bb9d-5d85-4202-840c-3cc5e3277213">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.svg" Name="fa-brands-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.svg" Guid="a9f6b286-dfb2-4427-afa1-38e1e540b708">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.svg" Name="fa-regular-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.svg" Guid="4e14df90-a325-4f4e-89e1-43020017ce0f">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.svg" Name="fa-solid-900.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.eot" Guid="ddf73204-2292-4d40-9b6c-5f2f7dc3a2a6">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.eot" Name="fa-brands-400.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.ttf" Guid="05c446f1-3439-4f7a-a931-75d5bdbf13ce">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.ttf" Name="fa-brands-400.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.ttf" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff" Guid="cda10095-9190-4e5b-a60a-41acafcee28d">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff" Name="fa-brands-400.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff2" Guid="b3f4975b-5050-473c-a2c4-365550cf2bf9">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff2" Name="fa-brands-400.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff2" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.eot" Guid="3cbd7679-9d95-46d0-8a81-01a5fe5aefd6">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.eot" Name="fa-regular-400.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.eot" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.ttf" Guid="c74624ae-2976-4436-84c3-d56d4212f163">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.ttf" Name="fa-regular-400.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.ttf" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff" Guid="259527ed-9c85-44ba-8e52-54b657a36921">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff" Name="fa-regular-400.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff2" Guid="f970f2b7-1aed-419f-8e9d-8802e1898df4">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff2" Name="fa-regular-400.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff2" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.eot" Guid="11435a28-d1d9-4b8f-bba7-e413556188e8">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.eot" Name="fa-solid-900.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.eot" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.ttf" Guid="ec411901-eda0-4b11-914e-8418756356a4">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.ttf" Name="fa-solid-900.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.ttf" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff" Guid="3925981d-8794-4633-a135-a3ecfb1bd995">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff" Name="fa-solid-900.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff2" Guid="593bf5e5-08ba-497f-8520-94467631c6b8">
+        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff2" Name="fa-solid-900.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff2" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_Images_files" Directory="Content_Images">
+      <Component Id="Content_Images_photon_dark.svg" Guid="a24f05d6-b232-41eb-b196-e6f3a5298683">
+        <File Id="Content_Images_photon_dark.svg" Name="photon_dark.svg" Source="$(var.PhotonServer_TargetDir)Content\Images\photon_dark.svg" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_files" Directory="Content">
+      <Component Id="Content_jquery_3.3.1.min.js" Guid="46a782b9-8b93-40f0-b2b2-99b0c10369ec">
+        <File Id="Content_jquery_3.3.1.min.js" Name="jquery-3.3.1.min.js" Source="$(var.PhotonServer_TargetDir)Content\jquery-3.3.1.min.js" />
+      </Component>
+      <Component Id="Content_photon_light.ico" Guid="d5b3425e-d2a5-4e4c-a102-079e29b2cc4b">
+        <File Id="Content_photon_light.ico" Name="photon_light.ico" Source="$(var.PhotonServer_TargetDir)Content\photon_light.ico" />
+      </Component>
+      <Component Id="Content_popper.min.js" Guid="d27cb018-bb47-44c4-81dd-1b3b8beaacf2">
+        <File Id="Content_popper.min.js" Name="popper.min.js" Source="$(var.PhotonServer_TargetDir)Content\popper.min.js" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
 </Wix>
