@@ -1,5 +1,4 @@
 ﻿using log4net;
-using Photon.Framework;
 using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
@@ -100,7 +99,7 @@ namespace Photon.Server.Internal.Sessions
             Domain = null;
         }
 
-        protected abstract DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent);
+        protected abstract DomainAgentSessionHostBase OnCreateHost(ServerAgent agent);
 
         public virtual async Task PrepareWorkDirectoryAsync()
         {
@@ -198,7 +197,7 @@ namespace Photon.Server.Internal.Sessions
             PostBuildEvent?.Invoke(this, EventArgs.Empty);
         }
 
-        private DomainAgentSessionClient ConnectionFactory_OnConnectionRequest(ServerAgentDefinition agent)
+        private DomainAgentSessionClient ConnectionFactory_OnConnectionRequest(ServerAgent agent)
         {
             var host = OnCreateHost(agent);
             hostList[host.SessionClientId] = host;

@@ -22,6 +22,17 @@ namespace Photon.CLI.Actions
         {
             var server = context.Servers.Get(ServerName);
 
+            //var agentIndex = await DownloadTools.GetLatestAgentIndex();
+
+            ConsoleEx.Out.WriteLine("Checking agent version...", ConsoleColor.DarkCyan);
+
+            string currentVersion;
+            using (var webClient = new WebClient()) {
+                var currentVersionUrl = NetPath.Combine(server.Url, "api/version");
+                currentVersion = (await webClient.DownloadStringTaskAsync(currentVersionUrl)).Trim();
+            }
+
+
             var startResult = await StartSession(server);
             var sessionId = startResult?.SessionId;
 

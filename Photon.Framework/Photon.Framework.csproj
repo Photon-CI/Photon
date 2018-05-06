@@ -76,6 +76,7 @@
     <Compile Include="Projects\ProjectSourceSerializer.cs" />
     <Compile Include="Server\IServerContext.cs" />
     <Compile Include="Server\IServerBuildContext.cs" />
+    <Compile Include="Server\ServerAgent.cs" />
     <Compile Include="Server\ServerContextBase.cs" />
     <Compile Include="NetPath.cs" />
     <Compile Include="Packages\FilePatternMatching.cs" />
@@ -96,8 +97,6 @@
     <Compile Include="Domain\TypeRegistry.cs" />
     <Compile Include="Server\ScriptOutput.cs" />
     <Compile Include="Server\ServerDeployContext.cs" />
-    <Compile Include="ServerAgentDefinition.cs" />
-    <Compile Include="ServerDefinition.cs" />
     <Compile Include="ServerHttpDefinition.cs" />
     <Compile Include="Agent\AgentBuildContext.cs" />
     <Compile Include="Agent\AgentDeployContext.cs" />

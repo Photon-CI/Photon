@@ -1,6 +1,7 @@
 ﻿using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Server;
 using Photon.Framework.Tools;
 using Photon.Library;
 using Photon.Library.TcpMessages;
@@ -31,7 +32,7 @@ namespace Photon.Server.Internal.Sessions
 
         public override async Task RunAsync()
         {
-            var agents = PhotonServer.Instance.Definition.Definition.Agents
+            var agents = PhotonServer.Instance.Agents.All
                 .Where(x => IncludesAgent(x.Name)).ToArray();
 
             if (!agents.Any()) throw new ApplicationException("No agents were found!");
@@ -62,7 +63,7 @@ namespace Photon.Server.Internal.Sessions
                 CancellationToken = TokenSource.Token,
             };
 
-            var queue = new ActionBlock<ServerAgentDefinition>(AgentAction, queueOptions);
+            var queue = new ActionBlock<ServerAgent>(AgentAction, queueOptions);
 
             foreach (var agent in agents)
                 queue.Post(agent);
@@ -71,12 +72,12 @@ namespace Photon.Server.Internal.Sessions
             await queue.Completion;
         }
 
-        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent)
+        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
         {
             return null;
         }
 
-        private async Task AgentAction(ServerAgentDefinition agent)
+        private async Task AgentAction(ServerAgent agent)
         {
             using (var messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry)) {
                 string agentVersion;
@@ -144,7 +145,7 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        private async Task UpdateAgent(ServerAgentDefinition agent, MessageClient messageClient, CancellationToken token)
+        private async Task UpdateAgent(ServerAgent agent, MessageClient messageClient, CancellationToken token)
         {
             var filename = await GetLatestAgentFilename;
 
@@ -175,7 +176,7 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        private async Task<MessageClient> Reconnect(ServerAgentDefinition agent, TimeSpan timeout)
+        private async Task<MessageClient> Reconnect(ServerAgent agent, TimeSpan timeout)
         {
             var client = new MessageClient(PhotonServer.Instance.MessageRegistry);
 

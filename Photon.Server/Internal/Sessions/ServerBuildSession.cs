@@ -1,6 +1,7 @@
-﻿using Photon.Framework;
-using Photon.Framework.Projects;
+﻿using Photon.Framework.Projects;
+using Photon.Framework.Server;
 using Photon.Library.GitHub;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
@@ -20,7 +21,7 @@ namespace Photon.Server.Internal.Sessions
         public override async Task RunAsync()
         {
             var context = new ServerBuildContext {
-                Agents = PhotonServer.Instance.Definition.Definition.Agents.ToArray(),
+                Agents = PhotonServer.Instance.Agents.All.ToArray(),
                 Project = Project,
                 AssemblyFilename = AssemblyFilename,
                 PreBuild = PreBuild,
@@ -48,7 +49,7 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent)
+        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
         {
             return new DomainAgentBuildSessionHost(this, agent, TokenSource.Token);
         }

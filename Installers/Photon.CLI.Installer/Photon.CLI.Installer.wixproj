@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\gpl-3.0.rtf" />
+    <Content Include="Photon.CLI.Installer.wax" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Photon.CLI\PhotonCLI.csproj">

@@ -1,0 +1,128 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="agents"]').addClass('active');
+    });
+
+    function onDelete() {
+        $.ajax({
+            url: '{{#Url api/agent/delete}}?id={{&AgentId}}',
+            method: 'POST'
+        }).done(function() {
+            document.location = '{{#Url agents}}';
+        }).fail(function() {
+            alert('Failed to delete Agent!');
+        });
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .layout-content {
+        padding: 12px 0;
+    }
+</style>
+{{#EndStyle}}
+
+<div class="container">
+    <h4>{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Agent</h4>
+    <hr style="margin: 2px 0 8px 0" />
+    {{#If Errors}}
+    <div class="alert alert-danger">
+        <ul>
+            {{#Each Errors.error}}
+            <li>{{error.Message}}</li>
+            {{#EndEach}}
+        </ul>
+    </div>
+    {{#EndIf}}
+    <form method="post">
+        <input name="AgentId_Source" type="hidden" value="{{AgentId}}" />
+        <div class="form-row">
+            <div class="form-group col-12 col-md-6">
+                <label for="AgentIdTextBox">ID</label>
+                <input id="AgentIdTextBox" name="AgentId" type="text" class="form-control" value="{{AgentId}}" />
+            </div>
+            <div class="form-group col-12 col-md-6">
+                <label for="AgentNameTextBox">Name</label>
+                <input id="AgentNameTextBox" name="AgentName" type="text" class="form-control" value="{{AgentName}}" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-sm-3">
+                <label for="AgentHostTextBox">Host</label>
+                <input id="AgentHostTextBox" name="AgentHost" type="text" class="form-control" value="{{AgentHost}}" />
+            </div>
+            <div class="form-group col-sm-2">
+                <label for="AgentPortTextBox">Port</label>
+                <input id="AgentPortTextBox" name="AgentPort" type="number" class="form-control" value="{{AgentPort}}" />
+            </div>
+        </div>
+        <hr />
+        <div class="form-row">
+            <div class="form-group col-12">
+                <h4>Roles</h4>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="input-group">
+                            <input type="text" class="form-control" disabled />
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" disabled>
+                                    <i class="fas fa-plus text-primary"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{#Each AgentRoles.role}}
+                        <div>
+                            <span>{{role}}</span>
+                        </div>
+                        {{#EndEach}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="form-row">
+            <div class="col-12 clearfix">
+                <div class="float-right">
+                    <a href="{{#Url Agents}}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+                {{#If !IsNew}}
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#DeleteModal">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                {{#EndIf}}
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="DeleteModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Agent</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>This operation cannot be undone. Are you sure you want to continue?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="onDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>

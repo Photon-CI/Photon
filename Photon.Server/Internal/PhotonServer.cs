@@ -5,6 +5,8 @@ using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.Packages;
 using Photon.Server.Internal.Projects;
+using Photon.Server.Internal.ServerAgents;
+using Photon.Server.Internal.ServerConfiguration;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
@@ -26,7 +28,6 @@ namespace Photon.Server.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public ServerDefinitionWatch Definition {get;}
         public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
@@ -36,10 +37,12 @@ namespace Photon.Server.Internal
         public MessageProcessorRegistry MessageRegistry {get;}
         public VariableSetCollection Variables {get;}
 
+        public ServerConfigurationManager ServerConfiguration {get;}
+        public ServerAgentManager Agents {get;}
+
 
         public PhotonServer()
         {
-            Definition = new ServerDefinitionWatch();
             Projects = new ProjectManager();
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
@@ -57,6 +60,9 @@ namespace Photon.Server.Internal
             Queue = new ScriptQueue {
                 MaxDegreeOfParallelism = Configuration.Parallelism,
             };
+
+            ServerConfiguration = new ServerConfigurationManager();
+            Agents = new ServerAgentManager();
         }
 
         public void Dispose()
@@ -77,7 +83,8 @@ namespace Photon.Server.Internal
             LoadVariables();
 
             // Load existing or default server configuration
-            Definition.Initialize();
+            ServerConfiguration.Load();
+            Agents.Load();
 
             Projects.Initialize();
             ProjectData.Initialize();
@@ -97,7 +104,6 @@ namespace Photon.Server.Internal
 
         public void Stop()
         {
-            Definition.Dispose();
             Queue.Stop();
             Sessions.Stop();
 
@@ -121,7 +127,6 @@ namespace Photon.Server.Internal
                 });
 
                 await Task.Run(() => {
-                    Definition.Dispose();
                     Queue.Stop();
                     Sessions.Stop();
                 }, token);
@@ -130,7 +135,6 @@ namespace Photon.Server.Internal
 
         public void Abort()
         {
-            Definition.Dispose();
             Queue.Abort();
             Sessions.Abort();
 
@@ -177,21 +181,20 @@ namespace Photon.Server.Internal
 
         private void StartHttpServer()
         {
-            var http = Definition.Definition.Http;
+            var http = ServerConfiguration.Value.Http;
 
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
                 ListenerPath = http.Path,
                 ContentDirectories = {
                     new ContentDirectory {
-                        DirectoryPath = Path.Combine(Configuration.AssemblyPath, "Content"),
+                        DirectoryPath = Configuration.HttpContentDirectory,
                         UrlPath = "/Content/",
                     }
                 },
             };
 
-            var assembly = Assembly.GetExecutingAssembly();
-            context.Views.AddAllFromAssembly(assembly, "Photon.Server.Views");
+            context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
             var httpPrefix = $"http://{http.Host}:{http.Port}/";
 

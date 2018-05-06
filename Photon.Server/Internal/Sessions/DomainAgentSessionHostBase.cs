@@ -1,13 +1,13 @@
 ﻿using log4net;
 using Photon.Communication;
-using Photon.Framework;
 using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
+using Photon.Framework.Server;
+using Photon.Library.TcpMessages;
 using System;
 using System.Runtime.Remoting.Lifetime;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Library.TcpMessages;
 
 namespace Photon.Server.Internal.Sessions
 {
@@ -18,7 +18,7 @@ namespace Photon.Server.Internal.Sessions
         private const int HandshakeTimeoutSec = 30;
 
         protected readonly CancellationToken Token;
-        private readonly ServerAgentDefinition agent;
+        private readonly ServerAgent agent;
         private readonly ClientSponsor sponsor;
         public DomainAgentSessionClient SessionClient {get;}
         public MessageClient MessageClient {get;}
@@ -28,7 +28,7 @@ namespace Photon.Server.Internal.Sessions
         public string SessionClientId => SessionClient.Id;
 
 
-        protected DomainAgentSessionHostBase(IServerSession sessionBase, ServerAgentDefinition agent, CancellationToken token)
+        protected DomainAgentSessionHostBase(IServerSession sessionBase, ServerAgent agent, CancellationToken token)
         {
             this.agent = agent;
             this.Token = token;

@@ -19,19 +19,21 @@ namespace Photon.CLI.Actions
 
         public async Task Run(CommandContext context)
         {
+            ConsoleEx.Out
+                .WriteLine($"Photon CLI {Configuration.Version}", ConsoleColor.DarkBlue)
+                .WriteLine("Checking for updates...", ConsoleColor.DarkCyan);
+
             var index = await DownloadTools.GetLatestCliIndex();
             var latestVersion = index.Version;
             
             if (!VersionTools.HasUpdates(Configuration.Version, latestVersion)) {
-                ConsoleEx.Out
-                    .Write("CLI is up-to-date. Version ", ConsoleColor.DarkCyan)
-                    .Write(Configuration.Version, ConsoleColor.Cyan)
-                    .WriteLine(".", ConsoleColor.DarkCyan);
-
+                ConsoleEx.Out.WriteLine("CLI is up-to-date.", ConsoleColor.DarkBlue);
                 return;
             }
 
-            ConsoleEx.Out.WriteLine("Downloading CLI update...", ConsoleColor.DarkCyan);
+            ConsoleEx.Out.Write("Downloading CLI update ", ConsoleColor.DarkCyan)
+                .Write(latestVersion, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
 
             updateDirectory = Path.Combine(Configuration.Directory, "Updates");
             updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
@@ -39,7 +41,7 @@ namespace Photon.CLI.Actions
             await DownloadUpdate(index);
 
             ConsoleEx.Out
-                .WriteLine("Downloading Complete.", ConsoleColor.DarkGreen)
+                .WriteLine("Download Complete.", ConsoleColor.DarkGreen)
                 .WriteLine("Launching installer...", ConsoleColor.DarkCyan);
 
             StartInstaller();

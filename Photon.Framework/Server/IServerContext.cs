@@ -5,7 +5,7 @@ namespace Photon.Framework.Server
 {
     public interface IServerContext : IDomainContext, IDisposable
     {
-        ServerAgentDefinition[] Agents {get;}
+        ServerAgent[] Agents {get;}
         string ServerSessionId {get;}
 
         //DomainAgentSessionHandle GetAgentSession(string agentSessionId);

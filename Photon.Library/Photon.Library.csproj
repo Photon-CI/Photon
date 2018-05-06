@@ -96,6 +96,7 @@
     <Compile Include="TcpMessages\ProjectPackagePullResponse.cs" />
     <Compile Include="TcpMessages\ProjectPackagePushRequest.cs" />
     <Compile Include="TcpMessages\ProjectPackagePushResponse.cs" />
+    <Compile Include="ViewModelBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

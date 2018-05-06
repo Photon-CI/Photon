@@ -1,8 +1,8 @@
-﻿using Photon.Framework;
-using Photon.Framework.Packages;
+﻿using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Sessions
@@ -17,7 +17,7 @@ namespace Photon.Server.Internal.Sessions
         public string ProjectPackageFilename {get; set;}
 
 
-        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgentDefinition agent)
+        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
         {
             return new DomainAgentDeploySessionHost(this, agent, TokenSource.Token);
         }
@@ -42,7 +42,7 @@ namespace Photon.Server.Internal.Sessions
             Domain.Initialize(assemblyFilename);
 
             var context = new ServerDeployContext {
-                Agents = PhotonServer.Instance.Definition.Definition.Agents.ToArray(),
+                Agents = PhotonServer.Instance.Agents.All.ToArray(),
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
                 ScriptName = ScriptName,

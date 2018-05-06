@@ -2,6 +2,7 @@ using Microsoft.Deployment.WindowsInstaller;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Text;
 
 namespace Photon.Installer.Common
 {
@@ -33,15 +34,7 @@ namespace Photon.Installer.Common
                 var http_host = (string)config?.http?.host ?? "localhost";
                 var http_port = (string)config?.http?.port ?? "8082";
                 var http_path = (string)config?.http?.path ?? "photon/server";
-
-                var url = $"http://{http_host}:{http_port}";
-
-                if (!string.IsNullOrEmpty(http_path)) {
-                    if (!http_path.StartsWith("/"))
-                        url += "/";
-
-                    url += http_path;
-                }
+                var url = BuildUrl(http_host, http_port, http_path);
 
                 session["PHOTON_URL"] = url;
 
@@ -81,15 +74,7 @@ namespace Photon.Installer.Common
                 var http_host = (string)config?.http?.host ?? "localhost";
                 var http_port = (string)config?.http?.port ?? "8082";
                 var http_path = (string)config?.http?.path ?? "photon/agent";
-
-                var url = $"http://{http_host}:{http_port}";
-
-                if (!string.IsNullOrEmpty(http_path)) {
-                    if (!http_path.StartsWith("/"))
-                        url += "/";
-
-                    url += http_path;
-                }
+                var url = BuildUrl(http_host, http_port, http_path);
 
                 session["PHOTON_URL"] = url;
 
@@ -111,6 +96,32 @@ namespace Photon.Installer.Common
                 var serializer = new JsonSerializer();
                 return serializer.Deserialize(jsonReader);
             }
+        }
+
+        private static string BuildUrl(string host, string port, string path)
+        {
+            var url = new StringBuilder();
+
+            url.Append("http://");
+
+            var isHostWild = host == "*" || host == "+";
+
+            if (isHostWild)
+                host = "localhost";
+
+            url.Append(host);
+
+            if (port != "80")
+                url.Append(":").Append(port);
+
+            if (!string.IsNullOrEmpty(path)) {
+                if (!path.StartsWith("/"))
+                    url.Append("/");
+
+                url.Append(path);
+            }
+
+            return url.ToString();
         }
     }
 }
