@@ -59,6 +59,7 @@
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="HttpHandlers\Agents\AgentEditHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\AgentDeleteHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
     <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Packages\PackageIndexHandler.cs" />
     <Compile Include="HttpHandlers\BuildsHandler.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Internal\JsonDynamicDocument.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfiguration.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
+    <Compile Include="Internal\Sessions\ServerSessionWatch.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
     <Compile Include="Internal\TaskRunner.cs" />
     <Compile Include="Internal\ServerBuildContext.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\PhotonServer.cs" />
     <Compile Include="Internal\TaskRunnerManager.cs" />
+    <Compile Include="Internal\WebSocketHost.cs" />
     <Compile Include="MessageProcessors\AgentSessionOutputProcessor.cs" />
     <Compile Include="MessageProcessors\ApplicationPackagePullProcessor.cs" />
     <Compile Include="MessageProcessors\ApplicationPackagePushProcessor.cs" />
@@ -140,6 +143,9 @@
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <Content Include="Content\ActiveSessions.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

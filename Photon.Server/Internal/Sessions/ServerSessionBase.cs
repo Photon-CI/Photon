@@ -23,6 +23,7 @@ namespace Photon.Server.Internal.Sessions
 
         public event EventHandler PreBuildEvent;
         public event EventHandler PostBuildEvent;
+        public event EventHandler ReleaseEvent;
 
         private readonly Lazy<ILog> _log;
         private readonly DateTime utcCreated;
@@ -43,6 +44,7 @@ namespace Photon.Server.Internal.Sessions
         protected DomainPackageClient PackageClient {get;}
         public TaskResult Result {get; private set;}
         public VariableSetCollection Variables {get;}
+        public bool IsReleased => isReleased;
         protected ILog Log => _log.Value;
 
         protected readonly CancellationTokenSource TokenSource;
@@ -116,7 +118,9 @@ namespace Photon.Server.Internal.Sessions
         {
             if (isReleased) return;
             isReleased = true;
+
             utcReleased = DateTime.UtcNow;
+            OnReleased();
 
             foreach (var host in hostList.Values) {
                 try {
@@ -195,6 +199,11 @@ namespace Photon.Server.Internal.Sessions
         public void OnPostBuildEvent()
         {
             PostBuildEvent?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected void OnReleased()
+        {
+            ReleaseEvent?.Invoke(this, EventArgs.Empty);
         }
 
         private DomainAgentSessionClient ConnectionFactory_OnConnectionRequest(ServerAgent agent)

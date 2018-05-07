@@ -279,6 +279,9 @@
       <Component Id="Content_popper.min.js" Guid="d27cb018-bb47-44c4-81dd-1b3b8beaacf2">
         <File Id="Content_popper.min.js" Name="popper.min.js" Source="$(var.PhotonServer_TargetDir)Content\popper.min.js" />
       </Component>
+      <Component Id="Content_ActiveSessions.js" Guid="639f1873-03fc-4d91-b860-d8aca6768b79">
+        <File Id="Content_ActiveSessions.js" Name="ActiveSessions.js" Source="$(var.PhotonServer_TargetDir)Content\ActiveSessions.js" />
+      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>

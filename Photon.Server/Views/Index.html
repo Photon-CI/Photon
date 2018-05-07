@@ -1,22 +1,66 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
+<script src="{{#Url Content/ActiveSessions.js}}"></script>
 <script>
+    var monitor;
+
+    var activeSessionUrl = '{{#Url api/sessions/active}}';
+
     $(function () {
         $('#layoutNavbarContent [data-link="dashboard"]').addClass('active');
+
+        var sessionListElement = document.getElementById('ActiveSessions');
+        monitor = new ActiveSessionMonitor(sessionListElement);
+        monitor.connect(activeSessionUrl);
     });
 </script>
 {{#EndScript}}
 
 {{#Style}}
 <style>
-    .layout-content {
-        padding: 8px 16px;
+    .card-body-ns {
+        position: relative;
+    }
+    .mask {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: #DDD;
+        opacity: 0.5;
+    }
+    .empty {
+        text-align: center;
+        padding: 8px 4px;
+    }
+
+    .session-row {
+        text-align: center;
+        padding: 8px 4px;
     }
 </style>
 {{#EndStyle}}
 
+<div class="bg-secondary mb-4 px-2 py-1">
+    <div class="container">
+        <h2 class="my-0">{{Name}} <small class="text-muted">{{Version}}</small></h2>
+        <a href="{{Url}}" class="my-0 text-light">{{Url}}</a>
+    </div>
+</div>
+
 <div class="container">
-    <h2 class="my-0">{{Name}} <small class="text-muted">{{Version}}</small></h2>
-    <a href="{{Url}}" class="my-0">{{Url}}</a>
+    <div class="card">
+        <div class="card-header">
+            <h3>Active Sessions</h3>
+        </div>
+        <div id="ActiveSessions" class="card-body-ns">
+            <div class="mask" data-session-mask></div>
+            <div data-session-list></div>
+            <div class="empty text-muted" data-session-empty>
+                None
+            </div>
+        </div>
+    </div>
 </div>

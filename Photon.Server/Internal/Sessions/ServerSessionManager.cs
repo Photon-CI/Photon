@@ -1,12 +1,28 @@
 ﻿using Photon.Framework.Pooling;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Photon.Server.Internal.Sessions
 {
+    internal class SessionStateEventArgs : EventArgs
+    {
+        public ServerSessionBase Session {get;}
+
+        public SessionStateEventArgs(ServerSessionBase session)
+        {
+            this.Session = session;
+        }
+    }
+
     internal class ServerSessionManager : IDisposable
     {
+        public event EventHandler<SessionStateEventArgs> SessionStarted;
+        public event EventHandler<SessionStateEventArgs> SessionReleased;
+
         private readonly ReferencePool<ServerSessionBase> pool;
+
+        public IEnumerable<ServerSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
 
 
         public ServerSessionManager()
@@ -41,6 +57,9 @@ namespace Photon.Server.Internal.Sessions
         public void BeginSession(ServerSessionBase session)
         {
             pool.Add(session);
+
+            session.ReleaseEvent += Session_OnReleased;
+            OnSessionStarted(session);
         }
 
         public bool TryGet(string sessionId, out ServerSessionBase session)
@@ -55,14 +74,32 @@ namespace Photon.Server.Internal.Sessions
                 ? (_session as T) : null;
         }
 
-        public async Task<bool> ReleaseSession(string sessionId)
-        {
-            if (pool.TryGet(sessionId, out var session)) {
-                await session.ReleaseAsync();
-                return true;
-            }
+        //public async Task<bool> ReleaseSession(string sessionId)
+        //{
+        //    if (pool.TryGet(sessionId, out var session)) {
+        //        await session.ReleaseAsync();
+        //        OnSessionReleased(session);
+        //        return true;
+        //    }
 
-            return false;
+        //    return false;
+        //}
+
+        protected void OnSessionStarted(ServerSessionBase session)
+        {
+            SessionStarted?.Invoke(this, new SessionStateEventArgs(session));
+        }
+
+        protected void OnSessionReleased(ServerSessionBase session)
+        {
+            SessionReleased?.Invoke(this, new SessionStateEventArgs(session));
+        }
+
+        private void Session_OnReleased(object sender, EventArgs e)
+        {
+            var session = (ServerSessionBase)sender;
+
+            OnSessionReleased(session);
         }
     }
 }
