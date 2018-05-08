@@ -66,9 +66,9 @@ namespace Photon.Communication
                 IsStarted = false;
             }
 
-            await Processor.StopAsync();
             await messageSender.StopAsync();
             await messageReceiver.StopAsync();
+            await Processor.StopAsync();
 
             stream.Close();
         }

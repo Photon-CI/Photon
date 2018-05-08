@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
 
 namespace Photon.Communication.Packets
 {
@@ -8,6 +7,6 @@ namespace Photon.Communication.Packets
         string MessageId {get;}
         byte PacketType {get;}
 
-        Task WriteToAsync(BinaryWriter writer);
+        void WriteTo(BinaryWriter writer);
     }
 }

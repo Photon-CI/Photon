@@ -51,6 +51,7 @@
     <Compile Include="Internal\IntegrationTestAttribute.cs" />
     <Compile Include="Internal\UnitTestFixtureAttribute.cs" />
     <Compile Include="Internal\UnitTestAttribute.cs" />
+    <Compile Include="Messaging\DisconnectTests.cs" />
     <Compile Include="Messaging\SendMessageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Variables\VariableWrapperTests.cs" />

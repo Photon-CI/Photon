@@ -44,6 +44,7 @@ namespace Photon.Server.Internal.Sessions
         {
             var data = new {
                 id = session.SessionId,
+                type = GetSessionType(session),
                 isReleased = session.IsReleased,
             };
 
@@ -53,6 +54,14 @@ namespace Photon.Server.Internal.Sessions
         protected void OnSessionChanged(object data)
         {
             SessionChanged?.Invoke(this, new SessionStatusArgs(data));
+        }
+
+        private string GetSessionType(ServerSessionBase session)
+        {
+            if (session is ServerBuildSession) return "build";
+            if (session is ServerDeploySession) return "deploy";
+            if (session is ServerUpdateSession) return "update";
+            return null;
         }
     }
 }

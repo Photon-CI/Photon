@@ -23,6 +23,8 @@ namespace Photon.Server.HttpHandlers.Api.Session
         {
             using (var socket = new WebSocketHost(stream))
             using (var watch = new ServerSessionWatch()) {
+                socket.Send("open");
+
                 var wRef = new WeakReference<WebSocketHost>(socket);
 
                 watch.SessionChanged += (o, e) => {

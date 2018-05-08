@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
 
 namespace Photon.Communication.Packets
 {
@@ -19,16 +18,12 @@ namespace Photon.Communication.Packets
             PacketSize = size;
         }
 
-        public async Task WriteToAsync(BinaryWriter writer)
+        public void WriteTo(BinaryWriter writer)
         {
-            await Task.Run(() => {
-                writer.Write(MessageId);
-                writer.Write(PacketType);
-                writer.Write(PacketSize);
-                writer.Write(PacketBuffer, 0, PacketSize);
-            });
+            writer.Write(MessageId);
+            writer.Write(PacketType);
+            writer.Write(PacketSize);
+            writer.Write(PacketBuffer, 0, PacketSize);
         }
-
-        // TODO: Parse Method
     }
 }
