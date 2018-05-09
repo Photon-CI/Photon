@@ -38,6 +38,10 @@ namespace Photon.Server.HttpHandlers.Api.Session
 
                 watch.Initialize();
 
+
+                // TODO: GET RID OF THIS!!!
+                // This is an awful hack, and never stops running!
+                // Need to read request and close both when closed.
                 while (!token.IsCancellationRequested) {
                     await Task.Delay(200, token);
                 }

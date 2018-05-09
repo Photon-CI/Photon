@@ -162,8 +162,8 @@ namespace Photon.Server.Internal.Sessions
         {
             TokenSource.Cancel();
 
-            //foreach (var host in hostList.Values)
-            //    host.Abort();
+            foreach (var host in hostList.Values)
+                host.Abort();
 
             // TODO: Wait?
         }

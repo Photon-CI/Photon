@@ -71,6 +71,11 @@ namespace Photon.Agent.Internal.Session
             Domain?.Dispose();
         }
 
+        public void Cancel()
+        {
+            //
+        }
+
         public virtual void OnSessionBegin() {}
         public virtual void OnSessionEnd() {}
 

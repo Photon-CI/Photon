@@ -1,9 +1,11 @@
 ﻿var ActiveSessionMonitor = function(container) {
     var self = this;
-
-    self.url = null;
-    self.socket = null;
     self.container = container;
+
+    self.dataUrl = null;
+    self.detailsUrl = null;
+    self.socket = null;
+    self.onCancel = null;
 
     var templateRow = $(container)
         .find('[data-session-template]').detach()
@@ -21,8 +23,16 @@
         return $(self.container).find('[data-session-empty]');
     };
 
+    this.setDetailsUrl = function(url) {
+        self.detailsUrl = url;
+    };
+
+    this.setCancelAction = function(cancelAction) {
+        self.onCancel = cancelAction;
+    };
+
     this.connect = function(url) {
-        self.url = url;
+        self.dataUrl = url;
 
         if (!window.WebSocket) {
             // not supported
@@ -87,8 +97,20 @@
     function onSessionUpdate(e, data) {
         var icon = getStatusIcon(data.type);
 
+        var sessionDetailsUrl = self.detailsUrl
+            + '?id=' + encodeURIComponent(data.id);
+
+        var labelText = data.projectName;
+
+        if (!!data.projectVersion)
+            labelText += ' - ' + data.projectVersion;
+
         e.find('[data-session-status]').attr('class', icon);
-        e.find('.label').text(data.id);
+        e.find('.label').text(labelText).attr('href', sessionDetailsUrl);
+
+        e.find('.cancel').click(function () {
+            if (self.onCancel !== 'undefined' && self.onCancel != null) self.onCancel(data.id);
+        });
     }
 
     function onSessionReleased(e) {
