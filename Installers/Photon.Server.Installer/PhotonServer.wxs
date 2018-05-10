@@ -26,6 +26,7 @@
       <ComponentGroupRef Id="Content_fontawesome_5.0.11_webfonts_files" />
       <ComponentGroupRef Id="Content_Images_files" />
       <ComponentGroupRef Id="Content_files" />
+      <ComponentGroupRef Id="Views_Session_files" />
 		</Feature>
 
     <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
@@ -69,6 +70,7 @@
 		            <Directory Id="Views_Packages" Name="Packages" />
 		            <Directory Id="Views_Projects" Name="Projects" />
 		            <Directory Id="Views_Variables" Name="Variables" />
+		            <Directory Id="Views_Session" Name="Session" />
 		          </Directory>
 		        </Directory>
 		      </Directory>
@@ -281,6 +283,13 @@
       </Component>
       <Component Id="Content_ActiveSessions.js" Guid="639f1873-03fc-4d91-b860-d8aca6768b79">
         <File Id="Content_ActiveSessions.js" Name="ActiveSessions.js" Source="$(var.PhotonServer_TargetDir)Content\ActiveSessions.js" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Session_files" Directory="Views_Session">
+      <Component Id="Views_Session_Details.html" Guid="ea34fdc3-1aa3-41c9-9049-aa4b3991ff1d">
+        <File Id="Views_Session_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Session\Details.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
