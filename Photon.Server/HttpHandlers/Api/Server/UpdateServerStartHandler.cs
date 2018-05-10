@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api.Server
@@ -16,10 +17,10 @@ namespace Photon.Server.HttpHandlers.Api.Server
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateServerStartHandler));
 
 
-        public override async Task<HttpHandlerResult> PostAsync()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             if (HttpContext.Request.ContentLength64 == 0)
-                return BadRequest().SetText("The request was empty!");
+                return Response.BadRequest().SetText("The request was empty!");
 
             try {
                 var updatePath = Path.Combine(Configuration.Directory, "Updates");
@@ -44,7 +45,7 @@ namespace Photon.Server.HttpHandlers.Api.Server
                         });
 
                         if (msiEntry == null)
-                            return BadRequest().SetText("No MSI file was found in the archive!");
+                            return Response.BadRequest().SetText("No MSI file was found in the archive!");
 
                         using (var entryStream = msiEntry.Open())
                         using (var fileStream = File.Open(msiFilename, FileMode.Create, FileAccess.Write)) {
@@ -68,16 +69,16 @@ namespace Photon.Server.HttpHandlers.Api.Server
                     }
                 }
                 else {
-                    return BadRequest().SetText($"Invalid content-type! '{HttpContext.Request.ContentType}'");
+                    return Response.BadRequest().SetText($"Invalid content-type! '{HttpContext.Request.ContentType}'");
                 }
 
                 BeginInstall(updatePath, msiFilename);
 
-                return Ok().SetText("Shutting down and performing update...");
+                return Response.Ok().SetText("Shutting down and performing update...");
             }
             catch (Exception error) {
                 Log.Error("Failed to run Update-Task!", error);
-                return Exception(error);
+                return Response.Exception(error);
             }
         }
 

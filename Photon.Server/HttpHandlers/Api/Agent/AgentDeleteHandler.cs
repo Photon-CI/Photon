@@ -11,11 +11,11 @@ namespace Photon.Server.HttpHandlers.Api.Agent
             var qId = GetQuery("id");
 
             if (string.IsNullOrEmpty(qId))
-                return BadRequest().SetText("'id' is undefined!");
+                return Response.BadRequest().SetText("'id' is undefined!");
 
             PhotonServer.Instance.Agents.Remove(qId);
 
-            return Ok();
+            return Response.Ok();
         }
     }
 }

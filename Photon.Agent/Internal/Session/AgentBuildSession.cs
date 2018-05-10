@@ -16,7 +16,7 @@ namespace Photon.Agent.Internal.Session
     {
         public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
-        public int BuildNumber {get; set;}
+        public uint BuildNumber {get; set;}
         public GithubCommit Commit {get; set;}
 
 

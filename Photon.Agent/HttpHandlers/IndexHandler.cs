@@ -19,7 +19,7 @@ namespace Photon.Agent.HttpHandlers
                 vm.Errors.Add(error);
             }
 
-            return View("Index.html", vm);
+            return Response.View("Index.html", vm);
         }
     }
 }

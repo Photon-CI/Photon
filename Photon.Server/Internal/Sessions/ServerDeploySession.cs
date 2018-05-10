@@ -9,6 +9,7 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerDeploySession : ServerSessionBase
     {
+        public uint DeploymentNumber {get; set;}
         public Project Project {get; set;}
         public string AssemblyFilename {get; set;}
         public string ScriptName {get; set;}
@@ -42,6 +43,7 @@ namespace Photon.Server.Internal.Sessions
             Domain.Initialize(assemblyFilename);
 
             var context = new ServerDeployContext {
+                DeploymentNumber = DeploymentNumber,
                 Agents = PhotonServer.Instance.Agents.All.ToArray(),
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,

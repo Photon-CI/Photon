@@ -1,8 +1,8 @@
-﻿using Photon.Server.Internal;
+﻿using log4net;
+using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,17 +11,20 @@ namespace Photon.Server.HttpHandlers.Api.Session
     [HttpHandler("/api/sessions/active")]
     internal class ActiveHandler : HttpHandler
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ActiveHandler));
+
+
         public override HttpHandlerResult Get()
         {
-            return Ok()
+            return Response.Ok()
                 .SetChunked(true)
                 .SetContentType("text/event-stream")
                 .SetContent(OnProcess);
         }
 
-        private async Task OnProcess(Stream stream, CancellationToken token)
+        private async Task OnProcess(ResponseBodyBuilder response, CancellationToken token)
         {
-            using (var socket = new WebSocketHost(stream))
+            using (var socket = new WebSocketHost(response.GetStream()))
             using (var watch = new ServerSessionWatch()) {
                 socket.Send("open");
 
@@ -32,7 +35,9 @@ namespace Photon.Server.HttpHandlers.Api.Session
                         try {
                             _socket.Send("message", e.Data);
                         }
-                        catch {}
+                        catch (Exception error) {
+                            Log.Warn("Failed to send WebSocket message!", error);
+                        }
                     }
                 };
 

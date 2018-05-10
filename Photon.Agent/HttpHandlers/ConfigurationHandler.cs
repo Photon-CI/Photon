@@ -1,5 +1,6 @@
 ﻿using Photon.Library;
 using PiServerLite.Http.Handlers;
+using System;
 
 namespace Photon.Agent.HttpHandlers
 {
@@ -11,9 +12,15 @@ namespace Photon.Agent.HttpHandlers
             var vm = new ViewModelBase {
                 PageTitle = "Photon Agent Configuration"
             };
-            vm.Build();
 
-            return View("Configuration.html", vm);
+            try {
+                vm.Build();
+            }
+            catch (Exception error) {
+                vm.Errors.Add(error);
+            }
+
+            return Response.View("Configuration.html", vm);
         }
     }
 }

@@ -6,6 +6,7 @@ using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api.GitHub
@@ -13,22 +14,22 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
     [HttpHandler("api/github/webhook")]
     internal class WebHookHandler : HttpHandlerAsync
     {
-        public override async Task<HttpHandlerResult> PostAsync()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var eventType = HttpContext.Request.Headers["X-GitHub-Event"];
             //var deliveryId = HttpContext.Request.Headers["X-GitHub-Delivery"];
             //var signature = HttpContext.Request.Headers["X-Hub-Signature"];
 
             if (string.IsNullOrEmpty(eventType))
-                return BadRequest().SetText("GitHub Webhook Event-Type is undefined!");
+                return Response.BadRequest().SetText("GitHub Webhook Event-Type is undefined!");
 
-            var json = await As.TextAsync();
+            var json = await Request.TextAsync();
             var commit = HookEventHandler.ParseEvent(eventType, json);
 
             if (commit != null)
                 StartBuild(commit);
 
-            return Ok();
+            return Response.Ok();
         }
 
         private void StartBuild(GithubCommit commit)

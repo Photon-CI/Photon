@@ -2,6 +2,7 @@
 using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api.Session
@@ -12,15 +13,15 @@ namespace Photon.Server.HttpHandlers.Api.Session
         private static readonly ILog Log = LogManager.GetLogger(typeof(CancelHandler));
 
 
-        public override async Task<HttpHandlerResult> PostAsync()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var sessionId = GetQuery("id");
 
             if (string.IsNullOrEmpty(sessionId))
-                return BadRequest().SetText("'id' is undefined!");
+                return Response.BadRequest().SetText("'id' is undefined!");
 
             if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
-                return BadRequest().SetText($"Session '{sessionId}' was not found!");
+                return Response.BadRequest().SetText($"Session '{sessionId}' was not found!");
 
             try {
                 session.Abort();
@@ -30,7 +31,7 @@ namespace Photon.Server.HttpHandlers.Api.Session
                 throw;
             }
 
-            return Ok()
+            return Response.Ok()
                 .SetContentType("text/plain");
         }
     }

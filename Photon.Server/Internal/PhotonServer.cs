@@ -13,7 +13,6 @@ using PiServerLite.Http.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,14 +79,8 @@ namespace Photon.Server.Internal
             if (isStarted) throw new Exception("Server has already been started!");
             isStarted = true;
 
-            LoadVariables();
-
             // Load existing or default server configuration
             ServerConfiguration.Load();
-            Agents.Load();
-
-            Projects.Initialize();
-            ProjectData.Initialize();
 
             MessageRegistry.Scan(Assembly.GetExecutingAssembly());
             MessageRegistry.Scan(typeof(ILibraryAssembly).Assembly);
@@ -99,7 +92,19 @@ namespace Photon.Server.Internal
             Sessions.Start();
             Queue.Start();
 
-            StartHttpServer();
+
+            var taskVariables = LoadVariables();
+            var taskHttp = Task.Run(() => StartHttpServer());
+            var taskAgents = Task.Run(() => Agents.Load());
+            var taskProjects = Task.Run(() => Projects.Initialize());
+            var taskProjectData = Task.Run(() => ProjectData.Initialize());
+
+            Task.WaitAll(
+                taskVariables,
+                taskAgents,
+                taskProjects,
+                taskProjectData,
+                taskHttp);
         }
 
         public void Stop()
@@ -147,36 +152,41 @@ namespace Photon.Server.Internal
             }
         }
 
-        private void LoadVariables()
+        private static async Task<string> ReadAsync(string filename)
         {
+            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read))
+            using (var reader = new StreamReader(stream)) {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        private async Task LoadVariables()
+        {
+            var taskList = new List<Task>();
+
             var filename = Path.Combine(Configuration.Directory, "variables.json");
-            var errorList = new List<Exception>();
 
             if (File.Exists(filename)) {
-                try {
-                    Variables.GlobalJson = File.ReadAllText(filename);
-                }
-                catch (Exception error) {
-                    errorList.Add(error);
-                }
+                var task = ReadAsync(filename)
+                    .ContinueWith(t => Variables.GlobalJson = t.Result);
+
+                taskList.Add(task);
             }
 
             if (Directory.Exists(Configuration.VariablesDirectory)) {
                 var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
-                Parallel.ForEach(fileEnum, file => {
+
+                foreach (var file in fileEnum) {
                     var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
 
-                    try {
-                        var json = File.ReadAllText(file);
-                        Variables.JsonList[file_name] = json;
-                    }
-                    catch (Exception error) {
-                        errorList.Add(error);
-                    }
-                });
+                    var task = ReadAsync(file)
+                        .ContinueWith(t => Variables.JsonList[file_name] = t.Result);
+
+                    taskList.Add(task);
+                }
             }
 
-            if (errorList.Any()) throw new AggregateException(errorList);
+            await Task.WhenAll(taskList);
         }
 
         private void StartHttpServer()

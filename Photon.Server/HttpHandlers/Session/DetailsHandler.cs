@@ -16,7 +16,7 @@ namespace Photon.Server.HttpHandlers.Session
 
             //...
 
-            return View("Session\\Details.html", vm);
+            return Response.View("Session\\Details.html", vm);
         }
     }
 }

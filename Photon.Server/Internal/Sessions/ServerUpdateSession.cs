@@ -1,14 +1,10 @@
 ﻿using Photon.Communication;
-using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
 using Photon.Framework.Tools;
-using Photon.Library;
 using Photon.Library.TcpMessages;
 using System;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -21,13 +17,9 @@ namespace Photon.Server.Internal.Sessions
     {
         private const int HandshakeTimeoutSec = 30;
 
-        private string LatestAgentVersion;
-        private string LatestAgentMsiFilename;
-        private string LatestAgentMsiUrl;
-        private string tempFilename;
-        private LazyAsync<string> GetLatestAgentFilename;
-
         public string[] AgentNames {get; set;}
+        public string UpdateFilename {get; set;}
+        public string UpdateVersion {get; set;}
 
 
         public override async Task RunAsync()
@@ -37,29 +29,8 @@ namespace Photon.Server.Internal.Sessions
 
             if (!agents.Any()) throw new ApplicationException("No agents were found!");
 
-            var agentIndex = await DownloadTools.GetLatestAgentIndex();
-            LatestAgentVersion = agentIndex.Version;
-            LatestAgentMsiFilename = agentIndex.MsiFilename;
-
-            LatestAgentMsiUrl = NetPath.Combine(Configuration.DownloadUrl, "agent", LatestAgentVersion, LatestAgentMsiFilename);
-
-            GetLatestAgentFilename = new LazyAsync<string>(async () => {
-                tempFilename = Path.GetTempFileName();
-
-                Output.Append("Downloading latest version ", ConsoleColor.DarkCyan)
-                    .AppendLine(LatestAgentVersion, ConsoleColor.Cyan);
-
-                using (var webClient = new WebClient()) {
-                    await webClient.DownloadFileTaskAsync(LatestAgentMsiUrl, tempFilename);
-                }
-
-                Output.AppendLine("Download complete.", ConsoleColor.DarkGreen);
-
-                return tempFilename;
-            });
-
             var queueOptions = new ExecutionDataflowBlockOptions {
-                MaxDegreeOfParallelism = 8,
+                MaxDegreeOfParallelism = Configuration.Parallelism,
                 CancellationToken = TokenSource.Token,
             };
 
@@ -80,12 +51,12 @@ namespace Photon.Server.Internal.Sessions
         private async Task AgentAction(ServerAgent agent)
         {
             using (var messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry)) {
-                string agentVersion;
+                Output.Append("Connecting to agent ", ConsoleColor.DarkCyan)
+                    .Append(agent.Name, ConsoleColor.Cyan)
+                    .AppendLine("...", ConsoleColor.DarkCyan);
 
                 try {
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
-
-                    var agentVersionRequest = new AgentGetVersionRequest();
 
                     var handshakeRequest = new HandshakeRequest {
                         Key = Guid.NewGuid().ToString(),
@@ -100,11 +71,6 @@ namespace Photon.Server.Internal.Sessions
 
                     if (!handshakeResponse.PasswordMatch)
                         throw new ApplicationException("Handshake Failed! Unauthorized.");
-
-                    var agentVersionResponse = await messageClient.Send(agentVersionRequest)
-                        .GetResponseAsync<AgentGetVersionResponse>(TokenSource.Token);
-
-                    agentVersion = agentVersionResponse.Version;
                 }
                 catch (Exception error) {
                     Output.Append("Failed to connect to agent ", ConsoleColor.DarkRed)
@@ -115,19 +81,11 @@ namespace Photon.Server.Internal.Sessions
                     return;
                 }
 
-                if (!VersionTools.HasUpdates(agentVersion, LatestAgentVersion)) {
-                    Output.Append("Agent ", ConsoleColor.DarkBlue)
-                        .Append(agent.Name, ConsoleColor.Blue)
-                        .AppendLine(" is up-to-date.", ConsoleColor.DarkBlue);
+                Output.AppendLine("Agent connected.", ConsoleColor.DarkGreen);
 
-                    return;
-                }
-
-                Output.Append("Updating agent ", ConsoleColor.DarkBlue)
-                    .Append(agent.Name, ConsoleColor.Blue)
-                    .Append(" from version ", ConsoleColor.DarkBlue)
-                    .Append(agentVersion, ConsoleColor.Blue)
-                    .AppendLine("...", ConsoleColor.DarkBlue);
+                Output.Append("Updating Agent ", ConsoleColor.DarkCyan)
+                    .Append(agent.Name, ConsoleColor.Cyan)
+                    .AppendLine("...", ConsoleColor.DarkCyan);
 
                 try {
                     await UpdateAgent(agent, messageClient, TokenSource.Token);
@@ -147,10 +105,8 @@ namespace Photon.Server.Internal.Sessions
 
         private async Task UpdateAgent(ServerAgent agent, MessageClient messageClient, CancellationToken token)
         {
-            var filename = await GetLatestAgentFilename;
-
             var message = new AgentUpdateRequest {
-                Filename = filename,
+                Filename = UpdateFilename,
             };
 
             try {
@@ -216,7 +172,7 @@ namespace Photon.Server.Internal.Sessions
                     var versionResponse = await client.Send(versionRequest)
                         .GetResponseAsync<AgentGetVersionResponse>(token);
 
-                    if (!VersionTools.HasUpdates(versionResponse.Version, LatestAgentVersion))
+                    if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
                         break;
                 }
                 catch (SocketException) {

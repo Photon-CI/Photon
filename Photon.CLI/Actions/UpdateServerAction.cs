@@ -72,17 +72,17 @@ namespace Photon.CLI.Actions
             try {
                 var url = NetPath.Combine(Configuration.DownloadUrl, "server", index.Version, index.MsiFilename);
 
+                var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
+                updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
+
+                if (!Directory.Exists(updateDirectory))
+                    Directory.CreateDirectory(updateDirectory);
+
                 using (var client = HttpClientEx.Get(url)) {
                     await client.Send();
 
-                    var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
-                    updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
-
-                    if (!Directory.Exists(updateDirectory))
-                        Directory.CreateDirectory(updateDirectory);
-
-                    using (var fileStream = File.Open(updateFilename, FileMode.Create, FileAccess.Write))
                     using (var responseStream = client.ResponseBase.GetResponseStream()) {
+                    using (var fileStream = File.Open(updateFilename, FileMode.Create, FileAccess.Write))
                         if (responseStream != null)
                             await responseStream.CopyToAsync(fileStream);
                     }

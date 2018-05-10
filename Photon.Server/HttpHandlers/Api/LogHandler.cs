@@ -5,6 +5,7 @@ using PiServerLite.Http.Handlers;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api
@@ -12,19 +13,19 @@ namespace Photon.Server.HttpHandlers.Api
     [HttpHandler("api/log")]
     internal class LogHandler : HttpHandlerAsync
     {
-        public override async Task<HttpHandlerResult> GetAsync()
+        public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
             var fileAppender = ((Hierarchy)LogManager.GetRepository())
                 .Root.Appenders.OfType<FileAppender>().FirstOrDefault();
 
             if (fileAppender == null)
-                return Status(HttpStatusCode.NoContent)
+                return Response.Status(HttpStatusCode.NoContent)
                     .SetText("No file logger was found.");
 
             var logFile = fileAppender.File;
 
             if (!File.Exists(logFile))
-                return Status(HttpStatusCode.NoContent)
+                return Response.Status(HttpStatusCode.NoContent)
                     .SetText("Log file was not found!");
 
             var bufferStream = new MemoryStream();
@@ -39,7 +40,7 @@ namespace Photon.Server.HttpHandlers.Api
                 throw;
             }
 
-            return Ok()
+            return Response.Ok()
                 .SetContentType("text/plain")
                 .SetContent(bufferStream);
         }
