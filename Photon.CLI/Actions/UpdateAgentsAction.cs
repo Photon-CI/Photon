@@ -138,7 +138,7 @@ namespace Photon.CLI.Actions
 
                 client = HttpClientEx.Post(url);
                 client.Query = new {
-                    agents = agentIds,
+                    agents = string.Join(";", agentIds),
                 };
 
                 client.BodyFunc = () => File.Open(updateFilename, FileMode.Open, FileAccess.Read);

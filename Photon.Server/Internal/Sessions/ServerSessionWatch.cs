@@ -55,8 +55,8 @@ namespace Photon.Server.Internal.Sessions
             }
             else if (session is ServerUpdateSession updateSession) {
                 projectName = "Update Agents";
-                projectVersion = updateSession.AgentNames != null
-                    ? string.Join(", ", updateSession.AgentNames)
+                projectVersion = updateSession.AgentIds != null
+                    ? string.Join(", ", updateSession.AgentIds)
                     : "<all>";
             }
 

@@ -17,7 +17,7 @@ namespace Photon.Server.Internal.Sessions
     {
         private const int HandshakeTimeoutSec = 30;
 
-        public string[] AgentNames {get; set;}
+        public string[] AgentIds {get; set;}
         public string UpdateFilename {get; set;}
         public string UpdateVersion {get; set;}
 
@@ -25,9 +25,12 @@ namespace Photon.Server.Internal.Sessions
         public override async Task RunAsync()
         {
             var agents = PhotonServer.Instance.Agents.All
-                .Where(x => IncludesAgent(x.Name)).ToArray();
+                .Where(x => AgentIds.Any(id => string.Equals(id, x.Id, StringComparison.OrdinalIgnoreCase))).ToArray();
 
-            if (!agents.Any()) throw new ApplicationException("No agents were found!");
+            if (!agents.Any()) {
+                Output.AppendLine("No agents were found!", ConsoleColor.DarkYellow);
+                throw new ApplicationException("No agents were found!");
+            }
 
             var queueOptions = new ExecutionDataflowBlockOptions {
                 MaxDegreeOfParallelism = Configuration.Parallelism,
@@ -185,9 +188,9 @@ namespace Photon.Server.Internal.Sessions
 
         private bool IncludesAgent(string agentName)
         {
-            if (!(AgentNames?.Any() ?? false)) return true;
+            if (!(AgentIds?.Any() ?? false)) return true;
 
-            foreach (var name in AgentNames) {
+            foreach (var name in AgentIds) {
                 var escapedName = Regex.Escape(name)
                     .Replace("\\?", ".")
                     .Replace("\\*", ".*");
