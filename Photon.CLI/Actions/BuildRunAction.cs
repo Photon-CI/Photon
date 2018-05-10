@@ -1,6 +1,7 @@
 ﻿using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
+using Photon.Framework.Extensions;
 using Photon.Library.HttpMessages;
 using System;
 using System.IO;
@@ -13,6 +14,7 @@ namespace Photon.CLI.Actions
     {
         private const int PollIntervalMs = 400;
 
+        public HttpBuildStartRequest Request {get; private set;}
         public string ServerName {get; set;}
         public string GitRefspec {get; set;}
         public string StartFile {get; set;}
@@ -23,7 +25,11 @@ namespace Photon.CLI.Actions
         {
             var server = context.Servers.Get(ServerName);
 
-            var startResult = await StartSession(server);
+            using (var fileStream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
+                Request = JsonSettings.Serializer.Deserialize<HttpBuildStartRequest>(fileStream);
+            }
+
+            var startResult = await StartSession(server, Request);
             var sessionId = startResult?.SessionId;
 
             if (string.IsNullOrEmpty(sessionId))
@@ -63,17 +69,14 @@ namespace Photon.CLI.Actions
             }
         }
 
-        private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server)
+        private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server, HttpBuildStartRequest request)
         {
             HttpClientEx client = null;
             MemoryStream requestStream = null;
 
             try {
-                using (var fileStream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
-                    var size = (int)Math.Min(fileStream.Length, int.MaxValue);
-                    requestStream = new MemoryStream(size);
-                    await fileStream.CopyToAsync(requestStream);
-                }
+                requestStream = new MemoryStream();
+                JsonSettings.Serializer.Serialize(requestStream, request, true);
 
                 var url = NetPath.Combine(server.Url, "api/build/start");
 

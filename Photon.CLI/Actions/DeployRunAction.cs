@@ -14,8 +14,10 @@ namespace Photon.CLI.Actions
         private const int PollIntervalMs = 400;
 
         public string ServerName {get; set;}
+        public string ProjectId {get; set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
+        public string Environment {get; set;}
         public HttpDeployResultResponse Result {get; set;}
 
 
@@ -58,8 +60,10 @@ namespace Photon.CLI.Actions
                 var url = NetPath.Combine(server.Url, "api/deploy/start");
 
                 client = HttpClientEx.Post(url, new {
-                    id = ProjectPackageId,
+                    project = ProjectId,
+                    package = ProjectPackageId,
                     version = ProjectPackageVersion,
+                    environment = Environment,
                 });
 
                 await client.Send();

@@ -27,7 +27,9 @@
         row.find('[data-role-value]').text(text);
 
         $('[data-role-list]').append(row);
-        $('#EditRoleTextbox').val('');
+
+        $('#EditRoleTextbox')
+            .val('').focus();
     }
 
     function onRemoveRole(btn) {

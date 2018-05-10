@@ -30,15 +30,12 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
             if (string.IsNullOrWhiteSpace(projectPackageVersion))
                 return Response.BadRequest().SetText("'version' is undefined!");
 
-            //if (string.IsNullOrWhiteSpace(environmentName))
-            //    return Response.BadRequest().SetText("'environment' is undefined!");
-
             try {
-                if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
-                    return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
-
                 if (!PhotonServer.Instance.ProjectPackages.TryGet(projectPackageId, projectPackageVersion, out var packageFilename))
                     return Response.BadRequest().SetText($"Project Package '{projectPackageId}.{projectPackageVersion}' was not found!");
+
+                if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
+                    return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
 
                 var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
                 var deploymentNumber = projectData.StartNewBuild();
