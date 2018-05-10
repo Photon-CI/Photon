@@ -1,13 +1,12 @@
-﻿using System;
+﻿using log4net;
 using Photon.Agent.Internal;
 using Photon.Communication;
 using Photon.Communication.Messages;
+using Photon.Framework;
 using Photon.Library.TcpMessages;
-using System.Diagnostics;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using log4net;
-using SysProcess = System.Diagnostics.Process;
 
 namespace Photon.Agent.MessageHandlers
 {
@@ -18,38 +17,34 @@ namespace Photon.Agent.MessageHandlers
 
         public override async Task<IResponseMessage> Process(AgentUpdateRequest requestMessage)
         {
-            var msiFilename = Path.Combine(Configuration.Directory, "Photon.Agent.Installer.msi");
+            var updatePath = Path.Combine(Configuration.Directory, "Updates");
+            var msiFilename = Path.Combine(updatePath, "Photon.Agent.msi");
+
+            if (!Directory.Exists(updatePath))
+                Directory.CreateDirectory(updatePath);
 
             if (File.Exists(msiFilename))
                 File.Delete(msiFilename);
 
             File.Move(requestMessage.Filename, msiFilename);
 
-            Run(msiFilename);
+            Run(updatePath, msiFilename);
 
             var response = new AgentUpdateResponse();
 
             return await Task.FromResult(response);
         }
 
-        private static void Run(string msiFilename)
+        private static void Run(string updatePath, string msiFilename)
         {
             try {
-                var info = new ProcessStartInfo {
-                    FileName = "msiexec.exe",
-                    Arguments = $"/i \"{msiFilename}\" /passive /l*vx \"log.txt\"",
-                };
+                var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
 
-                SysProcess.Start(info);
+                ProcessRunner.Run(updatePath, cmd);
             }
             catch (Exception error) {
-                Log.Error("Failed to start installation file!", error);
+                Log.Error("Failed to start agent update!", error);
             }
-
-            //await Task.Run(() => {
-                //await Task.Delay(200);
-
-            //});
         }
     }
 }
