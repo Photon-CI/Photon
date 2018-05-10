@@ -9,6 +9,7 @@
     public class AgentVersionResponse
     {
         public string AgentId {get; set;}
+        public string AgentName {get; set;}
         public string AgentVersion {get; set;}
         public string Exception {get; set;}
     }

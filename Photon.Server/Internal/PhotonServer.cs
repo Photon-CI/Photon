@@ -96,7 +96,7 @@ namespace Photon.Server.Internal
             var taskVariables = LoadVariables();
             var taskHttp = Task.Run(() => StartHttpServer());
             var taskAgents = Task.Run(() => Agents.Load());
-            var taskProjects = Task.Run(() => Projects.Initialize());
+            var taskProjects = Task.Run(() => Projects.Load());
             var taskProjectData = Task.Run(() => ProjectData.Initialize());
 
             Task.WaitAll(

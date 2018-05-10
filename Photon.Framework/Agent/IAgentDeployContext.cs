@@ -2,6 +2,7 @@
 {
     public interface IAgentDeployContext : IAgentContext
     {
+        uint DeploymentNumber {get; set;}
         string ProjectPackageId {get;}
         string ProjectPackageVersion {get;}
         string TaskName {get;}

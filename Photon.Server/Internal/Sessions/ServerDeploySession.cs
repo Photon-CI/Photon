@@ -16,6 +16,7 @@ namespace Photon.Server.Internal.Sessions
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
         public string ProjectPackageFilename {get; set;}
+        public string EnvironmentName {get; set;}
 
 
         protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
@@ -47,6 +48,7 @@ namespace Photon.Server.Internal.Sessions
                 Agents = PhotonServer.Instance.Agents.All.ToArray(),
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
+                EnvironmentName = EnvironmentName,
                 ScriptName = ScriptName,
                 WorkDirectory = WorkDirectory,
                 BinDirectory = BinDirectory,

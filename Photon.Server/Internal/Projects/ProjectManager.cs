@@ -11,23 +11,23 @@ namespace Photon.Server.Internal.Projects
     internal class ProjectManager : IEnumerable<Project>
     {
         private readonly Dictionary<string, Project> projects;
-        private string filename;
+        private readonly string filename;
 
 
         public ProjectManager()
         {
             projects = new Dictionary<string, Project>();
+            this.filename = Configuration.ProjectsFile;
         }
 
-        public void Initialize()
+        public void Load()
         {
-            this.filename = Configuration.ProjectsFile;
-
             Project[] _projectList;
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
                 _projectList = JsonSettings.Serializer.Deserialize<Project[]>(stream);
             }
 
+            projects.Clear();
             foreach (var project in _projectList)
                 projects[project.Id] = project;
         }

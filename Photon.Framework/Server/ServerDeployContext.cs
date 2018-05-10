@@ -8,6 +8,7 @@ namespace Photon.Framework.Server
         public uint DeploymentNumber {get; set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
+        public string EnvironmentName {get; set;}
         public string ScriptName {get; set;}
     }
 }

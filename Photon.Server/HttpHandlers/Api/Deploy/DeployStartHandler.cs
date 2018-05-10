@@ -19,6 +19,7 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
             var projectId = GetQuery("project");
             var projectPackageId = GetQuery("package");
             var projectPackageVersion = GetQuery("version");
+            var environmentName = GetQuery("environment");
 
             if (string.IsNullOrWhiteSpace(projectId))
                 return Response.BadRequest().SetText("'project' is undefined!");
@@ -28,6 +29,9 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
 
             if (string.IsNullOrWhiteSpace(projectPackageVersion))
                 return Response.BadRequest().SetText("'version' is undefined!");
+
+            //if (string.IsNullOrWhiteSpace(environmentName))
+            //    return Response.BadRequest().SetText("'environment' is undefined!");
 
             try {
                 if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
@@ -40,10 +44,12 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
                 var deploymentNumber = projectData.StartNewBuild();
 
                 var session = new ServerDeploySession {
+                    Project = project,
                     DeploymentNumber = deploymentNumber,
                     ProjectPackageId = projectPackageId,
                     ProjectPackageVersion = projectPackageVersion,
                     ProjectPackageFilename = packageFilename,
+                    EnvironmentName = environmentName,
                 };
 
                 PhotonServer.Instance.Sessions.BeginSession(session);

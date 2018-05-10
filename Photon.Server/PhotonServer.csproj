@@ -60,6 +60,7 @@
     <Compile Include="HttpHandlers\Agents\AgentEditHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\AgentDeleteHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\AgentVersionHandler.cs" />
+    <Compile Include="HttpHandlers\Api\ProjectsHandler.cs" />
     <Compile Include="HttpHandlers\Api\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />

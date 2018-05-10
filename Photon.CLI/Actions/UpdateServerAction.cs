@@ -37,15 +37,14 @@ namespace Photon.CLI.Actions
             var serverIndex = await DownloadTools.GetLatestServerIndex();
             
             if (!VersionTools.HasUpdates(currentVersion, serverIndex.Version)) {
-                ConsoleEx.Out
-                    .Write("Server is up-to-date.", ConsoleColor.DarkBlue);
+                ConsoleEx.Out.WriteLine("Server is up-to-date.", ConsoleColor.DarkBlue);
 
                 return;
             }
 
             await BeginServerUpdate(server, serverIndex);
 
-            ConsoleEx.Out.Write("Server update started. Waiting for restart...", ConsoleColor.Cyan);
+            ConsoleEx.Out.WriteLine("Server update started. Waiting for restart...", ConsoleColor.Cyan);
 
             await Task.Delay(3000);
 
@@ -54,7 +53,7 @@ namespace Photon.CLI.Actions
             try {
                 await Reconnect(server, serverIndex.Version, timeout);
 
-                ConsoleEx.Out.Write("Update completed successfully.", ConsoleColor.DarkGreen);
+                ConsoleEx.Out.WriteLine("Update completed successfully.", ConsoleColor.DarkGreen);
             }
             catch (TaskCanceledException) {
                 throw new ApplicationException($"Server failed to restart within timeout '{timeout}'.");

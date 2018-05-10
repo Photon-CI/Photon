@@ -9,7 +9,6 @@ namespace Photon.Framework.Server
         string ServerSessionId {get;}
 
         //DomainAgentSessionHandle GetAgentSession(string agentSessionId);
-        DomainAgentSessionHandle RegisterAnyAgent(params string[] roles);
-        AgentSessionHandleCollection RegisterAllAgents(params string[] roles);
+        AgentSelector RegisterAgents {get;}
     }
 }

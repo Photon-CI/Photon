@@ -37,7 +37,7 @@ namespace Photon.Server.Internal.Sessions
                 //Commit = Commit,
             };
 
-            using (var sessionHandle = context.RegisterAnyAgent(Roles)) {
+            using (var sessionHandle = context.RegisterAgents.Any(Roles)) {
                 try {
                     await sessionHandle.BeginAsync(TokenSource.Token);
 

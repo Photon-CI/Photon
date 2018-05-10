@@ -48,7 +48,7 @@ namespace Photon.CLI.Actions
             foreach (var agentVersion in agentVersionResponse.VersionList) {
                 if (!string.IsNullOrEmpty(agentVersion.Exception)) {
                     ConsoleEx.Out.Write("Failed to get version of agent ", ConsoleColor.DarkYellow)
-                        .Write(agentVersion.AgentId, ConsoleColor.Yellow)
+                        .Write(agentVersion.AgentName, ConsoleColor.Yellow)
                         .WriteLine($"! {agentVersion.Exception}", ConsoleColor.DarkYellow);
 
                     continue;
@@ -56,11 +56,17 @@ namespace Photon.CLI.Actions
 
                 if (!VersionTools.HasUpdates(agentVersion.AgentVersion, latestVersion)) {
                     ConsoleEx.Out.Write("Agent ", ConsoleColor.DarkBlue)
-                        .Write(agentVersion.AgentId, ConsoleColor.Blue)
+                        .Write(agentVersion.AgentName, ConsoleColor.Blue)
                         .WriteLine(" is up-to-date.", ConsoleColor.DarkBlue);
 
                     continue;
                 }
+
+                ConsoleEx.Out.Write("Updating ", ConsoleColor.DarkCyan)
+                    .Write(agentVersion.AgentName, ConsoleColor.Cyan)
+                    .Write(" from version ", ConsoleColor.DarkCyan)
+                    .Write(agentVersion.AgentVersion, ConsoleColor.Cyan)
+                    .WriteLine(".", ConsoleColor.DarkCyan);
 
                 updateAgents.Add(agentVersion.AgentId);
             }

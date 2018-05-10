@@ -14,6 +14,8 @@ namespace Photon.Agent.MessageHandlers
             var response = new DeploySessionBeginResponse();
 
             var session = new AgentDeploySession(Transceiver, requestMessage.ServerSessionId, requestMessage.SessionClientId) {
+                DeploymentNumber = requestMessage.DeploymentNumber,
+                EnvironmentName = requestMessage.EnvironmentName,
                 Project = null, // TODO: Store ProjectId in package
                 ProjectPackageId = requestMessage.ProjectPackageId,
                 ProjectPackageVersion = requestMessage.ProjectPackageVersion,

@@ -20,6 +20,7 @@ namespace Photon.Server.HttpHandlers.Api.Agent
 {
     internal class AgentVersionInfo
     {
+        public string Name {get; set;}
         public string Version {get; set;}
         public string Exception {get; set;}
     }
@@ -55,7 +56,9 @@ namespace Photon.Server.HttpHandlers.Api.Agent
                 };
 
                 var block = new ActionBlock<ServerAgent>(async agent => {
-                    var result = new AgentVersionInfo();
+                    var result = new AgentVersionInfo {
+                        Name = agent.Name,
+                    };
 
                     try {
                         result.Version = await GetAgentVersion(agent, token);
@@ -77,6 +80,7 @@ namespace Photon.Server.HttpHandlers.Api.Agent
                 var response = new HttpAgentVersionListResponse {
                     VersionList = versionMap.Select(x => new AgentVersionResponse {
                         AgentId = x.Key,
+                        AgentName = x.Value.Name,
                         AgentVersion = x.Value.Version,
                         Exception = x.Value.Exception,
                     }).ToArray(),
