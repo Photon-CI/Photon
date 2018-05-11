@@ -14,7 +14,7 @@ namespace Photon.CLI.Commands
         public string GitRefspec {get; set;}
         public string StartFile {get; set;}
         public bool Deploy {get; set;}
-        public bool Environment {get; set;}
+        public string Environment {get; set;}
 
 
         public BuildCommands(CommandContext context) : base(context)
@@ -26,7 +26,7 @@ namespace Photon.CLI.Commands
             Map("-r", "-refspec").ToProperty(v => GitRefspec = v);
             Map("-f", "-file").ToProperty(v => StartFile = v);
             Map("-d", "-deploy").ToProperty(v => Deploy = v, true);
-            Map("-e", "-environment").ToProperty(v => Environment = v, true);
+            Map("-e", "-environment").ToProperty(v => Environment = v);
         }
 
         private async Task OnHelp(string[] args)

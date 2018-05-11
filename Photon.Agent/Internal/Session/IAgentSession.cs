@@ -13,6 +13,7 @@ namespace Photon.Agent.Internal.Session
         Task InitializeAsync();
         Task ReleaseAsync();
         Task RunTaskAsync(string taskName, string taskSessionId);
-        void Cancel();
+        void Cancel(); // TODO: Remove?
+        void Abort();
     }
 }

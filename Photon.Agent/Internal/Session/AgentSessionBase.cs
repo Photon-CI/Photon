@@ -121,6 +121,13 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
+        public void Abort()
+        {
+            //TokenSource.Cancel();
+
+            // TODO: Wait?
+        }
+
         public bool IsExpired()
         {
             if (utcReleased.HasValue) {

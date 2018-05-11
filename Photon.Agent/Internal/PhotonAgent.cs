@@ -119,6 +119,21 @@ namespace Photon.Agent.Internal
             receiver?.Stop();
         }
 
+        public async Task Shutdown(TimeSpan timeout)
+        {
+            using (var tokenSource = new CancellationTokenSource(timeout)) {
+                var token = tokenSource.Token;
+
+                token.Register(() => {
+                    Sessions.Abort();
+                });
+
+                await Task.Run(() => {
+                    Sessions.Stop();
+                }, token);
+            }
+        }
+
         private AgentDefinition ParseAgentDefinition()
         {
             var file = Configuration.AgentFile ?? "agent.json";
