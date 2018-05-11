@@ -63,7 +63,7 @@ namespace Photon.CLI.Actions
                     project = ProjectId,
                     package = ProjectPackageId,
                     version = ProjectPackageVersion,
-                    environment = Environment,
+                    env = Environment,
                 });
 
                 await client.Send();

@@ -19,7 +19,7 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
             var projectId = GetQuery("project");
             var projectPackageId = GetQuery("package");
             var projectPackageVersion = GetQuery("version");
-            var environmentName = GetQuery("environment");
+            var environmentName = GetQuery("env");
 
             if (string.IsNullOrWhiteSpace(projectId))
                 return Response.BadRequest().SetText("'project' is undefined!");
