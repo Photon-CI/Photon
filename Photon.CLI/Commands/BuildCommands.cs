@@ -79,6 +79,7 @@ namespace Photon.CLI.Commands
                         ProjectId = buildAction.Request.ProjectId,
                         ProjectPackageId = package.PackageId,
                         ProjectPackageVersion = package.PackageVersion,
+                        Environment = Environment,
                     }.Run(Context);
                 }
             }
