@@ -45,6 +45,7 @@ namespace Photon.Server.Internal.Sessions
 
             var context = new ServerDeployContext {
                 DeploymentNumber = DeploymentNumber,
+                Project = Project,
                 Agents = PhotonServer.Instance.Agents.All.ToArray(),
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
