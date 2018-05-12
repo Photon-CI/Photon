@@ -37,15 +37,14 @@ namespace Photon.CLI.Actions
             var serverIndex = await DownloadTools.GetLatestServerIndex();
             
             if (!VersionTools.HasUpdates(currentVersion, serverIndex.Version)) {
-                ConsoleEx.Out
-                    .Write("Server is up-to-date.", ConsoleColor.DarkBlue);
+                ConsoleEx.Out.WriteLine("Server is up-to-date.", ConsoleColor.DarkBlue);
 
                 return;
             }
 
             await BeginServerUpdate(server, serverIndex);
 
-            ConsoleEx.Out.Write("Server update started. Waiting for restart...", ConsoleColor.Cyan);
+            ConsoleEx.Out.WriteLine("Server update started. Waiting for restart...", ConsoleColor.Cyan);
 
             await Task.Delay(3000);
 
@@ -54,7 +53,7 @@ namespace Photon.CLI.Actions
             try {
                 await Reconnect(server, serverIndex.Version, timeout);
 
-                ConsoleEx.Out.Write("Update completed successfully.", ConsoleColor.DarkGreen);
+                ConsoleEx.Out.WriteLine("Update completed successfully.", ConsoleColor.DarkGreen);
             }
             catch (TaskCanceledException) {
                 throw new ApplicationException($"Server failed to restart within timeout '{timeout}'.");
@@ -72,17 +71,17 @@ namespace Photon.CLI.Actions
             try {
                 var url = NetPath.Combine(Configuration.DownloadUrl, "server", index.Version, index.MsiFilename);
 
+                var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
+                updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
+
+                if (!Directory.Exists(updateDirectory))
+                    Directory.CreateDirectory(updateDirectory);
+
                 using (var client = HttpClientEx.Get(url)) {
                     await client.Send();
 
-                    var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
-                    updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
-
-                    if (!Directory.Exists(updateDirectory))
-                        Directory.CreateDirectory(updateDirectory);
-
-                    using (var fileStream = File.Open(updateFilename, FileMode.Create, FileAccess.Write))
                     using (var responseStream = client.ResponseBase.GetResponseStream()) {
+                    using (var fileStream = File.Open(updateFilename, FileMode.Create, FileAccess.Write))
                         if (responseStream != null)
                             await responseStream.CopyToAsync(fileStream);
                     }

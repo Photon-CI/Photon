@@ -1,5 +1,6 @@
 ﻿using Photon.Library;
 using PiServerLite.Http.Handlers;
+using System;
 
 namespace Photon.Server.HttpHandlers
 {
@@ -9,9 +10,15 @@ namespace Photon.Server.HttpHandlers
         public override HttpHandlerResult Get()
         {
             var vm = new ViewModelBase();
-            vm.Build();
 
-            return View("Configuration.html", vm);
+            try {
+                vm.Build();
+            }
+            catch (Exception error) {
+                vm.Errors.Add(error);
+            }
+
+            return Response.View("Configuration.html", vm);
         }
     }
 }

@@ -1,11 +1,15 @@
 ﻿var ActiveSessionMonitor = function(container) {
     var self = this;
-
-    self.url = null;
-    self.socket = null;
-    //self.listElement = sessionListElement;
     self.container = container;
 
+    self.dataUrl = null;
+    self.detailsUrl = null;
+    self.socket = null;
+    self.onCancel = null;
+
+    var templateRow = $(container)
+        .find('[data-session-template]').detach()
+        .removeAttr('data-session-template');
 
     this.getListElement = function() {
         return $(self.container).find('[data-session-list]');
@@ -19,8 +23,16 @@
         return $(self.container).find('[data-session-empty]');
     };
 
+    this.setDetailsUrl = function(url) {
+        self.detailsUrl = url;
+    };
+
+    this.setCancelAction = function(cancelAction) {
+        self.onCancel = cancelAction;
+    };
+
     this.connect = function(url) {
-        self.url = url;
+        self.dataUrl = url;
 
         if (!window.WebSocket) {
             // not supported
@@ -29,27 +41,32 @@
         }
 
         self.socket = new EventSource(url);
-        self.socket.addEventListener('open', onOpen, false);
-        self.socket.addEventListener('close', onClose, false);
-        self.socket.addEventListener('message', onMessage, false);
+        self.socket.onopen = onOpen;
+        self.socket.onerror = onError;
+        self.socket.onmessage = onMessage;
     };
 
     this.updateMask = function() {
-        if (self.getListElement().is(':empty')) {
+        if (self.getListElement().children().length === 0) {
             self.getMaskElement().show();
-            self.getEmptyElement().show();
+            self.getEmptyElement().show()
+                .text("None");
         } else {
             self.getMaskElement().hide();
             self.getEmptyElement().hide();
         }
     };
 
-    function onOpen(e) {
-        // TODO: hide overlay
+    function onOpen() {
+        self.updateMask();
     }
 
-    function onClose(e) {
-        // TODO: show overlay
+    function onError(e) {
+        if (e.readyState === EventSource.CLOSED) {
+            self.getMaskElement().show();
+            self.getEmptyElement().show()
+                .text("Disconnected");
+        }
     }
 
     function onMessage(e) {
@@ -63,30 +80,49 @@
 
         if (!session.isReleased) {
             if (sessionElement == null) {
-                sessionElement = $('<div/>')
-                    .addClass('session-row')
+                sessionElement = templateRow.clone()
                     .attr('data-session-id', session.id);
 
-                //sessionElement.prepend($('<i class="">'));
-
                 sessionElement.appendTo(self.getListElement());
-                //$(self.listElement).append(sessionElement);
             }
 
             onSessionUpdate(sessionElement, session);
         } else {
-            onSessionReleased(sessionElement, session);
+            onSessionReleased(sessionElement);
         }
 
         self.updateMask();
     }
 
     function onSessionUpdate(e, data) {
-        e.append($('<span>')
-            .text(data.id));
+        var icon = getStatusIcon(data.type);
+
+        var sessionDetailsUrl = self.detailsUrl
+            + '?id=' + encodeURIComponent(data.id);
+
+        var labelText = data.projectName;
+
+        if (!!data.projectVersion)
+            labelText += ' - ' + data.projectVersion;
+
+        e.find('[data-session-status]').attr('class', icon);
+        e.find('.label').text(labelText).attr('href', sessionDetailsUrl);
+
+        e.find('.cancel').click(function () {
+            if (self.onCancel !== 'undefined' && self.onCancel != null) self.onCancel(data.id);
+        });
     }
 
-    function onSessionReleased(e, data) {
+    function onSessionReleased(e) {
         e.remove();
+    }
+
+    function getStatusIcon(type) {
+        switch (type) {
+            case "build": return "fas fa-cubes";
+            case "deploy": return "fas fa-cloud-download-alt";
+            case "update": return "fas fa-download";
+            default: return "fas fa-ellipsis-h";
+        }
     }
 };

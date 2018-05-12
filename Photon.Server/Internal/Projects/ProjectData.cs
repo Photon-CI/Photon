@@ -12,6 +12,7 @@ namespace Photon.Server.Internal.Projects
         private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectData));
 
         private readonly object buildNumberLock;
+        private readonly object deployNumberLock;
 
         [JsonIgnore]
         public string DataPath {get; private set;}
@@ -22,16 +23,18 @@ namespace Photon.Server.Internal.Projects
         public string ProjectId {get; set;}
 
         public ProjectDataLastBuild LastBuild {get; set;}
+        public ProjectDataLastBuild LastDeployment {get; set;}
 
 
         public ProjectData()
         {
             buildNumberLock = new object();
+            deployNumberLock = new object();
         }
 
-        public int StartNewBuild()
+        public uint StartNewBuild()
         {
-            int buildNumber;
+            uint buildNumber;
             lock (buildNumberLock) {
                 if (LastBuild == null)
                     LastBuild = new ProjectDataLastBuild();
@@ -55,6 +58,29 @@ namespace Photon.Server.Internal.Projects
             }
 
             return buildNumber;
+        }
+
+        public uint StartNewDeployment()
+        {
+            uint deployNumber;
+            lock (deployNumberLock) {
+                if (LastDeployment == null)
+                    LastDeployment = new ProjectDataLastBuild();
+
+                LastDeployment.Number++;
+                LastDeployment.Time = DateTime.Now;
+
+                deployNumber = LastDeployment.Number;
+            }
+
+            try {
+                Save();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to update ProjectData index file!", error);
+            }
+
+            return deployNumber;
         }
 
         public void Save()

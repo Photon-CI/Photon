@@ -16,7 +16,7 @@ namespace Photon.Agent.Internal.Session
     {
         public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
-        public int BuildNumber {get; set;}
+        public uint BuildNumber {get; set;}
         public GithubCommit Commit {get; set;}
 
 
@@ -149,6 +149,11 @@ namespace Photon.Agent.Internal.Session
 
         private void LoadProjectAssembly()
         {
+            if (string.IsNullOrEmpty(AssemblyFilename)) {
+                Output.WriteLine("No assembly filename defined!", ConsoleColor.DarkRed);
+                throw new ApplicationException("Assembly filename is undefined!");
+            }
+
             var errorList = new Lazy<List<Exception>>();
             var abort = false;
 

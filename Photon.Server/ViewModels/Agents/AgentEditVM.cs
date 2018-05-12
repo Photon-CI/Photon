@@ -26,7 +26,8 @@ namespace Photon.Server.ViewModels.Agents
             AgentHost = form.Get("AgentHost");
             AgentPort = form.Get("AgentPort");
 
-            // TODO: AgentRoles
+            AgentRoles = form.Get("AgentRolesJson")
+                .Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
         }
 
         public override void Build()
@@ -57,8 +58,7 @@ namespace Photon.Server.ViewModels.Agents
                 TcpPort = AgentPort.To<int>(),
             };
 
-            // TODO: Populate Roles
-            //agent.Roles.AddRange()...;
+            agent.Roles.AddRange(AgentRoles);
 
             string prevId = null;
             if (!string.Equals(AgentId_Source, AgentId, StringComparison.Ordinal))

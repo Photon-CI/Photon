@@ -9,12 +9,14 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerDeploySession : ServerSessionBase
     {
+        public uint DeploymentNumber {get; set;}
         public Project Project {get; set;}
         public string AssemblyFilename {get; set;}
         public string ScriptName {get; set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
         public string ProjectPackageFilename {get; set;}
+        public string EnvironmentName {get; set;}
 
 
         protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
@@ -42,9 +44,12 @@ namespace Photon.Server.Internal.Sessions
             Domain.Initialize(assemblyFilename);
 
             var context = new ServerDeployContext {
+                DeploymentNumber = DeploymentNumber,
+                Project = Project,
                 Agents = PhotonServer.Instance.Agents.All.ToArray(),
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
+                EnvironmentName = EnvironmentName,
                 ScriptName = ScriptName,
                 WorkDirectory = WorkDirectory,
                 BinDirectory = BinDirectory,

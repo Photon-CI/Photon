@@ -27,15 +27,17 @@ namespace Photon.Server.Internal
             stream?.Dispose();
         }
 
-        public void Send(string eventName, object eventData)
+        public void Send(string eventName, object eventData = null)
         {
-            var json = JsonConvert.SerializeObject(eventData);
-            var lines = json.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
-
             writer.WriteLine($"event: {eventName}");
 
-            foreach (var line in lines)
-                writer.WriteLine($"data: {line}");
+            if (eventData != null) {
+                var json = JsonConvert.SerializeObject(eventData);
+                var lines = json.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var line in lines)
+                    writer.WriteLine($"data: {line}");
+            }
 
             writer.WriteLine();
             writer.Flush();

@@ -4,6 +4,6 @@
     {
         string TaskName {get;}
         string GitRefspec {get;}
-        int BuildNumber {get;}
+        uint BuildNumber {get;}
     }
 }

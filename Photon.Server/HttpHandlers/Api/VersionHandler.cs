@@ -11,7 +11,7 @@ namespace Photon.Server.HttpHandlers.Api
             var assembly = Assembly.GetExecutingAssembly();
             var version = assembly.GetName().Version.ToString();
 
-            return Ok().SetText(version);
+            return Response.Ok().SetText(version);
         }
     }
 }

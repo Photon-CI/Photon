@@ -7,6 +7,6 @@ namespace Photon.Framework.Agent
     {
         public string TaskName {get; set;}
         public string GitRefspec {get; set;}
-        public int BuildNumber {get; set;}
+        public uint BuildNumber {get; set;}
     }
 }

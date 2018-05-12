@@ -1,11 +1,9 @@
-﻿using Photon.Framework;
-using Photon.Framework.Extensions;
+﻿using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
-using System.IO;
 
 namespace Photon.Server.HttpHandlers.Api.Deploy
 {
@@ -18,7 +16,7 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
 
             try {
                 if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
-                    return BadRequest().SetText($"Server Session '{sessionId}' was not found!");
+                    return Response.BadRequest().SetText($"Server Session '{sessionId}' was not found!");
 
                 if (!(session is ServerDeploySession deploySession))
                     throw new Exception($"Session '{sessionId}' is not a valid deploy session!");
@@ -27,22 +25,10 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
                     Result = deploySession.Result,
                 };
 
-                var memStream = new MemoryStream();
-
-                try {
-                    JsonSettings.Serializer.Serialize(memStream, response, true);
-                }
-                catch {
-                    memStream.Dispose();
-                    throw;
-                }
-
-                return Ok()
-                    .SetContentType("application/json")
-                    .SetContent(memStream);
+                return Response.Json(response);
             }
             catch (Exception error) {
-                return Exception(error);
+                return Response.Exception(error);
             }
         }
     }

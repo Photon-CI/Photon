@@ -2,11 +2,51 @@
 
 {{#Script}}
 <script>
+    var roleTemplate;
+
     $(function () {
         $('#layoutNavbarContent [data-link="agents"]').addClass('active');
+
+        roleTemplate = $('[data-role-template]').detach()
+            .removeAttr('data-role-template');
     });
 
-    function onDelete() {
+    function onAddRole() {
+        var text = $('#EditRoleTextbox').val();
+        if (text.length === 0) return;
+
+        var existingRole = $('[data-role="' + text + '"]');
+        if (existingRole.length > 0) {
+            alert("Role '"+text+"' already exists!");
+            return;
+        }
+
+        var row = roleTemplate.clone(true);
+
+        row.attr('data-role', text);
+        row.find('[data-role-value]').text(text);
+
+        $('[data-role-list]').append(row);
+
+        $('#EditRoleTextbox')
+            .val('').focus();
+    }
+
+    function onRemoveRole(btn) {
+        $(btn).closest('[data-role]').remove();
+    }
+
+    function onSave() {
+        var roles = [];
+        $('[data-role]').each(function (i, e) {
+            var text = $(e).attr('data-role');
+            roles.push(text);
+        });
+
+        $('input[name="AgentRolesJson"]').val(roles.join(';'));
+    }
+
+    function onDeleteAgent() {
         $.ajax({
             url: '{{#Url api/agent/delete}}?id={{&AgentId}}',
             method: 'POST'
@@ -24,6 +64,28 @@
     .layout-content {
         padding: 12px 0;
     }
+    .roles-header {
+        padding: 2px;
+    }
+    #EditRoleTextbox {
+        font-family: monospace;
+    }
+    [data-role-template] {
+        display: none;
+    }
+    .role-row {
+        padding: 1px 2px 1px 6px;
+    }
+    .role-row [data-role-value] {
+        font-family: monospace;
+    }
+    .role-row:nth-child(even) {
+        background: #F3F3F3;
+    }
+    .role-row .btn-delete {
+        margin: 1px 2px;
+        padding: 1px 8px;
+    }
 </style>
 {{#EndStyle}}
 
@@ -39,8 +101,9 @@
         </ul>
     </div>
     {{#EndIf}}
-    <form method="post">
+    <form method="post" onsubmit="onSave()">
         <input name="AgentId_Source" type="hidden" value="{{AgentId}}" />
+        <input name="AgentRolesJson" type="hidden" />
         <div class="form-row">
             <div class="form-group col-12 col-md-6">
                 <label for="AgentIdTextBox">ID</label>
@@ -63,23 +126,32 @@
         </div>
         <hr />
         <div class="form-row">
-            <div class="form-group col-12">
+            <div class="form-group col-12 col-lg-6">
                 <h4>Roles</h4>
                 <div class="card">
-                    <div class="card-header">
-                        <div class="input-group">
-                            <input type="text" class="form-control" disabled />
+                    <div class="card-header roles-header">
+                        <div class="input-group input-group-sm">
+                            <input id="EditRoleTextbox" type="text" class="form-control" />
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-secondary" disabled>
+                                <button type="button" class="btn btn-outline-secondary" onclick="onAddRole()">
                                     <i class="fas fa-plus text-primary"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div data-role-list>
+                        <div class="role-row clearfix" data-role-template>
+                            <div class="btn btn-sm btn-outline-dark btn-delete border-0 float-right" onclick="onRemoveRole(this)">
+                                <i class="fas fa-times text-danger"></i>
+                            </div>
+                            <span data-role-value></span>
+                        </div>
                         {{#Each AgentRoles.role}}
-                        <div>
-                            <span>{{role}}</span>
+                        <div class="role-row clearfix" data-role="{{role}}">
+                            <div class="btn btn-sm btn-outline-dark btn-delete border-0 float-right" onclick="onRemoveRole(this)">
+                                <i class="fas fa-times text-danger"></i>
+                            </div>
+                            <span data-role-value>{{role}}</span>
                         </div>
                         {{#EndEach}}
                     </div>
@@ -121,7 +193,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" onclick="onDelete()">Delete</button>
+                <button type="button" class="btn btn-danger" onclick="onDeleteAgent()">Delete</button>
             </div>
         </div>
     </div>

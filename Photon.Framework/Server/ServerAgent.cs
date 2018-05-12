@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Photon.Framework.Server
 {
+    [Serializable]
     public class ServerAgent
     {
         public string Id {get; set;}

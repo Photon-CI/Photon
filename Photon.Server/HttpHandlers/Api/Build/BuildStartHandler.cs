@@ -1,12 +1,12 @@
 ﻿using log4net;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
-using System.IO;
 
 namespace Photon.Server.HttpHandlers.Api.Build
 {
@@ -26,13 +26,13 @@ namespace Photon.Server.HttpHandlers.Api.Build
             }
 
             if (startInfo == null)
-                return BadRequest().SetText("No json request was found!");
+                return Response.BadRequest().SetText("No json request was found!");
 
             var _gitRefspec = qGitRefspec ?? startInfo.GitRefspec;
 
             try {
                 if (!PhotonServer.Instance.Projects.TryGet(startInfo.ProjectId, out var project))
-                    return BadRequest().SetText($"Project '{startInfo.ProjectId}' was not found!");
+                    return Response.BadRequest().SetText($"Project '{startInfo.ProjectId}' was not found!");
 
                 var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
                 var buildNumber = projectData.StartNewBuild();
@@ -54,23 +54,11 @@ namespace Photon.Server.HttpHandlers.Api.Build
                     SessionId = session.SessionId,
                 };
 
-                var memStream = new MemoryStream();
-
-                try {
-                    JsonSettings.Serializer.Serialize(memStream, response, true);
-                }
-                catch {
-                    memStream.Dispose();
-                    throw;
-                }
-
-                return Ok()
-                    .SetContentType("application/json")
-                    .SetContent(memStream);
+                return Response.Json(response);
             }
             catch (Exception error) {
                 Log.Error($"Failed to run Build-Task '{startInfo.TaskName}' from Project '{startInfo.ProjectId}' @ '{_gitRefspec}'!", error);
-                return Exception(error);
+                return Response.Exception(error);
             }
         }
     }

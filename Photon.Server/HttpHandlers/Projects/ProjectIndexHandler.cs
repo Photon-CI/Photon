@@ -1,5 +1,6 @@
 ﻿using Photon.Server.ViewModels.Projects;
 using PiServerLite.Http.Handlers;
+using System;
 
 namespace Photon.Server.HttpHandlers.Projects
 {
@@ -11,9 +12,14 @@ namespace Photon.Server.HttpHandlers.Projects
         {
             var vm = new ProjectIndexVM();
 
-            vm.Build();
+            try {
+                vm.Build();
+            }
+            catch (Exception error) {
+                vm.Errors.Add(error);
+            }
 
-            return View("Projects\\Index.html", vm);
+            return Response.View("Projects\\Index.html", vm);
         }
     }
 }

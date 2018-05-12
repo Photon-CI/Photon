@@ -56,6 +56,18 @@ namespace Photon.Server.Internal.Sessions
             sponsor?.Close();
         }
 
+        public void Abort()
+        {
+            if (MessageClient.IsConnected && !string.IsNullOrEmpty(AgentSessionId)) {
+                try {
+                    OnCancelSession();
+                }
+                catch (Exception error) {
+                    Log.Error($"Failed to cancel Agent Session '{AgentSessionId}'! {error.Message}");
+                }
+            }
+        }
+
         protected abstract Task OnBeginSession();
 
         protected abstract Task OnReleaseSessionAsync();
@@ -102,6 +114,15 @@ namespace Photon.Server.Internal.Sessions
             return null;
         }
 
+        private void OnCancelSession()
+        {
+            var message = new SessionCancelRequest {
+                AgentSessionId = AgentSessionId,
+            };
+
+            MessageClient.SendOneWay(message);
+        }
+
         private void SessionClient_OnSessionRelease(RemoteTaskCompletionSource taskHandle)
         {
             Task.Run(async () => {
@@ -115,7 +136,6 @@ namespace Photon.Server.Internal.Sessions
                         catch (Exception error) {
                             Log.Error($"Failed to release Agent Session '{AgentSessionId}'! {error.Message}");
                         }
-
                     }
 
                     await MessageClient.DisconnectAsync();

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Photon.Framework.Projects
 {
@@ -17,5 +18,13 @@ namespace Photon.Framework.Projects
 
         [JsonProperty("assembly")]
         public string AssemblyFile {get; set;}
+
+        public List<ProjectEnvironment> Environments {get; set;}
+
+
+        public Project()
+        {
+            Environments = new List<ProjectEnvironment>();
+        }
     }
 }

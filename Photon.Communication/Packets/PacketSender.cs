@@ -15,6 +15,7 @@ namespace Photon.Communication.Packets
         private readonly BinaryWriter writer;
         private readonly ManualResetEventSlim waitEvent;
         private readonly JsonSerializer jsonSerializer;
+        private volatile bool enabled;
         private CancellationTokenSource tokenSource;
         private Task task;
 
@@ -40,8 +41,11 @@ namespace Photon.Communication.Packets
 
         public void Dispose()
         {
-            //try {tokenSource?.Cancel();}
-            //catch {}
+            try {
+                tokenSource?.Cancel();
+                waitEvent.Set();
+            }
+            catch { }
 
             foreach (var packetSource in packetSourceList)
                 packetSource.Dispose();
@@ -53,13 +57,14 @@ namespace Photon.Communication.Packets
 
         public void Start()
         {
+            enabled = true;
             tokenSource = new CancellationTokenSource();
             task = Task.Run(Process);
         }
 
         public async Task StopAsync()
         {
-            tokenSource.Cancel();
+            enabled = false;
             waitEvent.Set();
             await task;
         }
@@ -75,16 +80,20 @@ namespace Photon.Communication.Packets
         private async Task Process()
         {
             while (!tokenSource.IsCancellationRequested) {
-                var hasAny = await OnProcess();
+                var token = tokenSource.Token;
+
+                var hasAny = await OnProcess(token);
 
                 if (!hasAny && messageQueue.IsEmpty) {
+                    if (!enabled) return;
+
                     waitEvent.Reset();
-                    waitEvent.Wait();
+                    waitEvent.Wait(token);
                 }
             }
         }
 
-        private async Task<bool> OnProcess()
+        private async Task<bool> OnProcess(CancellationToken token)
         {
             var emptyCount = BufferSize - packetSourceList.Count;
 
@@ -95,7 +104,7 @@ namespace Photon.Communication.Packets
                     if (!messageQueue.TryDequeue(out var message))
                         continue;
 
-                    var packetSource = await CreatePacketSource(message);
+                    var packetSource = await CreatePacketSource(message, token);
                     packetSourceList.Add(packetSource);
                 }
             }
@@ -104,10 +113,9 @@ namespace Photon.Communication.Packets
             for (var i = count - 1; i >= 0; i--) {
                 var packetSource = packetSourceList[i];
 
-                var packet = await packetSource.TryTakePacket();
+                var packet = await packetSource.TryTakePacket(token);
 
-                if (packet != null)
-                    await packet.WriteToAsync(writer);
+                packet?.WriteTo(writer);
 
                 if (packetSource.IsComplete) {
                     packetSourceList.RemoveAt(i);
@@ -118,7 +126,7 @@ namespace Photon.Communication.Packets
             return count > 0;
         }
 
-        private async Task<PacketSource> CreatePacketSource(IMessage message)
+        private async Task<PacketSource> CreatePacketSource(IMessage message, CancellationToken token)
         {
             var messageId = message.MessageId;
             var messageType = message.GetType().AssemblyQualifiedName;
@@ -137,7 +145,7 @@ namespace Photon.Communication.Packets
             var bsonWriter = new BsonDataWriter(messageData);
 
             jsonSerializer.Serialize(bsonWriter, message);
-            await bsonWriter.FlushAsync();
+            await bsonWriter.FlushAsync(token);
 
             messageData.Seek(0, SeekOrigin.Begin);
 

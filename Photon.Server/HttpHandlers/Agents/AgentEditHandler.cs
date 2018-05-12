@@ -1,6 +1,6 @@
-﻿using System;
-using Photon.Server.ViewModels.Agents;
+﻿using Photon.Server.ViewModels.Agents;
 using PiServerLite.Http.Handlers;
+using System;
 
 namespace Photon.Server.HttpHandlers.Agents
 {
@@ -17,7 +17,7 @@ namespace Photon.Server.HttpHandlers.Agents
 
             vm.Build();
 
-            return View("Agents\\Edit.html", vm);
+            return Response.View("Agents\\Edit.html", vm);
         }
 
         public override HttpHandlerResult Post()
@@ -25,14 +25,14 @@ namespace Photon.Server.HttpHandlers.Agents
             var vm = new AgentEditVM();
 
             try {
-                vm.Restore(As.FormData());
+                vm.Restore(Request.FormData());
                 vm.Save();
 
-                return Redirect("Agents");
+                return Response.Redirect("Agents");
             }
             catch (Exception error) {
                 vm.Errors.Add(error);
-                return View("Agents\\Edit.html", vm);
+                return Response.View("Agents\\Edit.html", vm);
             }
         }
     }

@@ -71,6 +71,11 @@ namespace Photon.Agent.Internal.Session
             Domain?.Dispose();
         }
 
+        public void Cancel()
+        {
+            //
+        }
+
         public virtual void OnSessionBegin() {}
         public virtual void OnSessionEnd() {}
 
@@ -114,6 +119,13 @@ namespace Photon.Agent.Internal.Session
 
                 isReleased = true;
             }
+        }
+
+        public void Abort()
+        {
+            //TokenSource.Cancel();
+
+            // TODO: Wait?
         }
 
         public bool IsExpired()

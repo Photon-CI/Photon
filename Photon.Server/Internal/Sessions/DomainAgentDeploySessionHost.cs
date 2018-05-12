@@ -18,11 +18,13 @@ namespace Photon.Server.Internal.Sessions
         protected override async Task OnBeginSession()
         {
             var message = new DeploySessionBeginRequest {
+                DeploymentNumber = session.DeploymentNumber,
                 ServerSessionId = session.SessionId,
                 SessionClientId = SessionClientId,
                 ProjectPackageId = session.ProjectPackageId,
                 ProjectPackageVersion = session.ProjectPackageVersion,
                 Variables = session.Variables,
+                EnvironmentName = session.EnvironmentName,
             };
 
             var response = await MessageClient.Send(message)

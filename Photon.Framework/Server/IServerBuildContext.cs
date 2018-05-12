@@ -2,9 +2,9 @@
 {
     public interface IServerBuildContext : IServerContext
     {
-        string PreBuild {get; set;}
-        string GitRefspec {get; set;}
+        uint BuildNumber {get;}
+        string PreBuild {get;}
+        string GitRefspec {get;}
         string TaskName {get;}
-        int BuildNumber {get; set;}
     }
 }

@@ -1,11 +1,9 @@
-﻿using Photon.Framework;
-using Photon.Framework.Extensions;
+﻿using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
-using System.IO;
 
 namespace Photon.Server.HttpHandlers.Api.Agent
 {
@@ -18,29 +16,19 @@ namespace Photon.Server.HttpHandlers.Api.Agent
 
             try {
                 if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
-                    return BadRequest().SetText($"Server Session '{sessionId}' was not found!");
+                    return Response.BadRequest().SetText($"Server Session '{sessionId}' was not found!");
 
                 if (!(session is ServerUpdateSession updateSession))
                     throw new Exception($"Session '{sessionId}' is not a valid update session!");
 
-                var response = new HttpAgentUpdateResultResponse();
+                // TODO: Get something from session?
 
-                var memStream = new MemoryStream();
+                var responseMessage = new HttpAgentUpdateResultResponse();
 
-                try {
-                    JsonSettings.Serializer.Serialize(memStream, response, true);
-                }
-                catch {
-                    memStream.Dispose();
-                    throw;
-                }
-
-                return Ok()
-                    .SetContentType("application/json")
-                    .SetContent(memStream);
+                return Response.Json(responseMessage);
             }
             catch (Exception error) {
-                return Exception(error);
+                return Response.Exception(error);
             }
         }
     }

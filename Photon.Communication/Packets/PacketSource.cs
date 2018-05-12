@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication.Packets
@@ -40,7 +41,7 @@ namespace Photon.Communication.Packets
             StreamData = null;
         }
 
-        public async Task<IPacket> TryTakePacket()
+        public async Task<IPacket> TryTakePacket(CancellationToken token)
         {
             if (!sentHeader) {
                 sentHeader = true;
@@ -54,7 +55,7 @@ namespace Photon.Communication.Packets
             }
 
             if (MessageData != null && !sentMessage) {
-                var readSize = await MessageData.ReadAsync(messageDataBuffer, 0, PacketSize);
+                var readSize = await MessageData.ReadAsync(messageDataBuffer, 0, PacketSize, token);
 
                 if (readSize > 0)
                     return new DataPacket(messageId, messageDataBuffer, readSize);
@@ -63,7 +64,7 @@ namespace Photon.Communication.Packets
             }
 
             if (StreamData != null && !sentStream) {
-                var readSize = await StreamData.ReadAsync(messageDataBuffer, 0, PacketSize);
+                var readSize = await StreamData.ReadAsync(messageDataBuffer, 0, PacketSize, token);
 
                 if (readSize > 0)
                     return new DataPacket(messageId, messageDataBuffer, readSize);

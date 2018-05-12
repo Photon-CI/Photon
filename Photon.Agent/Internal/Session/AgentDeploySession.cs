@@ -11,10 +11,12 @@ namespace Photon.Agent.Internal.Session
 {
     internal class AgentDeploySession : AgentSessionBase
     {
+        public uint DeploymentNumber {get; set;}
         public ProjectPackage Metadata {get; private set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
         public string ApplicationsDirectory {get; set;}
+        public string EnvironmentName {get; set;}
 
 
         public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId) : base(transceiver, serverSessionId, sessionClientId)
@@ -82,6 +84,7 @@ namespace Photon.Agent.Internal.Session
         public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
             var context = new AgentDeployContext {
+                DeploymentNumber = DeploymentNumber,
                 Project = Project,
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
@@ -94,6 +97,7 @@ namespace Photon.Agent.Internal.Session
                 Output = Output.Writer,
                 Packages = PackageClient,
                 ServerVariables = ServerVariables,
+                EnvironmentName = EnvironmentName,
             };
 
             await Domain.RunDeployTask(context, CancellationToken.None);

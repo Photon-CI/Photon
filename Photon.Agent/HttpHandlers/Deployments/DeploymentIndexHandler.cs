@@ -15,7 +15,7 @@ namespace Photon.Agent.HttpHandlers.Deployments
 
             vm.Build();
 
-            return View("Deployments\\Index.html", vm);
+            return Response.View("Deployments\\Index.html", vm);
         }
     }
 }

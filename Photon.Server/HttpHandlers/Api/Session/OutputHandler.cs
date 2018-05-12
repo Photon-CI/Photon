@@ -15,24 +15,24 @@ namespace Photon.Server.HttpHandlers.Api.Session
 
             try {
                 if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
-                    return BadRequest().SetText($"Session '{sessionId}' not found!");
+                    return Response.BadRequest().SetText($"Session '{sessionId}' not found!");
 
                 var currentLength = session.Output.Length;
 
                 if (currentLength <= startPos)
-                    return HttpHandlerResult.Status(Context, HttpStatusCode.NotModified)
+                    return Response.Status(HttpStatusCode.NotModified)
                         .SetHeader("X-Complete", session.IsComplete.ToString());
 
                 var newText = session.Output.ToString()
                     .Substring(startPos);
 
-                return Ok()
+                return Response.Ok()
                     .SetHeader("X-Text-Pos", currentLength.ToString())
                     .SetHeader("X-Complete", session.IsComplete.ToString())
                     .SetText(newText);
             }
             catch (Exception error) {
-                return Exception(error);
+                return Response.Exception(error);
             }
         }
     }

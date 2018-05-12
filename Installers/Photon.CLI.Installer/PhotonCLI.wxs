@@ -2,10 +2,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <?define EXE=$(var.PhotonCLI.TargetFileName)?>
   <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
+  <?define PhotonCLI_TargetDir=$(var.PhotonCLI.TargetDir)?>
 	<Product Id="*" Name="Photon CLI $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="1487B751-2679-414F-9A00-D814DA938C62">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon CLI." />
 
-    <Media Id="1" Cabinet="Photon.CLI.cab" EmbedCab="yes"/>
+    <Media Id="1" Cabinet="Photon.CLI.cab" EmbedCab="yes" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of Photon CLI is already installed." />
 
@@ -39,35 +40,38 @@
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
-			<Component Id="Product_Exe" Guid="B9F36964-0494-485F-992D-BF7E5018FEF0">
-		    <File Source="$(var.PhotonCLI.TargetDir)PhotonCLI.exe" />
-      </Component>
-      <Component Id="Product_Config" Guid="0FAE7640-75F9-4F65-AA75-686175A5AE6F">
-			  <File Source="$(var.PhotonCLI.TargetDir)PhotonCLI.exe.config" />
-		  </Component>
-		  <Component Id="Product_DataflowTpl" Guid="*">
-			  <File Source="$(var.PhotonCLI.TargetDir)System.Threading.Tasks.Dataflow.dll" />
-		  </Component>
-		  <Component Id="Product_PhotonLib" Guid="*">
-			  <File Source="$(var.PhotonCLI.TargetDir)Photon.Library.dll" />
-		  </Component>
-		  <Component Id="Product_PhotonFramework" Guid="*">
-			  <File Source="$(var.PhotonCLI.TargetDir)Photon.Framework.dll" />
-		  </Component>
-		  <Component Id="Product_PhotonComm" Guid="*">
-			  <File Source="$(var.PhotonCLI.TargetDir)Photon.Communication.dll" />
-		  </Component>
-		  <Component Id="Product_NewtonsoftJson" Guid="*">
-			  <File Source="$(var.PhotonCLI.TargetDir)Newtonsoft.Json.dll" />
-		  </Component>
-		  <Component Id="Product_NewtonsoftBson" Guid="*">
-			  <File Source="$(var.PhotonCLI.TargetDir)Newtonsoft.Json.Bson.dll" />
-		  </Component>
       <Component Id="Product_AddPath" Guid="CADB0AB5-BD9A-4BCC-B1A6-10C954C80DB2">
         <CreateFolder />
         <Environment Id="PATH" Name="PATH" Value="[InstallBin]" Permanent="no" Part="last" Action="set" System="yes" />
         <Condition>ADD_TO_PATH = 1</Condition>
       </Component>
+			<Component Id="PhotonCLI.exe" Guid="32b076bf-7647-4a2b-88e1-f2030ea1da76">
+			  <File Id="PhotonCLI.exe" Name="PhotonCLI.exe" Source="$(var.PhotonCLI_TargetDir)PhotonCLI.exe" />
+			</Component>
+			<Component Id="PhotonCLI.exe.config" Guid="cc5e0beb-b2d6-4919-a7b7-beadff39e508">
+			  <File Id="PhotonCLI.exe.config" Name="PhotonCLI.exe.config" Source="$(var.PhotonCLI_TargetDir)PhotonCLI.exe.config" />
+			</Component>
+			<Component Id="Newtonsoft.Json.dll" Guid="039f1c69-dd3a-4ee5-a594-bb8e6e4d5245">
+			  <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.PhotonCLI_TargetDir)Newtonsoft.Json.dll" />
+			</Component>
+			<Component Id="Photon.Framework.dll" Guid="e339b1e0-0af3-472f-82dd-653e25c1179f">
+			  <File Id="Photon.Framework.dll" Name="Photon.Framework.dll" Source="$(var.PhotonCLI_TargetDir)Photon.Framework.dll" />
+			</Component>
+			<Component Id="Photon.Communication.dll" Guid="9fcd27bf-08ea-4d5c-ae31-86855c83bcf4">
+			  <File Id="Photon.Communication.dll" Name="Photon.Communication.dll" Source="$(var.PhotonCLI_TargetDir)Photon.Communication.dll" />
+			</Component>
+			<Component Id="PiServerLite.dll" Guid="aa48d950-dcfa-4994-83ee-60f92b0b4e0e">
+			  <File Id="PiServerLite.dll" Name="PiServerLite.dll" Source="$(var.PhotonCLI_TargetDir)PiServerLite.dll" />
+			</Component>
+			<Component Id="Photon.Library.dll" Guid="26dfbf0c-e494-4323-8c52-b33e30baa490">
+			  <File Id="Photon.Library.dll" Name="Photon.Library.dll" Source="$(var.PhotonCLI_TargetDir)Photon.Library.dll" />
+			</Component>
+			<Component Id="System.Threading.Tasks.Dataflow.dll" Guid="440c05a5-3f83-4d89-a2d4-468a74770f04">
+			  <File Id="System.Threading.Tasks.Dataflow.dll" Name="System.Threading.Tasks.Dataflow.dll" Source="$(var.PhotonCLI_TargetDir)System.Threading.Tasks.Dataflow.dll" />
+			</Component>
+			<Component Id="Newtonsoft.Json.Bson.dll" Guid="996580f1-369f-4fc7-9964-64a924fa9fb6">
+			  <File Id="Newtonsoft.Json.Bson.dll" Name="Newtonsoft.Json.Bson.dll" Source="$(var.PhotonCLI_TargetDir)Newtonsoft.Json.Bson.dll" />
+			</Component>
 		</ComponentGroup>
 	</Fragment>
 </Wix>

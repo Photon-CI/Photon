@@ -1,12 +1,10 @@
 ﻿using log4net;
-using Photon.Framework;
-using Photon.Framework.Extensions;
+using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
-using System.IO;
 
 namespace Photon.Server.HttpHandlers.Api.Deploy
 {
@@ -18,23 +16,37 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
 
         public override HttpHandlerResult Post()
         {
-            var projectPackageId = GetQuery("id");
+            var projectId = GetQuery("project");
+            var projectPackageId = GetQuery("package");
             var projectPackageVersion = GetQuery("version");
+            var environmentName = GetQuery("env");
+
+            if (string.IsNullOrWhiteSpace(projectId))
+                return Response.BadRequest().SetText("'project' is undefined!");
 
             if (string.IsNullOrWhiteSpace(projectPackageId))
-                return BadRequest().SetText("'id' is undefined!");
+                return Response.BadRequest().SetText("'package' is undefined!");
 
             if (string.IsNullOrWhiteSpace(projectPackageVersion))
-                return BadRequest().SetText("'version' is undefined!");
+                return Response.BadRequest().SetText("'version' is undefined!");
 
             try {
                 if (!PhotonServer.Instance.ProjectPackages.TryGet(projectPackageId, projectPackageVersion, out var packageFilename))
-                    return BadRequest().SetText($"Project Package '{projectPackageId}.{projectPackageVersion}' was not found!");
+                    return Response.BadRequest().SetText($"Project Package '{projectPackageId}.{projectPackageVersion}' was not found!");
+
+                if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
+                    return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
+
+                var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
+                var deploymentNumber = projectData.StartNewBuild();
 
                 var session = new ServerDeploySession {
+                    Project = project,
+                    DeploymentNumber = deploymentNumber,
                     ProjectPackageId = projectPackageId,
                     ProjectPackageVersion = projectPackageVersion,
                     ProjectPackageFilename = packageFilename,
+                    EnvironmentName = environmentName,
                 };
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
@@ -44,24 +56,11 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
                     SessionId = session.SessionId,
                 };
 
-                var memStream = new MemoryStream();
-
-                try {
-                    JsonSettings.Serializer.Serialize(memStream, response, true);
-                }
-                catch {
-                    memStream.Dispose();
-                    throw;
-                }
-
-                return Ok()
-                    .SetContentType("application/json")
-                    .SetContent(memStream);
-                    //.SetContent(s => new JsonSerializer().Serialize(s, response));
+                return Response.Json(response);
             }
             catch (Exception error) {
                 Log.Error($"Deployment of Project Package '{projectPackageId}.{projectPackageVersion}' has failed!", error);
-                return Exception(error);
+                return Response.Exception(error);
             }
         }
     }

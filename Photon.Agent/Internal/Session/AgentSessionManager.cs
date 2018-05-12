@@ -39,6 +39,12 @@ namespace Photon.Agent.Internal.Session
             Log.Info("Session pool stopped.");
         }
 
+        public void Abort()
+        {
+            foreach (var session in pool.Items)
+                session.Abort();
+        }
+
         public void BeginSession(IAgentSession session)
         {
             pool.Add(session);

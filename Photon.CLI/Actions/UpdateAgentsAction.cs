@@ -1,9 +1,14 @@
-﻿using Photon.CLI.Internal;
+﻿using Newtonsoft.Json;
+using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
+using Photon.Framework.Tools;
+using Photon.Library;
 using Photon.Library.HttpMessages;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -22,18 +27,80 @@ namespace Photon.CLI.Actions
         {
             var server = context.Servers.Get(ServerName);
 
-            //var agentIndex = await DownloadTools.GetLatestAgentIndex();
+            ConsoleEx.Out.WriteLine("Retrieving latest agent version...", ConsoleColor.DarkCyan);
 
-            ConsoleEx.Out.WriteLine("Checking agent version...", ConsoleColor.DarkCyan);
+            var agentIndex = await DownloadTools.GetLatestAgentIndex();
+            var latestVersion = agentIndex.Version;
 
-            string currentVersion;
+            ConsoleEx.Out
+                .Write("Found Latest Version ", ConsoleColor.DarkCyan)
+                .WriteLine(latestVersion, ConsoleColor.Cyan)
+                .WriteLine("Checking agent versions...", ConsoleColor.DarkCyan);
+
+            HttpAgentVersionListResponse agentVersionResponse;
             using (var webClient = new WebClient()) {
-                var currentVersionUrl = NetPath.Combine(server.Url, "api/version");
-                currentVersion = (await webClient.DownloadStringTaskAsync(currentVersionUrl)).Trim();
+                var currentVersionUrl = NetPath.Combine(server.Url, "api/agent/versions");
+                var json = (await webClient.DownloadStringTaskAsync(currentVersionUrl)).Trim();
+                agentVersionResponse = JsonConvert.DeserializeObject<HttpAgentVersionListResponse>(json);
             }
 
+            var updateAgents = new List<string>();
+            foreach (var agentVersion in agentVersionResponse.VersionList) {
+                if (!string.IsNullOrEmpty(agentVersion.Exception)) {
+                    ConsoleEx.Out.Write("Failed to get version of agent ", ConsoleColor.DarkYellow)
+                        .Write(agentVersion.AgentName, ConsoleColor.Yellow)
+                        .WriteLine($"! {agentVersion.Exception}", ConsoleColor.DarkYellow);
 
-            var startResult = await StartSession(server);
+                    continue;
+                }
+
+                if (!VersionTools.HasUpdates(agentVersion.AgentVersion, latestVersion)) {
+                    ConsoleEx.Out.Write("Agent ", ConsoleColor.DarkBlue)
+                        .Write(agentVersion.AgentName, ConsoleColor.Blue)
+                        .WriteLine(" is up-to-date.", ConsoleColor.DarkBlue);
+
+                    continue;
+                }
+
+                ConsoleEx.Out.Write("Updating ", ConsoleColor.DarkCyan)
+                    .Write(agentVersion.AgentName, ConsoleColor.Cyan)
+                    .Write(" from version ", ConsoleColor.DarkCyan)
+                    .Write(agentVersion.AgentVersion, ConsoleColor.Cyan)
+                    .WriteLine(".", ConsoleColor.DarkCyan);
+
+                updateAgents.Add(agentVersion.AgentId);
+            }
+
+            if (!updateAgents.Any()) {
+                ConsoleEx.Out.WriteLine("All agents are up-to-date.", ConsoleColor.DarkGreen);
+                return;
+            }
+
+            // Download update msi
+
+            ConsoleEx.Out.Write("Downloading Agent update ", ConsoleColor.DarkCyan)
+                .Write(agentIndex.Version, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
+
+            var url = NetPath.Combine(Configuration.DownloadUrl, "agent", agentIndex.Version, agentIndex.MsiFilename);
+
+            var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
+            var updateFilename = Path.Combine(updateDirectory, "Photon.Agent.msi");
+
+            if (!Directory.Exists(updateDirectory))
+                Directory.CreateDirectory(updateDirectory);
+
+            using (var client = new WebClient()) {
+                await client.DownloadFileTaskAsync(url, updateFilename);
+            }
+
+            ConsoleEx.Out.WriteLine("Download Complete.", ConsoleColor.DarkBlue);
+
+            // Perform updates
+
+            var agentIdList = updateAgents.ToArray();
+
+            var startResult = await StartSession(server, agentIdList, updateFilename);
             var sessionId = startResult?.SessionId;
 
             if (string.IsNullOrEmpty(sessionId))
@@ -62,7 +129,7 @@ namespace Photon.CLI.Actions
             ConsoleEx.Out.WriteLine("Update completed successfully.", ConsoleColor.DarkGreen);
         }
 
-        private async Task<HttpAgentUpdateStartResponse> StartSession(PhotonServerDefinition server)
+        private async Task<HttpAgentUpdateStartResponse> StartSession(PhotonServerDefinition server, string[] agentIds, string updateFilename)
         {
             HttpClientEx client = null;
 
@@ -71,8 +138,10 @@ namespace Photon.CLI.Actions
 
                 client = HttpClientEx.Post(url);
                 client.Query = new {
-                    names = AgentNames,
+                    agents = string.Join(";", agentIds),
                 };
+
+                client.BodyFunc = () => File.Open(updateFilename, FileMode.Open, FileAccess.Read);
 
                 await client.Send();
 

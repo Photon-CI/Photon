@@ -14,7 +14,7 @@ namespace Photon.Library.TcpMessages
         public string AssemblyFile {get; set;}
         public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
-        public int BuildNumber {get; set;}
+        public uint BuildNumber {get; set;}
         public VariableSetCollection Variables {get; set;}
         public GithubCommit Commit {get; set;}
     }

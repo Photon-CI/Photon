@@ -14,6 +14,7 @@ namespace Photon.CLI.Commands
         public string GitRefspec {get; set;}
         public string StartFile {get; set;}
         public bool Deploy {get; set;}
+        public string Environment {get; set;}
 
 
         public BuildCommands(CommandContext context) : base(context)
@@ -25,6 +26,7 @@ namespace Photon.CLI.Commands
             Map("-r", "-refspec").ToProperty(v => GitRefspec = v);
             Map("-f", "-file").ToProperty(v => StartFile = v);
             Map("-d", "-deploy").ToProperty(v => Deploy = v, true);
+            Map("-e", "-environment").ToProperty(v => Environment = v);
         }
 
         private async Task OnHelp(string[] args)
@@ -43,6 +45,7 @@ namespace Photon.CLI.Commands
                     .Add("-refspec | -r", "The repository branch, commit, or tag.")
                     .Add("-file    | -f", "A json file specifying the build parameters.")
                     .Add("-deploy  | -d", "Deploy all published Project Packages upon successful build.")
+                    .Add("-env     | -e", "The environment to deploy to.")
                     .PrintAsync();
 
                 return;
@@ -63,14 +66,20 @@ namespace Photon.CLI.Commands
 
             if (successful && Deploy) {
                 foreach (var package in buildAction.Result.ProjectPackages) {
-                    ConsoleEx.Out
-                        .ResetColor()
-                        .WriteLine();
+                    ConsoleEx.Out.Write("Deploying package ", ConsoleColor.DarkCyan)
+                        .Write(package.PackageId, ConsoleColor.Cyan)
+                        .Write(" @ ", ConsoleColor.DarkCyan)
+                        .Write(package.PackageVersion, ConsoleColor.Cyan)
+                        .Write(" to ", ConsoleColor.DarkCyan)
+                        .Write(Environment, ConsoleColor.Cyan)
+                        .WriteLine("...", ConsoleColor.DarkCyan);
 
                     await new DeployRunAction {
                         ServerName = Server,
+                        ProjectId = buildAction.Request.ProjectId,
                         ProjectPackageId = package.PackageId,
                         ProjectPackageVersion = package.PackageVersion,
+                        Environment = Environment,
                     }.Run(Context);
                 }
             }

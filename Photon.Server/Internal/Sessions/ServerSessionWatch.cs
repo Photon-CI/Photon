@@ -42,9 +42,30 @@ namespace Photon.Server.Internal.Sessions
 
         private void SendUpdate(ServerSessionBase session)
         {
+            var projectName = session.SessionId;
+            string projectVersion = null;
+
+            if (session is ServerBuildSession buildSession) {
+                projectName = buildSession.Project?.Name;
+                projectVersion = buildSession.GitRefspec;
+            }
+            else if (session is ServerDeploySession deploySession) {
+                projectName = deploySession.Project?.Name;
+                projectVersion = $"{deploySession.ProjectPackageId} @{deploySession.ProjectPackageVersion}";
+            }
+            else if (session is ServerUpdateSession updateSession) {
+                projectName = "Update Agents";
+                projectVersion = updateSession.AgentIds != null
+                    ? string.Join(", ", updateSession.AgentIds)
+                    : "<all>";
+            }
+
             var data = new {
                 id = session.SessionId,
+                type = GetSessionType(session),
                 isReleased = session.IsReleased,
+                projectName,
+                projectVersion,
             };
 
             OnSessionChanged(data);
@@ -53,6 +74,14 @@ namespace Photon.Server.Internal.Sessions
         protected void OnSessionChanged(object data)
         {
             SessionChanged?.Invoke(this, new SessionStatusArgs(data));
+        }
+
+        private string GetSessionType(ServerSessionBase session)
+        {
+            if (session is ServerBuildSession) return "build";
+            if (session is ServerDeploySession) return "deploy";
+            if (session is ServerUpdateSession) return "update";
+            return null;
         }
     }
 }

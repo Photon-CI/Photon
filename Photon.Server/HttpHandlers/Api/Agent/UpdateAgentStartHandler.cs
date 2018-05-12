@@ -1,6 +1,5 @@
 ﻿using log4net;
-using Photon.Framework;
-using Photon.Framework.Extensions;
+using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
@@ -9,24 +8,38 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api.Agent
 {
     [HttpHandler("api/agent/update/start")]
-    internal class UpdateAgentStartHandler : HttpHandler
+    internal class UpdateAgentStartHandler : HttpHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateAgentStartHandler));
 
 
-        public override HttpHandlerResult Post()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
-            var _names = GetQuery("names");
+            var agentIds = GetQuery("agents");
+
+            var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
+            var updateFilename = Path.Combine(updateDirectory, "Photon.Agent.msi");
+
+            if (!Directory.Exists(updateDirectory))
+                Directory.CreateDirectory(updateDirectory);
+
+            using (var fileStream = File.Open(updateFilename, FileMode.Create, FileAccess.Write)) {
+                await HttpContext.Request.InputStream.CopyToAsync(fileStream);
+            }
 
             try {
-                var session = new ServerUpdateSession();
+                var session = new ServerUpdateSession {
+                    UpdateFilename = updateFilename,
+                };
 
-                if (!string.IsNullOrEmpty(_names))
-                    session.AgentNames = ParseNames(_names).ToArray();
+                if (!string.IsNullOrEmpty(agentIds))
+                    session.AgentIds = ParseNames(agentIds).ToArray();
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
@@ -35,27 +48,15 @@ namespace Photon.Server.HttpHandlers.Api.Agent
                     SessionId = session.SessionId,
                 };
 
-                var memStream = new MemoryStream();
-
-                try {
-                    JsonSettings.Serializer.Serialize(memStream, response, true);
-                }
-                catch {
-                    memStream.Dispose();
-                    throw;
-                }
-
-                return Ok()
-                    .SetContentType("application/json")
-                    .SetContent(memStream);
+                return Response.Json(response);
             }
             catch (Exception error) {
                 Log.Error("Failed to run Update-Task!", error);
-                return Exception(error);
+                return Response.Exception(error);
             }
         }
 
-        private IEnumerable<string> ParseNames(string names)
+        private static IEnumerable<string> ParseNames(string names)
         {
             return names.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim());
