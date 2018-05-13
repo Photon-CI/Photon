@@ -1,14 +1,30 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.WindowsServices
 {
+    public class WindowsServiceDescription
+    {
+        public string Filename {get; set;}
+        public string Name {get; set;}
+        public string DisplayName {get; set;}
+        public ServiceStartMode StartMode {get; set;}
+        public string Username {get; set;}
+        public string Password {get; set;}
+    }
+
     public static class WindowsServiceManager
     {
         //private const int STANDARD_RIGHTS_REQUIRED = 0xF0000;
         private const int SERVICE_WIN32_OWN_PROCESS = 0x00000010;
 
+        private const uint SERVICE_NO_CHANGE = 0xFFFFFFFF;
+        //private const uint SERVICE_QUERY_CONFIG = 0x00000001;
+        //private const uint SERVICE_CHANGE_CONFIG = 0x00000002;
+        //private const uint SC_MANAGER_ALL_ACCESS = 0x000F003F;
 
         [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern IntPtr OpenSCManager(string machineName, string databaseName, ScmAccessRights dwDesiredAccess);
@@ -17,7 +33,7 @@ namespace Photon.WindowsServices
         private static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, ServiceAccessRights dwDesiredAccess);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern IntPtr CreateService(IntPtr hSCManager, string lpServiceName, string lpDisplayName, ServiceAccessRights dwDesiredAccess, int dwServiceType, ServiceBootFlag dwStartType, ServiceError dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string lpDependencies, string lp, string lpPassword);
+        private static extern IntPtr CreateService(IntPtr hSCManager, string lpServiceName, string lpDisplayName, ServiceAccessRights dwDesiredAccess, int dwServiceType, ServiceStartMode dwStartType, ServiceError dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string lpDependencies, string lp, string lpPassword);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -36,6 +52,54 @@ namespace Photon.WindowsServices
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern int StartService(IntPtr hService, int dwNumServiceArgs, int lpServiceArgVectors);
 
+        [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool ChangeServiceConfig(IntPtr hService, uint nServiceType, uint nStartType, uint nErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, [In] char[] lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+
+        //[DllImport("advapi32.dll", SetLastError=true, CharSet=CharSet.Auto)]
+        //[return: MarshalAs(UnmanagedType.Bool)]
+        //public static extern bool ChangeServiceConfig2(IntPtr hService, int dwInfoLevel, IntPtr lpInfo);
+
+
+        public static void Install(WindowsServiceDescription description, CancellationToken token = default(CancellationToken))
+        {
+            var scm = OpenSCManager(ScmAccessRights.AllAccess);
+
+            try {
+                var service = OpenService(scm, description.Name, ServiceAccessRights.AllAccess);
+
+                if (service != IntPtr.Zero)
+                    throw new ApplicationException($"Service '{description.Name}' already exists!");
+
+                service = CreateService(scm,
+                    description.Name,
+                    description.DisplayName,
+                    ServiceAccessRights.AllAccess,
+                    SERVICE_WIN32_OWN_PROCESS,
+                    description.StartMode,
+                    ServiceError.Normal,
+                    description.Filename,
+                    null,
+                    IntPtr.Zero,
+                    null,
+                    description.Username,
+                    description.Password);
+
+                if (service == IntPtr.Zero)
+                    throw new ApplicationException("Failed to install service.");
+
+                CloseServiceHandle(service);
+
+                //try {
+                //    await StartServiceAsync(service, token);
+                //}
+                //finally {
+                //    CloseServiceHandle(service);
+                //}
+            }
+            finally {
+                CloseServiceHandle(scm);
+            }
+        }
 
         public static void Uninstall(string serviceName)
         {
@@ -48,7 +112,7 @@ namespace Photon.WindowsServices
                     throw new ApplicationException("Service not installed.");
 
                 try {
-                    StopService(service);
+                    //await StopServiceAsync(service);
 
                     if (!DeleteService(service))
                         throw new ApplicationException("Could not delete service " + Marshal.GetLastWin32Error());
@@ -61,6 +125,31 @@ namespace Photon.WindowsServices
                 CloseServiceHandle(scm);
             }
         }
+
+        //public static void StopAndUninstallAsync(string serviceName)
+        //{
+        //    var scm = OpenSCManager(ScmAccessRights.AllAccess);
+
+        //    try {
+        //        var service = OpenService(scm, serviceName, ServiceAccessRights.AllAccess);
+
+        //        if (service == IntPtr.Zero)
+        //            throw new ApplicationException("Service not installed.");
+
+        //        try {
+        //            //await StopServiceAsync(service);
+
+        //            if (!DeleteService(service))
+        //                throw new ApplicationException("Could not delete service " + Marshal.GetLastWin32Error());
+        //        }
+        //        finally {
+        //            CloseServiceHandle(service);
+        //        }
+        //    }
+        //    finally {
+        //        CloseServiceHandle(scm);
+        //    }
+        //}
 
         public static bool ServiceIsInstalled(string serviceName)
         {
@@ -80,42 +169,43 @@ namespace Photon.WindowsServices
             }
         }
 
-        public static void InstallAndStart(string serviceName, string displayName, string fileName)
-        {
-            var scm = OpenSCManager(ScmAccessRights.AllAccess);
+        //public static async Task InstallAndStartAsync(string serviceName, string displayName, string fileName, CancellationToken token = default(CancellationToken))
+        //{
+        //    var scm = OpenSCManager(ScmAccessRights.AllAccess);
 
-            try {
-                var service = OpenService(scm, serviceName, ServiceAccessRights.AllAccess);
+        //    try {
+        //        var service = OpenService(scm, serviceName, ServiceAccessRights.AllAccess);
 
-                if (service == IntPtr.Zero)
-                    service = CreateService(scm, serviceName, displayName, ServiceAccessRights.AllAccess, SERVICE_WIN32_OWN_PROCESS, ServiceBootFlag.AutoStart, ServiceError.Normal, fileName, null, IntPtr.Zero, null, null, null);
+        //        if (service == IntPtr.Zero)
+        //            service = CreateService(scm, serviceName, displayName, ServiceAccessRights.AllAccess, SERVICE_WIN32_OWN_PROCESS, ServiceStartMode.AutoStart, ServiceError.Normal, fileName, null, IntPtr.Zero, null, null, null);
 
-                if (service == IntPtr.Zero)
-                    throw new ApplicationException("Failed to install service.");
+        //        if (service == IntPtr.Zero)
+        //            throw new ApplicationException("Failed to install service.");
 
-                try {
-                    StartService(service);
-                }
-                finally {
-                    CloseServiceHandle(service);
-                }
-            }
-            finally {
-                CloseServiceHandle(scm);
-            }
-        }
+        //        try {
+        //            await StartServiceAsync(service, token);
+        //        }
+        //        finally {
+        //            CloseServiceHandle(service);
+        //        }
+        //    }
+        //    finally {
+        //        CloseServiceHandle(scm);
+        //    }
+        //}
 
-        public static void StartService(string serviceName)
+        public static async Task StartServiceAsync(string serviceName, CancellationToken token = default(CancellationToken))
         {
             var scm = OpenSCManager(ScmAccessRights.Connect);
 
             try {
                 var service = OpenService(scm, serviceName, ServiceAccessRights.QueryStatus | ServiceAccessRights.Start);
+
                 if (service == IntPtr.Zero)
                     throw new ApplicationException("Could not open service.");
 
                 try {
-                    StartService(service);
+                    await StartServiceAsync(service, token);
                 }
                 finally {
                     CloseServiceHandle(service);
@@ -126,7 +216,7 @@ namespace Photon.WindowsServices
             }
         }
 
-        public static void StopService(string serviceName)
+        public static async Task StopServiceAsync(string serviceName, CancellationToken token = default(CancellationToken))
         {
             var scm = OpenSCManager(ScmAccessRights.Connect);
 
@@ -137,7 +227,7 @@ namespace Photon.WindowsServices
                     throw new ApplicationException("Could not open service.");
 
                 try {
-                    StopService(service);
+                    await StopServiceAsync(service, token);
                 }
                 finally {
                     CloseServiceHandle(service);
@@ -170,23 +260,63 @@ namespace Photon.WindowsServices
             }
         }
 
-        private static void StartService(IntPtr service)
+        public static void Configure(WindowsServiceDescription description)
+        {
+            var scm = OpenSCManager(ScmAccessRights.Connect);
+
+            try {
+                var service = OpenService(scm, description.Name, ServiceAccessRights.QueryConfig | ServiceAccessRights.ChangeConfig);
+
+                if (service == IntPtr.Zero)
+                    throw new ApplicationException("Could not open service.");
+
+                try {
+                    var result = ChangeServiceConfig(
+                        service,
+                        SERVICE_NO_CHANGE,
+                        (uint)description.StartMode,
+                        SERVICE_NO_CHANGE,
+                        description.Filename,
+                        null,
+                        IntPtr.Zero,
+                        null,
+                        description.Username,
+                        description.Password,
+                        description.DisplayName);
+
+                    if (!result) {
+                        var nError = Marshal.GetLastWin32Error();
+                        var win32Exception = new Win32Exception(nError);
+
+                        throw new ExternalException($"Could not change service start type: {win32Exception.Message}");
+                    }
+                }
+                finally {
+                    CloseServiceHandle(service);
+                }
+            }
+            finally {
+                CloseServiceHandle(scm);
+            }
+        }
+
+        private static async Task StartServiceAsync(IntPtr service, CancellationToken token = default(CancellationToken))
         {
             //var status = new SERVICE_STATUS();
             StartService(service, 0, 0);
 
-            var changedStatus = WaitForServiceStatus(service, ServiceState.StartPending, ServiceState.Running);
+            var changedStatus = await WaitForServiceStatusAsync(service, ServiceState.StartPending, ServiceState.Running, token);
 
             if (!changedStatus)
                 throw new ApplicationException("Unable to start service");
         }
 
-        private static void StopService(IntPtr service)
+        private static async Task StopServiceAsync(IntPtr service, CancellationToken token = default(CancellationToken))
         {
             var status = new SERVICE_STATUS();
             ControlService(service, ServiceControl.Stop, status);
 
-            var changedStatus = WaitForServiceStatus(service, ServiceState.StopPending, ServiceState.Stopped);
+            var changedStatus = await WaitForServiceStatusAsync(service, ServiceState.StopPending, ServiceState.Stopped, token);
 
             if (!changedStatus)
                 throw new ApplicationException("Unable to stop service");
@@ -202,7 +332,7 @@ namespace Photon.WindowsServices
             return status.dwCurrentState;
         }
 
-        private static bool WaitForServiceStatus(IntPtr service, ServiceState waitStatus, ServiceState desiredStatus)
+        private static async Task<bool> WaitForServiceStatusAsync(IntPtr service, ServiceState waitStatus, ServiceState desiredStatus, CancellationToken token = default(CancellationToken))
         {
             var status = new SERVICE_STATUS();
 
@@ -222,7 +352,7 @@ namespace Photon.WindowsServices
                 if (dwWaitTime < 1000) dwWaitTime = 1000;
                 else if (dwWaitTime > 10000) dwWaitTime = 10000;
 
-                Thread.Sleep(dwWaitTime);
+                await Task.Delay(dwWaitTime, token);
 
                 // Check the status again.
 
@@ -266,6 +396,20 @@ namespace Photon.WindowsServices
         public int dwCheckPoint = 0;
         public int dwWaitHint = 0;
     }
+
+    //[StructLayout(LayoutKind.Sequential)]
+    //public class QUERY_SERVICE_CONFIG
+    //{
+    //    [MarshalAs(UnmanagedType.U4)] public uint dwServiceType;
+    //    [MarshalAs(UnmanagedType.U4)] public uint dwStartType;
+    //    [MarshalAs(UnmanagedType.U4)] public uint dwErrorControl;
+    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpBinaryPathName;
+    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpLoadOrderGroup;
+    //    [MarshalAs(UnmanagedType.U4)] public uint dwTagID;
+    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpDependencies;
+    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpServiceStartName;
+    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpDisplayName;
+    //};
 
     public enum ServiceState
     {
@@ -313,13 +457,13 @@ namespace Photon.WindowsServices
                      Interrogate | UserDefinedControl)
     }
 
-    internal enum ServiceBootFlag
+    public enum ServiceStartMode
     {
         Start = 0x00000000,
         SystemStart = 0x00000001,
         AutoStart = 0x00000002,
-        DemandStart = 0x00000003,
-        Disabled = 0x00000004
+        Manual = 0x00000003,
+        Disabled = 0x00000004,
     }
 
     internal enum ServiceControl
