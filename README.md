@@ -5,7 +5,7 @@ Photon packages your custom .NET library with your applications, allowing users 
 
 Since standard .NET libraries are used, you can leverage the full user experience of Visual Studio when editing your pipelines. By decorating your scripts and tasks with test attributes, you can even make your tasks directly runnable and debuggable using your favorite testing platform.
 
-Visit the [Official Website](http://photon.null511.info) to download releases and view the documentation.
+Visit the [Official Website](http://www.photon.ci/) to download releases and view the documentation.
 
 ## Usage example
 
@@ -123,7 +123,7 @@ Distributed under the MIT license. See ``LICENSE`` for more information.
 
 ## Contributing
 
-1. Fork it (<https://github.com/null511/photon/fork>)
+1. Fork it (<https://github.com/Photon-CI/Photon/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
