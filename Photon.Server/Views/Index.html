@@ -52,6 +52,12 @@
 
 {{#Style}}
 <style>
+    .card-header {
+        padding: 4px 8px;
+    }
+    .card-header > h4 {
+        margin: 0 4px;
+    }
     .card-body-ns {
         position: relative;
     }
@@ -77,12 +83,10 @@
         float: left;
         line-height: 28px;
         margin-left: 4px;
+        margin-right: 4px;
     }
-    .session-row .label {
-        margin-left: 28px;
-        margin-right: 28px;
-        line-height: 26px;
-        display: block;
+    .session-row .refspec {
+        padding-left: 8px;
     }
     .session-row .cancel {
         float: right;
@@ -113,12 +117,21 @@
         <div id="ActiveSessions" class="card-body-ns">
             <div class="mask" data-session-mask></div>
             <div data-session-list>
-                <div data-session-template class="session-row">
+                <div data-session-template="build" class="session-row">
                     <i class="fas fa-ellipsis-h" data-session-status></i>
                     <div class="btn btn-sm btn-outline-dark border-0 cancel">
                         <i class="fas fa-times text-danger"></i>
                     </div>
-                    <a href="#" class="text-primary label" data-session-label></a>
+                    <a href="#" class="text-primary" data-session-title></a> - <span class="text-dark" data-session-project></span><br/>
+                    <span class="text-muted refspec" data-session-refspec></span>
+                </div>
+                <div data-session-template="deploy" class="session-row">
+                    <i class="fas fa-ellipsis-h" data-session-status></i>
+                    <div class="btn btn-sm btn-outline-dark border-0 cancel">
+                        <i class="fas fa-times text-danger"></i>
+                    </div>
+                    <a href="#" class="text-primary label" data-session-title></a> - <span class="text-light" data-session-project></span>
+                    <span class="text-muted" data-session-version></span>
                 </div>
             </div>
             <div class="empty text-muted" data-session-empty>

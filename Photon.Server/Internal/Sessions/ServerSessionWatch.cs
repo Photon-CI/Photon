@@ -42,14 +42,22 @@ namespace Photon.Server.Internal.Sessions
 
         private void SendUpdate(ServerSessionBase session)
         {
-            var projectName = session.SessionId;
+            var sessionId = session.SessionId;
+            uint? number = null;
+            string name = null;
+            string projectName = null;
             string projectVersion = null;
+            string gitRefspec = null;
 
             if (session is ServerBuildSession buildSession) {
+                number = buildSession.BuildNumber;
+                name = buildSession.TaskName;
                 projectName = buildSession.Project?.Name;
-                projectVersion = buildSession.GitRefspec;
+                gitRefspec = buildSession.GitRefspec;
             }
             else if (session is ServerDeploySession deploySession) {
+                number = deploySession.DeploymentNumber;
+                name = deploySession.ScriptName;
                 projectName = deploySession.Project?.Name;
                 projectVersion = $"{deploySession.ProjectPackageId} @{deploySession.ProjectPackageVersion}";
             }
@@ -64,8 +72,11 @@ namespace Photon.Server.Internal.Sessions
                 id = session.SessionId,
                 type = GetSessionType(session),
                 isReleased = session.IsReleased,
+                number,
+                name,
                 projectName,
                 projectVersion,
+                gitRefspec,
             };
 
             OnSessionChanged(data);
