@@ -125,10 +125,10 @@
             case 'build':
                 e.find('[data-session-title]')
                     .attr('href', sessionDetailsUrl)
-                    .text('#' + data.number + ' - ' + data.name);
+                    .text('#' + data.number + ' - ' + data.projectName + ' : ' + data.name);
 
                 e.find('[data-session-project]').text(data.projectName);
-                e.find('[data-session-refspec]').text(data.refspec);
+                e.find('[data-session-refspec]').text('@'+data.gitRefspec);
                 break;
             case 'deploy':
                 //

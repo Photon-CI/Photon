@@ -64,6 +64,7 @@
     <Compile Include="HttpHandlers\Api\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
     <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Packages\PackageIndexHandler.cs" />
     <Compile Include="HttpHandlers\BuildsHandler.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="ViewModels\Agents\AgentIndexVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\Projects\ProjectIndexVM.cs" />
+    <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -148,6 +150,12 @@
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <Content Include="Content\ansi_up.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\SessionOutput.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\ActiveSessions.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
