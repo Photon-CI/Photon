@@ -82,9 +82,8 @@
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
 			<Component Id="PhotonServer.exe" Guid="555abaa8-022d-4288-98a6-0eb32866a342">
-        <File Id="PhotonServer.exe" Name="PhotonServer.exe" Source="$(var.PhotonServer_TargetDir)PhotonServer.exe" KeyPath="yes">
-          <fire:FirewallException Id="PhotonServerFirewallException" Name="Photon Server" Protocol="tcp" Scope="any" />
-        </File>
+        <File Id="PhotonServer.exe" Name="PhotonServer.exe" Source="$(var.PhotonServer_TargetDir)PhotonServer.exe" KeyPath="yes" />
+			  <fire:FirewallException Id="PhotonServerFirewallException" File="PhotonServer.exe" Name="Photon Server" Protocol="tcp" Scope="any" />
 			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal" />
 			  <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Server" Wait="yes" />
 			</Component>
