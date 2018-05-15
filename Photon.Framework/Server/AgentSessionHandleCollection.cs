@@ -25,21 +25,21 @@ namespace Photon.Framework.Server
                 ?? throw new ArgumentNullException(nameof(agentSessions));
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(CancellationToken token)
         {
             var taskList = agentSessionList
-                .Select(x => x.BeginAsync(CancellationToken.None))
+                .Select(x => x.BeginAsync(token))
                 .ToArray();
 
             await Task.WhenAll(taskList);
         }
 
-        public async Task ReleaseAllAsync()
+        public async Task ReleaseAllAsync(CancellationToken token)
         {
             if (agentSessionList == null) return;
 
             var taskList = agentSessionList
-                .Select(x => x.ReleaseAsync(CancellationToken.None))
+                .Select(x => x.ReleaseAsync(token))
                 .ToArray();
 
             await Task.WhenAll(taskList);

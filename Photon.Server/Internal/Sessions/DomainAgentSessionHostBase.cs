@@ -68,26 +68,28 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        protected abstract Task OnBeginSession();
+        protected abstract Task OnBeginSession(CancellationToken token);
 
-        protected abstract Task OnReleaseSessionAsync();
+        protected abstract Task OnReleaseSessionAsync(CancellationToken token);
 
         protected abstract void OnSessionOutput(string text);
 
         private void SessionClient_OnSessionBegin(RemoteTaskCompletionSource taskHandle)
         {
-            Task.Run(ConnectToAgent, Token)
+            Task.Run(() => ConnectToAgent(Token), Token)
                 .ContinueWith(taskHandle.FromTask, Token);
         }
 
-        private async Task<object> ConnectToAgent()
+        private async Task<object> ConnectToAgent(CancellationToken token)
         {
-            Log.Debug($"Connecting to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'...");
+            var agentAddress = $"{agent.TcpHost}:{agent.TcpPort}";
+            Log.Debug($"Connecting to TCP Agent '{agentAddress}'...");
 
             try {
                 await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
-                Log.Info($"Connected to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'.");
+                Log.Info($"Connected to TCP Agent '{agentAddress}'.");
 
+                Log.Debug($"Performing TCP handshake... [{agentAddress}]");
                 var handshakeRequest = new HandshakeRequest {
                     Key = Guid.NewGuid().ToString(),
                     ServerVersion = Configuration.Version,
@@ -101,14 +103,16 @@ namespace Photon.Server.Internal.Sessions
 
                 if (!handshakeResponse.PasswordMatch)
                     throw new ApplicationException("Handshake Failed! Unauthorized.");
+
+                Log.Info($"Handshake successful. [{agentAddress}].");
             }
             catch (Exception error) {
-                Log.Error($"Failed to connect to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'!", error);
+                Log.Error($"Failed to connect to TCP Agent '{agentAddress}'!", error);
                 MessageClient.Dispose();
                 throw;
             }
 
-            await OnBeginSession();
+            await OnBeginSession(token);
 
             Tasks.Start();
             return null;
@@ -131,7 +135,7 @@ namespace Photon.Server.Internal.Sessions
                 if (MessageClient.IsConnected) {
                     if (!string.IsNullOrEmpty(AgentSessionId)) {
                         try {
-                            await OnReleaseSessionAsync();
+                            await OnReleaseSessionAsync(Token);
                         }
                         catch (Exception error) {
                             Log.Error($"Failed to release Agent Session '{AgentSessionId}'! {error.Message}");
