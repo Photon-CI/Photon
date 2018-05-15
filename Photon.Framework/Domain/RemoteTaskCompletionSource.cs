@@ -9,11 +9,14 @@ namespace Photon.Framework.Domain
     {
         private readonly TaskCompletionSource<object> taskEvent;
 
+        public CancellationToken Token {get;}
         public Task Task => taskEvent.Task;
 
 
-        public RemoteTaskCompletionSource(CancellationToken token)
+        public RemoteTaskCompletionSource(CancellationToken token = default(CancellationToken))
         {
+            this.Token = token;
+
             taskEvent = new TaskCompletionSource<object>();
         }
 
@@ -32,7 +35,7 @@ namespace Photon.Framework.Domain
             taskEvent.SetException(error);
         }
 
-        public static async Task Run(Action<RemoteTaskCompletionSource, ISponsor> action, CancellationToken token)
+        public static async Task Run(Action<RemoteTaskCompletionSource, ISponsor> action, CancellationToken token = default(CancellationToken))
         {
             var sponsor = new ClientSponsor();
 
@@ -53,11 +56,14 @@ namespace Photon.Framework.Domain
     {
         private readonly TaskCompletionSource<T> taskEvent;
 
+        public CancellationToken Token {get;}
         public Task<T> Task => taskEvent.Task;
 
 
-        public RemoteTaskCompletionSource()
+        public RemoteTaskCompletionSource(CancellationToken token = default(CancellationToken))
         {
+            this.Token = token;
+
             taskEvent = new TaskCompletionSource<T>();
         }
 
@@ -76,12 +82,12 @@ namespace Photon.Framework.Domain
             taskEvent.SetException(error);
         }
 
-        public static async Task<T> Run(Action<RemoteTaskCompletionSource<T>, ISponsor> action)
+        public static async Task<T> Run(Action<RemoteTaskCompletionSource<T>, ISponsor> action, CancellationToken token = default(CancellationToken))
         {
             var sponsor = new ClientSponsor();
 
             try {
-                var taskHandle = new RemoteTaskCompletionSource<T>();
+                var taskHandle = new RemoteTaskCompletionSource<T>(token);
                 sponsor.Register(taskHandle);
 
                 action(taskHandle, sponsor);

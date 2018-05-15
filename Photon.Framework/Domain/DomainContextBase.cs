@@ -5,6 +5,7 @@ using Photon.Framework.Server;
 using Photon.Framework.Variables;
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
@@ -78,18 +79,18 @@ namespace Photon.Framework.Domain
             await RunCommandLineAsync($"{command} {argString}");
         }
 
-        public async Task PushProjectPackageAsync(string filename)
+        public async Task PushProjectPackageAsync(string filename, CancellationToken token = default(CancellationToken))
         {
-            await RemoteTaskCompletionSource<object>.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run((task, sponsor) => {
                 Packages.PushProjectPackage(filename, task);
-            });
+            }, token);
         }
 
-        public async Task PushApplicationPackageAsync(string filename)
+        public async Task PushApplicationPackageAsync(string filename, CancellationToken token = default(CancellationToken))
         {
-            await RemoteTaskCompletionSource<object>.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run((task, sponsor) => {
                 Packages.PushApplicationPackage(filename, task);
-            });
+            }, token);
         }
 
         public async Task<string> PullProjectPackageAsync(string id, string version)

@@ -3,7 +3,7 @@ using System;
 
 namespace Photon.Framework.Packages
 {
-    public delegate void PushPackageFunc(string filename, RemoteTaskCompletionSource<object> taskHandle);
+    public delegate void PushPackageFunc(string filename, RemoteTaskCompletionSource taskHandle);
 
     public delegate void PullPackageFunc(string id, string version, RemoteTaskCompletionSource<string> taskHandle);
 
@@ -15,12 +15,12 @@ namespace Photon.Framework.Packages
         public event PullPackageFunc OnPullApplicationPackage;
 
 
-        public void PushProjectPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        public void PushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
             OnPushProjectPackage?.Invoke(filename, taskHandle);
         }
 
-        public void PushApplicationPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        public void PushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
             OnPushApplicationPackage?.Invoke(filename, taskHandle);
         }

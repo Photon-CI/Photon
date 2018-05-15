@@ -1,13 +1,17 @@
 ﻿using Photon.Framework.Server;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Publishing.Tasks
 {
     internal class TestDeployTask : IDeployScript
     {
-        public async Task RunAsync(IServerDeployContext context)
+        public IServerDeployContext Context {get; set;}
+
+
+        public async Task RunAsync(CancellationToken token)
         {
-            var agents = context.RegisterAgents.Environment(context.EnvironmentName);
+            var agents = Context.RegisterAgents.Environment(Context.EnvironmentName);
 
             //...
         }

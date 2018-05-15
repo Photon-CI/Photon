@@ -20,7 +20,8 @@ namespace Photon.Agent.Internal.Session
         public GithubCommit Commit {get; set;}
 
 
-        public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId) : base(transceiver, serverSessionId, sessionClientId) {}
+        public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
+            : base(transceiver, serverSessionId, sessionClientId) {}
 
         public override async Task InitializeAsync()
         {
@@ -72,7 +73,7 @@ namespace Photon.Agent.Internal.Session
             var success = false;
 
             try {
-                await Domain.RunBuildTask(context);
+                await Domain.RunBuildTask(context, TokenSource.Token);
 
                 success = true;
             }
@@ -110,7 +111,7 @@ namespace Photon.Agent.Internal.Session
 
                 RepositoryHandle handle = null;
                 try {
-                    handle = GetRepositoryHandle(githubSource.CloneUrl, TimeSpan.FromMinutes(1))
+                    handle = GetRepositoryHandle(githubSource.CloneUrl, TimeSpan.FromMinutes(1), TokenSource.Token)
                         .GetAwaiter().GetResult();
 
                     handle.Username = githubSource.Username;
@@ -131,16 +132,17 @@ namespace Photon.Agent.Internal.Session
             throw new ApplicationException($"Unknown source type '{Project.SourceType}'!");
         }
 
-        private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout)
+        private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout, CancellationToken token = default(CancellationToken))
         {
             var repositorySource = PhotonAgent.Instance.RepositorySources.GetOrCreate(url);
 
-            using (var startTokenSource = new CancellationTokenSource(timeout)) {
-                while (!startTokenSource.IsCancellationRequested) {
+            using (var timeoutTokenSource = new CancellationTokenSource(timeout)) 
+            using (var joinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token)) {
+                while (!joinedTokenSource.IsCancellationRequested) {
                     if (repositorySource.TryBegin(out var handle))
                         return handle;
 
-                    await Task.Delay(200, startTokenSource.Token);
+                    await Task.Delay(200, joinedTokenSource.Token);
                 }
             }
 

@@ -29,7 +29,7 @@ namespace Photon.Framework.Domain
 
         public void RunDeployScript(IServerDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
-            deployScriptRegistry.ExecuteScript(context)
+            deployScriptRegistry.ExecuteScript(context, completeEvent.Token)
                 .ContinueWith(completeEvent.FromTask);
         }
     }

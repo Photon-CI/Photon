@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Projects;
+﻿using System.Threading;
+using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Framework.Variables;
 using System.Threading.Tasks;
@@ -20,8 +21,8 @@ namespace Photon.Framework.Domain
         void RunCommandLine(string command, params string[] args);
         Task RunCommandLineAsync(string command);
         Task RunCommandLineAsync(string command, params string[] args);
-        Task PushProjectPackageAsync(string filename);
-        Task PushApplicationPackageAsync(string filename);
+        Task PushProjectPackageAsync(string filename, CancellationToken token);
+        Task PushApplicationPackageAsync(string filename, CancellationToken token);
         Task<string> PullProjectPackageAsync(string id, string version);
         Task<string> PullApplicationPackageAsync(string id, string version);
     }
