@@ -18,13 +18,15 @@ namespace Photon.Agent.Internal
             return Agent.GetDeployTasks();
         }
 
-        public async Task RunBuildTask(AgentBuildContext context, CancellationToken token)
+        public async Task RunBuildTask(AgentBuildContext context, CancellationToken token = default(CancellationToken))
         {
+            var completeEvent = new RemoteTaskCompletionSource();
+            token.Register(completeEvent.SetCancelled);
+
             Sponsor.Register(context.Output);
             Sponsor.Register(context.Packages);
 
             try {
-                var completeEvent = new RemoteTaskCompletionSource(token);
                 Agent.RunBuildTask(context, completeEvent);
                 await completeEvent.Task;
             }
@@ -34,13 +36,15 @@ namespace Photon.Agent.Internal
             }
         }
 
-        public async Task RunDeployTask(AgentDeployContext context, CancellationToken token)
+        public async Task RunDeployTask(AgentDeployContext context, CancellationToken token = default(CancellationToken))
         {
+            var completeEvent = new RemoteTaskCompletionSource();
+            token.Register(completeEvent.SetCancelled);
+
             Sponsor.Register(context.Output);
             Sponsor.Register(context.Packages);
 
             try {
-                var completeEvent = new RemoteTaskCompletionSource(token);
                 Agent.RunDeployTask(context, completeEvent);
                 await completeEvent.Task;
             }

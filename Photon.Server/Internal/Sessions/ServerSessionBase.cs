@@ -222,16 +222,13 @@ namespace Photon.Server.Internal.Sessions
 
                 await projectPackages.Add(filename);
                 PushedProjectPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
-            }, taskHandle.Token)
-                .ContinueWith(taskHandle.FromTask, taskHandle.Token);
+            }).ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
-            Task.Run(async () => {
-                await applicationPackages.Add(filename);
-            }, taskHandle.Token)
-                .ContinueWith(taskHandle.FromTask, taskHandle.Token);
+            applicationPackages.Add(filename)
+                .ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
@@ -241,8 +238,7 @@ namespace Photon.Server.Internal.Sessions
                     throw new ApplicationException($"Project Package '{id}.{version}' not found!");
 
                 return await Task.FromResult(packageFilename);
-            }, taskHandle.Token)
-                .ContinueWith(taskHandle.FromTask, taskHandle.Token);
+            }).ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPullApplicationPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
@@ -252,8 +248,7 @@ namespace Photon.Server.Internal.Sessions
                     throw new ApplicationException($"Application Package '{id}.{version}' not found!");
 
                 return await Task.FromResult(packageFilename);
-            }, taskHandle.Token)
-                .ContinueWith(taskHandle.FromTask, taskHandle.Token);
+            }).ContinueWith(taskHandle.FromTask);
         }
     }
 }

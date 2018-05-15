@@ -8,39 +8,49 @@ namespace Photon.Framework.Domain
     public class RemoteTaskCompletionSource : MarshalByRefObject
     {
         private readonly TaskCompletionSource<object> taskEvent;
+        private bool isComplete;
 
-        public CancellationToken Token {get;}
         public Task Task => taskEvent.Task;
 
 
-        public RemoteTaskCompletionSource(CancellationToken token = default(CancellationToken))
+        public RemoteTaskCompletionSource()
         {
-            this.Token = token;
-
+            isComplete = false;
             taskEvent = new TaskCompletionSource<object>();
         }
 
         public void SetResult()
         {
+            if (isComplete) return;
+            isComplete = true;
+
             taskEvent.SetResult(null);
         }
 
         public void SetCancelled()
         {
+            if (isComplete) return;
+            isComplete = true;
+
             taskEvent.SetCanceled();
         }
 
         public void SetException(Exception error)
         {
+            if (isComplete) return;
+            isComplete = true;
+
             taskEvent.SetException(error);
         }
 
         public static async Task Run(Action<RemoteTaskCompletionSource, ISponsor> action, CancellationToken token = default(CancellationToken))
         {
             var sponsor = new ClientSponsor();
+            var taskHandle = new RemoteTaskCompletionSource();
+
+            token.Register(() => taskHandle.SetCancelled());
 
             try {
-                var taskHandle = new RemoteTaskCompletionSource(token);
                 sponsor.Register(taskHandle);
 
                 action(taskHandle, sponsor);
@@ -55,39 +65,48 @@ namespace Photon.Framework.Domain
     public class RemoteTaskCompletionSource<T> : MarshalByRefObject
     {
         private readonly TaskCompletionSource<T> taskEvent;
+        private bool isComplete;
 
-        public CancellationToken Token {get;}
         public Task<T> Task => taskEvent.Task;
 
 
-        public RemoteTaskCompletionSource(CancellationToken token = default(CancellationToken))
+        public RemoteTaskCompletionSource()
         {
-            this.Token = token;
-
             taskEvent = new TaskCompletionSource<T>();
         }
 
         public void SetResult(T result)
         {
+            if (isComplete) return;
+            isComplete = true;
+
             taskEvent.SetResult(result);
         }
 
         public void SetCancelled()
         {
+            if (isComplete) return;
+            isComplete = true;
+
             taskEvent.SetCanceled();
         }
 
         public void SetException(Exception error)
         {
+            if (isComplete) return;
+            isComplete = true;
+
             taskEvent.SetException(error);
         }
 
         public static async Task<T> Run(Action<RemoteTaskCompletionSource<T>, ISponsor> action, CancellationToken token = default(CancellationToken))
         {
             var sponsor = new ClientSponsor();
+            var taskHandle = new RemoteTaskCompletionSource<T>();
+
+            token.Register(() => taskHandle.SetCancelled());
 
             try {
-                var taskHandle = new RemoteTaskCompletionSource<T>(token);
                 sponsor.Register(taskHandle);
 
                 action(taskHandle, sponsor);

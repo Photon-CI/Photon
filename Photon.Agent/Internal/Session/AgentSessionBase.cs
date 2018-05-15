@@ -151,7 +151,7 @@ namespace Photon.Agent.Internal.Session
             };
 
             Transceiver.Send(packageRequest)
-                .GetResponseAsync(taskHandle.Token)
+                .GetResponseAsync()
                 .ContinueWith(taskHandle.FromTask);
         }
 
@@ -162,8 +162,8 @@ namespace Photon.Agent.Internal.Session
             };
 
             Transceiver.Send(packageRequest)
-                .GetResponseAsync(taskHandle.Token)
-                .ContinueWith(taskHandle.FromTask, taskHandle.Token);
+                .GetResponseAsync()
+                .ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
@@ -175,10 +175,10 @@ namespace Photon.Agent.Internal.Session
 
             Task.Run(async () => {
                 var response = await Transceiver.Send(packageRequest)
-                    .GetResponseAsync<ProjectPackagePullResponse>(taskHandle.Token);
+                    .GetResponseAsync<ProjectPackagePullResponse>();
 
                 return response.Filename;
-            }).ContinueWith(taskHandle.FromTask, taskHandle.Token);
+            }).ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPullApplicationPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)

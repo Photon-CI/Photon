@@ -20,7 +20,7 @@ namespace Photon.Communication
             completionEvent = new TaskCompletionSource<IResponseMessage>();
         }
 
-        public async Task<IResponseMessage> GetResponseAsync(CancellationToken token)
+        public async Task<IResponseMessage> GetResponseAsync(CancellationToken token = default(CancellationToken))
         {
             token.Register(() => completionEvent.SetCanceled());
 
@@ -32,18 +32,10 @@ namespace Photon.Communication
             return response;
         }
 
-        public async Task<IResponseMessage> GetResponseAsync()
-        {
-            return await GetResponseAsync(CancellationToken.None);
-        }
-
         public async Task<T> GetResponseAsync<T>(CancellationToken token)
             where T : class, IResponseMessage
         {
-            token.Register(() => {
-                try {completionEvent.SetCanceled();}
-                catch {}
-            });
+            token.Register(() => completionEvent.SetCanceled());
 
             var response = await completionEvent.Task;
 

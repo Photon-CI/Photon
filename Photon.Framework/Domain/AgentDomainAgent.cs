@@ -3,6 +3,7 @@ using Photon.Framework.Extensions;
 using Photon.Framework.Tasks;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace Photon.Framework.Domain
 {
@@ -38,13 +39,13 @@ namespace Photon.Framework.Domain
 
         public void RunBuildTask(IAgentBuildContext context, RemoteTaskCompletionSource completeEvent)
         {
-            buildTaskRegistry.ExecuteTask(context, completeEvent.Token)
+            buildTaskRegistry.ExecuteTask(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);
         }
 
         public void RunDeployTask(IAgentDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
-            deployTaskRegistry.ExecuteTask(context, completeEvent.Token)
+            deployTaskRegistry.ExecuteTask(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);
         }
     }
