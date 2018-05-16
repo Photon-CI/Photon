@@ -51,6 +51,7 @@ namespace Photon.Framework.Domain
 
                     if (!isInRole) {
                         // Task is not in agent roles
+                        completeEvent.SetResult();
                         return;
                     }
                 }
