@@ -1,7 +1,7 @@
-﻿using System;
-using Photon.Framework.Agent;
+﻿using Photon.Framework.Agent;
 using Photon.Framework.Extensions;
 using Photon.Framework.Tasks;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;

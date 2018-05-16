@@ -5,6 +5,7 @@ using Photon.Agent.Internal;
 using Photon.Framework.Extensions;
 using System;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Agent
@@ -13,10 +14,15 @@ namespace Photon.Agent
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
 
+        private static CancellationTokenSource tokenSource;
+        private static AgentService service;
+
 
         public static int Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += Domain_OnUnhandledException;
+
+            tokenSource = new CancellationTokenSource();
 
             try {
                 XmlConfigurator.Configure();
@@ -31,6 +37,12 @@ namespace Photon.Agent
                 PhotonAgent.Instance?.Dispose();
                 LogManager.Flush(3000);
             }
+        }
+
+        public static void Shutdown()
+        {
+            tokenSource.Cancel();
+            service?.Stop();
         }
 
         private static async Task<int> Run(string[] args)
@@ -48,9 +60,9 @@ namespace Photon.Agent
             if (arguments.Debug)
                 return RunAsConsole();
 
-            ServiceBase.Run(new ServiceBase[] {
-                new AgentService(),
-            });
+            service = new AgentService();
+
+            ServiceBase.Run(new ServiceBase[] {service});
 
             return 0;
         }
@@ -61,13 +73,32 @@ namespace Photon.Agent
             Console.WriteLine("Photon Agent");
             Console.ResetColor();
 
+            Console.CancelKeyPress += (o, e) => {
+                tokenSource.Cancel();
+                e.Cancel = true;
+            };
+
             try {
                 PhotonAgent.Instance.Start();
 
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("Agent Started");
                 Console.ResetColor();
-                Console.ReadKey(true);
+                Console.WriteLine("Press [x] to exit...");
+
+                ConsoleKey? key;
+                do {
+                    key = null;
+
+                    if (Console.KeyAvailable)
+                        key = Console.ReadKey(true).Key;
+
+                    try {
+                        Task.Delay(200, tokenSource.Token)
+                            .GetAwaiter().GetResult();
+                    }
+                    catch (TaskCanceledException) {}
+                } while (!tokenSource.IsCancellationRequested && (!key.HasValue || key.Value != ConsoleKey.X));
 
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Agent Stopping...");
@@ -96,7 +127,6 @@ namespace Photon.Agent
 
                 Console.WriteLine();
                 Console.ResetColor();
-                Console.WriteLine("Press any key to exit...");
                 Console.ReadKey(true);
 
                 return 2;

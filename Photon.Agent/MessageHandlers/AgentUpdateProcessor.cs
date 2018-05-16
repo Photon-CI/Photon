@@ -47,12 +47,12 @@ namespace Photon.Agent.MessageHandlers
         //    }
         //}
 
-        private async void BeginInstall(string updatePath, string msiFilename)
+        private void BeginInstall(string updatePath, string msiFilename)
         {
             // TODO: Verify MSI?
 
             try {
-                await PhotonAgent.Instance.Shutdown(TimeSpan.FromSeconds(30));
+                Program.Shutdown(); // TimeSpan.FromSeconds(20)
             }
             catch (Exception error) {
                 Log.Error("An error occurred while shutting down!", error);

@@ -11,14 +11,10 @@ namespace Photon.Framework.Packages
         /// Creates an Application Package using the specified
         /// definition file.
         /// </summary>
-        /// <param name="definitionFilename">The file name of the package definition.</param>
         /// <param name="version">The version of the package to create.</param>
         /// <param name="outputFilename">The file name of the output package.</param>
-        public static async Task CreatePackage(string definitionFilename, string version, string outputFilename)
+        public static async Task CreatePackage(PackageDefinition definition, string rootPath, string version, string outputFilename)
         {
-            var definition = PackageTools.LoadDefinition<PackageDefinition>(definitionFilename);
-            var definitionPath = Path.GetDirectoryName(definitionFilename);
-
             var outputFilenameFull = Path.GetFullPath(outputFilename);
             var outputPath = Path.GetDirectoryName(outputFilenameFull);
 
@@ -34,7 +30,7 @@ namespace Photon.Framework.Packages
                 foreach (var fileDefinition in definition.Files) {
                     var destPath = Path.Combine("bin", fileDefinition.Destination);
 
-                    await PackageTools.AddFiles(archive, definitionPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
+                    await PackageTools.AddFiles(archive, rootPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
                 }
             });
         }

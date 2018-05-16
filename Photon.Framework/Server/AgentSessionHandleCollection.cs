@@ -57,15 +57,6 @@ namespace Photon.Framework.Server
             var taskList = new List<Task>();
             foreach (var task in taskNames) {
                 foreach (var session in agentSessionList) {
-                    // TODO: Do this without making a request to the agent
-                    //var taskRoles = session.GetBuildTaskRoles(task);
-                    //var agentRoles = session.Agent?.Roles?.ToArray();
-
-                    //if (taskRoles.Any()) {
-                    //    if (!taskRoles.ContainsAny(agentRoles, StringComparer.OrdinalIgnoreCase))
-                    //        continue;
-                    //}
-
                     taskList.Add(session.RunTaskAsync(task, token));
                 }
             }

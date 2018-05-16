@@ -64,6 +64,7 @@
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="IFrameworkAssembly.cs" />
     <Compile Include="JsonSettings.cs" />
+    <Compile Include="Packages\ApplicationPackageUtility.cs" />
     <Compile Include="Packages\DomainPackageClient.cs" />
     <Compile Include="Packages\PackageReference.cs" />
     <Compile Include="Pooling\IReferenceItem.cs" />

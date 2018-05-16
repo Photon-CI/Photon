@@ -1,7 +1,7 @@
-﻿using System.Threading;
-using Photon.Framework.Projects;
+﻿using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Framework.Variables;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain

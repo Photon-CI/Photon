@@ -45,7 +45,6 @@ namespace Photon.Server.HttpHandlers.Api.Build
                     GitRefspec = _gitRefspec,
                     BuildNumber = buildNumber,
                     Roles = startInfo.Roles,
-                    //BuildTasks = ,
                 };
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
