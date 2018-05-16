@@ -47,8 +47,8 @@ namespace Photon.Framework.Domain
         public void RunDeployTask(IAgentDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
             if (deployTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc)) {
-                if (taskDesc.Roles.Any()) {
-                    var isInRole = context.Agent.Roles?.ContainsAny(taskDesc.Roles) ?? false;
+                if (taskDesc.Roles?.Any() ?? false) {
+                    var isInRole = context.Agent?.Roles?.ContainsAny(taskDesc.Roles) ?? false;
 
                     if (!isInRole) {
                         // Task is not in agent roles
@@ -61,7 +61,7 @@ namespace Photon.Framework.Domain
             context.Output.Append("Running deployment task ", ConsoleColor.DarkCyan)
                 .Append(context.TaskName, ConsoleColor.Cyan)
                 .Append(" on agent ", ConsoleColor.DarkCyan)
-                .Append(context.Agent.Name, ConsoleColor.Cyan)
+                .Append(context.Agent?.Name, ConsoleColor.Cyan)
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
             deployTaskRegistry.ExecuteTask(context, CancellationToken.None)
