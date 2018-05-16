@@ -31,7 +31,9 @@ namespace Photon.Server.HttpHandlers.Api.Server
                     await HttpContext.Request.InputStream.CopyToAsync(fileStream);
                 }
 
-                BeginInstall(updatePath, msiFilename);
+                var _ = Task.Delay(100).ContinueWith(t => {
+                    BeginInstall(updatePath, msiFilename);
+                });
 
                 return Response.Ok().SetText("Shutting down and performing update...");
             }

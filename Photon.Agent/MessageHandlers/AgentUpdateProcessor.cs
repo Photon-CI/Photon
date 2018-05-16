@@ -28,7 +28,9 @@ namespace Photon.Agent.MessageHandlers
 
             File.Move(requestMessage.Filename, msiFilename);
 
-            BeginInstall(updatePath, msiFilename);
+            var _ = Task.Delay(100).ContinueWith(t => {
+                BeginInstall(updatePath, msiFilename);
+            });
 
             var response = new AgentUpdateResponse();
 
