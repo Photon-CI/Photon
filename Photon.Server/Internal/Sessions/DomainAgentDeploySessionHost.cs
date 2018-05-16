@@ -19,12 +19,14 @@ namespace Photon.Server.Internal.Sessions
         {
             var message = new DeploySessionBeginRequest {
                 DeploymentNumber = session.DeploymentNumber,
+                Project = session.Project,
                 ServerSessionId = session.SessionId,
                 SessionClientId = SessionClientId,
                 ProjectPackageId = session.ProjectPackageId,
                 ProjectPackageVersion = session.ProjectPackageVersion,
                 Variables = session.Variables,
                 EnvironmentName = session.EnvironmentName,
+                AgentRoles = Agent.Roles?.ToArray(),
             };
 
             var response = await MessageClient.Send(message)

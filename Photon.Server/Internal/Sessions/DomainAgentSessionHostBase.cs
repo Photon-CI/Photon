@@ -17,9 +17,9 @@ namespace Photon.Server.Internal.Sessions
 
         private const int HandshakeTimeoutSec = 30;
 
-        protected readonly CancellationToken Token;
-        private readonly ServerAgent agent;
         private readonly ClientSponsor sponsor;
+        protected CancellationToken Token {get;}
+        protected ServerAgent Agent {get;}
         public DomainAgentSessionClient SessionClient {get;}
         public MessageClient MessageClient {get;}
 
@@ -30,7 +30,7 @@ namespace Photon.Server.Internal.Sessions
 
         protected DomainAgentSessionHostBase(IServerSession sessionBase, ServerAgent agent, CancellationToken token)
         {
-            this.agent = agent;
+            this.Agent = agent;
             this.Token = token;
 
             Tasks = new TaskRunnerManager();
@@ -82,11 +82,11 @@ namespace Photon.Server.Internal.Sessions
 
         private async Task ConnectToAgent(CancellationToken token)
         {
-            var agentAddress = $"{agent.TcpHost}:{agent.TcpPort}";
+            var agentAddress = $"{Agent.TcpHost}:{Agent.TcpPort}";
             Log.Debug($"Connecting to TCP Agent '{agentAddress}'...");
 
             try {
-                await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
+                await MessageClient.ConnectAsync(Agent.TcpHost, Agent.TcpPort, Token);
                 Log.Info($"Connected to TCP Agent '{agentAddress}'.");
 
                 Log.Debug($"Performing TCP handshake... [{agentAddress}]");

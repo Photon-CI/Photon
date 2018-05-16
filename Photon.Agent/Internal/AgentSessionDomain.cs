@@ -3,17 +3,18 @@ using Photon.Framework.Domain;
 using Photon.Library.Session;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework.Tasks;
 
 namespace Photon.Agent.Internal
 {
     internal class AgentSessionDomain : SessionDomainBase<AgentDomainAgent>
     {
-        public string[] GetBuildTasks()
+        public TaskDescription[] GetBuildTasks()
         {
             return Agent.GetBuildTasks();
         }
 
-        public string[] GetDeployTasks()
+        public TaskDescription[] GetDeployTasks()
         {
             return Agent.GetDeployTasks();
         }

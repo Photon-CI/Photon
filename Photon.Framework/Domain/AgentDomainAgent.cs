@@ -27,14 +27,14 @@ namespace Photon.Framework.Domain
             deployTaskRegistry.ScanAssembly(assembly);
         }
 
-        public string[] GetBuildTasks()
+        public TaskDescription[] GetBuildTasks()
         {
-            return buildTaskRegistry.AllNames.ToArray();
+            return buildTaskRegistry.AllDescriptions.ToArray();
         }
 
-        public string[] GetDeployTasks()
+        public TaskDescription[] GetDeployTasks()
         {
-            return deployTaskRegistry.AllNames.ToArray();
+            return deployTaskRegistry.AllDescriptions.ToArray();
         }
 
         public void RunBuildTask(IAgentBuildContext context, RemoteTaskCompletionSource completeEvent)
@@ -45,6 +45,17 @@ namespace Photon.Framework.Domain
 
         public void RunDeployTask(IAgentDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
+            if (deployTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc)) {
+                if (taskDesc.Roles.Any()) {
+                    var isInRole = context.AgentRoles?.ContainsAny(taskDesc.Roles) ?? false;
+
+                    if (!isInRole) {
+                        // Task is not in agent roles
+                        return;
+                    }
+                }
+            }
+
             deployTaskRegistry.ExecuteTask(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);
         }

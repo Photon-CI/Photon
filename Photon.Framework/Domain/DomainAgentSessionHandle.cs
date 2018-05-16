@@ -7,7 +7,7 @@ namespace Photon.Framework.Domain
 {
     public class DomainAgentSessionHandle : IDisposable
     {
-        public ServerAgent Agent {get;}
+        public ServerAgent Agent { get; }
         public DomainAgentSessionClient Client {get; private set;}
 
 
@@ -44,11 +44,10 @@ namespace Photon.Framework.Domain
             }, token);
         }
 
-        public async Task<string[]> GetTaskRolesAsync(string taskName, CancellationToken token = default(CancellationToken))
-        {
-            return await RemoteTaskCompletionSource<string[]>.Run((task, sponsor) => {
-                Client.GetTaskRolesAsync(taskName, task);
-            }, token);
-        }
+        //public string[] GetBuildTaskRoles(string taskName)
+        //{
+        //    return (context as IServerBuildContext)?.BuildTasks?
+        //        .FirstOrDefault(x => string.Equals(x.Name, taskName, StringComparison.OrdinalIgnoreCase))?.Roles;
+        //}
     }
 }
