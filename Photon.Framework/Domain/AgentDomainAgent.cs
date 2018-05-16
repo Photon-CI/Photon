@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Agent;
+﻿using System;
+using Photon.Framework.Agent;
 using Photon.Framework.Extensions;
 using Photon.Framework.Tasks;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace Photon.Framework.Domain
         {
             if (deployTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc)) {
                 if (taskDesc.Roles.Any()) {
-                    var isInRole = context.AgentRoles?.ContainsAny(taskDesc.Roles) ?? false;
+                    var isInRole = context.Agent.Roles?.ContainsAny(taskDesc.Roles) ?? false;
 
                     if (!isInRole) {
                         // Task is not in agent roles
@@ -56,6 +57,12 @@ namespace Photon.Framework.Domain
                     }
                 }
             }
+
+            context.Output.Append("Running deployment task ", ConsoleColor.DarkCyan)
+                .Append(context.TaskName, ConsoleColor.Cyan)
+                .Append(" on agent ", ConsoleColor.DarkCyan)
+                .Append(context.Agent.Name, ConsoleColor.Cyan)
+                .AppendLine("...", ConsoleColor.DarkCyan);
 
             deployTaskRegistry.ExecuteTask(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);
