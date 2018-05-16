@@ -285,6 +285,12 @@
       <Component Id="Content_ActiveSessions.js" Guid="639f1873-03fc-4d91-b860-d8aca6768b79">
         <File Id="Content_ActiveSessions.js" Name="ActiveSessions.js" Source="$(var.PhotonServer_TargetDir)Content\ActiveSessions.js" />
       </Component>
+      <Component Id="Content_ansi_up.js" Guid="b0fe2a0a-ed97-4309-8a50-a4e5b2622e41">
+        <File Id="Content_ansi_up.js" Name="ansi_up.js" Source="$(var.PhotonServer_TargetDir)Content\ansi_up.js" />
+      </Component>
+      <Component Id="Content_SessionOutput.js" Guid="da535f07-5d27-40be-8746-be12c0ba6d5f">
+        <File Id="Content_SessionOutput.js" Name="SessionOutput.js" Source="$(var.PhotonServer_TargetDir)Content\SessionOutput.js" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
