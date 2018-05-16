@@ -36,6 +36,7 @@ namespace Photon.Agent.Internal.Session
         {
             var context = new AgentBuildContext {
                 Project = Project,
+                Agent = Agent,
                 AssemblyFilename = AssemblyFilename,
                 GitRefspec = GitRefspec,
                 TaskName = taskName,

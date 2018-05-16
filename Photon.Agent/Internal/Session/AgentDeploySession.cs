@@ -17,7 +17,6 @@ namespace Photon.Agent.Internal.Session
         public string ProjectPackageVersion {get; set;}
         public string ApplicationsDirectory {get; set;}
         public string EnvironmentName {get; set;}
-        public string[] AgentRoles {get; set;}
 
 
         public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId) : base(transceiver, serverSessionId, sessionClientId)
@@ -99,7 +98,7 @@ namespace Photon.Agent.Internal.Session
                 Packages = PackageClient,
                 ServerVariables = ServerVariables,
                 EnvironmentName = EnvironmentName,
-                AgentRoles = AgentRoles,
+                Agent = Agent,
             };
 
             await Domain.RunDeployTask(context, CancellationToken.None);

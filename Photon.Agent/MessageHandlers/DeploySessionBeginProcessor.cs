@@ -20,7 +20,7 @@ namespace Photon.Agent.MessageHandlers
                 ProjectPackageId = requestMessage.ProjectPackageId,
                 ProjectPackageVersion = requestMessage.ProjectPackageVersion,
                 ServerVariables = requestMessage.Variables,
-                AgentRoles = requestMessage.AgentRoles,
+                Agent = requestMessage.Agent,
             };
 
             PhotonAgent.Instance.Sessions.BeginSession(session);

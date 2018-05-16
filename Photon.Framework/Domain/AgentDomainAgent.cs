@@ -44,11 +44,16 @@ namespace Photon.Framework.Domain
                 .ContinueWith(completeEvent.FromTask);
         }
 
+        //class TaskRoleException : ApplicationException
+        //{
+        //    //
+        //}
+
         public void RunDeployTask(IAgentDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
             if (deployTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc)) {
                 if (taskDesc.Roles?.Any() ?? false) {
-                    var isInRole = context.Agent?.Roles?.ContainsAny(taskDesc.Roles) ?? false;
+                    var isInRole = context.Agent?.Roles?.ContainsAny(taskDesc.Roles, StringComparer.OrdinalIgnoreCase) ?? false;
 
                     if (!isInRole) {
                         // Task is not in agent roles

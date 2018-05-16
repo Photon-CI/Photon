@@ -1,5 +1,6 @@
 ﻿using Photon.Communication.Messages;
 using Photon.Framework.Projects;
+using Photon.Framework.Server;
 using Photon.Framework.Variables;
 
 namespace Photon.Library.TcpMessages
@@ -15,6 +16,6 @@ namespace Photon.Library.TcpMessages
         public string ProjectPackageVersion {get; set;}
         public VariableSetCollection Variables {get; set;}
         public string EnvironmentName {get; set;}
-        public string[] AgentRoles {get; set;}
+        public ServerAgent Agent {get; set;}
     }
 }

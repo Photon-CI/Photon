@@ -4,6 +4,7 @@ using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
+using Photon.Framework.Server;
 using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.TcpMessages;
@@ -29,6 +30,7 @@ namespace Photon.Agent.Internal.Session
         public string ContentDirectory {get;}
         public string BinDirectory {get;}
         public Project Project {get; set;}
+        public ServerAgent Agent {get; set;}
         public string AssemblyFilename {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
