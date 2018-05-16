@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework.Extensions;
 
 namespace Photon.Framework.Server
 {
@@ -47,12 +48,26 @@ namespace Photon.Framework.Server
 
         public async Task RunTasksAsync(params string[] taskNames)
         {
+            await RunTasksAsync(taskNames, CancellationToken.None);
+        }
+
+        public async Task RunTasksAsync(string[] taskNames, CancellationToken token)
+        {
             if (agentSessionList == null) return;
 
             var taskList = new List<Task>();
             foreach (var task in taskNames) {
                 foreach (var session in agentSessionList) {
-                    taskList.Add(session.RunTaskAsync(task, CancellationToken.None));
+                    // TODO: Do this without making a request to the agent
+                    var taskRoles = await session.GetTaskRolesAsync(task, token);
+                    var agentRoles = session.Agent?.Roles?.ToArray();
+
+                    if (taskRoles.Any()) {
+                        if (!taskRoles.ContainsAny(agentRoles, StringComparer.OrdinalIgnoreCase))
+                            continue;
+                    }
+
+                    taskList.Add(session.RunTaskAsync(task, token));
                 }
             }
 

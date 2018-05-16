@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication
@@ -32,6 +33,7 @@ namespace Photon.Communication
             Processor = new MessageProcessor(this, registry);
             messageReceiver = new MessageReceiver();
 
+            messageSender.ThreadError += MessageSender_OnThreadError;
             messageReceiver.MessageReceived += MessageReceiver_MessageReceived;
             messageReceiver.ThreadException += MessageReceiver_OnThreadException;
         }
@@ -142,6 +144,11 @@ namespace Photon.Communication
         private void MessageReceiver_OnThreadException(object sender, UnhandledExceptionEventArgs e)
         {
             OnThreadException(e.ExceptionObject);
+        }
+
+        private void MessageSender_OnThreadError(object sender, ThreadExceptionEventArgs e)
+        {
+            OnThreadException(e.Exception);
         }
 
         private static string UnfoldMessages(Exception error)

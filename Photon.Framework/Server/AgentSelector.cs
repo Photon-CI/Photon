@@ -68,7 +68,7 @@ namespace Photon.Framework.Server
         {
             var sessionClient = context.ConnectionFactory.RequestConnection(agent);
 
-            var sessionHandle = new DomainAgentSessionHandle(sessionClient);
+            var sessionHandle = new DomainAgentSessionHandle(agent, sessionClient);
             context.agentSessions.Add(sessionHandle);
             return sessionHandle;
         }

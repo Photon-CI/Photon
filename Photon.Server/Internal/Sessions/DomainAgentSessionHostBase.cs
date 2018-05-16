@@ -80,7 +80,7 @@ namespace Photon.Server.Internal.Sessions
                 .ContinueWith(taskHandle.FromTask, Token);
         }
 
-        private async Task<object> ConnectToAgent(CancellationToken token)
+        private async Task ConnectToAgent(CancellationToken token)
         {
             var agentAddress = $"{agent.TcpHost}:{agent.TcpPort}";
             Log.Debug($"Connecting to TCP Agent '{agentAddress}'...");
@@ -115,7 +115,6 @@ namespace Photon.Server.Internal.Sessions
             await OnBeginSession(token);
 
             Tasks.Start();
-            return null;
         }
 
         private void OnCancelSession()

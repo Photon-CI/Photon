@@ -3,12 +3,15 @@ using Photon.Communication.Packets;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
     internal class MessageSender : IDisposable
     {
+        public event ThreadExceptionEventHandler ThreadError;
+
         private readonly object startStopLock;
         private PacketSender packetSender;
 
@@ -41,6 +44,7 @@ namespace Photon.Communication
             writer = new BinaryWriter(stream, Encoding.UTF8, true);
 
             packetSender = new PacketSender(writer, 4096);
+            packetSender.ThreadError += PacketSender_ThreadError;
             packetSender.Start();
         }
 
@@ -57,6 +61,16 @@ namespace Photon.Communication
         public void Send(IMessage message)
         {
             packetSender.Enqueue(message);
+        }
+
+        protected void OnThreadError(Exception error)
+        {
+            ThreadError?.Invoke(this, new ThreadExceptionEventArgs(error));
+        }
+
+        private void PacketSender_ThreadError(object sender, ThreadExceptionEventArgs e)
+        {
+            OnThreadError(e.Exception);
         }
     }
 }

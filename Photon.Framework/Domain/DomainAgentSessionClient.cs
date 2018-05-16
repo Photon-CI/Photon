@@ -5,6 +5,7 @@ namespace Photon.Framework.Domain
     public delegate void SessionBeginFunc(RemoteTaskCompletionSource taskHandle);
     public delegate void SessionReleaseFunc(RemoteTaskCompletionSource taskHandle);
     public delegate void SessionRunTaskFunc(string taskName, RemoteTaskCompletionSource taskHandle);
+    public delegate void SessionGetTaskRolesFunc(string taskName, RemoteTaskCompletionSource<string[]> taskHandle);
     public delegate void SessionDisposedFunc();
 
     public class DomainAgentSessionClient : MarshalByRefObject
@@ -13,6 +14,7 @@ namespace Photon.Framework.Domain
         public event SessionBeginFunc OnSessionBegin;
         public event SessionReleaseFunc OnSessionRelease;
         public event SessionRunTaskFunc OnSessionRunTask;
+        public event SessionGetTaskRolesFunc OnSessionGetTaskRoles;
         public event SessionDisposedFunc OnSessionDisposed;
 
 
@@ -34,6 +36,11 @@ namespace Photon.Framework.Domain
         public void RunTaskAsync(string taskName, RemoteTaskCompletionSource taskHandle)
         {
             OnSessionRunTask?.Invoke(taskName, taskHandle);
+        }
+
+        public void GetTaskRolesAsync(string taskName, RemoteTaskCompletionSource<string[]> taskHandle)
+        {
+            OnSessionGetTaskRoles?.Invoke(taskName, taskHandle);
         }
 
         public void Dispose()
