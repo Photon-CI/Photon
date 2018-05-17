@@ -11,7 +11,10 @@ namespace Photon.Server.HttpHandlers.Api
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
-            return await Task.FromResult(Response.File(Configuration.ProjectsFile));
+            var name = Path.GetFileName(Configuration.ProjectsFile);
+
+            return Response.File(Configuration.ProjectsFile)
+                .SetHeader("Content-Disposition", $"attachment; filename={name}");
         }
 
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)

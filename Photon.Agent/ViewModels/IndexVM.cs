@@ -11,7 +11,7 @@ namespace Photon.Agent.ViewModels
         public string Url {get; set;}
 
 
-        public override void Build()
+        public void Build()
         {
             var config = PhotonAgent.Instance.Definition;
 

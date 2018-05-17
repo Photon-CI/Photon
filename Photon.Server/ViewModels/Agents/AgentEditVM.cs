@@ -30,7 +30,7 @@ namespace Photon.Server.ViewModels.Agents
                 .Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public override void Build()
+        public void Build()
         {
             IsNew = string.IsNullOrEmpty(AgentId);
 
@@ -64,7 +64,7 @@ namespace Photon.Server.ViewModels.Agents
             if (!string.Equals(AgentId_Source, AgentId, StringComparison.Ordinal))
                 prevId = AgentId_Source;
 
-            PhotonServer.Instance.Agents.SaveAgent(agent, prevId);
+            PhotonServer.Instance.Agents.Save(agent, prevId);
         }
     }
 }

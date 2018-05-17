@@ -1,6 +1,5 @@
 ﻿using Photon.Library;
 using PiServerLite.Http.Handlers;
-using System;
 
 namespace Photon.Server.HttpHandlers.Packages
 {
@@ -14,12 +13,12 @@ namespace Photon.Server.HttpHandlers.Packages
                 PageTitle = "Photon Server Packages",
             };
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            //try {
+            //    vm.Build();
+            //}
+            //catch (Exception error) {
+            //    vm.Errors.Add(error);
+            //}
 
             return Response.View("Packages\\Index.html", vm);
         }

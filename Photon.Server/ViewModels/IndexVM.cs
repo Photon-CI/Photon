@@ -11,7 +11,7 @@ namespace Photon.Server.ViewModels
         public string Url {get; set;}
 
 
-        public override void Build()
+        public void Build()
         {
             Name = PhotonServer.Instance.ServerConfiguration.Value.Name;
             Version = Configuration.Version;

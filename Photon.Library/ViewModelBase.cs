@@ -17,6 +17,6 @@ namespace Photon.Library
             Errors = new List<Exception>();
         }
 
-        public virtual void Build() {}
+        //public virtual void Build() {}
     }
 }

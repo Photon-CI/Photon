@@ -1,6 +1,5 @@
 ﻿using Photon.Library;
 using PiServerLite.Http.Handlers;
-using System;
 
 namespace Photon.Server.HttpHandlers.Variables
 {
@@ -14,12 +13,12 @@ namespace Photon.Server.HttpHandlers.Variables
                 PageTitle = "Photon Server Variables",
             };
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            //try {
+            //    vm.Build();
+            //}
+            //catch (Exception error) {
+            //    vm.Errors.Add(error);
+            //}
 
             return Response.View("Variables\\Index.html", vm);
         }

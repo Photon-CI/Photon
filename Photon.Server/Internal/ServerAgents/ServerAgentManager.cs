@@ -42,7 +42,7 @@ namespace Photon.Server.Internal.ServerAgents
             agentsDocument.Remove(d => Document_OnRemove(d, id));
         }
 
-        public void SaveAgent(ServerAgent agent, string prevId = null)
+        public void Save(ServerAgent agent, string prevId = null)
         {
             if (prevId != null) {
                 agentCollection.TryRemove(prevId, out var _);
@@ -60,7 +60,7 @@ namespace Photon.Server.Internal.ServerAgents
             agentsDocument.Update(d => Document_OnUpdate(d, agent, prevId));
         }
 
-        private void Document_OnLoad(JObject document)
+        private void Document_OnLoad(dynamic document)
         {
             if (!(document.GetValue("agents") is JArray agentArray)) return;
 

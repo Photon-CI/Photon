@@ -49,8 +49,14 @@
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.XmlTransform, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.2\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Core, Version=2.13.0.824, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\NuGet.Core.2.13.0\lib\net40-Client\NuGet.Core.dll</HintPath>
     </Reference>
     <Reference Include="PiServerLite, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\PiServerLite.0.2.3\lib\net45\PiServerLite.dll</HintPath>
@@ -64,12 +70,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="HttpHandlers\Agents\AgentEditHandler.cs" />
+    <Compile Include="HttpHandlers\Agents\AgentEditJsonHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\AgentDeleteHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\AgentVersionHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Agent\JsonHandler.cs" />
     <Compile Include="HttpHandlers\Api\ProjectsHandler.cs" />
     <Compile Include="HttpHandlers\Api\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
@@ -89,6 +98,8 @@
     <Compile Include="HttpHandlers\Api\Session\OutputHandler.cs" />
     <Compile Include="HttpHandlers\Api\VersionHandler.cs" />
     <Compile Include="HttpHandlers\Agents\AgentIndexHandler.cs" />
+    <Compile Include="HttpHandlers\Projects\ProjectJsonHandler.cs" />
+    <Compile Include="HttpHandlers\Projects\ProjectEditHandler.cs" />
     <Compile Include="HttpHandlers\Projects\ProjectIndexHandler.cs" />
     <Compile Include="HttpHandlers\Session\DetailsHandler.cs" />
     <Compile Include="HttpHandlers\Variables\VariableIndexHandler.cs" />
@@ -145,8 +156,10 @@
     <Compile Include="HttpHandlers\Api\Deploy\DeployStartHandler.cs" />
     <Compile Include="HttpHandlers\IndexHandler.cs" />
     <Compile Include="ViewModels\Agents\AgentEditVM.cs" />
+    <Compile Include="ViewModels\Agents\AgentEditJsonVM.cs" />
     <Compile Include="ViewModels\Agents\AgentIndexVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
+    <Compile Include="ViewModels\Projects\ProjectEditVM.cs" />
     <Compile Include="ViewModels\Projects\ProjectIndexVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
   </ItemGroup>
@@ -164,6 +177,15 @@
       <DependentUpon>App.config</DependentUpon>
     </None>
     <Content Include="Content\ansi_up.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\jsoneditor-5.15.0\img\jsoneditor-icons.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\jsoneditor-5.15.0\jsoneditor.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\jsoneditor-5.15.0\jsoneditor.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\SessionOutput.js">
@@ -238,6 +260,9 @@
     <Content Include="Views\Agents\Edit.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\Agents\EditJson.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Configuration.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -254,6 +279,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Projects\Edit.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Projects\Json.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Projects\Index.html">

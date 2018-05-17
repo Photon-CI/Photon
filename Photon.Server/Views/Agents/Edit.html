@@ -90,6 +90,11 @@
 {{#EndStyle}}
 
 <div class="container">
+    <div class="float-right">
+        <a href="{{#Url agent/edit/json}}?id={{&AgentId}}">
+            Edit JSON <i class="fas fa-code"></i>
+        </a>
+    </div>
     <h4>{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Agent</h4>
     <hr style="margin: 2px 0 8px 0" />
     {{#If Errors}}

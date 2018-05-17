@@ -1,0 +1,83 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script src="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
+<script>
+    var editor;
+
+    $(function () {
+        $('#layoutNavbarContent [data-link="agents"]').addClass('active');
+
+        var options = {
+            modes: ['code', 'tree']
+        };
+
+        var container = document.getElementById("jsoneditor");
+        editor = new JSONEditor(container, options);
+
+        onLoad();
+    });
+
+    var agentJsonUrl = '{{#Url api/agent/json}}?id={{&AgentId}}';
+
+    function onLoad() {
+        $.ajax({
+            url: agentJsonUrl,
+            dataType: 'json',
+            method: 'get'
+        }).done(function(data) {
+            editor.set(data);
+        }).fail(function() {
+            alert('Failed to load agent JSON!');
+        });
+    }
+
+    function onSave() {
+        var json = editor.get();
+
+        $.ajax({
+            url: agentJsonUrl,
+            method: 'post',
+            data: JSON.stringify(json)
+        }).done(function() {
+            alert('Saved Successfully!');
+        }).fail(function() {
+            alert('Failed to save agent JSON!');
+        });
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<link href="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
+<style>
+    .layout-content {
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    #jsoneditor {
+        flex: 1;
+    }
+</style>
+{{#EndStyle}}
+
+<div class="bg-dark">
+    <div class="row">
+        <div class="col-12 clearfix">
+            <div class="float-right" style="padding: 4px">
+                <button type="button" class="btn btn-sm btn-primary" onclick="onSave()">
+                    Save <i class="fas fa-save"></i>
+                </button>
+            </div>
+            <a href="{{#Url agent/edit}}?id={{&AgentId}}" class="btn btn-sm btn-secondary float-left" style="margin: 4px">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h4 class="text-light" style="line-height: 36px; margin: 0">Edit Agent JSON</h4>
+        </div>
+    </div>
+</div>
+
+<div id="jsoneditor"></div>

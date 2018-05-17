@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Photon.Framework.Extensions;
 using System;
 using System.IO;
@@ -16,50 +17,49 @@ namespace Photon.Server.Internal
         {
             Serializer = new JsonSerializer {
                 Formatting = Formatting.Indented,
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
             };
         }
 
-        public void Load(Action<JObject> loadAction)
+        public void Load(Action<dynamic> loadAction)
         {
             if (!File.Exists(Filename)) return;
 
             using (var stream = File.Open(Filename, FileMode.Open, FileAccess.Read)) {
-                var document = Serializer.Deserialize(stream);
+                dynamic document = Serializer.Deserialize(stream);
 
                 loadAction?.Invoke(document);
             }
         }
 
-        public void Update(Action<JObject> updateAction)
+        public void Update(Action<dynamic> updateAction)
         {
-            var path = Path.GetDirectoryName(Configuration.ServerFile);
+            var path = Path.GetDirectoryName(Filename);
 
             if (path != null && !Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
-            using (var stream = File.Open(Configuration.ServerFile, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
-                var serializer = new JsonSerializer();
-                JObject document = serializer.Deserialize(stream, true) ?? new JObject();
+            using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
+                dynamic document = Serializer.Deserialize(stream, true);
 
                 updateAction(document);
 
                 stream.SetLength(0);
-                serializer.Serialize(stream, document);
+                JsonSerializerExtensions.Serialize(Serializer, stream, document);
             }
         }
 
-        public void Remove(Func<JObject, bool> removeAction)
+        public void Remove(Func<dynamic, bool> removeAction)
         {
             if (!File.Exists(Filename)) return;
 
             using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
-                var serializer = new JsonSerializer();
-                JObject document = serializer.Deserialize(stream, true) ?? new JObject();
+                JObject document = Serializer.Deserialize(stream, true);
 
                 if (!removeAction(document)) return;
 
                 stream.SetLength(0);
-                serializer.Serialize(stream, document);
+                Serializer.Serialize(stream, document);
             }
         }
     }

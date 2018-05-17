@@ -1,0 +1,99 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="projects"]').addClass('active');
+    });
+
+    function onDeleteProject() {
+        $.ajax({
+            url: '{{#Url api/project/delete}}?id={{&ProjectId}}',
+            method: 'POST'
+        }).done(function() {
+            document.location = '{{#Url projects}}';
+        }).fail(function() {
+            alert('Failed to delete Project!');
+        });
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .layout-content {
+        padding: 12px 0;
+    }
+</style>
+{{#EndStyle}}
+
+<div class="container">
+    <h4>{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Project</h4>
+    <hr style="margin: 2px 0 8px 0" />
+    {{#If Errors}}
+    <div class="alert alert-danger">
+        <ul>
+            {{#Each Errors.error}}
+            <li>{{error.Message}}</li>
+            {{#EndEach}}
+        </ul>
+    </div>
+    {{#EndIf}}
+    <form method="post">
+        <input name="ProjectId_Source" type="hidden" value="{{ProjectId}}" />
+        <div class="form-row">
+            <div class="form-group col-12 col-md-4">
+                <label for="ProjectIdTextBox">ID</label>
+                <input id="ProjectIdTextBox" name="ProjectId" type="text" class="form-control" value="{{ProjectId}}" />
+            </div>
+            <div class="form-group col-12 col-md-8">
+                <label for="ProjectNameTextBox">Name</label>
+                <input id="ProjectNameTextBox" name="ProjectName" type="text" class="form-control" value="{{ProjectName}}" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-12">
+                <label for="ProjectDescriptionTextBox">Description</label>
+                <textarea id="ProjectDescriptionTextBox" name="ProjectDescription" class="form-control">{{ProjectDescription}}</textarea>
+            </div>
+        </div>
+        <hr />
+        <div class="form-row">
+            <div class="col-12 clearfix">
+                <div class="float-right">
+                    <a href="{{#Url projects}}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+                {{#If !IsNew}}
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#DeleteModal">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                {{#EndIf}}
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="DeleteModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Project</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>This operation cannot be undone. Are you sure you want to continue?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="onDeleteProject()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>

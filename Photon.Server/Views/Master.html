@@ -2,36 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{PageTitle}}</title>
     <link rel="SHORTCUT ICON" href="{{#Url Content/photon_light.ico}}">
     <link rel="stylesheet" href="{{#Url Content/bootstrap-4.1.0/css/bootstrap.min.css}}">
     <link rel="stylesheet" href="{{#Url Content/fontawesome-5.0.11/css/fontawesome-all.min.css}}">
     <style>
-        body,html{
+        body, html {
             height: 100%;
             overflow-x: hidden;
         }
+
         nav.sidebar {
             -webkit-transition: margin 200ms ease-out;
             -moz-transition: margin 200ms ease-out;
             -o-transition: margin 200ms ease-out;
             transition: margin 200ms ease-out;
         }
+
         .layout-content {
             -webkit-transition: margin 200ms ease-out, width 200ms ease-out;
             -moz-transition: margin 200ms ease-out, width 200ms ease-out;
             -o-transition: margin 200ms ease-out, width 200ms ease-out;
             transition: margin 200ms ease-out, width 200ms ease-out;
         }
+
         .nav-item-iconholder {
             float: right;
             text-align: center;
         }
+
         .photon-icon > img {
             width: auto;
             height: 50px;
         }
+
         nav.sidebar li.active a {
             color: #47b5d6 !important;
         }
@@ -46,20 +52,24 @@
                 margin-bottom: 0;
                 padding: 0;
             }
-            nav.sidebar .container-fluid {
-                padding: 0;
-                height: 100%;
-                align-items: flex-start;
-                flex-direction: column;
-            }
+
+                nav.sidebar .container-fluid {
+                    padding: 0;
+                    height: 100%;
+                    align-items: flex-start;
+                    flex-direction: column;
+                }
+
             #layoutNavbarContent {
                 align-items: flex-start;
                 width: 100%;
             }
+
             nav.sidebar ul {
                 flex-direction: column !important;
                 width: 100%;
             }
+
             nav.sidebar li {
                 width: 100%;
             }
@@ -73,13 +83,15 @@
                 border-bottom: 1px solid #2c2c2c;
                 width: 100%;
             }
-            .photon-icon > img {
-                position: absolute;
-                right: 4px;
-                top: 8px;
-                width: 32px;
-                height: 32px;
-            }
+
+                .photon-icon > img {
+                    position: absolute;
+                    right: 4px;
+                    top: 8px;
+                    width: 32px;
+                    height: 32px;
+                }
+
             .layout-content {
                 position: absolute;
                 width: calc(100% - 40px);
@@ -91,9 +103,11 @@
                 margin-left: 200px;
                 width: calc(100% - 200px);
             }
+
             nav.sidebar:hover {
                 margin-left: 0;
             }
+
             .forAnimate {
                 opacity: 0;
             }
@@ -104,10 +118,12 @@
                 margin-left: 0;
                 float: left;
             }
+
             .layout-content {
                 width: calc(100% - 200px);
                 margin-left: 200px;
             }
+
             nav.sidebar .forAnimate {
                 opacity: 1;
             }

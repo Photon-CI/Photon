@@ -16,9 +16,9 @@ namespace Photon.Server.ViewModels.Projects
             PageTitle = "Photon Server Projects";
         }
 
-        public override void Build()
+        public void Build()
         {
-            Projects = PhotonServer.Instance.Projects.ToList();
+            Projects = PhotonServer.Instance.Projects.All.ToList();
         }
     }
 }

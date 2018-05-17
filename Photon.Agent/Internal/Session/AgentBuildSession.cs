@@ -130,7 +130,7 @@ namespace Photon.Agent.Internal.Session
                 return;
             }
 
-            throw new ApplicationException($"Unknown source type '{Project.SourceType}'!");
+            throw new ApplicationException($"Unknown source type '{Project.Source?.GetType().Name}'!");
         }
 
         private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout, CancellationToken token = default(CancellationToken))

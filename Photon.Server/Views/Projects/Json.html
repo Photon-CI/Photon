@@ -1,0 +1,119 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script src="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
+<script>
+    var editor;
+
+    $(function () {
+        $('#layoutNavbarContent [data-link="projects"]').addClass('active');
+
+        var options = {
+            modes: ['code', 'tree']
+        };
+
+        var container = document.getElementById("jsoneditor");
+        editor = new JSONEditor(container, options);
+
+        onLoad();
+    });
+
+    var projectsJsonUrl = '{{#Url api/projects}}';
+
+    function onLoad() {
+        $.ajax({
+            url: projectsJsonUrl,
+            dataType: 'json',
+            method: 'get'
+        }).done(function(data) {
+            editor.set(data);
+        }).fail(function() {
+            alert('Failed to load projects.json!');
+        });
+    }
+
+    function onSave() {
+        var json = editor.get();
+
+        $.ajax({
+            url: projectsJsonUrl,
+            method: 'post',
+            data: JSON.stringify(json)
+        }).done(function() {
+            alert('Saved Successfully!');
+        }).fail(function() {
+            alert('Failed to save projects.json!');
+        });
+    }
+
+    function onImport() {
+        //
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<link href="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
+<style>
+    .layout-content {
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    #jsoneditor {
+        flex: 1;
+    }
+</style>
+{{#EndStyle}}
+
+<div class="bg-dark">
+    <div class="row">
+        <div class="col-12 clearfix">
+            <div class="float-right" style="padding: 4px">
+                <a href="{{#Url api/projects}}" target="_blank" class="btn btn-sm btn-secondary">
+                    Download <i class="fas fa-download"></i>
+                </a>
+                <button type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#ImportProjectsModal">
+                    Upload <i class="fas fa-upload"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="onSave()">
+                    Save <i class="fas fa-save"></i>
+                </button>
+            </div>
+            <a href="{{#Url projects}}" class="btn btn-sm btn-secondary float-left" style="margin: 4px">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h4 class="text-light" style="line-height: 36px; margin: 0">Edit Projects.json</h4>
+        </div>
+    </div>
+</div>
+
+<div id="jsoneditor"></div>
+
+<div class="modal fade" id="ImportProjectsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Projects</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST">
+                <div class="modal-body">
+                    <input type="file" />
+
+                    <p>
+                        Select a JSON Projects document to upload to the server. This will replace the current document and cannot be undone!
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

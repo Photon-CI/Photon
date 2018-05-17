@@ -34,7 +34,7 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
 
         private void StartBuild(GithubCommit commit)
         {
-            var project = PhotonServer.Instance.Projects.FirstOrDefault(x =>
+            var project = PhotonServer.Instance.Projects.All.FirstOrDefault(x =>
                 string.Equals((x.Source as ProjectGithubSource)?.CloneUrl, commit.RepositoryUrl, StringComparison.OrdinalIgnoreCase));
 
             if (project == null)

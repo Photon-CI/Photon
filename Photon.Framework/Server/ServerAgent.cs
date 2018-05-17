@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,10 +8,19 @@ namespace Photon.Framework.Server
     [Serializable]
     public class ServerAgent
     {
+        [JsonProperty(Order = 1)]
         public string Id {get; set;}
+
+        [JsonProperty(Order = 2)]
         public string Name {get; set;}
+
+        [JsonProperty(Order = 3)]
         public string TcpHost {get; set;}
+
+        [JsonProperty(Order = 4)]
         public int TcpPort {get; set;}
+
+        [JsonProperty(Order = 5)]
         public List<string> Roles {get; set;}
 
 

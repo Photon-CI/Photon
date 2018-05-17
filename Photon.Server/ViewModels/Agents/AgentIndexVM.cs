@@ -1,7 +1,7 @@
 ﻿using Photon.Framework.Server;
+using Photon.Library;
 using Photon.Server.Internal;
 using System.Linq;
-using Photon.Library;
 
 namespace Photon.Server.ViewModels.Agents
 {
@@ -10,7 +10,7 @@ namespace Photon.Server.ViewModels.Agents
         public ServerAgent[] Agents {get; set;}
 
 
-        public override void Build()
+        public void Build()
         {
             Agents = PhotonServer.Instance.Agents.All.ToArray();
         }

@@ -13,7 +13,7 @@ namespace Photon.Agent.HttpHandlers.Deployments
                 PageTitle = "Photon Agent Deployments",
             };
 
-            vm.Build();
+            //vm.Build();
 
             return Response.View("Deployments\\Index.html", vm);
         }
