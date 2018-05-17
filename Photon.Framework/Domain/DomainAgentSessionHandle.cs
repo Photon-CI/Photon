@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Server;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,14 +7,14 @@ namespace Photon.Framework.Domain
 {
     public class DomainAgentSessionHandle : IDisposable
     {
+        public ServerAgent Agent { get; }
         public DomainAgentSessionClient Client {get; private set;}
-        //public string AgentSessionId {get;}
 
 
-        public DomainAgentSessionHandle(DomainAgentSessionClient client/*, string agentSessionId*/)
+        public DomainAgentSessionHandle(ServerAgent agent, DomainAgentSessionClient client)
         {
+            this.Agent = agent;
             this.Client = client;
-            //this.AgentSessionId = agentSessionId;
         }
 
         public void Dispose()
@@ -36,11 +37,17 @@ namespace Photon.Framework.Domain
             }, token);
         }
 
-        public async Task RunTaskAsync(string taskName, CancellationToken token)
+        public async Task RunTaskAsync(string taskName, CancellationToken token = default(CancellationToken))
         {
             await RemoteTaskCompletionSource.Run((task, sponsor) => {
                 Client.RunTaskAsync(taskName, task);
             }, token);
         }
+
+        //public string[] GetBuildTaskRoles(string taskName)
+        //{
+        //    return (context as IServerBuildContext)?.BuildTasks?
+        //        .FirstOrDefault(x => string.Equals(x.Name, taskName, StringComparison.OrdinalIgnoreCase))?.Roles;
+        //}
     }
 }

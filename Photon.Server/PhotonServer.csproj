@@ -34,6 +34,16 @@
   <PropertyGroup>
     <StartupObject>Photon.Server.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PI|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\PI\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
@@ -64,6 +74,7 @@
     <Compile Include="HttpHandlers\Api\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
     <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Packages\PackageIndexHandler.cs" />
     <Compile Include="HttpHandlers\BuildsHandler.cs" />
@@ -137,6 +148,7 @@
     <Compile Include="ViewModels\Agents\AgentIndexVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\Projects\ProjectIndexVM.cs" />
+    <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -145,9 +157,18 @@
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <None Include="App.PI.config">
+      <DependentUpon>App.config</DependentUpon>
+    </None>
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <Content Include="Content\ansi_up.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\SessionOutput.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\ActiveSessions.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

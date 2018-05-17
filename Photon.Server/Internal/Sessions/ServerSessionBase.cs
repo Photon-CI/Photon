@@ -214,7 +214,7 @@ namespace Photon.Server.Internal.Sessions
             return host.SessionClient;
         }
 
-        private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
             Task.Run(async () => {
                 var metadata = await ProjectPackageTools.GetMetadataAsync(filename);
@@ -222,16 +222,13 @@ namespace Photon.Server.Internal.Sessions
 
                 await projectPackages.Add(filename);
                 PushedProjectPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
-                return (object)null;
             }).ContinueWith(taskHandle.FromTask);
         }
 
-        private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
-            Task.Run(async () => {
-                await applicationPackages.Add(filename);
-                return (object)null;
-            }).ContinueWith(taskHandle.FromTask);
+            applicationPackages.Add(filename)
+                .ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)

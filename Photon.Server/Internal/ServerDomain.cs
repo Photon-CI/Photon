@@ -15,7 +15,7 @@ namespace Photon.Server.Internal
 
         public async Task RunDeployScript(IServerDeployContext context, CancellationToken token)
         {
-            var completeEvent = new RemoteTaskCompletionSource(token);
+            var completeEvent = new RemoteTaskCompletionSource();
             Agent.RunDeployScript(context, completeEvent);
             await completeEvent.Task;
         }

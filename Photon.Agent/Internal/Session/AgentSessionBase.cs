@@ -4,17 +4,20 @@ using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
+using Photon.Framework.Server;
 using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.TcpMessages;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Session
 {
     internal abstract class AgentSessionBase : IAgentSession
     {
+        protected readonly CancellationTokenSource TokenSource;
         private readonly Lazy<ILog> _log;
         private readonly DateTime utcCreated;
         private DateTime? utcReleased;
@@ -27,6 +30,7 @@ namespace Photon.Agent.Internal.Session
         public string ContentDirectory {get;}
         public string BinDirectory {get;}
         public Project Project {get; set;}
+        public ServerAgent Agent {get; set;}
         public string AssemblyFilename {get; set;}
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
@@ -49,6 +53,7 @@ namespace Photon.Agent.Internal.Session
             utcCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
+            TokenSource = new CancellationTokenSource();
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
             Output = new SessionOutput(transceiver, ServerSessionId, SessionClientId);
@@ -66,14 +71,16 @@ namespace Photon.Agent.Internal.Session
         public virtual void Dispose()
         {
             if (!isReleased)
-                ReleaseAsync().GetAwaiter().GetResult();
-
+                Log.Error("Session was disposed without being released!");
+                //ReleaseAsync().GetAwaiter().GetResult();
+            
+            TokenSource?.Dispose();
             Domain?.Dispose();
         }
 
         public void Cancel()
         {
-            //
+            TokenSource?.Cancel();
         }
 
         public virtual void OnSessionBegin() {}
@@ -138,43 +145,37 @@ namespace Photon.Agent.Internal.Session
             return DateTime.UtcNow - utcCreated > LifeSpan;
         }
 
-        private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
-            Task.Run(async () => {
-                var packageRequest = new ProjectPackagePushRequest {
-                    ServerSessionId = ServerSessionId,
-                    Filename = filename,
-                };
+            var packageRequest = new ProjectPackagePushRequest {
+                ServerSessionId = ServerSessionId,
+                Filename = filename,
+            };
 
-                await Transceiver.Send(packageRequest)
-                    .GetResponseAsync();
-
-                return (object)null;
-            }).ContinueWith(taskHandle.FromTask);
+            Transceiver.Send(packageRequest)
+                .GetResponseAsync()
+                .ContinueWith(taskHandle.FromTask);
         }
 
-        private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource<object> taskHandle)
+        private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
-            Task.Run(async () => {
-                var packageRequest = new ApplicationPackagePushRequest {
-                    Filename = filename,
-                };
+            var packageRequest = new ApplicationPackagePushRequest {
+                Filename = filename,
+            };
 
-                await Transceiver.Send(packageRequest)
-                    .GetResponseAsync();
-
-                return (object)null;
-            }).ContinueWith(taskHandle.FromTask);
+            Transceiver.Send(packageRequest)
+                .GetResponseAsync()
+                .ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
         {
-            Task.Run(async () => {
-                var packageRequest = new ProjectPackagePullRequest {
-                    ProjectPackageId = id,
-                    ProjectPackageVersion = version,
-                };
+            var packageRequest = new ProjectPackagePullRequest {
+                ProjectPackageId = id,
+                ProjectPackageVersion = version,
+            };
 
+            Task.Run(async () => {
                 var response = await Transceiver.Send(packageRequest)
                     .GetResponseAsync<ProjectPackagePullResponse>();
 

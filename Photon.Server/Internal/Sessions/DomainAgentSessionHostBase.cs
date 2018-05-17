@@ -17,9 +17,9 @@ namespace Photon.Server.Internal.Sessions
 
         private const int HandshakeTimeoutSec = 30;
 
-        protected readonly CancellationToken Token;
-        private readonly ServerAgent agent;
         private readonly ClientSponsor sponsor;
+        protected CancellationToken Token {get;}
+        protected ServerAgent Agent {get;}
         public DomainAgentSessionClient SessionClient {get;}
         public MessageClient MessageClient {get;}
 
@@ -30,7 +30,7 @@ namespace Photon.Server.Internal.Sessions
 
         protected DomainAgentSessionHostBase(IServerSession sessionBase, ServerAgent agent, CancellationToken token)
         {
-            this.agent = agent;
+            this.Agent = agent;
             this.Token = token;
 
             Tasks = new TaskRunnerManager();
@@ -68,26 +68,28 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        protected abstract Task OnBeginSession();
+        protected abstract Task OnBeginSession(CancellationToken token);
 
-        protected abstract Task OnReleaseSessionAsync();
+        protected abstract Task OnReleaseSessionAsync(CancellationToken token);
 
         protected abstract void OnSessionOutput(string text);
 
         private void SessionClient_OnSessionBegin(RemoteTaskCompletionSource taskHandle)
         {
-            Task.Run(ConnectToAgent, Token)
+            Task.Run(() => ConnectToAgent(Token), Token)
                 .ContinueWith(taskHandle.FromTask, Token);
         }
 
-        private async Task<object> ConnectToAgent()
+        private async Task ConnectToAgent(CancellationToken token)
         {
-            Log.Debug($"Connecting to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'...");
+            var agentAddress = $"{Agent.TcpHost}:{Agent.TcpPort}";
+            Log.Debug($"Connecting to TCP Agent '{agentAddress}'...");
 
             try {
-                await MessageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, Token);
-                Log.Info($"Connected to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'.");
+                await MessageClient.ConnectAsync(Agent.TcpHost, Agent.TcpPort, Token);
+                Log.Info($"Connected to TCP Agent '{agentAddress}'.");
 
+                Log.Debug($"Performing TCP handshake... [{agentAddress}]");
                 var handshakeRequest = new HandshakeRequest {
                     Key = Guid.NewGuid().ToString(),
                     ServerVersion = Configuration.Version,
@@ -101,17 +103,18 @@ namespace Photon.Server.Internal.Sessions
 
                 if (!handshakeResponse.PasswordMatch)
                     throw new ApplicationException("Handshake Failed! Unauthorized.");
+
+                Log.Info($"Handshake successful. [{agentAddress}].");
             }
             catch (Exception error) {
-                Log.Error($"Failed to connect to TCP Agent '{agent.TcpHost}:{agent.TcpPort}'!", error);
+                Log.Error($"Failed to connect to TCP Agent '{agentAddress}'!", error);
                 MessageClient.Dispose();
                 throw;
             }
 
-            await OnBeginSession();
+            await OnBeginSession(token);
 
             Tasks.Start();
-            return null;
         }
 
         private void OnCancelSession()
@@ -131,7 +134,7 @@ namespace Photon.Server.Internal.Sessions
                 if (MessageClient.IsConnected) {
                     if (!string.IsNullOrEmpty(AgentSessionId)) {
                         try {
-                            await OnReleaseSessionAsync();
+                            await OnReleaseSessionAsync(Token);
                         }
                         catch (Exception error) {
                             Log.Error($"Failed to release Agent Session '{AgentSessionId}'! {error.Message}");

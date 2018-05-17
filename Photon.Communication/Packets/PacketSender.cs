@@ -12,6 +12,8 @@ namespace Photon.Communication.Packets
 {
     internal class PacketSender : IDisposable
     {
+        public event ThreadExceptionEventHandler ThreadError;
+
         private readonly BinaryWriter writer;
         private readonly ManualResetEventSlim waitEvent;
         private readonly JsonSerializer jsonSerializer;
@@ -134,10 +136,20 @@ namespace Photon.Communication.Packets
 
             Stream streamData = null;
             if (message is IStreamMessage streamMessage) {
-                streamData = streamMessage.StreamFunc();
+                try {
+                    streamData = streamMessage.StreamFunc();
+                }
+                catch (Exception error) {
+                    OnThreadError(new ApplicationException("Failed to open message stream source!", error));
+                }
             }
             else if (message is IFileMessage fileMessage) {
-                streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read);
+                try {
+                    streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                }
+                catch (Exception error) {
+                    OnThreadError(new ApplicationException("Failed to open message file source!", error));
+                }
             }
 
             // TODO: BsonDataWriter should be disposed!
@@ -153,6 +165,11 @@ namespace Photon.Communication.Packets
                 MessageData = messageData,
                 StreamData = streamData,
             };
+        }
+
+        protected void OnThreadError(Exception error)
+        {
+            ThreadError?.Invoke(this, new ThreadExceptionEventArgs(error));
         }
     }
 }

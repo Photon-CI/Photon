@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
   <?define EXE=$(var.PhotonServer.TargetFileName)?>
   <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
   <?define PhotonServer_TargetDir=$(var.PhotonServer.TargetDir)?>
@@ -82,7 +82,8 @@
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
 			<Component Id="PhotonServer.exe" Guid="555abaa8-022d-4288-98a6-0eb32866a342">
-			  <File Id="PhotonServer.exe" Name="PhotonServer.exe" Source="$(var.PhotonServer_TargetDir)PhotonServer.exe" KeyPath="yes" />
+        <File Id="PhotonServer.exe" Name="PhotonServer.exe" Source="$(var.PhotonServer_TargetDir)PhotonServer.exe" KeyPath="yes" />
+			  <fire:FirewallException Id="PhotonServerFirewallException" File="PhotonServer.exe" Name="Photon Server" Protocol="tcp" Scope="any" />
 			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal" />
 			  <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Server" Wait="yes" />
 			</Component>
@@ -283,6 +284,12 @@
       </Component>
       <Component Id="Content_ActiveSessions.js" Guid="639f1873-03fc-4d91-b860-d8aca6768b79">
         <File Id="Content_ActiveSessions.js" Name="ActiveSessions.js" Source="$(var.PhotonServer_TargetDir)Content\ActiveSessions.js" />
+      </Component>
+      <Component Id="Content_ansi_up.js" Guid="b0fe2a0a-ed97-4309-8a50-a4e5b2622e41">
+        <File Id="Content_ansi_up.js" Name="ansi_up.js" Source="$(var.PhotonServer_TargetDir)Content\ansi_up.js" />
+      </Component>
+      <Component Id="Content_SessionOutput.js" Guid="da535f07-5d27-40be-8746-be12c0ba6d5f">
+        <File Id="Content_SessionOutput.js" Name="SessionOutput.js" Source="$(var.PhotonServer_TargetDir)Content\SessionOutput.js" />
       </Component>
     </ComponentGroup>
   </Fragment>

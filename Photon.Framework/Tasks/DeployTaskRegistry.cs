@@ -1,24 +1,23 @@
 ﻿using Photon.Framework.Agent;
-using Photon.Framework.Domain;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Tasks
 {
-    internal class DeployTaskRegistry : TypeRegistry<IDeployTask>
+    internal class DeployTaskRegistry : TaskRegistryBase<IDeployTask>
     {
         public async Task ExecuteTask(IAgentDeployContext context, CancellationToken token)
         {
-            if (!map.TryGetValue(context.TaskName, out var taskClassType))
+            if (!mapType.TryGetValue(context.TaskName, out var taskType))
                 throw new Exception($"Deploy Task '{context.TaskName}' was not found!");
 
             object classObject = null;
             try {
-                classObject = Activator.CreateInstance(taskClassType);
+                classObject = Activator.CreateInstance(taskType);
 
                 if (!(classObject is IDeployTask task))
-                    throw new Exception($"Unable to create Deploy-Task implementation '{taskClassType}'!");
+                    throw new Exception($"Unable to create Deploy-Task implementation '{taskType.Name}'!");
 
                 task.Context = context;
 

@@ -1,9 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Server
 {
     public interface IDeployScript
     {
-        Task RunAsync(IServerDeployContext context);
+        IServerDeployContext Context {get; set;}
+        Task RunAsync(CancellationToken token);
     }
 }

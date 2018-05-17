@@ -15,12 +15,13 @@ namespace Photon.Server.Internal.Sessions
             this.session = session;
         }
 
-        protected override async Task OnBeginSession()
+        protected override async Task OnBeginSession(CancellationToken token)
         {
             var message = new BuildSessionBeginRequest {
                 ServerSessionId = session.SessionId,
                 SessionClientId = SessionClientId,
                 Project = session.Project,
+                Agent = Agent,
                 AssemblyFile = session.AssemblyFilename,
                 PreBuild = session.PreBuild,
                 GitRefspec = session.GitRefspec,
@@ -30,19 +31,19 @@ namespace Photon.Server.Internal.Sessions
             };
 
             var response = await MessageClient.Send(message)
-                .GetResponseAsync<BuildSessionBeginResponse>();
+                .GetResponseAsync<BuildSessionBeginResponse>(token);
 
             AgentSessionId = response.AgentSessionId;
         }
 
-        protected override async Task OnReleaseSessionAsync()
+        protected override async Task OnReleaseSessionAsync(CancellationToken token)
         {
             var message = new BuildSessionReleaseRequest {
                 AgentSessionId = AgentSessionId,
             };
 
             await MessageClient.Send(message)
-                .GetResponseAsync();
+                .GetResponseAsync(token);
         }
 
         protected override void OnSessionOutput(string text)

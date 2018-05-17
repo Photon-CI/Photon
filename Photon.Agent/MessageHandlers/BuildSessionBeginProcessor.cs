@@ -24,6 +24,7 @@ namespace Photon.Agent.MessageHandlers
                 BuildNumber = requestMessage.BuildNumber,
                 ServerVariables = requestMessage.Variables,
                 Commit = requestMessage.Commit,
+                Agent = requestMessage.Agent,
             };
 
             PhotonAgent.Instance.Sessions.BeginSession(session);

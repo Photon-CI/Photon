@@ -1,4 +1,4 @@
-﻿using Photon.Library;
+﻿using Photon.Server.ViewModels.Session;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Server.HttpHandlers.Session
@@ -10,11 +10,14 @@ namespace Photon.Server.HttpHandlers.Session
         {
             var sessionId = GetQuery("id");
 
-            var vm = new ViewModelBase {
+            var vm = new SessionDetailsVM {
                 PageTitle = "Photon Server Session Details",
+                SessionId = sessionId,
             };
 
-            //...
+            //try {
+            //    vm.
+            //}
 
             return Response.View("Session\\Details.html", vm);
         }

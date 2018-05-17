@@ -98,6 +98,7 @@ namespace Photon.Agent.Internal.Session
                 Packages = PackageClient,
                 ServerVariables = ServerVariables,
                 EnvironmentName = EnvironmentName,
+                Agent = Agent,
             };
 
             await Domain.RunDeployTask(context, CancellationToken.None);

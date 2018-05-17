@@ -1,10 +1,38 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
+<script src="{{#Url Content/SessionOutput.js}}"></script>
+<script src="{{#Url Content/ansi_up.js}}"></script>
 <script>
+    var reader;
+
     $(function () {
         $('#layoutNavbarContent [data-link="builds"]').addClass('active');
+
+        var outputUrl = '{{#Url api/session/output-stream}}?id={{&SessionId}}';
+
+        reader = new SessionOutputReader();
+        reader.onAppend = onAppend;
+        reader.onDone = onDone;
+        reader.onError = onError;
+        reader.begin(outputUrl);
     });
+
+    function onAppend(text) {
+        var text_out = ansi_up.escape_for_html(text);
+        text_out = ansi_up.ansi_to_html(text_out);
+        //text_out = ansi_up.linkify(text_out);
+
+        $('#SessionOutput').append(text_out);
+    }
+
+    function onDone() {
+        //
+    }
+
+    function onError() {
+        //
+    }
 </script>
 {{#EndScript}}
 
@@ -13,7 +41,17 @@
     .layout-content {
         padding: 8px 16px;
     }
+
+    .session-output {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: monospace;
+        background: #111;
+        color: #CCC;
+    }
 </style>
 {{#EndStyle}}
 
 <h2>Session Details</h2>
+
+<div id="SessionOutput" class="session-output"></div>

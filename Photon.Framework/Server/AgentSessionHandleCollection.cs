@@ -25,21 +25,21 @@ namespace Photon.Framework.Server
                 ?? throw new ArgumentNullException(nameof(agentSessions));
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(CancellationToken token)
         {
             var taskList = agentSessionList
-                .Select(x => x.BeginAsync(CancellationToken.None))
+                .Select(x => x.BeginAsync(token))
                 .ToArray();
 
             await Task.WhenAll(taskList);
         }
 
-        public async Task ReleaseAllAsync()
+        public async Task ReleaseAllAsync(CancellationToken token)
         {
             if (agentSessionList == null) return;
 
             var taskList = agentSessionList
-                .Select(x => x.ReleaseAsync(CancellationToken.None))
+                .Select(x => x.ReleaseAsync(token))
                 .ToArray();
 
             await Task.WhenAll(taskList);
@@ -47,12 +47,17 @@ namespace Photon.Framework.Server
 
         public async Task RunTasksAsync(params string[] taskNames)
         {
+            await RunTasksAsync(taskNames, CancellationToken.None);
+        }
+
+        public async Task RunTasksAsync(string[] taskNames, CancellationToken token)
+        {
             if (agentSessionList == null) return;
 
             var taskList = new List<Task>();
             foreach (var task in taskNames) {
                 foreach (var session in agentSessionList) {
-                    taskList.Add(session.RunTaskAsync(task, CancellationToken.None));
+                    taskList.Add(session.RunTaskAsync(task, token));
                 }
             }
 

@@ -7,8 +7,16 @@
     self.socket = null;
     self.onCancel = null;
 
-    var templateRow = $(container)
-        .find('[data-session-template]').detach()
+    var buildTemplateRow = $(container)
+        .find('[data-session-template="build"]').detach()
+        .removeAttr('data-session-template');
+
+    var deployTemplateRow = $(container)
+        .find('[data-session-template="deploy"]').detach()
+        .removeAttr('data-session-template');
+
+    var updateTemplateRow = $(container)
+        .find('[data-session-template="update"]').detach()
         .removeAttr('data-session-template');
 
     this.getListElement = function() {
@@ -80,10 +88,7 @@
 
         if (!session.isReleased) {
             if (sessionElement == null) {
-                sessionElement = templateRow.clone()
-                    .attr('data-session-id', session.id);
-
-                sessionElement.appendTo(self.getListElement());
+                sessionElement = appendNewRow(session);
             }
 
             onSessionUpdate(sessionElement, session);
@@ -94,19 +99,46 @@
         self.updateMask();
     }
 
+    function appendNewRow(session) {
+        var sessionElement = getRowTemplate(session.type)
+            .clone().attr('data-session-id', session.id);
+
+        sessionElement.appendTo(self.getListElement());
+        return sessionElement;
+    }
+
+    function getRowTemplate(type) {
+        switch (type) {
+            case 'build': return buildTemplateRow;
+            case 'deploy': return deployTemplateRow;
+            case 'update': return updateTemplateRow;
+        }
+    }
+
     function onSessionUpdate(e, data) {
         var icon = getStatusIcon(data.type);
 
         var sessionDetailsUrl = self.detailsUrl
             + '?id=' + encodeURIComponent(data.id);
 
-        var labelText = data.projectName;
+        switch (data.type) {
+            case 'build':
+                e.find('[data-session-title]')
+                    .attr('href', sessionDetailsUrl)
+                    .text('#' + data.number + ' - ' + data.projectName + ' : ' + data.name);
 
-        if (!!data.projectVersion)
-            labelText += ' - ' + data.projectVersion;
+                e.find('[data-session-project]').text(data.projectName);
+                e.find('[data-session-refspec]').text('@'+data.gitRefspec);
+                break;
+            case 'deploy':
+                //
+                break;
+            case 'update':
+                //
+                break;
+        }
 
         e.find('[data-session-status]').attr('class', icon);
-        e.find('.label').text(labelText).attr('href', sessionDetailsUrl);
 
         e.find('.cancel').click(function () {
             if (self.onCancel !== 'undefined' && self.onCancel != null) self.onCancel(data.id);

@@ -16,10 +16,11 @@ namespace Photon.Agent.MessageHandlers
             var session = new AgentDeploySession(Transceiver, requestMessage.ServerSessionId, requestMessage.SessionClientId) {
                 DeploymentNumber = requestMessage.DeploymentNumber,
                 EnvironmentName = requestMessage.EnvironmentName,
-                Project = null, // TODO: Store ProjectId in package
+                Project = requestMessage.Project,
                 ProjectPackageId = requestMessage.ProjectPackageId,
                 ProjectPackageVersion = requestMessage.ProjectPackageVersion,
                 ServerVariables = requestMessage.Variables,
+                Agent = requestMessage.Agent,
             };
 
             PhotonAgent.Instance.Sessions.BeginSession(session);

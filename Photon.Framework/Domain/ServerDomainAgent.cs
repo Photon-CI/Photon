@@ -2,6 +2,7 @@
 using Photon.Framework.Server;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace Photon.Framework.Domain
 {
@@ -29,7 +30,7 @@ namespace Photon.Framework.Domain
 
         public void RunDeployScript(IServerDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
-            deployScriptRegistry.ExecuteScript(context)
+            deployScriptRegistry.ExecuteScript(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);
         }
     }
