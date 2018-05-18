@@ -1,9 +1,9 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Framework;
-using Photon.Framework.Variables;
 using Photon.Library;
 using Photon.Library.Packages;
+using Photon.Library.Variables;
 using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.ServerAgents;
 using Photon.Server.Internal.ServerConfiguration;
@@ -11,8 +11,6 @@ using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +32,8 @@ namespace Photon.Server.Internal
         public ProjectPackageManager ProjectPackages {get;}
         public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
-        public VariableSetCollection Variables {get;}
+        //public VariableSetCollection Variables {get;}
+        public VariableSetDocumentManager Variables {get;}
 
         public ServerConfigurationManager ServerConfiguration {get;}
         public ServerAgentManager Agents {get;}
@@ -46,7 +45,7 @@ namespace Photon.Server.Internal
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();
-            Variables = new VariableSetCollection();
+            Variables = new VariableSetDocumentManager();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
@@ -93,7 +92,7 @@ namespace Photon.Server.Internal
             Queue.Start();
 
 
-            var taskVariables = LoadVariables();
+            var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskHttp = Task.Run(() => StartHttpServer());
             var taskAgents = Task.Run(() => Agents.Load());
             var taskProjects = Task.Run(() => Projects.Load());
@@ -150,43 +149,6 @@ namespace Photon.Server.Internal
             catch (Exception error) {
                 Log.Error("Failed to stop HTTP Receiver!", error);
             }
-        }
-
-        private static async Task<string> ReadAsync(string filename)
-        {
-            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read))
-            using (var reader = new StreamReader(stream)) {
-                return await reader.ReadToEndAsync();
-            }
-        }
-
-        private async Task LoadVariables()
-        {
-            var taskList = new List<Task>();
-
-            var filename = Path.Combine(Configuration.Directory, "variables.json");
-
-            if (File.Exists(filename)) {
-                var task = ReadAsync(filename)
-                    .ContinueWith(t => Variables.GlobalJson = t.Result);
-
-                taskList.Add(task);
-            }
-
-            if (Directory.Exists(Configuration.VariablesDirectory)) {
-                var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
-
-                foreach (var file in fileEnum) {
-                    var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
-
-                    var task = ReadAsync(file)
-                        .ContinueWith(t => Variables.JsonList[file_name] = t.Result);
-
-                    taskList.Add(task);
-                }
-            }
-
-            await Task.WhenAll(taskList);
         }
 
         private void StartHttpServer()

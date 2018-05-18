@@ -27,12 +27,12 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
             var commit = HookEventHandler.ParseEvent(eventType, json);
 
             if (commit != null)
-                StartBuild(commit);
+                await StartBuild(commit);
 
             return Response.Ok();
         }
 
-        private void StartBuild(GithubCommit commit)
+        private async Task StartBuild(GithubCommit commit)
         {
             var project = PhotonServer.Instance.Projects.All.FirstOrDefault(x =>
                 string.Equals((x.Source as ProjectGithubSource)?.CloneUrl, commit.RepositoryUrl, StringComparison.OrdinalIgnoreCase));

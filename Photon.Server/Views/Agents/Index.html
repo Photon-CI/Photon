@@ -5,13 +5,13 @@
     $(function () {
         $('#layoutNavbarContent [data-link="agents"]').addClass('active');
 
-        $('#AgentSearchTextBox').on('input', onSearchChanged);
+        $('#SearchTextBox').on('input', onSearchChanged);
 
         onSearchChanged();
     });
 
     function onSearchChanged() {
-        var searchText = $('#AgentSearchTextBox').val();
+        var searchText = $('#SearchTextBox').val();
 
         $('div[data-card-name]').each(function (i, e) {
             var visible = false;
@@ -23,9 +23,6 @@
 
                 if (name.match(new RegExp(searchText, "i")))
                     visible = true;
-
-                //if (name.includes(searchText))
-                //    visible = true;
             }
 
             $(e).toggle(visible);
@@ -88,7 +85,7 @@
         </ul>
         <div class="form-inline">
             <div class="input-group">
-                <input id="AgentSearchTextBox" type="text" class="form-control" />
+                <input id="SearchTextBox" type="text" class="form-control" />
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <i class="fas fa-search"></i>
@@ -125,4 +122,3 @@
         {{#EndEach}}
     </div>
 </div>
-

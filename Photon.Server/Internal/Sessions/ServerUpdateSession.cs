@@ -6,7 +6,6 @@ using Photon.Library.TcpMessages;
 using System;
 using System.Linq;
 using System.Net.Sockets;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -116,7 +115,10 @@ namespace Photon.Server.Internal.Sessions
                 await messageClient.Send(message)
                     .GetResponseAsync(token);
 
-                await messageClient.DisconnectAsync();
+                try {
+                    await messageClient.DisconnectAsync();
+                }
+                catch {}
             }
             finally {
                 messageClient?.Dispose();
@@ -130,6 +132,10 @@ namespace Photon.Server.Internal.Sessions
             try {
                 messageClient = await Reconnect(agent, TimeSpan.FromMinutes(2));
             }
+            catch (TaskCanceledException) {
+                // TODO: Better error messages
+                throw;
+            }
             finally {
                 messageClient?.Dispose();
             }
@@ -139,13 +145,13 @@ namespace Photon.Server.Internal.Sessions
         {
             var client = new MessageClient(PhotonServer.Instance.MessageRegistry);
 
-            client.ThreadException += (o, e) => {
-                var error = (Exception) e.ExceptionObject;
-                Output.AppendLine("An error occurred while messaging the client!", ConsoleColor.DarkRed)
-                    .AppendLine(error.UnfoldMessages());
+            //client.ThreadException += (o, e) => {
+            //    var error = (Exception) e.ExceptionObject;
+            //    Output.AppendLine("An error occurred while messaging the client!", ConsoleColor.DarkRed)
+            //        .AppendLine(error.UnfoldMessages());
 
-                Log.Error("Message Client error after update!", error);
-            };
+            //    Log.Error("Message Client error after update!", error);
+            //};
 
             var tokenSource = new CancellationTokenSource(timeout);
 
@@ -186,21 +192,21 @@ namespace Photon.Server.Internal.Sessions
             return client;
         }
 
-        private bool IncludesAgent(string agentName)
-        {
-            if (!(AgentIds?.Any() ?? false)) return true;
+        //private bool IncludesAgent(string agentName)
+        //{
+        //    if (!(AgentIds?.Any() ?? false)) return true;
 
-            foreach (var name in AgentIds) {
-                var escapedName = Regex.Escape(name)
-                    .Replace("\\?", ".")
-                    .Replace("\\*", ".*");
+        //    foreach (var name in AgentIds) {
+        //        var escapedName = Regex.Escape(name)
+        //            .Replace("\\?", ".")
+        //            .Replace("\\*", ".*");
 
-                var namePattern = $"^{escapedName}$";
-                if (Regex.IsMatch(agentName, namePattern, RegexOptions.IgnoreCase))
-                    return true;
-            }
+        //        var namePattern = $"^{escapedName}$";
+        //        if (Regex.IsMatch(agentName, namePattern, RegexOptions.IgnoreCase))
+        //            return true;
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
     }
 }

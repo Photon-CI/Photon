@@ -71,10 +71,11 @@ namespace Photon.Server.Internal.Projects
             }
         }
 
-        private void Document_OnLoad(dynamic document)
+        private void Document_OnLoad(JToken document)
         {
             if (!(document?.Root is JArray projectArray)) return;
 
+            projectsCollection.Clear();
             foreach (var projectDef in projectArray) {
                 var project = projectDef.ToObject<Project>();
 
@@ -116,7 +117,7 @@ namespace Photon.Server.Internal.Projects
             }
         }
 
-        private bool Document_OnRemove(JObject document, string id)
+        private bool Document_OnRemove(JToken document, string id)
         {
             if (!(document.Root is JArray projectArray))
                 return false;

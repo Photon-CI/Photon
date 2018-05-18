@@ -40,6 +40,7 @@ namespace Photon.Agent.Internal.Session
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
         public VariableSetCollection ServerVariables {get; set;}
+        public VariableSetCollection AgentVariables {get; set;}
         protected ILog Log => _log.Value;
 
 
@@ -88,6 +89,8 @@ namespace Photon.Agent.Internal.Session
 
         public virtual async Task InitializeAsync()
         {
+            AgentVariables = await PhotonAgent.Instance.Variables.GetCollection();
+
             await Task.Run(() => {
                 Directory.CreateDirectory(WorkDirectory);
                 Directory.CreateDirectory(ContentDirectory);

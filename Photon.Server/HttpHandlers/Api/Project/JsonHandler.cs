@@ -4,10 +4,10 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.Server.HttpHandlers.Api
+namespace Photon.Server.HttpHandlers.Api.Project
 {
-    [HttpHandler("/api/projects")]
-    internal class ProjectsHandler : HttpHandlerAsync
+    [HttpHandler("/api/projects/json")]
+    internal class JsonHandler : HttpHandlerAsync
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {

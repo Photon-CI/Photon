@@ -1,6 +1,7 @@
 ﻿using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Library.GitHub;
+using Photon.Library.HttpMessages;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace Photon.Server.Internal.Sessions
         public string TaskName {get; set;}
         public string GitRefspec {get; set;}
         public string[] Roles {get; set;}
+        public AgentStartModes Mode {get; set;}
         public GithubCommit Commit {get; set;}
 
 
@@ -37,6 +39,37 @@ namespace Photon.Server.Internal.Sessions
                 //Commit = Commit,
             };
 
+            switch (Mode) {
+                case AgentStartModes.All:
+                    await RunAll(context);
+                    break;
+                case AgentStartModes.Any:
+                    await RunAny(context);
+                    break;
+            }
+        }
+
+        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
+        {
+            return new DomainAgentBuildSessionHost(this, agent, TokenSource.Token);
+        }
+
+        private async Task RunAll(ServerBuildContext context)
+        {
+            var sessionHandleCollection = context.RegisterAgents.All(Roles);
+
+            try {
+                await sessionHandleCollection.InitializeAsync(TokenSource.Token);
+
+                await sessionHandleCollection.RunTasksAsync(new [] {TaskName}, TokenSource.Token);
+            }
+            finally {
+                await sessionHandleCollection.ReleaseAllAsync(TokenSource.Token);
+            }
+        }
+
+        private async Task RunAny(ServerBuildContext context)
+        {
             using (var sessionHandle = context.RegisterAgents.Any(Roles)) {
                 try {
                     await sessionHandle.BeginAsync(TokenSource.Token);
@@ -47,11 +80,6 @@ namespace Photon.Server.Internal.Sessions
                     await sessionHandle.ReleaseAsync(TokenSource.Token);
                 }
             }
-        }
-
-        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
-        {
-            return new DomainAgentBuildSessionHost(this, agent, TokenSource.Token);
         }
     }
 }

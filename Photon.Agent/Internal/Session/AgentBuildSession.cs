@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework.Variables;
 
 namespace Photon.Agent.Internal.Session
 {
@@ -18,6 +19,7 @@ namespace Photon.Agent.Internal.Session
         public string GitRefspec {get; set;}
         public uint BuildNumber {get; set;}
         public GithubCommit Commit {get; set;}
+        public VariableSetCollection Variables {get; set;}
 
 
         public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
@@ -47,7 +49,7 @@ namespace Photon.Agent.Internal.Session
                 Output = Output.Writer,
                 Packages = PackageClient,
                 ServerVariables = ServerVariables,
-                AgentVariables = PhotonAgent.Instance.Variables,
+                AgentVariables = Variables,
             };
 
             var githubSource = Project?.Source as ProjectGithubSource;

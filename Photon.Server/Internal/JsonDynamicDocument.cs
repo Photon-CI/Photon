@@ -21,45 +21,46 @@ namespace Photon.Server.Internal
             };
         }
 
-        public void Load(Action<dynamic> loadAction)
+        public void Load(Action<JToken> loadAction)
         {
             if (!File.Exists(Filename)) return;
 
             using (var stream = File.Open(Filename, FileMode.Open, FileAccess.Read)) {
-                dynamic document = Serializer.Deserialize(stream);
+                var document = Serializer.Deserialize(stream);
 
                 loadAction?.Invoke(document);
             }
         }
 
-        public void Update(Action<dynamic> updateAction)
+        public void Update(Action<JToken> updateAction)
         {
             var path = Path.GetDirectoryName(Filename);
 
             if (path != null && !Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
-            using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
-                dynamic document = Serializer.Deserialize(stream, true);
-
+            AlterDocument(document => {
                 updateAction(document);
-
-                stream.SetLength(0);
-                JsonSerializerExtensions.Serialize(Serializer, stream, document);
-            }
+                return true;
+            });
         }
 
-        public void Remove(Func<dynamic, bool> removeAction)
+        public void Remove(Func<JToken, bool> removeAction)
         {
             if (!File.Exists(Filename)) return;
 
-            using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
-                JObject document = Serializer.Deserialize(stream, true);
+            AlterDocument(removeAction);
+        }
 
-                if (!removeAction(document)) return;
+        private void AlterDocument(Func<JToken, bool> alterFunc)
+        {
+            using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
+                var document = Serializer.Deserialize(stream, true);
+
+                if (!alterFunc(document)) return;
 
                 stream.SetLength(0);
-                Serializer.Serialize(stream, document);
+                JsonSerializerExtensions.Serialize(Serializer, stream, document);
             }
         }
     }

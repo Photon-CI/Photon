@@ -86,16 +86,35 @@ namespace Photon.Server.Internal
 
         private async Task OnProcess(IServerSession session)
         {
-            Log.Debug($"Processing Script Session '{session.SessionId}'.");
+            Log.Debug($"Session '{session.SessionId}' processing...");
 
+            try {
+                await OnProcessItem(session);
+
+                Log.Debug($"Session '{session.SessionId}' completed successfully.");
+            }
+            catch (Exception error) {
+                Log.Error($"Session '{session.SessionId}' Failed!", error);
+            }
+        }
+
+        private async Task OnProcessItem(IServerSession session)
+        {
             var abort = false;
             var errorList = new List<Exception>();
+
+            await session.InitializeAsync();
 
             try {
                 session.OnPreBuildEvent();
             }
             catch (Exception error) {
+                session.Output
+                    .Append("Pre-Build event failed! ", ConsoleColor.DarkRed)
+                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+
                 Log.Error("Pre-Build Event Failed!", error);
+                return;
             }
 
             try {

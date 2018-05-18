@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Photon.Framework.Variables
 {
     public class VariableSet
     {
         private readonly object variable;
+
+        public string this[string name] => GetValue(name)?.ToString();
 
 
         public VariableSet(object variable)
@@ -28,8 +32,6 @@ namespace Photon.Framework.Variables
         {
             return (T)GetValue(name);
         }
-
-        public string this[string name] => GetValue(name)?.ToString();
 
         private object GetPathValue(object value, string[] path, string sourcePath)
         {
@@ -69,6 +71,15 @@ namespace Photon.Framework.Variables
             }
 
             throw new ArgumentException($"Value '{part}' not found at '{sourcePath}'!");
+        }
+
+        public static VariableSet Create(string json, JsonSerializer serializer)
+        {
+            using (var reader = new StringReader(json))
+            using (var jsonReader = new JsonTextReader(reader)) {
+                var variable = serializer.Deserialize(jsonReader);
+                return new VariableSet(variable);
+            }
         }
     }
 }

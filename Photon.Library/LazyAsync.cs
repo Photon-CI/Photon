@@ -9,11 +9,6 @@ namespace Photon.Library
         private readonly Lazy<Task<T>> lazyTask;
 
 
-        public LazyAsync(Func<T> initFunc)
-        {
-            lazyTask = new Lazy<Task<T>>(() => Task.Run(initFunc));
-        }
-
         public LazyAsync(Func<Task<T>> initFunc)
         {
             lazyTask = new Lazy<Task<T>>(() => Task.Run(initFunc));

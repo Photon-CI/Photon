@@ -43,7 +43,7 @@ namespace Photon.Server.Internal.Sessions
         protected DomainConnectionFactory ConnectionFactory {get;}
         protected DomainPackageClient PackageClient {get;}
         public TaskResult Result {get; private set;}
-        public VariableSetCollection Variables {get;}
+        public VariableSetCollection Variables {get; private set;}
         public bool IsReleased => isReleased;
         protected ILog Log => _log.Value;
 
@@ -77,8 +77,6 @@ namespace Photon.Server.Internal.Sessions
                 PackageDirectory = Configuration.ApplicationPackageDirectory,
             };
 
-            Variables = PhotonServer.Instance.Variables;
-
             ConnectionFactory = new DomainConnectionFactory();
             ConnectionFactory.OnConnectionRequest += ConnectionFactory_OnConnectionRequest;
 
@@ -89,6 +87,11 @@ namespace Photon.Server.Internal.Sessions
             PackageClient.OnPullApplicationPackage += PackageClient_OnPullApplicationPackage;
 
             TokenSource = new CancellationTokenSource();
+        }
+
+        public virtual async Task InitializeAsync()
+        {
+            Variables = await PhotonServer.Instance.Variables.GetCollection();
         }
 
         public virtual void Dispose()

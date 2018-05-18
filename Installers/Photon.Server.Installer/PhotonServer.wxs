@@ -187,6 +187,9 @@
       <Component Id="Views_Variables_Index.html" Guid="1a1c4c42-6b8c-4909-8177-ba34d632aee5">
         <File Id="Views_Variables_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Variables\Index.html" />
       </Component>
+      <Component Id="Views_Variables_EditJson.html" Guid="a341a67a-9497-4b4e-876c-673ae31b977c">
+        <File Id="Views_Variables_EditJson.html" Name="EditJson.html" Source="$(var.PhotonServer_TargetDir)Views\Variables\EditJson.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>

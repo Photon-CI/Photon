@@ -5,16 +5,18 @@ using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api.Deploy
 {
     [HttpHandler("api/deploy/start")]
-    internal class DeployHandler : HttpHandler
+    internal class DeployHandler : HttpHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DeployHandler));
 
 
-        public override HttpHandlerResult Post()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var projectId = GetQuery("project");
             var projectPackageId = GetQuery("package");
