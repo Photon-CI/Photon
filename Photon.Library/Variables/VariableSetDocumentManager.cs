@@ -1,5 +1,4 @@
-﻿using Photon.Framework;
-using Photon.Framework.Variables;
+﻿using Photon.Framework.Variables;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -82,7 +81,7 @@ namespace Photon.Library.Variables
 
         public async Task<VariableSetCollection> GetCollection()
         {
-            var collection = new VariableSetCollection(JsonSettings.Serializer);
+            var collection = new VariableSetCollection();
 
             foreach (var document in documents.Values) {
                 var data = await document.GetJson();

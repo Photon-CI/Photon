@@ -14,11 +14,12 @@ namespace Photon.Framework.Variables
         public VariableSet this[string name] => GetSet(name);
 
 
-        public VariableSetCollection(JsonSerializer serializer)
+        public VariableSetCollection()
         {
-            this.serializer = serializer;
-
             Json = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            serializer = JsonSerializer.CreateDefault();
+            serializer.Formatting = Formatting.Indented;
         }
 
         public bool TryGetSet(string name, out VariableSet variableSet)
