@@ -27,6 +27,8 @@ namespace Photon.Library.Variables
 
             documents.Clear();
 
+            if (!Directory.Exists(path)) return;
+
             foreach (var file in Directory.EnumerateFiles(path, "*.json", SearchOption.AllDirectories)) {
                 var id = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
 
