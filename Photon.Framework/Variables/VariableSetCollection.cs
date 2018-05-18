@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Photon.Framework.Variables
 {
     [Serializable]
     public class VariableSetCollection
     {
-        private readonly JsonSerializer serializer;
-
         public Dictionary<string, string> Json {get;}
 
         public VariableSet this[string name] => GetSet(name);
@@ -17,22 +17,32 @@ namespace Photon.Framework.Variables
         public VariableSetCollection()
         {
             Json = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            serializer = JsonSerializer.CreateDefault();
-            serializer.Formatting = Formatting.Indented;
         }
 
         public bool TryGetSet(string name, out VariableSet variableSet)
         {
             var result = Json.TryGetValue(name, out var json);
-            variableSet = result ? VariableSet.Create(json, serializer) : null;
+            variableSet = result ? CreateSet(json) : null;
             return result;
         }
 
         public VariableSet GetSet(string name)
         {
             return Json.TryGetValue(name, out var json)
-                ? VariableSet.Create(json, serializer) : null;
+                ? CreateSet(json) : null;
+        }
+
+        private static VariableSet CreateSet(string json)
+        {
+            var serializer = JsonSerializer.CreateDefault();
+            serializer.Formatting = Formatting.Indented;
+            serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            using (var reader = new StringReader(json))
+            using (var jsonReader = new JsonTextReader(reader)) {
+                var variable = serializer.Deserialize(jsonReader);
+                return new VariableSet(variable);
+            }
         }
     }
 }

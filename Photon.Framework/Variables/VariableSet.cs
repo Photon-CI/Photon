@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Photon.Framework.Variables
@@ -71,15 +69,6 @@ namespace Photon.Framework.Variables
             }
 
             throw new ArgumentException($"Value '{part}' not found at '{sourcePath}'!");
-        }
-
-        public static VariableSet Create(string json, JsonSerializer serializer)
-        {
-            using (var reader = new StringReader(json))
-            using (var jsonReader = new JsonTextReader(reader)) {
-                var variable = serializer.Deserialize(jsonReader);
-                return new VariableSet(variable);
-            }
         }
     }
 }
