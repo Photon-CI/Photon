@@ -28,7 +28,6 @@ namespace Photon.Server.Internal.Sessions
         private readonly Lazy<ILog> _log;
         private readonly DateTime utcCreated;
         private DateTime? utcReleased;
-        private bool isReleased;
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
@@ -44,7 +43,8 @@ namespace Photon.Server.Internal.Sessions
         protected DomainPackageClient PackageClient {get;}
         public TaskResult Result {get; private set;}
         public VariableSetCollection Variables {get; private set;}
-        public bool IsReleased => isReleased;
+        public bool IsReleased { get; private set; }
+
         protected ILog Log => _log.Value;
 
         protected readonly CancellationTokenSource TokenSource;
@@ -96,7 +96,7 @@ namespace Photon.Server.Internal.Sessions
 
         public virtual void Dispose()
         {
-            if (!isReleased)
+            if (!IsReleased)
                 ReleaseAsync().GetAwaiter().GetResult();
 
             TokenSource?.Dispose();
@@ -119,8 +119,8 @@ namespace Photon.Server.Internal.Sessions
 
         public async Task ReleaseAsync()
         {
-            if (isReleased) return;
-            isReleased = true;
+            if (IsReleased) return;
+            IsReleased = true;
 
             utcReleased = DateTime.UtcNow;
             OnReleased();

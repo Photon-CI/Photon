@@ -15,7 +15,7 @@ namespace Photon.Agent.MessageHandlers
 
         public override async Task<IResponseMessage> Process(TaskRunRequest requestMessage)
         {
-            if (!PhotonAgent.Instance.Sessions.TryGetSession(requestMessage.AgentSessionId, out var session))
+            if (!PhotonAgent.Instance.Sessions.TryGet(requestMessage.AgentSessionId, out var session))
                 throw new ApplicationException($"Session '{requestMessage.AgentSessionId}' not found!");
 
             try {

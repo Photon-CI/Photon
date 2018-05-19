@@ -98,7 +98,7 @@ namespace Photon.Framework.Server
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
-        public override string ToString()
+        public string GetString()
         {
             lock (lockHandle) {
                 return builder.ToString();

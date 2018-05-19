@@ -1,118 +1,13 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8" lang="en" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{PageTitle}}</title>
     <link rel="SHORTCUT ICON" href="{{#Url Content/favicon.ico}}">
-    <link rel="stylesheet" href="{{#Url Content/bootstrap-4.1.0/css/bootstrap.min.css}}">
-    <link rel="stylesheet" href="{{#Url Content/fontawesome-5.0.11/css/fontawesome-all.min.css}}">
-    <style>
-        body,html{
-            height: 100%;
-            overflow-x: hidden;
-        }
-        nav.sidebar {
-            -webkit-transition: margin 200ms ease-out;
-            -moz-transition: margin 200ms ease-out;
-            -o-transition: margin 200ms ease-out;
-            transition: margin 200ms ease-out;
-        }
-        .layout-content {
-            -webkit-transition: margin 200ms ease-out, width 200ms ease-out;
-            -moz-transition: margin 200ms ease-out, width 200ms ease-out;
-            -o-transition: margin 200ms ease-out, width 200ms ease-out;
-            transition: margin 200ms ease-out, width 200ms ease-out;
-        }
-        .nav-item-iconholder {
-            float: right;
-            text-align: center;
-        }
-        .photon-icon > img {
-            width: auto;
-            height: 50px;
-        }
-        nav.sidebar li.active a {
-            color: #47b5d6 !important;
-        }
-
-        @media (min-width: 768px) {
-            nav.sidebar {
-                width: 200px;
-                height: 100%;
-                margin-left: -160px;
-                float: left;
-                z-index: 8000;
-                margin-bottom: 0;
-                padding: 0;
-            }
-            nav.sidebar .container-fluid {
-                padding: 0;
-                height: 100%;
-                align-items: flex-start;
-                flex-direction: column;
-            }
-            #layoutNavbarContent {
-                align-items: flex-start;
-                width: 100%;
-            }
-            nav.sidebar ul {
-                flex-direction: column !important;
-                width: 100%;
-            }
-            nav.sidebar li {
-                width: 100%;
-            }
-
-            .nav-item-iconholder {
-                width: 30px;
-            }
-
-            .photon-icon {
-                padding: 8px 4px;
-                border-bottom: 1px solid #2c2c2c;
-                width: 100%;
-            }
-            .photon-icon > img {
-                position: absolute;
-                right: 4px;
-                top: 8px;
-                width: 32px;
-                height: 32px;
-            }
-            .layout-content {
-                position: absolute;
-                width: calc(100% - 40px);
-                margin-left: 40px;
-                float: right;
-            }
-
-            nav.sidebar:hover + .layout-content {
-                margin-left: 200px;
-                width: calc(100% - 200px);
-            }
-            nav.sidebar:hover {
-                margin-left: 0;
-            }
-            .forAnimate {
-                opacity: 0;
-            }
-        }
-
-        @media (min-width: 1330px) {
-            nav.sidebar {
-                margin-left: 0;
-                float: left;
-            }
-            .layout-content {
-                width: calc(100% - 200px);
-                margin-left: 200px;
-            }
-            nav.sidebar .forAnimate {
-                opacity: 1;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{#Url SharedContent/bootstrap-4.1.0/css/bootstrap.min.css}}">
+    <script defer src="{{#Url SharedContent/fontawesome-5.0.13/js/fontawesome-all.min.js}}"></script>
+    <link rel="stylesheet" href="{{#Url Content/site.css}}">
     {{style-content}}
 </head>
 <body>
@@ -128,39 +23,31 @@
             <div class="collapse navbar-collapse" id="layoutNavbarContent">
                 <ul class="navbar-nav">
                     <li class="nav-item" data-link="dashboard">
-                        <a href="{{#Url Index}}" class="nav-link">
+                        <a href="{{#Url index}}" class="nav-link">
                             <div class="nav-item-iconholder">
                                 <i style="font-size: 16px" class="fas fa-home"></i>
                             </div>
                             Dashboard
                         </a>
                     </li>
+                    <li class="nav-item" data-link="sessions">
+                        <a href="{{#Url sessions}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-cubes"></i>
+                            </div>
+                            Sessions
+                        </a>
+                    </li>
                     <li class="nav-item" data-link="variables">
-                        <a href="{{#Url Variables}}" class="nav-link">
+                        <a href="{{#Url variables}}" class="nav-link">
                             <div class="nav-item-iconholder">
                                 <i style="font-size: 16px" class="fas fa-hashtag"></i>
                             </div>
                             Variables
                         </a>
                     </li>
-                    <li class="nav-item" data-link="builds">
-                        <a href="{{#Url Builds}}" class="nav-link">
-                            <div class="nav-item-iconholder">
-                                <i style="font-size: 16px" class="fas fa-cubes"></i>
-                            </div>
-                            Builds
-                        </a>
-                    </li>
-                    <li class="nav-item" data-link="deployments">
-                        <a href="{{#Url Deployments}}" class="nav-link">
-                            <div class="nav-item-iconholder">
-                                <i style="font-size: 16px" class="fas fa-cloud-download-alt"></i>
-                            </div>
-                            Deployments
-                        </a>
-                    </li>
                     <li class="nav-item" data-link="configuration">
-                        <a href="{{#Url Configuration}}" class="nav-link">
+                        <a href="{{#Url configuration}}" class="nav-link">
                             <div class="nav-item-iconholder">
                                 <i style="font-size: 16px" class="fas fa-cog"></i>
                             </div>
@@ -174,9 +61,9 @@
     <div class="layout-content">
         {{master-content}}
     </div>
-    <script src="{{#Url Content/jquery-3.3.1.min.js}}"></script>
-    <script src="{{#Url Content/popper.min.js}}"></script>
-    <script src="{{#Url Content/bootstrap-4.1.0/js/bootstrap.min.js}}"></script>
+    <script src="{{#Url SharedContent/jquery-3.3.1.min.js}}"></script>
+    <script src="{{#Url SharedContent/popper.min.js}}"></script>
+    <script src="{{#Url SharedContent/bootstrap-4.1.0/js/bootstrap.min.js}}"></script>
     {{script-content}}
 </body>
 </html>

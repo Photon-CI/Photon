@@ -31,7 +31,6 @@ namespace Photon.Agent.Internal
         public string WorkDirectory {get;}
         public AgentSessionManager Sessions {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
-        //public VariableSetCollection Variables {get;}
         public VariableSetDocumentManager Variables {get;}
         public RepositorySourceManager RepositorySources {get;}
 
@@ -154,48 +153,24 @@ namespace Photon.Agent.Internal
             }
         }
 
-        //private void LoadVariables()
-        //{
-        //    var filename = Path.Combine(Configuration.Directory, "variables.json");
-        //    var errorList = new List<Exception>();
-
-        //    if (File.Exists(filename)) {
-        //        try {
-        //            Variables.GlobalJson = File.ReadAllText(filename);
-        //        }
-        //        catch (Exception error) {
-        //            errorList.Add(error);
-        //        }
-        //    }
-
-        //    if (Directory.Exists(Configuration.VariablesDirectory)) {
-        //        var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
-        //        Parallel.ForEach(fileEnum, file => {
-        //            var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
-
-        //            try {
-        //                var json = File.ReadAllText(file);
-        //                Variables.Json[file_name] = json;
-        //            }
-        //            catch (Exception error) {
-        //                errorList.Add(error);
-        //            }
-        //        });
-        //    }
-
-        //    if (errorList.Any()) throw new AggregateException(errorList);
-        //}
-
         private void StartHttpServer()
         {
+            var contentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpContentDirectory,
+                UrlPath = "/Content/",
+            };
+
+            var sharedContentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpSharedContentDirectory,
+                UrlPath = "/SharedContent/",
+            };
+
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
                 ListenerPath = Definition.Http.Path,
                 ContentDirectories = {
-                    new ContentDirectory {
-                        DirectoryPath = Configuration.HttpContentDirectory,
-                        UrlPath = "/Content/",
-                    }
+                    contentDir,
+                    sharedContentDir,
                 },
             };
 

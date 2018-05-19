@@ -1,0 +1,17 @@
+{
+	"id": "photon.linux",
+	"name": "Photon [Linux]",
+	"description": "Deploy Photon Server and Agent to a Linux environment.",
+	"assembly": "PhotonTasks.dll",
+	"script": "LinuxDeploy",
+	"files": [
+		{
+			"path": "bin\\Linux\\**",
+			"destination": "",
+			"exclude": [
+				"**\\*.xml",
+				"**\\*.pdb"
+			]
+		}
+	]
+}

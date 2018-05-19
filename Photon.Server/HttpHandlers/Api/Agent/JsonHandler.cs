@@ -21,8 +21,9 @@ namespace Photon.Server.HttpHandlers.Api.Agent
             if (!PhotonServer.Instance.Agents.TryGet(id, out var agent))
                 return Response.BadRequest().SetText($"Agent '{id}' was not found!");
 
-            return Response.Json(agent)
-                .SetHeader("Content-Disposition", $"attachment; filename={id}.json");
+            return await Response.Json(agent)
+                .SetHeader("Content-Disposition", $"attachment; filename={id}.json")
+                .AsAsync();
         }
 
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)

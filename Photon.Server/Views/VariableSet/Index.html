@@ -1,0 +1,99 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="variables"]').addClass('active');
+
+        $('#SearchTextBox').on('input', onSearchChanged);
+
+        onSearchChanged();
+    });
+
+    function onSearchChanged() {
+        var searchText = $('#SearchTextBox').val();
+
+        $('div[data-card-name]').each(function (i, e) {
+            var visible = false;
+
+            if (searchText.length === 0) {
+                visible = true;
+            } else {
+                var name = $(e).attr('data-card-name');
+
+                if (name.match(new RegExp(searchText, "i")))
+                    visible = true;
+            }
+
+            $(e).toggle(visible);
+        });
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .layout-content {
+        padding: 4px 6px;
+    }
+    .layout-content > .container-fluid {
+        padding: 0;
+    }
+    .card-container {
+        margin: -4px -4px;
+        padding: 0;
+    }
+    .set-card {
+        margin: 4px 4px;
+        min-height: 120px;
+    }
+    .set-card .card-body {
+        padding: 8px;
+    }
+    .set-name {
+        margin: 0;
+        display: inline-block;
+    }
+</style>
+{{#EndStyle}}
+
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark rounded mb-2">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#variablesNavbarMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="variablesNavbarMenu">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a href="{{#Url variable/edit/json}}" class="nav-link">
+                    <i class="fas fa-plus"></i> New Variable Set
+                </a>
+            </li>
+        </ul>
+        <div class="form-inline">
+            <div class="input-group">
+                <input id="SearchTextBox" type="text" class="form-control" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row no-gutters card-container">
+        {{#Each Sets.set}}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3" data-card-name="{{set.Id}}">
+            <div class="card set-card">
+                <div class="card-header">
+                    <h5 class="card-title set-name">
+                        <a href="{{#Url variable/edit/json}}?id={{&set.Id}}">{{set.Id}}</a>
+                    </h5>
+                </div>
+            </div>
+        </div>
+        {{#EndEach}}
+    </div>
+</div>

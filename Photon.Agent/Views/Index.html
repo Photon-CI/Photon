@@ -10,13 +10,28 @@
 
 {{#Style}}
 <style>
-    .layout-content {
-        padding: 8px 16px;
-    }
 </style>
 {{#EndStyle}}
 
+<div class="bg-secondary">
+    <h2 class="my-0 py-2 px-3">{{AgentName}}</h2>
+</div>
+
 <div class="container">
-    <h2 class="my-0">{{Name}} <small class="text-muted">{{Version}}</small></h2>
-    <a href="{{Url}}" class="my-0">{{Url}}</a>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>Agent Version</td>
+                <td>{{AgentVersion}}</td>
+            </tr>
+            <tr>
+                <td>HTTP URL</td>
+                <td>{{AgentHttpUrl}}</td>
+            </tr>
+            <tr>
+                <td>TCP URL</td>
+                <td>{{AgentTcpUrl}}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>

@@ -2,6 +2,7 @@
 using Photon.Framework.Extensions;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Packages
@@ -9,6 +10,8 @@ namespace Photon.Framework.Packages
     public class ApplicationPackageUtility
     {
         private readonly IDomainContext context;
+
+        public string PackageDirectory {get; set;}
 
 
         public ApplicationPackageUtility(IDomainContext context)
@@ -18,15 +21,21 @@ namespace Photon.Framework.Packages
 
         /// <summary>
         /// Creates an Application Package using the specified
-        /// definition file.
+        /// definition file and pushes it to the server.
         /// </summary>
         /// <param name="definitionFilename">The file name of the package definition.</param>
         /// <param name="version">The version of the package to create.</param>
-        /// <param name="outputFilename">The file name of the output package.</param>
-        public async Task CreatePackage(string definitionFilename, string version, string outputFilename)
+        public async Task Publish(string definitionFilename, string version, CancellationToken token = default(CancellationToken))
         {
-            var definition = PackageTools.LoadDefinition<PackageDefinition>(definitionFilename);
+            var name = Path.GetFileName(definitionFilename);
+
+            context.Output.Append("Parsing package definition ", ConsoleColor.DarkCyan)
+                .Append(name, ConsoleColor.Cyan)
+                .AppendLine("...", ConsoleColor.DarkCyan);
+
+            var definition = PackageTools.LoadDefinition<ApplicationPackageDefinition>(definitionFilename);
             var rootPath = Path.GetDirectoryName(definitionFilename);
+            var packageFilename = Path.Combine(PackageDirectory, $"{definition.Id}.zip");
 
             context.Output.Append("Packaging ", ConsoleColor.DarkCyan)
                 .Append(definition.Id, ConsoleColor.Cyan)
@@ -35,7 +44,7 @@ namespace Photon.Framework.Packages
                 .AppendLine("...", ConsoleColor.DarkCyan);
 
             try {
-                await ApplicationPackageTools.CreatePackage(definition, rootPath, version, outputFilename);
+                await ApplicationPackageTools.CreatePackage(definition, rootPath, version, packageFilename);
 
                 context.Output.Append("Packaged ", ConsoleColor.DarkBlue)
                     .Append(definition.Id, ConsoleColor.Blue)
@@ -45,6 +54,32 @@ namespace Photon.Framework.Packages
             }
             catch (Exception error) {
                 context.Output.Append("Failed to package ", ConsoleColor.DarkRed)
+                    .Append(definition.Id, ConsoleColor.Red)
+                    .Append(" @", ConsoleColor.DarkRed)
+                    .Append(version, ConsoleColor.Red)
+                    .AppendLine("!", ConsoleColor.DarkRed)
+                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+
+                throw;
+            }
+
+            context.Output.Append("Publishing ", ConsoleColor.DarkCyan)
+                .Append(definition.Id, ConsoleColor.Cyan)
+                .Append(" @", ConsoleColor.DarkCyan)
+                .Append(version, ConsoleColor.Cyan)
+                .AppendLine("...", ConsoleColor.DarkCyan);
+
+            try {
+                await context.PushApplicationPackageAsync(packageFilename, token);
+
+                context.Output.Append("Published ", ConsoleColor.DarkGreen)
+                    .Append(definition.Id, ConsoleColor.Green)
+                    .Append(" @", ConsoleColor.DarkGreen)
+                    .Append(version, ConsoleColor.Green)
+                    .AppendLine(" successfully.", ConsoleColor.DarkGreen);
+            }
+            catch (Exception error) {
+                context.Output.Append("Failed to publish ", ConsoleColor.DarkRed)
                     .Append(definition.Id, ConsoleColor.Red)
                     .Append(" @", ConsoleColor.DarkRed)
                     .Append(version, ConsoleColor.Red)

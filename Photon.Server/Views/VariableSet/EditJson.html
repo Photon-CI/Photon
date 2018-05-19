@@ -1,0 +1,160 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script src="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
+<script>
+    var editor;
+
+    $(function () {
+        $('#layoutNavbarContent [data-link="variables"]').addClass('active');
+
+        var options = {
+            modes: ['code', 'tree']
+        };
+
+        var container = document.getElementById("jsoneditor");
+        editor = new JSONEditor(container, options);
+
+        $('#SaveModal').on('show.bs.modal', function () {
+            var setId = $('#SetId').val();
+            $('#SetIdTextBox').val(setId).focus();
+        });
+    });
+
+    var agentJsonUrl = '{{#Url api/variable/json}}';
+    var agentDeleteUrl = '{{#Url api/variable/delete}}';
+
+    function onLoad() {
+        $.ajax({
+            url: agentJsonUrl +'?id={{&SetId}}',
+            dataType: 'json',
+            method: 'get'
+        }).done(function(data) {
+            editor.set(data);
+        }).fail(function() {
+            alert('Failed to load variable set JSON!');
+        });
+    }
+
+    function onSave() {
+        var json = editor.get();
+        var setIdPrev = $('#SetId').val();
+        var setId = $('#SetIdTextBox').val();
+
+        $.ajax({
+            url: agentJsonUrl + '?id=' + encodeURIComponent(setId)
+                +'&prevId='+encodeURIComponent(setIdPrev),
+            method: 'post',
+            data: JSON.stringify(json)
+        }).done(function () {
+            //$('#SetId').val(setId);
+            document.location = '{{#Url variables}}';
+        }).fail(function() {
+            alert('Failed to save variable set JSON!');
+        });
+    }
+
+    function onDelete() {
+        var setId = $('#SetId').val();
+
+        $.ajax({
+            url: agentDeleteUrl + '?id=' + encodeURIComponent(setId),
+            method: 'post'
+        }).done(function () {
+            document.location = '{{#Url variables}}';
+        }).fail(function () {
+            alert('Failed to delete variable set!');
+        });
+    }
+</script>
+{{#If SetId}}
+<script>
+    $(function() {
+        onLoad();
+    });
+</script>
+{{#EndIf}}
+
+{{#EndScript}}
+
+{{#Style}}
+<link href="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
+<style>
+    .layout-content {
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+
+    #jsoneditor {
+        flex: 1;
+    }
+</style>
+{{#EndStyle}}
+
+<div class="bg-dark">
+    <div class="row">
+        <div class="col-12 clearfix">
+            <div class="float-right" style="padding: 4px">
+                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#DeleteModal">
+                    Delete <i class="fas fa-trash"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#SaveModal">
+                    Save <i class="fas fa-save"></i>
+                </button>
+            </div>
+            <a href="{{#Url variables}}" class="btn btn-sm btn-secondary float-left" style="margin: 4px">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h4 class="text-light" style="line-height: 36px; margin: 0">Edit Variable Set JSON</h4>
+        </div>
+    </div>
+</div>
+
+<input id="SetId" type="hidden" value="{{SetId}}" />
+<div id="jsoneditor"></div>
+
+<div id="SaveModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Save Variable Set</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="SetIdTextBox">ID / Filename</label>
+                    <input type="text" id="SetIdTextBox" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="onSave()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="DeleteModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Variable Set</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure? This operation cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="onDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -41,6 +41,11 @@ namespace Photon.Library.Variables
 
         internal async Task SaveJson()
         {
+            var path = Path.GetDirectoryName(Filename);
+
+            if (path != null && !Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
             using (var stream = File.Open(Filename, FileMode.Create, FileAccess.Write))
             using (var writer = new StreamWriter(stream)) {
                 var json = await _json;

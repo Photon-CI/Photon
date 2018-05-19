@@ -5,16 +5,6 @@ using System.Linq;
 
 namespace Photon.Server.Internal.Sessions
 {
-    internal class SessionStateEventArgs : EventArgs
-    {
-        public ServerSessionBase Session {get;}
-
-        public SessionStateEventArgs(ServerSessionBase session)
-        {
-            this.Session = session;
-        }
-    }
-
     internal class ServerSessionManager : IDisposable
     {
         public event EventHandler<SessionStateEventArgs> SessionStarted;
@@ -59,6 +49,7 @@ namespace Photon.Server.Internal.Sessions
             pool.Add(session);
 
             session.ReleaseEvent += Session_OnReleased;
+
             OnSessionStarted(session);
         }
 

@@ -17,11 +17,12 @@ namespace Photon.Agent.Internal.Session
 {
     internal abstract class AgentSessionBase : IAgentSession
     {
+        public event EventHandler ReleaseEvent;
+
         protected readonly CancellationTokenSource TokenSource;
         private readonly Lazy<ILog> _log;
-        private readonly DateTime utcCreated;
-        private DateTime? utcReleased;
-        private bool isReleased;
+        public DateTime TimeCreated {get;}
+        public DateTime? TimeReleased {get; private set;}
 
         public string SessionId {get;}
         public string ServerSessionId {get;}
@@ -41,6 +42,9 @@ namespace Photon.Agent.Internal.Session
         public SessionOutput Output {get;}
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
+        public bool IsReleased {get; private set;}
+        //public bool IsComplete {get; set;}
+
         protected ILog Log => _log.Value;
 
 
@@ -51,7 +55,7 @@ namespace Photon.Agent.Internal.Session
             this.SessionClientId = sessionClientId;
 
             SessionId = Guid.NewGuid().ToString("N");
-            utcCreated = DateTime.UtcNow;
+            TimeCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
             TokenSource = new CancellationTokenSource();
@@ -71,7 +75,7 @@ namespace Photon.Agent.Internal.Session
 
         public virtual void Dispose()
         {
-            if (!isReleased)
+            if (!IsReleased)
                 Log.Error("Session was disposed without being released!");
                 //ReleaseAsync().GetAwaiter().GetResult();
             
@@ -102,12 +106,13 @@ namespace Photon.Agent.Internal.Session
 
         public async Task ReleaseAsync()
         {
-            utcReleased = DateTime.UtcNow;
+            TimeReleased = DateTime.UtcNow;
+            OnReleased();
 
             if (Domain != null)
                 await Domain.Unload(true);
 
-            if (!isReleased) {
+            if (!IsReleased) {
                 try {
                     var _workDirectory = WorkDirectory;
                     await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
@@ -127,7 +132,7 @@ namespace Photon.Agent.Internal.Session
                     Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
                 }
 
-                isReleased = true;
+                IsReleased = true;
             }
         }
 
@@ -138,14 +143,27 @@ namespace Photon.Agent.Internal.Session
             // TODO: Wait?
         }
 
+        //public void Complete(TaskResult result)
+        //{
+        //    this.Result = result;
+
+        //    Output.Flush();
+        //    IsComplete = true;
+        //}
+
         public bool IsExpired()
         {
-            if (utcReleased.HasValue) {
-                if (DateTime.UtcNow - utcReleased > CacheSpan)
+            if (TimeReleased.HasValue) {
+                if (DateTime.UtcNow - TimeReleased > CacheSpan)
                     return true;
             }
 
-            return DateTime.UtcNow - utcCreated > LifeSpan;
+            return DateTime.UtcNow - TimeCreated > LifeSpan;
+        }
+
+        protected void OnReleased()
+        {
+            ReleaseEvent?.Invoke(this, EventArgs.Empty);
         }
 
         private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)

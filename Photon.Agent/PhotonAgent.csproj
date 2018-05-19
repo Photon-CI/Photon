@@ -37,7 +37,7 @@
   <PropertyGroup>
     <StartupObject>Photon.Agent.Program</StartupObject>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PI|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Linux|AnyCPU' ">
     <OutputPath>bin\PI\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
@@ -74,10 +74,16 @@
     </Compile>
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="HttpHandlers\Api\LogHandler.cs" />
-    <Compile Include="HttpHandlers\Builds\BuildIndexHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Variable\DeleteHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Variable\JsonHandler.cs" />
     <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\Deployments\DeploymentIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Variables\VariableIndexHandler.cs" />
+    <Compile Include="HttpHandlers\Session\SessionDetailsHandler.cs" />
+    <Compile Include="HttpHandlers\Session\SessionIndexHandler.cs" />
+    <Compile Include="HttpHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
+    <Compile Include="HttpHandlers\VariableSet\VariableSetIndexHandler.cs" />
     <Compile Include="Internal\Git\RepositoryHandle.cs" />
     <Compile Include="Internal\Git\RepositoryIndex.cs" />
     <Compile Include="Internal\Git\RepositoryIndexEntry.cs" />
@@ -91,7 +97,9 @@
     <Compile Include="Internal\Session\IAgentSession.cs" />
     <Compile Include="Internal\PhotonAgent.cs" />
     <Compile Include="Internal\Configuration.cs" />
+    <Compile Include="Internal\Session\AgentSessionWatch.cs" />
     <Compile Include="Internal\Session\SessionOutput.cs" />
+    <Compile Include="Internal\Session\SessionStateEventArgs.cs" />
     <Compile Include="MessageHandlers\AgentUpdateProcessor.cs" />
     <Compile Include="MessageHandlers\SessionCancelProcessor.cs" />
     <Compile Include="MessageHandlers\DeploySessionBeginProcessor.cs" />
@@ -105,6 +113,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
+    <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
+    <Compile Include="ViewModels\VariableSet\VariableSetEditJsonVM.cs" />
+    <Compile Include="ViewModels\VariableSet\VariableSetIndexVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="agent.json" />
@@ -114,46 +125,92 @@
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="App.PI.config">
+    <None Include="App.Linux.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot">
+    <Content Include="..\SharedContent\ActiveSessions.js">
+      <Link>Content\ActiveSessions.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.ttf">
+    <Content Include="..\SharedContent\ansi_up.js">
+      <Link>Content\ansi_up.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap-grid.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap-grid.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff2">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap-reboot.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap-reboot.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.eot">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.ttf">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\js\bootstrap.bundle.min.js">
+      <Link>Content\bootstrap-4.1.0\js\bootstrap.bundle.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\js\bootstrap.min.js">
+      <Link>Content\bootstrap-4.1.0\js\bootstrap.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff2">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\css\fa-svg-with-js.css">
+      <Link>Content\fontawesome-5.0.13\css\fa-svg-with-js.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.eot">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-brands.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-brands.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.ttf">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-regular.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-regular.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-solid.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-solid.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff2">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-v4-shims.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-v4-shims.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fontawesome-all.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fontawesome-all.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fontawesome.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fontawesome.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jquery-3.3.1.min.js">
+      <Link>Content\jquery-3.3.1.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\img\jsoneditor-icons.svg">
+      <Link>Content\jsoneditor-5.15.0\img\jsoneditor-icons.svg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\jsoneditor.min.css">
+      <Link>Content\jsoneditor-5.15.0\jsoneditor.min.css</Link>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\jsoneditor.min.js">
+      <Link>Content\jsoneditor-5.15.0\jsoneditor.min.js</Link>
+    </Content>
+    <Content Include="..\SharedContent\photon_light.ico">
+      <Link>Content\photon_light.ico</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\popper.min.js">
+      <Link>Content\popper.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\SessionOutput.js">
+      <Link>Content\SessionOutput.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
@@ -173,73 +230,31 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Builds\Index.html">
+    <Content Include="Content\site.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configuration.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Deployments\Index.html">
+    <Content Include="Views\Session\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Variables\Index.html">
+    <Content Include="Views\Session\Details.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\VariableSet\EditJson.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\VariableSet\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap-grid.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap-reboot.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\js\bootstrap.bundle.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\js\bootstrap.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-brands.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-regular.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-solid.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fontawesome-all.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fontawesome.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\Images\photon_dark.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\jquery-3.3.1.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\photon_light.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\popper.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Master.html">

@@ -64,6 +64,9 @@
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="IFrameworkAssembly.cs" />
     <Compile Include="JsonSettings.cs" />
+    <Compile Include="Packages\ApplicationPackageDefinition.cs" />
+    <Compile Include="Packages\ProjectPackageDefinition.cs" />
+    <Compile Include="Packages\ProjectPackageUtility.cs" />
     <Compile Include="Packages\ApplicationPackageUtility.cs" />
     <Compile Include="Packages\DomainPackageClient.cs" />
     <Compile Include="Packages\PackageReference.cs" />
@@ -108,7 +111,7 @@
     <Compile Include="Agent\IAgentDeployContext.cs" />
     <Compile Include="Agent\IAgentBuildContext.cs" />
     <Compile Include="Tasks\IDeployTask.cs" />
-    <Compile Include="Packages\PackageDefinition.cs" />
+    <Compile Include="Packages\IPackageDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks\RolesAttribute.cs" />
     <Compile Include="Tasks\BuildTaskRegistry.cs" />

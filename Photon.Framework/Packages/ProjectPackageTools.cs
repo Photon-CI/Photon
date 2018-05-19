@@ -7,17 +7,19 @@ namespace Photon.Framework.Packages
 {
     public class ProjectPackageTools
     {
+        public static ProjectPackageDefinition LoadDefinition(string filename)
+        {
+            return PackageTools.LoadDefinition<ProjectPackageDefinition>(filename);
+        }
+
         /// <summary>
         /// Creates a Project Package using the specified
         /// definition file.
         /// </summary>
-        /// <param name="definitionFilename">The file name of the package definition.</param>
         /// <param name="version">The version of the package to create.</param>
         /// <param name="outputFilename">The file name of the output package.</param>
-        public static async Task CreatePackage(string definitionFilename, string version, string outputFilename)
+        public static async Task CreatePackage(ProjectPackageDefinition definition, string rootPath, string version, string outputFilename)
         {
-            var definition = PackageTools.LoadDefinition<PackageDefinition>(definitionFilename);
-            var definitionPath = Path.GetDirectoryName(definitionFilename);
 
             var outputFilenameFull = Path.GetFullPath(outputFilename);
             var outputPath = Path.GetDirectoryName(outputFilenameFull);
@@ -34,7 +36,7 @@ namespace Photon.Framework.Packages
                 foreach (var fileDefinition in definition.Files) {
                     var destPath = Path.Combine("bin", fileDefinition.Destination);
 
-                    await PackageTools.AddFiles(archive, definitionPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
+                    await PackageTools.AddFiles(archive, rootPath, fileDefinition.Path, destPath, fileDefinition.Exclude?.ToArray());
                 }
             });
         }
@@ -66,7 +68,7 @@ namespace Photon.Framework.Packages
             return metadata;
         }
 
-        private static void AppendMetadata(ZipArchive archive, PackageDefinition definition, string version)
+        private static void AppendMetadata(ZipArchive archive, ProjectPackageDefinition definition, string version)
         {
             var metadata = new ProjectPackage {
                 Id = definition.Id,

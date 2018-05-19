@@ -32,7 +32,7 @@ namespace Photon.Server.HttpHandlers.Api.Session
                                 
 
                                 if (session.Output.Length > pos) {
-                                    var text = session.Output.ToString().Substring(pos);
+                                    var text = session.Output.GetString().Substring(pos);
                                     await writer.WriteAsync(text);
 
                                     pos = session.Output.Length;

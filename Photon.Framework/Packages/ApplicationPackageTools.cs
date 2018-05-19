@@ -13,7 +13,7 @@ namespace Photon.Framework.Packages
         /// </summary>
         /// <param name="version">The version of the package to create.</param>
         /// <param name="outputFilename">The file name of the output package.</param>
-        public static async Task CreatePackage(PackageDefinition definition, string rootPath, string version, string outputFilename)
+        public static async Task CreatePackage(ApplicationPackageDefinition definition, string rootPath, string version, string outputFilename)
         {
             var outputFilenameFull = Path.GetFullPath(outputFilename);
             var outputPath = Path.GetDirectoryName(outputFilenameFull);
@@ -62,7 +62,7 @@ namespace Photon.Framework.Packages
             return metadata;
         }
 
-        private static void AppendMetadata(ZipArchive archive, PackageDefinition definition, string version)
+        private static void AppendMetadata(ZipArchive archive, ApplicationPackageDefinition definition, string version)
         {
             var metadata = new ApplicationPackage {
                 Id = definition.Id,

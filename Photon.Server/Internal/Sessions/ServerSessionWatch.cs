@@ -1,16 +1,8 @@
-﻿using System;
+﻿using Photon.Library.Session;
+using System;
 
 namespace Photon.Server.Internal.Sessions
 {
-    internal class SessionStatusArgs : EventArgs
-    {
-        public object Data {get; set;}
-
-        public SessionStatusArgs(object data)
-        {
-            this.Data = data;
-        }
-    }
 
     internal class ServerSessionWatch : IDisposable
     {
@@ -42,7 +34,6 @@ namespace Photon.Server.Internal.Sessions
 
         private void SendUpdate(ServerSessionBase session)
         {
-            var sessionId = session.SessionId;
             uint? number = null;
             string name = null;
             string projectName = null;

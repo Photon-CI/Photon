@@ -1,5 +1,5 @@
 ﻿using log4net;
-using Photon.Server.Internal;
+using Photon.Library;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;

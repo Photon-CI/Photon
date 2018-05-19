@@ -26,6 +26,8 @@
       <ComponentGroupRef Id="Content_fontawesome_5.0.11_webfonts_files" />
       <ComponentGroupRef Id="Content_Images_files" />
       <ComponentGroupRef Id="Content_files" />
+      <ComponentGroupRef Id="Content_jsoneditor_5.15.0_img_files" />
+      <ComponentGroupRef Id="Content_jsoneditor_5.15.0_files" />
 		</Feature>
 
 	  <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
@@ -89,6 +91,9 @@
                   <Directory Id="Content_fontawesome_5.0.11_webfonts" Name="webfonts" />
                 </Directory>
                 <Directory Id="Content_Images" Name="Images" />
+                <Directory Id="Content_jsoneditor_5.15.0" Name="jsoneditor-5.15.0">
+                  <Directory Id="Content_jsoneditor_5.15.0_img" Name="img" />
+                </Directory>
               </Directory>
               <Directory Id="Views" Name="Views">
                 <Directory Id="Views_Builds" Name="Builds" />
@@ -186,6 +191,9 @@
     <ComponentGroup Id="Views_Variables_files" Directory="Views_Variables">
       <Component Id="Views_Variables_Index.html" Guid="bf672bed-6c64-4ba9-8d55-88ea2ba97d80">
         <File Id="Views_Variables_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Variables\Index.html" />
+      </Component>
+      <Component Id="Views_Variables_EditJson.html" Guid="e45f1c5c-749e-4f5e-9456-725cd078152b">
+        <File Id="Views_Variables_EditJson.html" Name="EditJson.html" Source="$(var.PhotonAgent_TargetDir)Views\Variables\EditJson.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -297,6 +305,23 @@
       </Component>
       <Component Id="Content_popper.min.js" Guid="e1c05e07-29b9-42b9-aeaf-7f00bcf068ca">
         <File Id="Content_popper.min.js" Name="popper.min.js" Source="$(var.PhotonAgent_TargetDir)Content\popper.min.js" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_jsoneditor_5.15.0_img_files" Directory="Content_jsoneditor_5.15.0_img">
+      <Component Id="Content_jsoneditor_5.15.0_img_jsoneditor_icons.svg" Guid="2f202c4a-741e-403a-af6a-aa4a9ac801ee">
+        <File Id="Content_jsoneditor_5.15.0_img_jsoneditor_icons.svg" Name="jsoneditor-icons.svg" Source="$(var.PhotonAgent_TargetDir)Content\jsoneditor-5.15.0\img\jsoneditor-icons.svg" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_jsoneditor_5.15.0_files" Directory="Content_jsoneditor_5.15.0">
+      <Component Id="Content_jsoneditor_5.15.0_jsoneditor.min.js" Guid="746be443-2f18-4a86-a5d9-d7b00d88e7d6">
+        <File Id="Content_jsoneditor_5.15.0_jsoneditor.min.js" Name="jsoneditor.min.js" Source="$(var.PhotonAgent_TargetDir)Content\jsoneditor-5.15.0\jsoneditor.min.js" />
+      </Component>
+      <Component Id="Content_jsoneditor_5.15.0_jsoneditor.min.css" Guid="96a50ce6-9355-4630-b643-fd480d9369bc">
+        <File Id="Content_jsoneditor_5.15.0_jsoneditor.min.css" Name="jsoneditor.min.css" Source="$(var.PhotonAgent_TargetDir)Content\jsoneditor-5.15.0\jsoneditor.min.css" />
       </Component>
     </ComponentGroup>
   </Fragment>

@@ -23,7 +23,7 @@ namespace Photon.Server.HttpHandlers.Api.Session
                     return Response.Status(HttpStatusCode.NotModified)
                         .SetHeader("X-Complete", session.IsComplete.ToString());
 
-                var newText = session.Output.ToString()
+                var newText = session.Output.GetString()
                     .Substring(startPos);
 
                 return Response.Ok()
