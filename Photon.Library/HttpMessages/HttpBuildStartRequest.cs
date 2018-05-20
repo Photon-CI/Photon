@@ -14,6 +14,12 @@ namespace Photon.Library.HttpMessages
         [JsonProperty("refspec")]
         public string GitRefspec {get; set;}
 
+        [JsonProperty("preBuild")]
+        public string PreBuildCommand {get; set;}
+
+        [JsonProperty("assembly")]
+        public string AssemblyFilename {get; set;}
+
         [JsonProperty("mode")]
         [JsonConverter(typeof(StringEnumConverter))]
         public AgentStartModes Mode {get; set;}

@@ -165,12 +165,11 @@ namespace Photon.Agent.Internal.Session
             var errorList = new Lazy<List<Exception>>();
             var abort = false;
 
-            var preBuildScript = PreBuild;
-            if (!string.IsNullOrWhiteSpace(preBuildScript)) {
+            if (!string.IsNullOrWhiteSpace(PreBuild)) {
                 Output.WriteLine("Running Pre-Build Script...", ConsoleColor.DarkCyan);
 
                 try {
-                    RunCommandScript(preBuildScript);
+                    RunCommandScript(PreBuild);
                 }
                 catch (Exception error) {
                     errorList.Value.Add(new ApplicationException($"Script Pre-Build failed! [{SessionId}]", error));

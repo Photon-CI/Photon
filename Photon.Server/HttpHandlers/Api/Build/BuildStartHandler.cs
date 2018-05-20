@@ -48,6 +48,12 @@ namespace Photon.Server.HttpHandlers.Api.Build
                     Mode = startInfo.Mode,
                 };
 
+                if (!string.IsNullOrEmpty(startInfo.AssemblyFilename))
+                    session.AssemblyFilename = startInfo.AssemblyFilename;
+
+                if (!string.IsNullOrEmpty(startInfo.PreBuildCommand))
+                    session.PreBuild = startInfo.PreBuildCommand;
+
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
 
