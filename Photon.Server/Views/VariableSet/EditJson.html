@@ -1,9 +1,12 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
-<script src="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
+<script src="{{#Url SharedContent/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
 <script>
     var editor;
+
+    var agentJsonUrl = '{{#Url api/variable/json}}';
+    var agentDeleteUrl = '{{#Url api/variable/delete}}';
 
     $(function () {
         $('#layoutNavbarContent [data-link="variables"]').addClass('active');
@@ -24,11 +27,8 @@
             $('#SetIdTextBox').focus();
         });
 
-        //editor.focus();
+        editor.focus();
     });
-
-    var agentJsonUrl = '{{#Url api/variable/json}}';
-    var agentDeleteUrl = '{{#Url api/variable/delete}}';
 
     function onLoad() {
         $.ajax({
@@ -84,7 +84,7 @@
 {{#EndScript}}
 
 {{#Style}}
-<link href="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
+<link href="{{#Url SharedContent/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
 <style>
     .layout-content {
         padding: 0;

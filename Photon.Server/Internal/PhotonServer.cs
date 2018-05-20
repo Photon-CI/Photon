@@ -32,7 +32,6 @@ namespace Photon.Server.Internal
         public ProjectPackageManager ProjectPackages {get;}
         public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
-        //public VariableSetCollection Variables {get;}
         public VariableSetDocumentManager Variables {get;}
 
         public ServerConfigurationManager ServerConfiguration {get;}
@@ -153,16 +152,24 @@ namespace Photon.Server.Internal
 
         private void StartHttpServer()
         {
+            var contentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpContentDirectory,
+                UrlPath = "/Content/",
+            };
+
+            var sharedContentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpSharedContentDirectory,
+                UrlPath = "/SharedContent/",
+            };
+
             var http = ServerConfiguration.Value.Http;
 
             var context = new HttpReceiverContext {
                 //SecurityMgr = new Internal.Security.SecurityManager(),
                 ListenerPath = http.Path,
                 ContentDirectories = {
-                    new ContentDirectory {
-                        DirectoryPath = Configuration.HttpContentDirectory,
-                        UrlPath = "/Content/",
-                    }
+                    contentDir,
+                    sharedContentDir,
                 },
             };
 

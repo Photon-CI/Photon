@@ -19,16 +19,8 @@
         .find('[data-session-template="update"]').detach()
         .removeAttr('data-session-template');
 
-    this.getListElement = function() {
-        return $(self.container).find('[data-session-list]');
-    };
-
-    this.getMaskElement = function () {
-        return $(self.container).find('[data-session-mask]');
-    };
-
-    this.getEmptyElement = function () {
-        return $(self.container).find('[data-session-empty]');
+    this.getStatusRow = function () {
+        return $(self.container).find('thead > tr');
     };
 
     this.setDetailsUrl = function(url) {
@@ -54,14 +46,20 @@
         self.socket.onmessage = onMessage;
     };
 
-    this.updateMask = function() {
-        if (self.getListElement().children().length === 0) {
-            self.getMaskElement().show();
-            self.getEmptyElement().show()
-                .text("None");
+    this.updateMask = function () {
+        var hasRows = $(container).find('tbody').children().length > 0;
+
+        var statusRow = self.getStatusRow();
+        if (!hasRows) {
+            statusRow.show();
+
+            statusRow.find('[data-status-icon]')
+                .attr('class', 'fas fa-ban text-muted');
+
+            statusRow.find('[data-status-text]')
+                .text('None').attr('class', 'text-muted');
         } else {
-            self.getMaskElement().hide();
-            self.getEmptyElement().hide();
+            statusRow.hide();
         }
     };
 
@@ -71,9 +69,14 @@
 
     function onError(e) {
         if (e.readyState === EventSource.CLOSED) {
-            self.getMaskElement().show();
-            self.getEmptyElement().show()
-                .text("Disconnected");
+            var statusRow = self.getStatusRow();
+            statusRow.show();
+
+            statusRow.find('[data-status-icon]')
+                .prop('class', 'fas fa-exclamation-triangle text-danger');
+
+            statusRow.find('[data-status-text]')
+                .text('Error').attr('class', 'text-muted');
         }
     }
 
@@ -83,18 +86,14 @@
 
         var sessionElement = null;
 
-        var sessionElementList = self.getListElement().find('[data-session-id="' + session.id + '"]');
-        if (sessionElementList.length > 0) sessionElement = sessionElementList[0];
+        var sessionElementList = $(self.container).find('[data-session-id="' + session.id + '"]');
+        if (sessionElementList.length > 0) sessionElement = $(sessionElementList[0]);
 
-        if (!session.isReleased) {
-            if (sessionElement === null) {
-                sessionElement = appendNewRow(session);
-            }
-
-            onSessionUpdate(sessionElement, session);
-        } else {
-            onSessionReleased(sessionElement);
+        if (sessionElement === null) {
+            sessionElement = appendNewRow(session);
         }
+
+        onSessionUpdate(sessionElement, session);
 
         self.updateMask();
     }
@@ -103,7 +102,7 @@
         var sessionElement = getRowTemplate(session.type)
             .clone().attr('data-session-id', session.id);
 
-        sessionElement.prependTo(self.getListElement());
+        sessionElement.prependTo($(self.container));
         return sessionElement;
     }
 
@@ -112,6 +111,7 @@
             case 'build': return buildTemplateRow;
             case 'deploy': return deployTemplateRow;
             case 'update': return updateTemplateRow;
+            default: return null;
         }
     }
 
@@ -148,10 +148,6 @@
         });
     }
 
-    function onSessionReleased(e) {
-        e.remove();
-    }
-
     function getTypeIcon(type) {
         switch (type) {
             case "build": return "fas fa-cubes";
@@ -171,15 +167,4 @@
             default: return "text-muted";
         }
     }
-
-    //function getStatusIcon(status) {
-    //    switch (status) {
-    //        case "running": return "fas fa-spinner text-info";
-    //        case "success": return "fas fa-check text-success";
-    //        case "failed": return "fas fa-exclamation-circle text-danger";
-    //        case "cancelled": return "far fa-ban text-warning";
-    //        case "pending":
-    //        default: return "fas fa-ellipsis-h text-muted";
-    //    }
-    //}
 };

@@ -22,6 +22,7 @@ namespace Photon.Server.Internal
         private static string ApplicationPackagePath => ConfigurationReader.AppSetting("applicationPackages", "ApplicationPackages");
         private static string VariablesPath => ConfigurationReader.AppSetting("variables", "Variables");
         private static string HttpContentPath => ConfigurationReader.AppSetting("httpContent", ".\\Content");
+        private static string HttpSharedContentPath => ConfigurationReader.AppSetting("httpSharedContent", ".\\Content");
         private static string HttpViewPath => ConfigurationReader.AppSetting("httpViews", ".\\Views");
 
         public static string ServerFile => FullPath(Directory, ServerFilePath);
@@ -32,6 +33,7 @@ namespace Photon.Server.Internal
         public static string ApplicationPackageDirectory => FullPath(Directory, ApplicationPackagePath);
         public static string VariablesDirectory => FullPath(Directory, VariablesPath);
         public static string HttpContentDirectory => FullPath(AssemblyPath, HttpContentPath);
+        public static string HttpSharedContentDirectory => FullPath(AssemblyPath, HttpSharedContentPath);
         public static string HttpViewDirectory => FullPath(AssemblyPath, HttpViewPath);
 
 

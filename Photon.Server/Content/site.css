@@ -33,13 +33,17 @@ nav.sidebar li.active a {
 
 @media (min-width: 768px) {
     nav.sidebar {
+        position: fixed;
         width: 200px;
-        height: 100%;
+        top: 0;
+        bottom: 0;
+        left: 0;
         margin-left: -160px;
-        float: left;
         z-index: 8000;
         margin-bottom: 0;
         padding: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     nav.sidebar .container-fluid {
@@ -82,14 +86,11 @@ nav.sidebar li.active a {
     }
 
     .layout-content {
-        position: absolute;
         width: calc(100% - 40px);
-        margin-left: 40px;
         float: right;
     }
 
     nav.sidebar:hover + .layout-content {
-        margin-left: 200px;
         width: calc(100% - 200px);
     }
 

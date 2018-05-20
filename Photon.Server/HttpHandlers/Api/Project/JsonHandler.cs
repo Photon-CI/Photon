@@ -13,8 +13,9 @@ namespace Photon.Server.HttpHandlers.Api.Project
         {
             var name = Path.GetFileName(Configuration.ProjectsFile);
 
-            return Response.File(Configuration.ProjectsFile)
-                .SetHeader("Content-Disposition", $"attachment; filename={name}");
+            return await Response.File(Configuration.ProjectsFile)
+                .SetHeader("Content-Disposition", $"attachment; filename={name}")
+                .AsAsync();
         }
 
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)

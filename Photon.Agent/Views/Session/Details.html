@@ -39,21 +39,31 @@
 {{#Style}}
 <style>
     .layout-content {
-        min-height: 100vh;
         background: #111;
+        overflow-x: auto;
     }
     .session-output {
-        min-height: 100%;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        font-family: monospace;
         color: #CCC;
+    }
+
+    @media (min-width: 768px) {
+        .layout-content {
+            position: relative;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .inner-content {
+            position: absolute;
+        }
     }
 </style>
 {{#EndStyle}}
 
-<div class="bg-secondary px-2 py-1">
-    <h2 class="text-light my-0">Session Output</h2>
-</div>
+<div class="inner-content">
+    <div class="bg-secondary px-2 py-1">
+        <h2 class="text-light my-0">Session Output</h2>
+    </div>
 
-<div id="SessionOutput" class="session-output px-2 py-1"></div>
+    <pre id="SessionOutput" class="session-output px-2 py-1"></pre>
+</div>

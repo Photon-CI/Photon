@@ -8,14 +8,67 @@
 </script>
 {{#EndScript}}
 
-{{#Style}}
-<style>
-</style>
-{{#EndStyle}}
-
 <div class="bg-secondary mb-4 px-2 py-1">
-    <div class="container">
-        <h2 class="text-light my-0">{{Name}} <small class="text-light">{{Version}}</small></h2>
-        <a href="{{Url}}" class="my-0 text-light">{{Url}}</a>
-    </div>
+    <h2 class="text-light my-0">{{ServerName}}</h2>
+</div>
+
+<div class="container">
+    <table class="table table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th colspan="2">Server</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="col-4">Server Version</td>
+            <td class="col-8">{{ServerVersion}}</td>
+        </tr>
+        <tr>
+            <td>Architecture</td>
+            <td>{{ProcessArchitecture}}</td>
+        </tr>
+        <tr>
+            <td>HTTP URL</td>
+            <td>{{ServerHttpUrl}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th colspan="2">Machine</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="col-4">Operating System</td>
+            <td class="col-8">{{OsDescription}}</td>
+        </tr>
+        <tr>
+            <td>Architecture</td>
+            <td>{{OsArchitecture}}</td>
+        </tr>
+        <tr>
+            <td>Processor Count</td>
+            <td>{{MachineProcessorCount}}</td>
+        </tr>
+        <tr>
+            <td>Machine Name</td>
+            <td>{{MachineName}}</td>
+        </tr>
+        <tr>
+            <td>Host Name</td>
+            <td>{{MachineHost}}</td>
+        </tr>
+        <tr>
+            <td>Framework</td>
+            <td>{{FrameworkDescription}}</td>
+        </tr>
+        <tr>
+            <td>CLR Version</td>
+            <td>{{MachineClrVersion}}</td>
+        </tr>
+        </tbody>
+    </table>
 </div>

@@ -1,13 +1,13 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
-<script src="{{#Url Content/SessionOutput.js}}"></script>
-<script src="{{#Url Content/ansi_up.js}}"></script>
+<script src="{{#Url SharedContent/SessionOutput.js}}"></script>
+<script src="{{#Url SharedContent/ansi_up.js}}"></script>
 <script>
     var reader;
 
     $(function () {
-        $('#layoutNavbarContent [data-link="builds"]').addClass('active');
+        $('#layoutNavbarContent [data-link="sessions"]').addClass('active');
 
         var outputUrl = '{{#Url api/session/output-stream}}?id={{&SessionId}}';
 
@@ -39,19 +39,31 @@
 {{#Style}}
 <style>
     .layout-content {
-        padding: 8px 16px;
+        background: #111;
+        overflow-x: auto;
+    }
+    .session-output {
+        color: #CCC;
     }
 
-    .session-output {
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        font-family: monospace;
-        background: #111;
-        color: #CCC;
+    @media (min-width: 768px) {
+        .layout-content {
+            position: relative;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .inner-content {
+            position: absolute;
+        }
     }
 </style>
 {{#EndStyle}}
 
-<h2>Session Details</h2>
+<div class="inner-content">
+    <div class="bg-secondary px-2 py-1">
+        <h2 class="text-light my-0">Session Output</h2>
+    </div>
 
-<div id="SessionOutput" class="session-output"></div>
+    <pre id="SessionOutput" class="session-output px-2 py-1"></pre>
+</div>

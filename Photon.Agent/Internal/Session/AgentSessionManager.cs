@@ -2,7 +2,6 @@
 using Photon.Framework.Pooling;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Session
@@ -11,13 +10,13 @@ namespace Photon.Agent.Internal.Session
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AgentSessionManager));
 
-        public event EventHandler<SessionStateEventArgs> SessionStarted;
-        public event EventHandler<SessionStateEventArgs> SessionReleased;
+        public event EventHandler<SessionStateEventArgs> SessionChanged;
+        //public event EventHandler<SessionStateEventArgs> SessionReleased;
 
         private readonly ReferencePool<AgentSessionBase> pool;
 
         public IEnumerable<AgentSessionBase> All => pool.Items;
-        public IEnumerable<AgentSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
+        //public IEnumerable<AgentSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
 
 
         public AgentSessionManager()
@@ -58,7 +57,7 @@ namespace Photon.Agent.Internal.Session
             pool.Add(session);
 
             session.ReleaseEvent += Session_OnReleased;
-            OnSessionStarted(session);
+            OnSessionChanged(session);
 
             Log.Info($"Started Session '{session.SessionId}'.");
         }
@@ -79,21 +78,16 @@ namespace Photon.Agent.Internal.Session
             return true;
         }
 
-        protected void OnSessionStarted(AgentSessionBase session)
+        protected void OnSessionChanged(AgentSessionBase session)
         {
-            SessionStarted?.Invoke(this, new SessionStateEventArgs(session));
-        }
-
-        protected void OnSessionReleased(AgentSessionBase session)
-        {
-            SessionReleased?.Invoke(this, new SessionStateEventArgs(session));
+            SessionChanged?.Invoke(this, new SessionStateEventArgs(session));
         }
 
         private void Session_OnReleased(object sender, EventArgs e)
         {
             var session = (AgentSessionBase)sender;
 
-            OnSessionReleased(session);
+            OnSessionChanged(session);
         }
     }
 }

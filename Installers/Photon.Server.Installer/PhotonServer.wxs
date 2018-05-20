@@ -29,6 +29,14 @@
       <ComponentGroupRef Id="Views_Session_files" />
       <ComponentGroupRef Id="Content_jsoneditor_5.15.0_img_files" />
       <ComponentGroupRef Id="Content_jsoneditor_5.15.0_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.0.13_js_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.0.13_css_files" />
+      <ComponentGroupRef Id="Views_VariableSet_files" />
+      <ComponentGroupRef Id="Views_Project_files" />
+      <ComponentGroupRef Id="Views_Agent_files" />
+      <ComponentGroupRef Id="Views_Package_files" />
+      <ComponentGroupRef Id="Views_Build_files" />
+      <ComponentGroupRef Id="Views_Deployment_files" />
 		</Feature>
 
     <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
@@ -69,6 +77,10 @@
 		            <Directory Id="Content_jsoneditor_5.15.0" Name="jsoneditor-5.15.0">
 		              <Directory Id="Content_jsoneditor_5.15.0_img" Name="img" />
 		            </Directory>
+		            <Directory Id="Content_fontawesome_5.0.13" Name="fontawesome-5.0.13">
+		              <Directory Id="Content_fontawesome_5.0.13_css" Name="css" />
+		              <Directory Id="Content_fontawesome_5.0.13_js" Name="js" />
+		            </Directory>
 		          </Directory>
 		          <Directory Id="Views" Name="Views">
 		            <Directory Id="Views_Agents" Name="Agents" />
@@ -76,6 +88,12 @@
 		            <Directory Id="Views_Projects" Name="Projects" />
 		            <Directory Id="Views_Variables" Name="Variables" />
 		            <Directory Id="Views_Session" Name="Session" />
+		            <Directory Id="Views_Package" Name="Package" />
+		            <Directory Id="Views_Deployment" Name="Deployment" />
+		            <Directory Id="Views_Build" Name="Build" />
+		            <Directory Id="Views_Agent" Name="Agent" />
+		            <Directory Id="Views_Project" Name="Project" />
+		            <Directory Id="Views_VariableSet" Name="VariableSet" />
 		          </Directory>
 		        </Directory>
 		      </Directory>
@@ -119,6 +137,9 @@
 			<Component Id="Photon.Library.dll" Guid="b131f8e8-afd7-4563-885a-d5136c99e4c1">
 			  <File Id="Photon.Library.dll" Name="Photon.Library.dll" Source="$(var.PhotonServer_TargetDir)Photon.Library.dll" />
 			</Component>
+			<Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="e4e34802-30ef-4e84-a9d1-f0144093b078">
+			  <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" Name="System.Runtime.InteropServices.RuntimeInformation.dll" Source="$(var.PhotonServer_TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
+			</Component>
 			
 			
 		</ComponentGroup>
@@ -132,15 +153,9 @@
 	</Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Agents_files" Directory="Views_Agents">
-      <Component Id="Views_Agents_Edit.html" Guid="38f2fc1b-3264-4d88-83c7-aeeca74395c8">
-        <File Id="Views_Agents_Edit.html" Name="Edit.html" Source="$(var.PhotonServer_TargetDir)Views\Agents\Edit.html" />
-      </Component>
-      <Component Id="Views_Agents_Index.html" Guid="467a239f-a30d-4b22-9844-c6fa0f43034b">
-        <File Id="Views_Agents_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Agents\Index.html" />
-      </Component>
-      <Component Id="Views_Agents_EditJson.html" Guid="fd9cfe5d-3574-46b3-bda1-c94c75ef3a50">
-        <File Id="Views_Agents_EditJson.html" Name="EditJson.html" Source="$(var.PhotonServer_TargetDir)Views\Agents\EditJson.html" />
-      </Component>
+      
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -148,12 +163,8 @@
       <Component Id="Views_Configuration.html" Guid="8e668301-0b6a-4c15-8bee-1bf0a4139eca">
         <File Id="Views_Configuration.html" Name="Configuration.html" Source="$(var.PhotonServer_TargetDir)Views\Configuration.html" />
       </Component>
-      <Component Id="Views_Deployments.html" Guid="4e21a669-a7c0-432a-a377-1ff00e0b4b24">
-        <File Id="Views_Deployments.html" Name="Deployments.html" Source="$(var.PhotonServer_TargetDir)Views\Deployments.html" />
-      </Component>
-      <Component Id="Views_Builds.html" Guid="dddaacb2-1a45-42f8-8d39-d8232b8bb6ae">
-        <File Id="Views_Builds.html" Name="Builds.html" Source="$(var.PhotonServer_TargetDir)Views\Builds.html" />
-      </Component>
+      
+      
       <Component Id="Views_Index.html" Guid="00b3c93f-90c5-48c8-b873-77b8dd3a62d9">
         <File Id="Views_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Index.html" />
       </Component>
@@ -164,32 +175,20 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Packages_files" Directory="Views_Packages">
-      <Component Id="Views_Packages_Index.html" Guid="a2140a9e-154b-4d13-9aaf-c8cbd807eac7">
-        <File Id="Views_Packages_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Packages\Index.html" />
-      </Component>
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Projects_files" Directory="Views_Projects">
-      <Component Id="Views_Projects_Index.html" Guid="6b06fa14-09fe-48fd-baa5-aa64af2fe8bb">
-        <File Id="Views_Projects_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Projects\Index.html" />
-      </Component>
-      <Component Id="Views_Projects_Json.html" Guid="dc89d7f5-dfb9-4118-8bd6-01e56c66708f">
-        <File Id="Views_Projects_Json.html" Name="Json.html" Source="$(var.PhotonServer_TargetDir)Views\Projects\Json.html" />
-      </Component>
-      <Component Id="Views_Projects_Edit.html" Guid="244eef91-d434-4af4-93e9-82e1ce268560">
-        <File Id="Views_Projects_Edit.html" Name="Edit.html" Source="$(var.PhotonServer_TargetDir)Views\Projects\Edit.html" />
-      </Component>
+      
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Variables_files" Directory="Views_Variables">
-      <Component Id="Views_Variables_Index.html" Guid="1a1c4c42-6b8c-4909-8177-ba34d632aee5">
-        <File Id="Views_Variables_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Variables\Index.html" />
-      </Component>
-      <Component Id="Views_Variables_EditJson.html" Guid="a341a67a-9497-4b4e-876c-673ae31b977c">
-        <File Id="Views_Variables_EditJson.html" Name="EditJson.html" Source="$(var.PhotonServer_TargetDir)Views\Variables\EditJson.html" />
-      </Component>
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -217,70 +216,30 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.11_css_files" Directory="Content_fontawesome_5.0.11_css">
-      <Component Id="Content_fontawesome_5.0.11_css_fa_brands.min.css" Guid="27f71bfb-b31b-43cb-a840-8f4f628bd72e">
-        <File Id="Content_fontawesome_5.0.11_css_fa_brands.min.css" Name="fa-brands.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fa-brands.min.css" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_css_fa_regular.min.css" Guid="9ac39a8f-374d-470a-a778-a34ced82aeae">
-        <File Id="Content_fontawesome_5.0.11_css_fa_regular.min.css" Name="fa-regular.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fa-regular.min.css" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_css_fa_solid.min.css" Guid="6fe823be-1a67-4d42-beae-4368da384770">
-        <File Id="Content_fontawesome_5.0.11_css_fa_solid.min.css" Name="fa-solid.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fa-solid.min.css" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_css_fontawesome_all.min.css" Guid="ae4c0260-ee83-4de8-9881-4647ab4f0ca7">
-        <File Id="Content_fontawesome_5.0.11_css_fontawesome_all.min.css" Name="fontawesome-all.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fontawesome-all.min.css" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_css_fontawesome.min.css" Guid="09d7d896-34a2-4c1c-9e6a-3f2e6eca5ded">
-        <File Id="Content_fontawesome_5.0.11_css_fontawesome.min.css" Name="fontawesome.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\css\fontawesome.min.css" />
-      </Component>
+      
+      
+      
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.11_webfonts_files" Directory="Content_fontawesome_5.0.11_webfonts">
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.svg" Guid="e821bb9d-5d85-4202-840c-3cc5e3277213">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.svg" Name="fa-brands-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.svg" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.svg" Guid="a9f6b286-dfb2-4427-afa1-38e1e540b708">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.svg" Name="fa-regular-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.svg" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.svg" Guid="4e14df90-a325-4f4e-89e1-43020017ce0f">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.svg" Name="fa-solid-900.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.svg" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.eot" Guid="ddf73204-2292-4d40-9b6c-5f2f7dc3a2a6">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.eot" Name="fa-brands-400.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.ttf" Guid="05c446f1-3439-4f7a-a931-75d5bdbf13ce">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.ttf" Name="fa-brands-400.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.ttf" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff" Guid="cda10095-9190-4e5b-a60a-41acafcee28d">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff" Name="fa-brands-400.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff2" Guid="b3f4975b-5050-473c-a2c4-365550cf2bf9">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_brands_400.woff2" Name="fa-brands-400.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff2" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.eot" Guid="3cbd7679-9d95-46d0-8a81-01a5fe5aefd6">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.eot" Name="fa-regular-400.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.eot" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.ttf" Guid="c74624ae-2976-4436-84c3-d56d4212f163">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.ttf" Name="fa-regular-400.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.ttf" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff" Guid="259527ed-9c85-44ba-8e52-54b657a36921">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff" Name="fa-regular-400.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff2" Guid="f970f2b7-1aed-419f-8e9d-8802e1898df4">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_regular_400.woff2" Name="fa-regular-400.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff2" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.eot" Guid="11435a28-d1d9-4b8f-bba7-e413556188e8">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.eot" Name="fa-solid-900.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.eot" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.ttf" Guid="ec411901-eda0-4b11-914e-8418756356a4">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.ttf" Name="fa-solid-900.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.ttf" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff" Guid="3925981d-8794-4633-a135-a3ecfb1bd995">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff" Name="fa-solid-900.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff2" Guid="593bf5e5-08ba-497f-8520-94467631c6b8">
-        <File Id="Content_fontawesome_5.0.11_webfonts_fa_solid_900.woff2" Name="fa-solid-900.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff2" />
-      </Component>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -310,12 +269,18 @@
       <Component Id="Content_SessionOutput.js" Guid="da535f07-5d27-40be-8746-be12c0ba6d5f">
         <File Id="Content_SessionOutput.js" Name="SessionOutput.js" Source="$(var.PhotonServer_TargetDir)Content\SessionOutput.js" />
       </Component>
+      <Component Id="Content_site.css" Guid="2bf69640-ec61-4164-9d45-81a1f28f83ef">
+        <File Id="Content_site.css" Name="site.css" Source="$(var.PhotonServer_TargetDir)Content\site.css" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Session_files" Directory="Views_Session">
       <Component Id="Views_Session_Details.html" Guid="ea34fdc3-1aa3-41c9-9049-aa4b3991ff1d">
         <File Id="Views_Session_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Session\Details.html" />
+      </Component>
+      <Component Id="Views_Session_Index.html" Guid="7ac6c20b-2725-446d-81bd-007ed60926e4">
+        <File Id="Views_Session_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Session\Index.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -333,6 +298,92 @@
       </Component>
       <Component Id="Content_jsoneditor_5.15.0_jsoneditor.min.js" Guid="e7865e9f-28be-4b81-b3b7-5483e88dbef9">
         <File Id="Content_jsoneditor_5.15.0_jsoneditor.min.js" Name="jsoneditor.min.js" Source="$(var.PhotonServer_TargetDir)Content\jsoneditor-5.15.0\jsoneditor.min.js" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.0.13_js_files" Directory="Content_fontawesome_5.0.13_js">
+      <Component Id="Content_fontawesome_5.0.13_js_fontawesome.min.js" Guid="fa3f969d-6960-4c9c-99e6-a05938e88c0c">
+        <File Id="Content_fontawesome_5.0.13_js_fontawesome.min.js" Name="fontawesome.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fontawesome.min.js" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.13_js_fontawesome_all.min.js" Guid="8656b6d7-5d5b-413f-8656-e10cefbb6bc3">
+        <File Id="Content_fontawesome_5.0.13_js_fontawesome_all.min.js" Name="fontawesome-all.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fontawesome-all.min.js" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.13_js_fa_v4_shims.min.js" Guid="4336951c-5e80-4cf7-ba30-f7087bd213f5">
+        <File Id="Content_fontawesome_5.0.13_js_fa_v4_shims.min.js" Name="fa-v4-shims.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-v4-shims.min.js" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.13_js_fa_solid.min.js" Guid="3a7557ed-0501-40a1-be4e-7c4e489ddd30">
+        <File Id="Content_fontawesome_5.0.13_js_fa_solid.min.js" Name="fa-solid.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-solid.min.js" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.13_js_fa_regular.min.js" Guid="c21772f4-8a89-404c-9d5f-bfe0083121a5">
+        <File Id="Content_fontawesome_5.0.13_js_fa_regular.min.js" Name="fa-regular.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-regular.min.js" />
+      </Component>
+      <Component Id="Content_fontawesome_5.0.13_js_fa_brands.min.js" Guid="e3598269-fa6f-4532-bbc3-3827269779bc">
+        <File Id="Content_fontawesome_5.0.13_js_fa_brands.min.js" Name="fa-brands.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-brands.min.js" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.0.13_css_files" Directory="Content_fontawesome_5.0.13_css">
+      <Component Id="Content_fontawesome_5.0.13_css_fa_svg_with_js.css" Guid="7efe9282-6821-405c-9dee-9360353e4080">
+        <File Id="Content_fontawesome_5.0.13_css_fa_svg_with_js.css" Name="fa-svg-with-js.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\css\fa-svg-with-js.css" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_VariableSet_files" Directory="Views_VariableSet">
+      <Component Id="Views_VariableSet_Index.html" Guid="7ec6cccf-9de5-4a2e-9879-84c17be71654">
+        <File Id="Views_VariableSet_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\VariableSet\Index.html" />
+      </Component>
+      <Component Id="Views_VariableSet_EditJson.html" Guid="b50d5811-1b8f-47c1-8b8d-930336f68aa4">
+        <File Id="Views_VariableSet_EditJson.html" Name="EditJson.html" Source="$(var.PhotonServer_TargetDir)Views\VariableSet\EditJson.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Project_files" Directory="Views_Project">
+      <Component Id="Views_Project_Index.html" Guid="803ce825-9acc-4fc8-9268-19a9ee5ac473">
+        <File Id="Views_Project_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Project\Index.html" />
+      </Component>
+      <Component Id="Views_Project_Json.html" Guid="ff1b4ed4-71b4-4241-af0c-bf1c823fb3ba">
+        <File Id="Views_Project_Json.html" Name="Json.html" Source="$(var.PhotonServer_TargetDir)Views\Project\Json.html" />
+      </Component>
+      <Component Id="Views_Project_Edit.html" Guid="8968d143-cdb3-4844-a293-c06276d7ca62">
+        <File Id="Views_Project_Edit.html" Name="Edit.html" Source="$(var.PhotonServer_TargetDir)Views\Project\Edit.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Agent_files" Directory="Views_Agent">
+      <Component Id="Views_Agent_Index.html" Guid="dc4c039a-b47e-4f5e-ab1f-ffe95e35177f">
+        <File Id="Views_Agent_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Agent\Index.html" />
+      </Component>
+      <Component Id="Views_Agent_EditJson.html" Guid="c6070f19-c48c-44c2-bff0-a25d9f4019eb">
+        <File Id="Views_Agent_EditJson.html" Name="EditJson.html" Source="$(var.PhotonServer_TargetDir)Views\Agent\EditJson.html" />
+      </Component>
+      <Component Id="Views_Agent_Edit.html" Guid="903b9c69-3c19-4b81-8f07-ab8865d2f19e">
+        <File Id="Views_Agent_Edit.html" Name="Edit.html" Source="$(var.PhotonServer_TargetDir)Views\Agent\Edit.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Package_files" Directory="Views_Package">
+      <Component Id="Views_Package_Index.html" Guid="18eb0848-02bf-4e0b-b2bc-b873d4e1cb96">
+        <File Id="Views_Package_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Package\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Build_files" Directory="Views_Build">
+      <Component Id="Views_Build_Index.html" Guid="ffe034da-b210-4313-9782-c67c4890c82f">
+        <File Id="Views_Build_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Build\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Deployment_files" Directory="Views_Deployment">
+      <Component Id="Views_Deployment_Index.html" Guid="0002200d-61fb-471f-8352-f39c4a6f55e6">
+        <File Id="Views_Deployment_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\Index.html" />
       </Component>
     </ComponentGroup>
   </Fragment>

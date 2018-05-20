@@ -79,6 +79,10 @@ namespace Photon.Agent.Internal.Session
 
                 success = true;
             }
+            catch (Exception error) {
+                Exception = error;
+                throw;
+            }
             finally {
                 if (notifyGithub) {
                     var status = new CommitStatus {

@@ -42,7 +42,7 @@ namespace Photon.Agent.Internal.Session
         public SessionOutput Output {get;}
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
-        public bool IsReleased {get; private set;}
+        public bool IsReleased {get; set;}
         //public bool IsComplete {get; set;}
 
         protected ILog Log => _log.Value;
@@ -106,33 +106,32 @@ namespace Photon.Agent.Internal.Session
 
         public async Task ReleaseAsync()
         {
+            if (IsReleased) return;
+
+            IsReleased = true;
             TimeReleased = DateTime.UtcNow;
             OnReleased();
 
             if (Domain != null)
                 await Domain.Unload(true);
 
-            if (!IsReleased) {
-                try {
-                    var _workDirectory = WorkDirectory;
-                    await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
-                }
-                catch (AggregateException errors) {
-                    errors.Flatten().Handle(e => {
-                        if (e is IOException ioError) {
-                            Log.Warn(ioError.Message);
-                            return true;
-                        }
-
-                        Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
+            try {
+                var _workDirectory = WorkDirectory;
+                await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
+            }
+            catch (AggregateException errors) {
+                errors.Flatten().Handle(e => {
+                    if (e is IOException ioError) {
+                        Log.Warn(ioError.Message);
                         return true;
-                    });
-                }
-                catch (Exception error) {
-                    Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
-                }
+                    }
 
-                IsReleased = true;
+                    Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
+                    return true;
+                });
+            }
+            catch (Exception error) {
+                Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
             }
         }
 

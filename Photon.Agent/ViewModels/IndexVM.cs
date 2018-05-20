@@ -16,12 +16,10 @@ namespace Photon.Agent.ViewModels
 
         public string MachineName {get; set;}
         public string MachineHost {get; set;}
-
         public string MachineProcessorCount {get; set;}
         public string MachineOsVersion {get; set;}
         public string MachineClrVersion {get; set;}
         public string MachineArchitecture {get; set;}
-
         public string OsDescription {get; set;}
         public string OsArchitecture {get; set;}
         public string FrameworkDescription {get; set;}

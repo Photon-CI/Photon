@@ -1,7 +1,7 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
-<script src="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
+<script src="{{#Url SharedContent/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
 <script>
     var editor;
 
@@ -14,6 +14,7 @@
 
         var container = document.getElementById("jsoneditor");
         editor = new JSONEditor(container, options);
+        editor.focus();
 
         onLoad();
     });
@@ -53,7 +54,7 @@
 {{#EndScript}}
 
 {{#Style}}
-<link href="{{#Url Content/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
+<link href="{{#Url SharedContent/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
 <style>
     .layout-content {
         padding: 0;

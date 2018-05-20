@@ -1,7 +1,7 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
-<script src="{{#Url Content/ActiveSessions.js}}"></script>
+<script src="{{#Url SharedContent/ActiveSessions.js}}"></script>
 <script>
     var monitor;
 
@@ -10,7 +10,7 @@
     $(function () {
         $('#layoutNavbarContent [data-link="sessions"]').addClass('active');
 
-        var sessionListElement = document.getElementById('ActiveSessions');
+        var sessionListElement = $('[data-session-list]')[0];
         monitor = new ActiveSessionMonitor(sessionListElement);
         monitor.setDetailsUrl('{{#Url session/details}}');
         monitor.setCancelAction(onSessionCancelPrompt);
@@ -52,43 +52,21 @@
 
 {{#Style}}
 <style>
-    .card-header {
-        padding: 4px 8px;
-    }
-    .card-header > h4 {
-        margin: 0 4px;
-    }
-    .card-body-ns {
-        position: relative;
-    }
-    .mask {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background: #DDD;
-        opacity: 0.5;
-    }
-    .empty {
-        text-align: center;
-        padding: 8px 4px;
-    }
-    .session-row {
+    tbody td {
         clear: both;
         line-height: 28px;
         height: 28px;
     }
-    .session-row > i {
+    tbody td > i {
         float: left;
         line-height: 28px;
         margin-left: 4px;
         margin-right: 4px;
     }
-    .session-row .refspec {
+    tbody td .refspec {
         padding-left: 8px;
     }
-    .session-row .cancel {
+    tbody td .cancel {
         float: right;
         height: 28px;
         line-height: 28px;
@@ -96,49 +74,50 @@
         padding: 0 6px;
     }
 
-    .session-row[data-session-template] {
+    [data-session-template] {
         display: none;
     }
 </style>
 {{#EndStyle}}
 
 <div class="bg-secondary mb-4 px-2 py-1">
-    <div class="container">
-        <h2 class="text-light my-0">{{Name}} <small class="text-light">{{Version}}</small></h2>
-        <a href="{{Url}}" class="my-0 text-light">{{Url}}</a>
-    </div>
+    <h2 class="text-light my-0">Sessions</h2>
 </div>
 
 <div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h4>Active Sessions</h4>
-        </div>
-        <div id="ActiveSessions" class="card-body-ns">
-            <div class="mask" data-session-mask></div>
-            <div data-session-list>
-                <div data-session-template="build" class="session-row">
-                    <i class="fas fa-ellipsis-h" data-session-status></i>
-                    <div class="btn btn-sm btn-outline-dark border-0 cancel">
-                        <i class="fas fa-times text-danger"></i>
-                    </div>
-                    <a href="#" class="text-primary" data-session-title></a>
-                    <span class="text-muted refspec" data-session-refspec></span>
+    <table class="table" data-session-list>
+        <thead>
+        <tr>
+            <td class="h4 text-center">
+                <i class="fas fa-spinner fa-spin text-muted" data-status-icon></i>
+                <span class="text-muted" data-status-text>Loading...</span>
+            </td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-session-template="build">
+            <td>
+                <i data-session-status></i>
+                <div class="btn btn-sm btn-outline-dark border-0 cancel">
+                    <i class="fas fa-times text-danger"></i>
                 </div>
-                <div data-session-template="deploy" class="session-row">
-                    <i class="fas fa-ellipsis-h" data-session-status></i>
-                    <div class="btn btn-sm btn-outline-dark border-0 cancel">
-                        <i class="fas fa-times text-danger"></i>
-                    </div>
-                    <a href="#" class="text-primary label" data-session-title></a> - <span class="text-light" data-session-project></span>
-                    <span class="text-muted" data-session-version></span>
+                <a href="#" class="text-primary" data-session-link></a>
+                <span class="text-dark" data-session-title></span>
+                <span class="text-muted refspec" data-session-refspec></span>
+            </td>
+        </tr>
+        <tr data-session-template="deploy">
+            <td>
+                <i data-session-status></i>
+                <div class="btn btn-sm btn-outline-dark border-0 cancel">
+                    <i class="fas fa-times text-danger"></i>
                 </div>
-            </div>
-            <div class="empty text-muted" data-session-empty>
-                Loading...
-            </div>
-        </div>
-    </div>
+                <a href="#" class="text-primary label" data-session-title></a> - <span class="text-light" data-session-project></span>
+                <span class="text-muted" data-session-version></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 
 <div id="CancelSessionModal" class="modal" tabindex="-1" role="dialog">

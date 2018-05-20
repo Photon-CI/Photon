@@ -4,7 +4,6 @@ using Photon.Framework.Packages;
 using Photon.Library.TcpMessages;
 using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Session
@@ -101,7 +100,13 @@ namespace Photon.Agent.Internal.Session
                 Agent = Agent,
             };
 
-            await Domain.RunDeployTask(context, CancellationToken.None);
+            try {
+                await Domain.RunDeployTask(context, TokenSource.Token);
+            }
+            catch (Exception error) {
+                Exception = error;
+                throw;
+            }
         }
     }
 }

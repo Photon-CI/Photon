@@ -45,7 +45,6 @@ namespace Photon.Agent.HttpHandlers.Api.Session
                             }
 
                             t.ThrowIfCancellationRequested();
-                            //await writer.FlushAsync();
                         }
                     });
             }

@@ -7,18 +7,16 @@ using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api.Build
 {
     [HttpHandler("/api/build/start")]
-    internal class BuildStartHandler : HttpHandlerAsync
+    internal class BuildStartHandler : HttpHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BuildStartHandler));
 
 
-        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
+        public override HttpHandlerResult Post()
         {
             var qGitRefspec = GetQuery("refspec");
 

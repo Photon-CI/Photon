@@ -8,26 +8,21 @@
 </script>
 {{#EndScript}}
 
-{{#Style}}
-<style>
-</style>
-{{#EndStyle}}
-
 <div class="bg-secondary mb-4 px-2 py-1">
     <h2 class="text-light my-0">{{AgentName}}</h2>
 </div>
 
 <div class="container">
     <table class="table table-sm">
-        <thead>
+        <thead class="thead-light">
             <tr>
                 <th colspan="2">Agent</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Agent Version</td>
-                <td>{{AgentVersion}}</td>
+                <td class="col-4">Agent Version</td>
+                <td class="col-8">{{AgentVersion}}</td>
             </tr>
             <tr>
                 <td>Architecture</td>
@@ -44,15 +39,15 @@
         </tbody>
     </table>
     <table class="table table-sm">
-        <thead>
+        <thead class="thead-light">
             <tr>
                 <th colspan="2">Machine</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Operating System</td>
-                <td>{{OsDescription}}</td>
+                <td class="col-4">Operating System</td>
+                <td class="col-8">{{OsDescription}}</td>
             </tr>
             <tr>
                 <td>Architecture</td>
