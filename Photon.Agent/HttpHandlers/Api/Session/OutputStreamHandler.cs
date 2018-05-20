@@ -22,11 +22,11 @@ namespace Photon.Agent.HttpHandlers.Api.Session
 
                 return Response.Ok()
                     .SetChunked(true)
-                    .SetContentType("application/octet-stream")
+                    .SetContentType("text/octet-stream")
                     .SetContent(async (r, t) => {
                         using (var stream = r.GetStream())
                         using (var writer = new StreamWriter(stream)) {
-                            //writer.AutoFlush = false;
+                            writer.AutoFlush = true;
                             var pos = 0;
                             while (!t.IsCancellationRequested) {
                                 if (session.Output.Length > pos) {
@@ -45,7 +45,7 @@ namespace Photon.Agent.HttpHandlers.Api.Session
                             }
 
                             t.ThrowIfCancellationRequested();
-                            await writer.FlushAsync();
+                            //await writer.FlushAsync();
                         }
                     });
             }

@@ -17,7 +17,6 @@
         self.xhr.onerror = onError;
         self.xhr.onload = onLoad;
         self.xhr.open('GET', url, true);
-        self.xhr.responseType = 'text';
         self.xhr.send();
     };
 

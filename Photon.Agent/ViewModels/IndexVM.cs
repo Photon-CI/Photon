@@ -1,4 +1,7 @@
-﻿using Photon.Agent.Internal;
+﻿using System;
+using System.Net;
+using System.Runtime.InteropServices;
+using Photon.Agent.Internal;
 using Photon.Framework;
 using Photon.Library;
 
@@ -11,6 +14,19 @@ namespace Photon.Agent.ViewModels
         public string AgentHttpUrl {get; set;}
         public string AgentTcpUrl {get; set;}
 
+        public string MachineName {get; set;}
+        public string MachineHost {get; set;}
+
+        public string MachineProcessorCount {get; set;}
+        public string MachineOsVersion {get; set;}
+        public string MachineClrVersion {get; set;}
+        public string MachineArchitecture {get; set;}
+
+        public string OsDescription {get; set;}
+        public string OsArchitecture {get; set;}
+        public string FrameworkDescription {get; set;}
+        public string ProcessArchitecture {get; set;}
+
 
         public void Build()
         {
@@ -18,6 +34,18 @@ namespace Photon.Agent.ViewModels
             AgentVersion = Configuration.Version;
             AgentHttpUrl = GetAgentHttpUrl();
             AgentTcpUrl = GetAgentTcpUrl();
+            ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
+
+            MachineName = Environment.MachineName;
+            MachineHost = Dns.GetHostName();
+            MachineProcessorCount = Environment.ProcessorCount.ToString("N0");
+            MachineOsVersion = Environment.OSVersion.VersionString;
+            MachineClrVersion = Environment.Version.ToString();
+            MachineArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
+
+            OsDescription = RuntimeInformation.OSDescription;
+            OsArchitecture = RuntimeInformation.OSArchitecture.ToString();
+            FrameworkDescription = RuntimeInformation.FrameworkDescription;
         }
 
         private static string GetAgentName()

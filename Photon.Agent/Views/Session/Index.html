@@ -114,16 +114,17 @@
         <div id="ActiveSessions" class="card-body-ns">
             <div class="mask" data-session-mask></div>
             <div data-session-list>
-                <div data-session-template="build" class="session-row">
-                    <i class="fas fa-ellipsis-h" data-session-status></i>
+                <div data-session-template="build" class="session-row pl-2">
+                    <i data-session-status></i>
                     <div class="btn btn-sm btn-outline-dark border-0 cancel">
                         <i class="fas fa-times text-danger"></i>
                     </div>
-                    <a href="#" class="text-primary" data-session-title></a>
+                    <a href="#" class="text-primary" data-session-link></a>
+                    <span class="text-dark" data-session-title></span>
                     <span class="text-muted refspec" data-session-refspec></span>
                 </div>
                 <div data-session-template="deploy" class="session-row">
-                    <i class="fas fa-ellipsis-h" data-session-status></i>
+                    <i data-session-status></i>
                     <div class="btn btn-sm btn-outline-dark border-0 cancel">
                         <i class="fas fa-times text-danger"></i>
                     </div>

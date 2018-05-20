@@ -39,19 +39,21 @@
 {{#Style}}
 <style>
     .layout-content {
-        padding: 8px 16px;
+        min-height: 100vh;
+        background: #111;
     }
-
     .session-output {
+        min-height: 100%;
         white-space: pre-wrap;
         word-wrap: break-word;
         font-family: monospace;
-        background: #111;
         color: #CCC;
     }
 </style>
 {{#EndStyle}}
 
-<h2>Session Details</h2>
+<div class="bg-secondary px-2 py-1">
+    <h2 class="text-light my-0">Session Output</h2>
+</div>
 
-<div id="SessionOutput" class="session-output"></div>
+<div id="SessionOutput" class="session-output px-2 py-1"></div>

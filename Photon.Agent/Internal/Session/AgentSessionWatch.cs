@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Photon.Framework.Projects;
 using Photon.Library.Session;
 
 namespace Photon.Agent.Internal.Session
@@ -24,6 +25,15 @@ namespace Photon.Agent.Internal.Session
 
         public void Initialize()
         {
+            // TODO: FOR TESTING ONLY!!!
+            var testSession = new AgentBuildSession(null, Guid.NewGuid().ToString("N"), Guid.NewGuid().ToString("N"));
+            testSession.BuildNumber = 123;
+            testSession.GitRefspec = "master";
+            testSession.Project = new Project {
+                Name = "Test Project",
+            };
+            SendUpdate(testSession);
+
             var sessionList = PhotonAgent.Instance.Sessions.All
                 .OrderByDescending(x => x.TimeCreated)
                 .Take(20).Reverse().ToArray();
@@ -47,13 +57,13 @@ namespace Photon.Agent.Internal.Session
 
             if (session is AgentBuildSession buildSession) {
                 number = buildSession.BuildNumber;
-                name = "?"; // buildSession.TaskName;
+                name = "<unknown>"; // buildSession.TaskName;
                 projectName = buildSession.Project?.Name;
                 gitRefspec = buildSession.GitRefspec;
             }
             else if (session is AgentDeploySession deploySession) {
                 number = deploySession.DeploymentNumber;
-                name = "?"; // deploySession.ScriptName;
+                name = "<unknown>"; // deploySession.ScriptName;
                 projectName = deploySession.Project?.Name;
                 projectVersion = $"{deploySession.ProjectPackageId} @{deploySession.ProjectPackageVersion}";
             }
