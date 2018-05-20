@@ -243,9 +243,8 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        protected void RunCommandScript(string filename)
+        protected void RunCommandScript(string command)
         {
-            var command = $"cmd.exe /c \"{filename}\"";
             var result = ProcessRunner.Run(ContentDirectory, command, Output.Writer);
 
             if (result.ExitCode != 0)
