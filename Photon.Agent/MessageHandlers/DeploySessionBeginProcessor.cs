@@ -23,9 +23,9 @@ namespace Photon.Agent.MessageHandlers
                 Agent = requestMessage.Agent,
             };
 
-            PhotonAgent.Instance.Sessions.BeginSession(session);
-
             await session.InitializeAsync();
+
+            PhotonAgent.Instance.Sessions.BeginSession(session);
 
             response.AgentSessionId = session.SessionId;
 
