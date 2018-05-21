@@ -104,12 +104,15 @@
     <Compile Include="HttpHandlers\Session\SessionDetailsHandler.cs" />
     <Compile Include="HttpHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
     <Compile Include="HttpHandlers\VariableSet\VariableSetIndexHandler.cs" />
+    <Compile Include="Internal\Builds\BuildData.cs" />
+    <Compile Include="Internal\Builds\BuildDataManager.cs" />
     <Compile Include="Internal\ClientHandshake.cs" />
     <Compile Include="Internal\ServerAgents\ServerAgentManager.cs" />
     <Compile Include="Internal\GitHub\HookEventHandler.cs" />
     <Compile Include="Internal\JsonDynamicDocument.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfiguration.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
+    <Compile Include="Internal\ServerHttpSecurity.cs" />
     <Compile Include="Internal\Sessions\ServerSessionWatch.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
     <Compile Include="Internal\Sessions\SessionStateEventArgs.cs" />
@@ -158,6 +161,7 @@
     <Compile Include="ViewModels\Agent\AgentEditVM.cs" />
     <Compile Include="ViewModels\Agent\AgentEditJsonVM.cs" />
     <Compile Include="ViewModels\Agent\AgentIndexVM.cs" />
+    <Compile Include="ViewModels\Build\BuildIndexVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\Project\ProjectEditVM.cs" />
     <Compile Include="ViewModels\Project\ProjectIndexVM.cs" />
@@ -283,7 +287,9 @@
       <Name>Photon.Library</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ViewModels\Deployment\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="projects.json" />
     <None Include="server.json" />

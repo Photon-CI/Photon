@@ -11,3 +11,15 @@
 <div class="bg-secondary mb-4 px-2 py-1">
     <h2 class="text-light my-0">Builds</h2>
 </div>
+
+<table class="table table-sm">
+    <tbody>
+    {{#Each Builds.build}}
+    <tr>
+        <td>
+            <a href="#">#{{build.Number}}: {{build.ProjectName}}</a>
+        </td>
+    </tr>
+    {{#EndEach}}
+    </tbody>
+</table>

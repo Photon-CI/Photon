@@ -165,7 +165,7 @@ namespace Photon.Server.Internal
             var http = ServerConfiguration.Value.Http;
 
             var context = new HttpReceiverContext {
-                //SecurityMgr = new Internal.Security.SecurityManager(),
+                SecurityMgr = new ServerHttpSecurity(),
                 ListenerPath = http.Path,
                 ContentDirectories = {
                     contentDir,

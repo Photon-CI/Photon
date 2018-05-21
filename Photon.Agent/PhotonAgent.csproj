@@ -90,6 +90,7 @@
     <Compile Include="Internal\Git\RepositoryIndexEntry.cs" />
     <Compile Include="Internal\Git\RepositorySourceManager.cs" />
     <Compile Include="Internal\Git\RepositorySource.cs" />
+    <Compile Include="Internal\AgentHttpSecurity.cs" />
     <Compile Include="Internal\Session\AgentBuildSession.cs" />
     <Compile Include="Internal\Session\AgentDeploySession.cs" />
     <Compile Include="Internal\Session\AgentSessionBase.cs" />

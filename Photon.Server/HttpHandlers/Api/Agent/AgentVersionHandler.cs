@@ -102,19 +102,7 @@ namespace Photon.Server.HttpHandlers.Api.Agent
                 messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry);
                 await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, token);
 
-                var handshakeRequest = new HandshakeRequest {
-                    Key = Guid.NewGuid().ToString(),
-                    ServerVersion = Configuration.Version,
-                };
-
-                var timeout = TimeSpan.FromSeconds(30);
-                var handshakeResponse = await messageClient.Handshake<HandshakeResponse>(handshakeRequest, timeout, token);
-
-                if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
-                    throw new ApplicationException("Handshake Failed! An invalid key was returned.");
-
-                if (!handshakeResponse.PasswordMatch)
-                    throw new ApplicationException("Handshake Failed! Unauthorized.");
+                await ClientHandshake.Verify(messageClient, token);
 
                 var agentVersionRequest = new AgentGetVersionRequest();
 

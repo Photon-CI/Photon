@@ -168,7 +168,7 @@ namespace Photon.Agent.Internal
             };
 
             var context = new HttpReceiverContext {
-                //SecurityMgr = new Internal.Security.SecurityManager(),
+                SecurityMgr = new AgentHttpSecurity(),
                 ListenerPath = Definition.Http.Path,
                 ContentDirectories = {
                     contentDir,

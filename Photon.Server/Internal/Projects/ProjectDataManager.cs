@@ -11,6 +11,8 @@ namespace Photon.Server.Internal.Projects
         private readonly Dictionary<string, ProjectData> data;
         private string projectDataPath;
 
+        public IEnumerable<ProjectData> AllData => data.Values;
+
 
         public ProjectDataManager()
         {

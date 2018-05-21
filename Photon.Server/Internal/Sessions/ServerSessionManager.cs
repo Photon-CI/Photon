@@ -1,7 +1,6 @@
 ﻿using Photon.Framework.Pooling;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Photon.Server.Internal.Sessions
 {
@@ -12,7 +11,8 @@ namespace Photon.Server.Internal.Sessions
 
         private readonly ReferencePool<ServerSessionBase> pool;
 
-        public IEnumerable<ServerSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
+        public IEnumerable<ServerSessionBase> All => pool.Items;
+        //public IEnumerable<ServerSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
 
 
         public ServerSessionManager()

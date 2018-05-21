@@ -1,9 +1,8 @@
-﻿using System;
-using System.Net;
-using System.Runtime.InteropServices;
-using Photon.Agent.Internal;
+﻿using Photon.Agent.Internal;
 using Photon.Framework;
 using Photon.Library;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Photon.Agent.ViewModels
 {
@@ -15,7 +14,6 @@ namespace Photon.Agent.ViewModels
         public string AgentTcpUrl {get; set;}
 
         public string MachineName {get; set;}
-        public string MachineHost {get; set;}
         public string MachineProcessorCount {get; set;}
         public string MachineOsVersion {get; set;}
         public string MachineClrVersion {get; set;}
@@ -35,7 +33,6 @@ namespace Photon.Agent.ViewModels
             ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
 
             MachineName = Environment.MachineName;
-            MachineHost = Dns.GetHostName();
             MachineProcessorCount = Environment.ProcessorCount.ToString("N0");
             MachineOsVersion = Environment.OSVersion.VersionString;
             MachineClrVersion = Environment.Version.ToString();

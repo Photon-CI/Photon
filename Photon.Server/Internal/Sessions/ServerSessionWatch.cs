@@ -23,7 +23,7 @@ namespace Photon.Server.Internal.Sessions
 
         public void Initialize()
         {
-            foreach (var session in PhotonServer.Instance.Sessions.Active)
+            foreach (var session in PhotonServer.Instance.Sessions.All)
                 SendUpdate(session);
         }
 

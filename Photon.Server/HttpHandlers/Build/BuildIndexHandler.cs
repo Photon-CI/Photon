@@ -1,5 +1,6 @@
-﻿using Photon.Library;
+﻿using Photon.Server.ViewModels.Build;
 using PiServerLite.Http.Handlers;
+using System;
 
 namespace Photon.Server.HttpHandlers.Build
 {
@@ -9,16 +10,16 @@ namespace Photon.Server.HttpHandlers.Build
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new ViewModelBase {
+            var vm = new BuildIndexVM {
                 PageTitle = "Photon Server Builds",
             };
 
-            //try {
-            //    vm.Build();
-            //}
-            //catch (Exception error) {
-            //    vm.Errors.Add(error);
-            //}
+            try {
+                vm.Build();
+            }
+            catch (Exception error) {
+                vm.Errors.Add(error);
+            }
 
             return Response.View("Build\\Index.html", vm);
         }

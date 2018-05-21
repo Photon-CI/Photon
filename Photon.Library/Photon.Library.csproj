@@ -41,8 +41,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builds\BuildData.cs" />
-    <Compile Include="Builds\BuildDataManager.cs" />
     <Compile Include="Commands\CommandActionBuilder.cs" />
     <Compile Include="Commands\CommandAttribute.cs" />
     <Compile Include="Commands\CommandDictionary.cs" />
@@ -69,6 +67,7 @@
     <Compile Include="HttpMessages\HttpBuildStartResponse.cs" />
     <Compile Include="HttpMessages\HttpPackageIndex.cs" />
     <Compile Include="HttpMessages\HttpPackageReference.cs" />
+    <Compile Include="HttpSecurity\HttpSecurityManager.cs" />
     <Compile Include="ILibraryAssembly.cs" />
     <Compile Include="LazyAsync.cs" />
     <Compile Include="Packages\ApplicationPackageManager.cs" />

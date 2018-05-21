@@ -14,6 +14,7 @@ namespace Photon.CLI.Commands
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
         //public string ScriptName {get; set;}
+        public string Environment {get; set;}
 
 
         public DeployCommands(CommandContext context) : base(context)
@@ -25,23 +26,25 @@ namespace Photon.CLI.Commands
             Map("-id").ToProperty(v => ProjectPackageId = v);
             Map("-v", "-version").ToProperty(v => ProjectPackageVersion = v);
             //Map("-s", "-script").ToProperty(v => ScriptName = v);
+            Map("-e", "-environment").ToProperty(v => Environment = v);
         }
 
         private async Task OnHelp(string[] args)
         {
             await new HelpPrinter()
-                .Add("Run", "Run a Deploy script.")
+                .Add(typeof(DeployCommands), nameof(RunCommand))
                 .PrintAsync();
         }
 
         public async Task RunCommand(string[] args)
         {
             if (args.ContainsAny("help", "?")) {
-                await new HelpPrinter("Run", "Runs a project deployment script using the specified package version.")
+                await new HelpPrinter(typeof(DeployCommands), nameof(RunCommand))
                     .Add("-server      ", "The name of the Server instance. Defaults to primary server.")
                     .Add("-id          ", "The ID of the project package.")
                     .Add("-version | -v", "The version of the project package.")
                     //.Add("-script  | -s", "The name of the deploy script.")
+                    .Add("-env     | -e", "The environment to deploy to.")
                     .PrintAsync();
 
                 return;
@@ -58,7 +61,15 @@ namespace Photon.CLI.Commands
 
             ConsoleEx.Out
                 .Write("Deploying Project Package ", ConsoleColor.DarkCyan)
-                .Write($"{ProjectPackageId}.{ProjectPackageVersion}", ConsoleColor.Cyan)
+                .Write($"{ProjectPackageId}.{ProjectPackageVersion}", ConsoleColor.Cyan);
+
+            if (!string.IsNullOrEmpty(Environment)) {
+                ConsoleEx.Out
+                    .Write(" to environment ", ConsoleColor.DarkCyan)
+                    .Write(Environment, ConsoleColor.Cyan);
+            }
+
+            ConsoleEx.Out
                 .WriteLine(".", ConsoleColor.DarkCyan);
 
             await new DeployRunAction {
@@ -66,10 +77,11 @@ namespace Photon.CLI.Commands
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
                 //ScriptName = ScriptName,
+                Environment = Environment,
             }.Run(Context);
 
-            ConsoleEx.Out
-                .WriteLine("Script completed successfully.", ConsoleColor.Green);
+            //ConsoleEx.Out
+            //    .WriteLine("Deployment completed successfully.", ConsoleColor.Green);
         }
     }
 }

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Server.Internal.Builds;
 using System;
 using System.IO;
 
@@ -22,14 +23,23 @@ namespace Photon.Server.Internal.Projects
 
         public string ProjectId {get; set;}
 
-        public ProjectDataLastBuild LastBuild {get; set;}
-        public ProjectDataLastBuild LastDeployment {get; set;}
+        public ProjectDataLastBuild LastBuild {get; private set;}
+        public ProjectDataLastBuild LastDeployment {get; private set;}
+        public BuildDataManager Builds {get; private set;}
 
 
         public ProjectData()
         {
             buildNumberLock = new object();
             deployNumberLock = new object();
+        }
+
+        public void Initialize()
+        {
+            var buildsPath = Path.Combine(DataPath, "builds");
+
+            Builds = new BuildDataManager(buildsPath);
+            Builds.Load();
         }
 
         public uint StartNewBuild()
@@ -98,6 +108,7 @@ namespace Photon.Server.Internal.Projects
                 DataPath = Path.GetDirectoryName(filename),
             };
 
+            index.Initialize();
             index.Save();
 
             return index;
@@ -112,6 +123,7 @@ namespace Photon.Server.Internal.Projects
 
             projectData.Filename = filename;
             projectData.DataPath = Path.GetDirectoryName(filename);
+            projectData.Initialize();
 
             return projectData;
         }
