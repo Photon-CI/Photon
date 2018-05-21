@@ -110,8 +110,8 @@ namespace Photon.Agent.Internal
 
         public void Stop(TimeSpan? timeout = null)
         {
-            if (!isStarted) return;
-            isStarted = false;
+            //if (!isStarted) return;
+            //isStarted = false;
 
             // TODO: Enable timeout usage
 

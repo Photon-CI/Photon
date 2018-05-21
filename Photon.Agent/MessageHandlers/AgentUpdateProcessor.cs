@@ -30,14 +30,14 @@ namespace Photon.Agent.MessageHandlers
 
             BeginInstall(updatePath, msiFilename);
 
-            var _ = Task.Delay(200).ContinueWith(t => {
-                try {
-                    PhotonAgent.Instance.Stop(TimeSpan.FromSeconds(20));
-                }
-                catch (Exception error) {
-                    Log.Error("An error occurred while shutting down!", error);
-                }
-            });
+            //var _ = Task.Delay(200).ContinueWith(t => {
+            //    try {
+            //        PhotonAgent.Instance.Stop(TimeSpan.FromSeconds(20));
+            //    }
+            //    catch (Exception error) {
+            //        Log.Error("An error occurred while shutting down!", error);
+            //    }
+            //});
 
             var response = new AgentUpdateResponse();
 
