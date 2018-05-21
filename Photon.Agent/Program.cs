@@ -42,7 +42,7 @@ namespace Photon.Agent
         public static void Shutdown()
         {
             tokenSource.Cancel();
-            service?.Stop();
+            //service?.Stop();
         }
 
         private static async Task<int> Run(string[] args)

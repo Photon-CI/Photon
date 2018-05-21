@@ -108,10 +108,12 @@ namespace Photon.Agent.Internal
                 taskHttp);
         }
 
-        public void Stop()
+        public void Stop(TimeSpan? timeout = null)
         {
             if (!isStarted) return;
             isStarted = false;
+
+            // TODO: Enable timeout usage
 
             messageListener?.StopAsync()
                 .GetAwaiter().GetResult();
