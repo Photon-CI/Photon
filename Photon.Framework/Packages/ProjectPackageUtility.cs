@@ -1,5 +1,6 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using System;
 using System.IO;
 using System.Threading;
@@ -92,8 +93,7 @@ namespace Photon.Framework.Packages
 
         public async Task<ProjectPackage> UnpackAsync(string filename, string path)
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreatePath(path);
 
             ProjectPackage metadata = null;
 

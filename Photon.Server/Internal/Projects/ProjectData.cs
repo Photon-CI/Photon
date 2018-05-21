@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using Photon.Server.Internal.Builds;
 using System;
 using System.IO;
@@ -24,7 +25,9 @@ namespace Photon.Server.Internal.Projects
         public string ProjectId {get; set;}
 
         public ProjectDataLastBuild LastBuild {get; private set;}
+
         public ProjectDataLastBuild LastDeployment {get; private set;}
+
         public BuildDataManager Builds {get; private set;}
 
 
@@ -55,10 +58,8 @@ namespace Photon.Server.Internal.Projects
                 buildNumber = LastBuild.Number;
             }
 
-            var path = Path.Combine(DataPath, "Builds", buildNumber.ToString());
-
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            var buildPath = Path.Combine(DataPath, "Builds", buildNumber.ToString());
+            PathEx.CreatePath(buildPath);
 
             try {
                 Save();
@@ -83,6 +84,9 @@ namespace Photon.Server.Internal.Projects
                 deployNumber = LastDeployment.Number;
             }
 
+            var deployPath = Path.Combine(DataPath, "Deployments", deployNumber.ToString());
+            PathEx.CreatePath(deployPath);
+
             try {
                 Save();
             }
@@ -95,6 +99,8 @@ namespace Photon.Server.Internal.Projects
 
         public void Save()
         {
+            PathEx.CreateFilePath(Filename);
+
             using (var stream = File.Open(Filename, FileMode.Create, FileAccess.Write)) {
                 JsonSettings.Serializer.Serialize(stream, this);
             }

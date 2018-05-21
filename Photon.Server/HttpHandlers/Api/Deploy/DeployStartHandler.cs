@@ -1,28 +1,27 @@
 ﻿using log4net;
+using Photon.Framework.Packages;
 using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.HttpHandlers.Api.Deploy
 {
     [HttpHandler("api/deploy/start")]
-    internal class DeployHandler : HttpHandler
+    internal class DeployHandler : HttpHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DeployHandler));
 
 
-        public override HttpHandlerResult Post()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
-            var projectId = GetQuery("project");
             var projectPackageId = GetQuery("package");
             var projectPackageVersion = GetQuery("version");
             var environmentName = GetQuery("env");
-
-            if (string.IsNullOrWhiteSpace(projectId))
-                return Response.BadRequest().SetText("'project' is undefined!");
 
             if (string.IsNullOrWhiteSpace(projectPackageId))
                 return Response.BadRequest().SetText("'package' is undefined!");
@@ -34,11 +33,14 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
                 if (!PhotonServer.Instance.ProjectPackages.TryGet(projectPackageId, projectPackageVersion, out var packageFilename))
                     return Response.BadRequest().SetText($"Project Package '{projectPackageId}.{projectPackageVersion}' was not found!");
 
+                var metadata = await ProjectPackageTools.GetMetadataAsync(packageFilename);
+                var projectId = metadata.ProjectId;
+
                 if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
 
-                var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
-                var deploymentNumber = projectData.StartNewBuild();
+                var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(projectId);
+                var deploymentNumber = projectData.StartNewDeployment();
 
                 var session = new ServerDeploySession {
                     Project = project,

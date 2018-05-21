@@ -87,8 +87,7 @@ namespace Photon.CLI.Actions
             var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
             var updateFilename = Path.Combine(updateDirectory, "Photon.Agent.msi");
 
-            if (!Directory.Exists(updateDirectory))
-                Directory.CreateDirectory(updateDirectory);
+            PathEx.CreatePath(updateDirectory);
 
             using (var client = new WebClient()) {
                 await client.DownloadFileTaskAsync(url, updateFilename);

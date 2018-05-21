@@ -3,6 +3,7 @@ using Photon.Agent.Internal;
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Framework;
+using Photon.Framework.Tools;
 using Photon.Library.TcpMessages;
 using System;
 using System.IO;
@@ -20,8 +21,7 @@ namespace Photon.Agent.MessageHandlers
             var updatePath = Path.Combine(Configuration.Directory, "Updates");
             var msiFilename = Path.Combine(updatePath, "Photon.Agent.msi");
 
-            if (!Directory.Exists(updatePath))
-                Directory.CreateDirectory(updatePath);
+            PathEx.CreatePath(updatePath);
 
             if (File.Exists(msiFilename))
                 File.Delete(msiFilename);

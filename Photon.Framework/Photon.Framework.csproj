@@ -122,6 +122,7 @@
     <Compile Include="ContextTaskDefinition.cs" />
     <Compile Include="ContextProjectDefinition.cs" />
     <Compile Include="Tools\AssemblyTools.cs" />
+    <Compile Include="Tools\PathEx.cs" />
     <Compile Include="Tools\VersionTools.cs" />
     <Compile Include="Variables\VariableSet.cs" />
     <Compile Include="Variables\VariableSetCollection.cs" />

@@ -1,5 +1,6 @@
 ﻿using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,10 +38,7 @@ namespace Photon.CLI.Internal
 
         public void Save()
         {
-            var filePath = Path.GetDirectoryName(filename);
-
-            if (!string.IsNullOrEmpty(filePath) && !Directory.Exists(filePath))
-                Directory.CreateDirectory(filePath);
+            PathEx.CreateFilePath(filename);
 
             using (var stream = File.Open(filename, FileMode.Create, FileAccess.Write)) {
                 JsonSettings.Serializer.Serialize(stream, this);

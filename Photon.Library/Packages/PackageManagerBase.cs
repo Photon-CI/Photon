@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Photon.Framework.Packages;
+using Photon.Framework.Tools;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Framework.Packages;
 
 namespace Photon.Library.Packages
 {
@@ -25,10 +26,7 @@ namespace Photon.Library.Packages
                 throw new Exception($"Package '{metadata.Id}.{metadata.Version}' already exists!");
 
             await Task.Run(() => {
-                var path = Path.GetDirectoryName(packageFilename) ?? string.Empty;
-
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
+                PathEx.CreateFilePath(packageFilename);
 
                 File.Copy(filename, packageFilename);
             });

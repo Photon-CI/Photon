@@ -1,5 +1,6 @@
 ﻿using log4net;
 using Photon.Framework;
+using Photon.Framework.Tools;
 using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
 using System;
@@ -24,16 +25,16 @@ namespace Photon.Server.HttpHandlers.Api.Server
                 var updatePath = Path.Combine(Configuration.Directory, "Updates");
                 var msiFilename = Path.Combine(updatePath, "Photon.Server.msi");
 
-                if (!Directory.Exists(updatePath))
-                    Directory.CreateDirectory(updatePath);
+                PathEx.CreatePath(updatePath);
 
                 using (var fileStream = File.Open(msiFilename, FileMode.Create, FileAccess.Write)) {
                     await HttpContext.Request.InputStream.CopyToAsync(fileStream);
                 }
 
-                var _ = Task.Delay(100).ContinueWith(t => {
-                    BeginInstall(updatePath, msiFilename);
-                });
+                var _ = Task.Delay(100, token)
+                    .ContinueWith(t => {
+                        BeginInstall(updatePath, msiFilename);
+                    }, token);
 
                 return Response.Ok().SetText("Shutting down and performing update...");
             }

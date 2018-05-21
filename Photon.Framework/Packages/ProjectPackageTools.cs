@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Tools;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -16,19 +17,19 @@ namespace Photon.Framework.Packages
         /// Creates a Project Package using the specified
         /// definition file.
         /// </summary>
+        /// <param name="definition">The project-package definition.</param>
+        /// <param name="rootPath">The root path of the package source.</param>
         /// <param name="version">The version of the package to create.</param>
-        /// <param name="outputFilename">The file name of the output package.</param>
+        /// <param name="outputFilename">The filename of the package to create.</param>
         public static async Task CreatePackage(ProjectPackageDefinition definition, string rootPath, string version, string outputFilename)
         {
-
             var outputFilenameFull = Path.GetFullPath(outputFilename);
             var outputPath = Path.GetDirectoryName(outputFilenameFull);
 
             if (string.IsNullOrEmpty(outputPath))
                 throw new ApplicationException("Empty package output path!");
 
-            if (!Directory.Exists(outputPath))
-                Directory.CreateDirectory(outputPath);
+            PathEx.CreatePath(outputPath);
 
             await PackageTools.WriteArchive(outputFilename, async archive => {
                 AppendMetadata(archive, definition, version);
@@ -54,8 +55,7 @@ namespace Photon.Framework.Packages
 
         public static async Task<ProjectPackage> UnpackAsync(string filename, string path)
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreatePath(path);
 
             ProjectPackage metadata = null;
 
@@ -72,6 +72,7 @@ namespace Photon.Framework.Packages
         {
             var metadata = new ProjectPackage {
                 Id = definition.Id,
+                ProjectId = definition.ProjectId,
                 Name = definition.Name,
                 Description = definition.Description,
                 AssemblyFilename = definition.Assembly,

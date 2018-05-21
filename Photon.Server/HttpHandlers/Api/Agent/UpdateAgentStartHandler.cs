@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework.Tools;
 
 namespace Photon.Server.HttpHandlers.Api.Agent
 {
@@ -26,8 +27,7 @@ namespace Photon.Server.HttpHandlers.Api.Agent
             var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
             var updateFilename = Path.Combine(updateDirectory, "Photon.Agent.msi");
 
-            if (!Directory.Exists(updateDirectory))
-                Directory.CreateDirectory(updateDirectory);
+            PathEx.CreatePath(updateDirectory);
 
             using (var fileStream = File.Open(updateFilename, FileMode.Create, FileAccess.Write)) {
                 await HttpContext.Request.InputStream.CopyToAsync(fileStream);

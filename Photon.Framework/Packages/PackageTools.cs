@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -87,8 +88,7 @@ namespace Photon.Framework.Packages
                 var entryDestPath = Path.Combine(destPath, entryPathDest);
                 var entryDestFilename = Path.Combine(entryDestPath, entry.Name);
 
-                if (!Directory.Exists(entryDestPath))
-                    Directory.CreateDirectory(entryDestPath);
+                PathEx.CreatePath(entryDestPath);
 
                 using (var entryStream = entry.Open())
                 using (var fileStream = File.Open(entryDestFilename, FileMode.Create, FileAccess.Write)) {

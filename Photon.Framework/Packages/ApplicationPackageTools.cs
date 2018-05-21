@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Tools;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -21,8 +22,7 @@ namespace Photon.Framework.Packages
             if (string.IsNullOrEmpty(outputPath))
                 throw new ApplicationException("Empty package output path!");
 
-            if (!Directory.Exists(outputPath))
-                Directory.CreateDirectory(outputPath);
+            PathEx.CreatePath(outputPath);
 
             await PackageTools.WriteArchive(outputFilename, async archive => {
                 AppendMetadata(archive, definition, version);
@@ -48,8 +48,7 @@ namespace Photon.Framework.Packages
 
         public static async Task<ApplicationPackage> UnpackAsync(string filename, string path)
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreatePath(path);
 
             ApplicationPackage metadata = null;
 

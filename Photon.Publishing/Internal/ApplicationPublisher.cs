@@ -58,8 +58,7 @@ namespace Photon.Publishing.Internal
             // Publish
 
             // Create ZIP
-            if (!Directory.Exists(PackagePath))
-                Directory.CreateDirectory(PackagePath);
+            PathEx.CreatePath(PackagePath);
 
             var zipFilename = Path.Combine(PackagePath, $"{packageId}.zip");
             await CreateZip(BinPath, zipFilename);

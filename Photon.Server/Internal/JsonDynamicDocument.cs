@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using System;
 using System.IO;
 
@@ -34,10 +35,7 @@ namespace Photon.Server.Internal
 
         public void Update(Action<JToken> updateAction)
         {
-            var path = Path.GetDirectoryName(Filename);
-
-            if (path != null && !Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreateFilePath(Filename);
 
             AlterDocument(document => {
                 updateAction(document);
@@ -54,6 +52,8 @@ namespace Photon.Server.Internal
 
         private void AlterDocument(Func<JToken, bool> alterFunc)
         {
+            PathEx.CreateFilePath(Filename);
+
             using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
                 var document = Serializer.Deserialize(stream, true);
 

@@ -52,8 +52,7 @@ namespace Photon.Publishing.Tasks
             await PublishAgent();
             await PublishCLI();
 
-            if (!Directory.Exists(nugetPackageDir))
-                Directory.CreateDirectory(nugetPackageDir);
+            PathEx.CreatePath(nugetPackageDir);
 
             await PublishFrameworkPackage(token);
             await PublishPluginPackage("Photon.IIS", token);

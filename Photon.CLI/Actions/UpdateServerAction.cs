@@ -74,8 +74,7 @@ namespace Photon.CLI.Actions
                 var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
                 updateFilename = Path.Combine(updateDirectory, "Photon.Server.msi");
 
-                if (!Directory.Exists(updateDirectory))
-                    Directory.CreateDirectory(updateDirectory);
+                PathEx.CreatePath(updateDirectory);
 
                 using (var client = HttpClientEx.Get(url)) {
                     await client.Send();

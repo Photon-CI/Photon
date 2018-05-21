@@ -6,6 +6,7 @@ using NuGet.Protocol.Core.Types;
 using NuGet.Protocol.Core.v2;
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
+using Photon.Framework.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -111,8 +112,7 @@ namespace Photon.NuGetPlugin
             try {
                 var outputPath = Path.GetDirectoryName(packageFilename);
 
-                if (!string.IsNullOrEmpty(outputPath) && !Directory.Exists(outputPath))
-                    Directory.CreateDirectory(outputPath);
+                PathEx.CreatePath(outputPath);
 
                 var builder = new PackageBuilder();
                 builder.Populate(nuspec.Metadata);

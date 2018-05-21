@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Photon.Framework.Tools;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Photon.Library.Variables
@@ -41,10 +42,7 @@ namespace Photon.Library.Variables
 
         internal async Task SaveJson()
         {
-            var path = Path.GetDirectoryName(Filename);
-
-            if (path != null && !Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreateFilePath(Filename);
 
             using (var stream = File.Open(Filename, FileMode.Create, FileAccess.Write))
             using (var writer = new StreamWriter(stream)) {
