@@ -6,8 +6,9 @@ namespace Photon.Plugins.IIS
 {
     public class IISTools : IDisposable
     {
-        public IDomainContext Context {get;}
-        public ServerManager Server {get;}
+        private readonly IISServerHandle handle;
+
+        public ServerManager Server => handle.Server;
 
         public ApplicationPoolTools ApplicationPool {get;}
         public WebSiteTools WebSite {get;}
@@ -16,18 +17,16 @@ namespace Photon.Plugins.IIS
 
         public IISTools(IDomainContext context, string serverName = "localhost")
         {
-            this.Context = context;
+            handle = new IISServerHandle(context, serverName);
 
-            Server = ServerManager.OpenRemote(serverName);
-
-            ApplicationPool = new ApplicationPoolTools(context, Server);
-            WebSite = new WebSiteTools(context, Server);
-            WebApplication = new WebApplicationTools(context, Server);
+            ApplicationPool = new ApplicationPoolTools(handle);
+            WebSite = new WebSiteTools(handle);
+            WebApplication = new WebApplicationTools(handle);
         }
 
         public void Dispose()
         {
-            Server?.Dispose();
+            handle?.Dispose();
         }
     }
 }

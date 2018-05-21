@@ -1,5 +1,4 @@
 ﻿using Microsoft.Web.Administration;
-using Photon.Framework.Domain;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,20 +7,18 @@ namespace Photon.Plugins.IIS
 {
     public class ApplicationPoolTools
     {
-        public IDomainContext Context {get;}
-        public ServerManager Server {get;}
+        private readonly IISServerHandle handle;
 
 
-        internal ApplicationPoolTools(IDomainContext context, ServerManager server)
+        internal ApplicationPoolTools(IISServerHandle handle)
         {
-            this.Context = context;
-            this.Server = server;
+            this.handle = handle;
         }
 
         public async Task<bool> StartAsync(string appPoolName, TimeSpan timeout)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                Context.Output
+                handle.Context.Output
                     .Append("Application Pool ", ConsoleColor.DarkYellow)
                     .Append(appPoolName, ConsoleColor.Yellow)
                     .AppendLine(" not found.", ConsoleColor.DarkYellow);
@@ -30,7 +27,7 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State == ObjectState.Started) {
-                Context.Output
+                handle.Context.Output
                     .Append("Application Pool ", ConsoleColor.DarkBlue)
                     .Append(appPoolName, ConsoleColor.Blue)
                     .AppendLine(" is already started.", ConsoleColor.DarkBlue);
@@ -49,7 +46,7 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State != ObjectState.Started) {
-                Context.Output
+                handle.Context.Output
                     .Append("A timeout was reached after ", ConsoleColor.DarkRed)
                     .Append(timeout, ConsoleColor.Red)
                     .Append(" waiting for Application Pool ", ConsoleColor.DarkRed)
@@ -59,7 +56,7 @@ namespace Photon.Plugins.IIS
                 return false;
             }
 
-            Context.Output
+            handle.Context.Output
                 .Append("Application Pool ", ConsoleColor.DarkGreen)
                 .Append(appPoolName, ConsoleColor.Green)
                 .AppendLine(" started successfully.", ConsoleColor.DarkGreen);
@@ -70,7 +67,7 @@ namespace Photon.Plugins.IIS
         public async Task<bool> StopAsync(string appPoolName, TimeSpan timeout)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                Context.Output
+                handle.Context.Output
                     .Append("Application Pool ", ConsoleColor.DarkYellow)
                     .Append(appPoolName, ConsoleColor.Yellow)
                     .AppendLine(" not found.", ConsoleColor.DarkYellow);
@@ -79,7 +76,7 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State == ObjectState.Stopped) {
-                Context.Output
+                handle.Context.Output
                     .Append("Application Pool ", ConsoleColor.DarkBlue)
                     .Append(appPoolName, ConsoleColor.Blue)
                     .AppendLine(" is already stopped.", ConsoleColor.DarkBlue);
@@ -98,7 +95,7 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State != ObjectState.Stopped) {
-                Context.Output
+                handle.Context.Output
                     .Append("A timeout was reached after ", ConsoleColor.DarkRed)
                     .Append(timeout, ConsoleColor.Red)
                     .Append(" waiting for Application Pool ", ConsoleColor.DarkRed)
@@ -108,7 +105,7 @@ namespace Photon.Plugins.IIS
                 return false;
             }
 
-            Context.Output
+            handle.Context.Output
                 .Append("Application Pool ", ConsoleColor.DarkGreen)
                 .Append(appPoolName, ConsoleColor.Green)
                 .AppendLine(" stopped successfully.", ConsoleColor.DarkGreen);
@@ -119,11 +116,11 @@ namespace Photon.Plugins.IIS
         public void Configure(string appPoolName, Action<ApplicationPool> configureAction)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                Server.ApplicationPools.Add(appPoolName);
-                Server.CommitChanges();
+                handle.Server.ApplicationPools.Add(appPoolName);
+                handle.CommitChanges();
 
                 if (!TryFind(appPoolName, out appPool)) {
-                    Context.Output
+                    handle.Context.Output
                         .Append("Unable to create Application Pool ", ConsoleColor.DarkRed)
                         .Append(appPoolName, ConsoleColor.Red)
                         .AppendLine("!", ConsoleColor.DarkRed);
@@ -131,7 +128,7 @@ namespace Photon.Plugins.IIS
                     throw new Exception($"Unable to create Application Pool '{appPoolName}'!");
                 }
 
-                Context.Output
+                handle.Context.Output
                     .Append("Created new Application Pool ", ConsoleColor.DarkBlue)
                     .Append(appPoolName, ConsoleColor.Blue)
                     .AppendLine(".", ConsoleColor.DarkBlue);
@@ -139,9 +136,9 @@ namespace Photon.Plugins.IIS
 
             configureAction(appPool);
 
-            Server.CommitChanges();
+            handle.CommitChanges();
 
-            Context.Output
+            handle.Context.Output
                 .Append("Application Pool ", ConsoleColor.DarkGreen)
                 .Append(appPoolName, ConsoleColor.Green)
                 .AppendLine(" configured successfully.", ConsoleColor.DarkGreen);
@@ -149,7 +146,7 @@ namespace Photon.Plugins.IIS
 
         private bool TryFind(string appPoolName, out ApplicationPool appPool)
         {
-            appPool = Server.ApplicationPools.FirstOrDefault(x => string.Equals(x.Name, appPoolName, StringComparison.OrdinalIgnoreCase));
+            appPool = handle.Server.ApplicationPools.FirstOrDefault(x => string.Equals(x.Name, appPoolName, StringComparison.OrdinalIgnoreCase));
             return appPool != null;
         }
     }

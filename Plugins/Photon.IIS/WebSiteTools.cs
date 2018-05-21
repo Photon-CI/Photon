@@ -1,5 +1,4 @@
 ﻿using Microsoft.Web.Administration;
-using Photon.Framework.Domain;
 using System;
 using System.Linq;
 
@@ -7,26 +6,24 @@ namespace Photon.Plugins.IIS
 {
     public class WebSiteTools
     {
-        private const string DefaultPhysicalPath = "C:\\inetpub\\wwwroot";
+        private const string DefaultPhysicalPath = "%SystemRoot%\\inetpub\\wwwroot";
 
-        public IDomainContext Context {get;}
-        public ServerManager Server {get;}
+        private readonly IISServerHandle handle;
 
 
-        internal WebSiteTools(IDomainContext context, ServerManager server)
+        internal WebSiteTools(IISServerHandle handle)
         {
-            this.Context = context;
-            this.Server = server;
+            this.handle = handle;
         }
 
         public void Configure(string websiteName, int port, Action<Site> configureAction)
         {
             if (!TryFind(websiteName, out var webSite)) {
-                Server.Sites.Add(websiteName, DefaultPhysicalPath, port);
-                Server.CommitChanges();
+                handle.Server.Sites.Add(websiteName, DefaultPhysicalPath, port);
+                handle.CommitChanges();
 
                 if (!TryFind(websiteName, out webSite)) {
-                    Context.Output
+                    handle.Context.Output
                         .Append("Unable to create WebSite ", ConsoleColor.DarkRed)
                         .Append(websiteName, ConsoleColor.Red)
                         .AppendLine("!", ConsoleColor.DarkRed);
@@ -34,7 +31,7 @@ namespace Photon.Plugins.IIS
                     throw new Exception($"Unable to create WebSite '{websiteName}'!");
                 }
 
-                Context.Output
+                handle.Context.Output
                     .Append("Created new WebSite ", ConsoleColor.DarkBlue)
                     .Append(websiteName, ConsoleColor.Blue)
                     .AppendLine(".", ConsoleColor.DarkBlue);
@@ -45,9 +42,9 @@ namespace Photon.Plugins.IIS
 
             configureAction(webSite);
 
-            Server.CommitChanges();
+            handle.CommitChanges();
 
-            Context.Output
+            handle.Context.Output
                 .Append("WebSite ", ConsoleColor.DarkGreen)
                 .Append(websiteName, ConsoleColor.Green)
                 .AppendLine(" configured successfully.", ConsoleColor.DarkGreen);
@@ -55,7 +52,7 @@ namespace Photon.Plugins.IIS
 
         private bool TryFind(string webSiteName, out Site webSite)
         {
-            webSite = Server.Sites.FirstOrDefault(x => string.Equals(x.Name, webSiteName, StringComparison.OrdinalIgnoreCase));
+            webSite = handle.Server.Sites.FirstOrDefault(x => string.Equals(x.Name, webSiteName, StringComparison.OrdinalIgnoreCase));
             return webSite != null;
         }
     }

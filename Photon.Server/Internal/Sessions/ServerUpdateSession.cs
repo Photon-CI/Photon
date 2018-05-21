@@ -14,8 +14,6 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerUpdateSession : ServerSessionBase
     {
-        private const int HandshakeTimeoutSec = 30;
-
         public string[] AgentIds {get; set;}
         public string UpdateFilename {get; set;}
         public string UpdateVersion {get; set;}
@@ -60,19 +58,7 @@ namespace Photon.Server.Internal.Sessions
                 try {
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
 
-                    var handshakeRequest = new HandshakeRequest {
-                        Key = Guid.NewGuid().ToString(),
-                        ServerVersion = Configuration.Version,
-                    };
-
-                    var timeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
-                    var handshakeResponse = await messageClient.Handshake<HandshakeResponse>(handshakeRequest, timeout, TokenSource.Token);
-
-                    if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
-                        throw new ApplicationException("Handshake Failed! An invalid key was returned.");
-
-                    if (!handshakeResponse.PasswordMatch)
-                        throw new ApplicationException("Handshake Failed! Unauthorized.");
+                    await ClientHandshake.Verify(messageClient, TokenSource.Token);
                 }
                 catch (Exception error) {
                     Output.Append("Failed to connect to agent ", ConsoleColor.DarkRed)
@@ -129,19 +115,21 @@ namespace Photon.Server.Internal.Sessions
             // TODO: Verify update was successful by polling for server and checking version
             messageClient = null;
 
+            var reconnectTimeout = TimeSpan.FromMinutes(2);
+
             try {
-                messageClient = await Reconnect(agent, TimeSpan.FromMinutes(2));
+                messageClient = await Reconnect(agent, reconnectTimeout, token);
             }
-            catch (TaskCanceledException) {
+            catch (OperationCanceledException) {
                 // TODO: Better error messages
-                throw;
+                throw new ApplicationException($"A timeout occurred after {reconnectTimeout} while waiting for the update to complete.");
             }
             finally {
                 messageClient?.Dispose();
             }
         }
 
-        private async Task<MessageClient> Reconnect(ServerAgent agent, TimeSpan timeout)
+        private async Task<MessageClient> Reconnect(ServerAgent agent, TimeSpan timeout, CancellationToken token)
         {
             var client = new MessageClient(PhotonServer.Instance.MessageRegistry);
 
@@ -153,60 +141,33 @@ namespace Photon.Server.Internal.Sessions
             //    Log.Error("Message Client error after update!", error);
             //};
 
-            var tokenSource = new CancellationTokenSource(timeout);
+            using (var timeoutTokenSource = new CancellationTokenSource(timeout))
+            using (var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token)) {
+                var _token = mergedTokenSource.Token;
 
-            var token = tokenSource.Token;
-            while (true) {
-                token.ThrowIfCancellationRequested();
+                while (true) {
+                    _token.ThrowIfCancellationRequested();
 
-                try {
-                    await client.ConnectAsync(agent.TcpHost, agent.TcpPort, tokenSource.Token);
+                    try {
+                        await client.ConnectAsync(agent.TcpHost, agent.TcpPort, _token);
 
-                    var handshakeRequest = new HandshakeRequest {
-                        Key = Guid.NewGuid().ToString(),
-                        ServerVersion = Configuration.Version,
-                    };
+                        await ClientHandshake.Verify(client, _token);
 
-                    var handshakeTimeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
-                    var handshakeResponse = await client.Handshake<HandshakeResponse>(handshakeRequest, handshakeTimeout, TokenSource.Token);
+                        var versionRequest = new AgentGetVersionRequest();
 
-                    if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
-                        throw new ApplicationException("Handshake Failed! An invalid key was returned.");
+                        var versionResponse = await client.Send(versionRequest)
+                            .GetResponseAsync<AgentGetVersionResponse>(_token);
 
-                    if (!handshakeResponse.PasswordMatch)
-                        throw new ApplicationException("Handshake Failed! Unauthorized.");
-
-                    var versionRequest = new AgentGetVersionRequest();
-
-                    var versionResponse = await client.Send(versionRequest)
-                        .GetResponseAsync<AgentGetVersionResponse>(token);
-
-                    if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
-                        break;
-                }
-                catch (SocketException) {
-                    await Task.Delay(1000, tokenSource.Token);
+                        if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
+                            break;
+                    }
+                    catch (SocketException) {
+                        await Task.Delay(1000, _token);
+                    }
                 }
             }
 
             return client;
         }
-
-        //private bool IncludesAgent(string agentName)
-        //{
-        //    if (!(AgentIds?.Any() ?? false)) return true;
-
-        //    foreach (var name in AgentIds) {
-        //        var escapedName = Regex.Escape(name)
-        //            .Replace("\\?", ".")
-        //            .Replace("\\*", ".*");
-
-        //        var namePattern = $"^{escapedName}$";
-        //        if (Regex.IsMatch(agentName, namePattern, RegexOptions.IgnoreCase))
-        //            return true;
-        //    }
-
-        //    return false;
-        //}
     }
 }

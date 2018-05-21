@@ -104,6 +104,7 @@
     <Compile Include="HttpHandlers\Session\SessionDetailsHandler.cs" />
     <Compile Include="HttpHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
     <Compile Include="HttpHandlers\VariableSet\VariableSetIndexHandler.cs" />
+    <Compile Include="Internal\ClientHandshake.cs" />
     <Compile Include="Internal\ServerAgents\ServerAgentManager.cs" />
     <Compile Include="Internal\GitHub\HookEventHandler.cs" />
     <Compile Include="Internal\JsonDynamicDocument.cs" />
