@@ -95,6 +95,7 @@ namespace Photon.Agent.Internal.Session
                 ApplicationsDirectory = ApplicationsDirectory,
                 Output = Output.Writer,
                 Packages = PackageClient,
+                AgentVariables = AgentVariables,
                 ServerVariables = ServerVariables,
                 EnvironmentName = EnvironmentName,
                 Agent = Agent,
