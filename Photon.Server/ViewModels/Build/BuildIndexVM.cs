@@ -29,7 +29,7 @@ namespace Photon.Server.ViewModels.Build
                 }));
             }
 
-            Builds = allBuilds.OrderByDescending(x => x.Created).ToArray();
+            Builds = allBuilds.OrderByDescending(x => x.Number).ToArray();
         }
     }
 

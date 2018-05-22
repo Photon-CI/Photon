@@ -19,6 +19,7 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
 
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
+            var qProjectId = GetQuery("project");
             var projectPackageId = GetQuery("package");
             var projectPackageVersion = GetQuery("version");
             var environmentName = GetQuery("env");
@@ -35,6 +36,12 @@ namespace Photon.Server.HttpHandlers.Api.Deploy
 
                 var metadata = await ProjectPackageTools.GetMetadataAsync(packageFilename);
                 var projectId = metadata.ProjectId;
+
+                if (!string.IsNullOrEmpty(qProjectId))
+                    projectId = qProjectId;
+
+                if (string.IsNullOrEmpty(projectId))
+                    throw new ApplicationException("'project' is undefined!");
 
                 if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
