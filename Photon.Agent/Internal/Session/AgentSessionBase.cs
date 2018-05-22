@@ -137,7 +137,7 @@ namespace Photon.Agent.Internal.Session
 
         public void Abort()
         {
-            //TokenSource.Cancel();
+            TokenSource.Cancel();
 
             // TODO: Wait?
         }
