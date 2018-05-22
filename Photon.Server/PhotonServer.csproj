@@ -78,7 +78,7 @@
     <Compile Include="HttpHandlers\Api\Project\ProjectJsonHandler.cs" />
     <Compile Include="HttpHandlers\Api\Project\JsonHandler.cs" />
     <Compile Include="HttpHandlers\Api\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\ListHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />
     <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
     <Compile Include="HttpHandlers\Api\Variable\DeleteHandler.cs" />

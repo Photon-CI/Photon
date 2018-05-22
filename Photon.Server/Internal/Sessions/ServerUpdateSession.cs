@@ -110,6 +110,10 @@ namespace Photon.Server.Internal.Sessions
                 messageClient?.Dispose();
             }
 
+            Output.Append("Agent update start on ", ConsoleColor.DarkCyan)
+                .Append(agent.Name, ConsoleColor.Cyan)
+                .AppendLine("...", ConsoleColor.DarkCyan);
+
             await Task.Delay(3000, token);
 
             // TODO: Verify update was successful by polling for server and checking version

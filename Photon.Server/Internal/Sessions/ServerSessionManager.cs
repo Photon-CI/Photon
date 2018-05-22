@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Pooling;
+﻿using log4net;
+using Photon.Framework.Pooling;
 using System;
 using System.Collections.Generic;
 
@@ -6,8 +7,10 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerSessionManager : IDisposable
     {
-        public event EventHandler<SessionStateEventArgs> SessionStarted;
-        public event EventHandler<SessionStateEventArgs> SessionReleased;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ServerSessionManager));
+
+        public event EventHandler<SessionStateEventArgs> SessionChanged;
+        //public event EventHandler<SessionStateEventArgs> SessionReleased;
 
         private readonly ReferencePool<ServerSessionBase> pool;
 
@@ -49,8 +52,9 @@ namespace Photon.Server.Internal.Sessions
             pool.Add(session);
 
             session.ReleaseEvent += Session_OnReleased;
+            OnSessionChanged(session);
 
-            OnSessionStarted(session);
+            Log.Info($"Started Session '{session.SessionId}'.");
         }
 
         public bool TryGet(string sessionId, out ServerSessionBase session)
@@ -76,21 +80,16 @@ namespace Photon.Server.Internal.Sessions
         //    return false;
         //}
 
-        protected void OnSessionStarted(ServerSessionBase session)
+        protected void OnSessionChanged(ServerSessionBase session)
         {
-            SessionStarted?.Invoke(this, new SessionStateEventArgs(session));
-        }
-
-        protected void OnSessionReleased(ServerSessionBase session)
-        {
-            SessionReleased?.Invoke(this, new SessionStateEventArgs(session));
+            SessionChanged?.Invoke(this, new SessionStateEventArgs(session));
         }
 
         private void Session_OnReleased(object sender, EventArgs e)
         {
             var session = (ServerSessionBase)sender;
 
-            OnSessionReleased(session);
+            OnSessionChanged(session);
         }
     }
 }

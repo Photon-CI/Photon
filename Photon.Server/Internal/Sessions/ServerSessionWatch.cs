@@ -1,5 +1,6 @@
 ﻿using Photon.Library.Session;
 using System;
+using System.Linq;
 
 namespace Photon.Server.Internal.Sessions
 {
@@ -11,25 +12,21 @@ namespace Photon.Server.Internal.Sessions
 
         public ServerSessionWatch()
         {
-            PhotonServer.Instance.Sessions.SessionStarted += OnSessionStartedStopped;
-            PhotonServer.Instance.Sessions.SessionReleased += OnSessionStartedStopped;
+            PhotonServer.Instance.Sessions.SessionChanged += Session_OnChanged;
         }
 
         public void Dispose()
         {
-            PhotonServer.Instance.Sessions.SessionStarted -= OnSessionStartedStopped;
-            PhotonServer.Instance.Sessions.SessionReleased -= OnSessionStartedStopped;
+            PhotonServer.Instance.Sessions.SessionChanged -= Session_OnChanged;
         }
 
         public void Initialize()
         {
-            foreach (var session in PhotonServer.Instance.Sessions.All)
-                SendUpdate(session);
-        }
+            var sessionList = PhotonServer.Instance.Sessions.All
+                .OrderBy(x => x.TimeCreated).ToArray();
 
-        public void OnSessionStartedStopped(object sender, SessionStateEventArgs e)
-        {
-            SendUpdate(e.Session);
+            foreach (var session in sessionList)
+                SendUpdate(session);
         }
 
         private void SendUpdate(ServerSessionBase session)
@@ -76,6 +73,11 @@ namespace Photon.Server.Internal.Sessions
         protected void OnSessionChanged(object data)
         {
             SessionChanged?.Invoke(this, new SessionStatusArgs(data));
+        }
+
+        private void Session_OnChanged(object sender, SessionStateEventArgs e)
+        {
+            SendUpdate(e.Session);
         }
 
         private string GetSessionType(ServerSessionBase session)

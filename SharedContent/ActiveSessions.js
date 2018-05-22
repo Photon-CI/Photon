@@ -132,10 +132,16 @@
                 e.find('[data-session-refspec]').text('@'+data.gitRefspec);
                 break;
             case 'deploy':
-                //
+                e.find('[data-session-link]')
+                    .attr('href', sessionDetailsUrl)
+                    .text(data.projectName + ' - Deployment #' + data.number);
+
+                e.find('[data-session-title]').text(data.name);
+                e.find('[data-session-version]').text('@' + data.projectVersion);
                 break;
             case 'update':
-                //
+                e.find('[data-session-link]')
+                    .attr('href', sessionDetailsUrl);
                 break;
         }
 

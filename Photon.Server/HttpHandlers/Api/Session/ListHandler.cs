@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Photon.Server.HttpHandlers.Api.Session
 {
     [HttpHandler("/api/sessions/active")]
-    internal class ActiveHandler : HttpHandler
+    internal class ListHandler : HttpHandler
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ActiveHandler));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ListHandler));
 
 
         public override HttpHandlerResult Get()

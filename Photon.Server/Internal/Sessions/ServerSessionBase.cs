@@ -26,8 +26,8 @@ namespace Photon.Server.Internal.Sessions
         public event EventHandler ReleaseEvent;
 
         private readonly Lazy<ILog> _log;
-        private readonly DateTime utcCreated;
-        private DateTime? utcReleased;
+        public DateTime TimeCreated {get;}
+        public DateTime? TimeReleased {get; private set;}
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
@@ -57,7 +57,7 @@ namespace Photon.Server.Internal.Sessions
         protected ServerSessionBase()
         {
             SessionId = Guid.NewGuid().ToString("N");
-            utcCreated = DateTime.UtcNow;
+            TimeCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
             Output = new ScriptOutput();
@@ -122,7 +122,7 @@ namespace Photon.Server.Internal.Sessions
             if (IsReleased) return;
             IsReleased = true;
 
-            utcReleased = DateTime.UtcNow;
+            TimeReleased = DateTime.UtcNow;
             OnReleased();
 
             foreach (var host in hostList.Values) {
@@ -181,12 +181,12 @@ namespace Photon.Server.Internal.Sessions
 
         public bool IsExpired()
         {
-            if (utcReleased.HasValue) {
-                if (DateTime.UtcNow - utcReleased > CacheSpan)
+            if (TimeReleased.HasValue) {
+                if (DateTime.UtcNow - TimeReleased > CacheSpan)
                     return true;
             }
 
-            return DateTime.UtcNow - utcCreated > LifeSpan;
+            return DateTime.UtcNow - TimeCreated > LifeSpan;
         }
 
         public bool GetAgentSession(string sessionClientId, out DomainAgentSessionHostBase sessionHost)
