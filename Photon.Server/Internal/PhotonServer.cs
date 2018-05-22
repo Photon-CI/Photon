@@ -77,6 +77,8 @@ namespace Photon.Server.Internal
             if (isStarted) throw new Exception("Server has already been started!");
             isStarted = true;
 
+            Log.Debug("Starting Server...");
+
             // Load existing or default server configuration
             ServerConfiguration.Load();
 
@@ -90,7 +92,6 @@ namespace Photon.Server.Internal
             Sessions.Start();
             Queue.Start();
 
-
             var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskHttp = Task.Run(() => StartHttpServer());
             var taskAgents = Task.Run(() => Agents.Load());
@@ -103,10 +104,14 @@ namespace Photon.Server.Internal
                 taskProjects,
                 taskProjectData,
                 taskHttp);
+
+            Log.Info("Server started.");
         }
 
         public void Stop()
         {
+            Log.Debug("Stopping Server...");
+
             Queue.Stop();
             Sessions.Stop();
 
@@ -117,10 +122,14 @@ namespace Photon.Server.Internal
             catch (Exception error) {
                 Log.Error("Failed to stop HTTP Receiver!", error);
             }
+
+            Log.Info("Server stopped.");
         }
 
         public async Task Shutdown(TimeSpan timeout)
         {
+            Log.Debug("Shutdown started...");
+
             using (var tokenSource = new CancellationTokenSource(timeout)) {
                 var token = tokenSource.Token;
 
@@ -138,6 +147,8 @@ namespace Photon.Server.Internal
 
         public void Abort()
         {
+            Log.Debug("Server abort started...");
+
             Queue.Abort();
             Sessions.Abort();
 

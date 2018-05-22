@@ -79,6 +79,8 @@ namespace Photon.Agent.Internal
             if (isStarted) throw new Exception("Agent has already been started!");
             isStarted = true;
 
+            Log.Debug("Starting Agent...");
+
             // Load existing or default agent configuration
             Definition = ParseAgentDefinition() ?? new AgentDefinition {
                 Http = {
@@ -106,10 +108,14 @@ namespace Photon.Agent.Internal
                 taskVariables,
                 taskRepositories,
                 taskHttp);
+
+            Log.Info("Agent started.");
         }
 
         public void Stop(TimeSpan? timeout = null)
         {
+            Log.Debug("Stopping Agent...");
+
             //if (!isStarted) return;
             //isStarted = false;
 
@@ -120,6 +126,8 @@ namespace Photon.Agent.Internal
 
             Sessions?.Stop();
             receiver?.Stop();
+
+            Log.Info("Agent stopped.");
         }
 
         //public async Task Shutdown(TimeSpan timeout)

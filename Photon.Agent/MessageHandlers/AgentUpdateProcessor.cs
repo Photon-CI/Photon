@@ -48,10 +48,14 @@ namespace Photon.Agent.MessageHandlers
         {
             // TODO: Verify MSI?
 
+            Log.Debug("Starting agent update...");
+
             try {
                 var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
 
                 ProcessRunner.Run(updatePath, cmd);
+
+                Log.Info("Agent update started.");
             }
             catch (Exception error) {
                 Log.Error("Failed to start agent update!", error);
