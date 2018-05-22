@@ -11,6 +11,7 @@ namespace Photon.CLI.Commands
     internal class DeployCommands : CommandDictionary<CommandContext>
     {
         public string ServerName {get; set;}
+        public string ProjectId {get; set;}
         public string ProjectPackageId {get; set;}
         public string ProjectPackageVersion {get; set;}
         //public string ScriptName {get; set;}
@@ -23,6 +24,7 @@ namespace Photon.CLI.Commands
             Map("help", "?").ToAction(OnHelp);
 
             Map("-server").ToProperty(v => ServerName = v);
+            Map("-project", "-p").ToProperty(v => ProjectId = v);
             Map("-id").ToProperty(v => ProjectPackageId = v);
             Map("-v", "-version").ToProperty(v => ProjectPackageVersion = v);
             //Map("-s", "-script").ToProperty(v => ScriptName = v);
@@ -45,6 +47,7 @@ namespace Photon.CLI.Commands
                     .Add("-version | -v", "The version of the project package.")
                     //.Add("-script  | -s", "The name of the deploy script.")
                     .Add("-env     | -e", "The environment to deploy to.")
+                    .Add("-project | -p", "[Optional] Overrides the ID of the project.")
                     .PrintAsync();
 
                 return;
@@ -74,6 +77,7 @@ namespace Photon.CLI.Commands
 
             await new DeployRunAction {
                 ServerName = ServerName,
+                ProjectId = ProjectId,
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
                 //ScriptName = ScriptName,
