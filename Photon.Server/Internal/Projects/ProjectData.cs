@@ -24,10 +24,11 @@ namespace Photon.Server.Internal.Projects
 
         public string ProjectId {get; set;}
 
-        public ProjectDataLastBuild LastBuild {get; private set;}
+        public ProjectDataLastBuild LastBuild {get; set;}
 
-        public ProjectDataLastBuild LastDeployment {get; private set;}
+        public ProjectDataLastBuild LastDeployment {get; set;}
 
+        [JsonIgnore]
         public BuildDataManager Builds {get; private set;}
 
 

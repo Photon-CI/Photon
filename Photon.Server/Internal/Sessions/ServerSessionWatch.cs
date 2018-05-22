@@ -36,6 +36,17 @@ namespace Photon.Server.Internal.Sessions
             string projectName = null;
             string projectVersion = null;
             string gitRefspec = null;
+            string status;
+
+            if (!session.IsReleased) {
+                status = "running";
+            }
+            else if (session.Exception != null) {
+                status = "failed";
+            }
+            else {
+                status = "success";
+            }
 
             if (session is ServerBuildSession buildSession) {
                 number = buildSession.BuildNumber;
@@ -62,6 +73,7 @@ namespace Photon.Server.Internal.Sessions
                 isReleased = session.IsReleased,
                 number,
                 name,
+                status,
                 projectName,
                 projectVersion,
                 gitRefspec,
