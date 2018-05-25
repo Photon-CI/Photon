@@ -35,7 +35,7 @@ namespace Photon.Server.HttpHandlers.Api.Build
                     return Response.BadRequest().SetText($"Project '{startInfo.ProjectId}' was not found!");
 
                 var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
-                var buildNumber = projectData.StartNewBuild();
+                var build = projectData.StartNewBuild();
 
                 var session = new ServerBuildSession {
                     Project = project,
@@ -43,10 +43,12 @@ namespace Photon.Server.HttpHandlers.Api.Build
                     PreBuild = project.PreBuild,
                     TaskName = startInfo.TaskName,
                     GitRefspec = _gitRefspec,
-                    BuildNumber = buildNumber,
+                    Build = build,
                     Roles = startInfo.Roles,
                     Mode = startInfo.Mode,
                 };
+
+                build.ServerSessionId = session.SessionId;
 
                 if (!string.IsNullOrEmpty(startInfo.AssemblyFilename))
                     session.AssemblyFilename = startInfo.AssemblyFilename;

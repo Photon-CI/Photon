@@ -23,7 +23,7 @@ namespace Photon.CLI.Commands
             Map("run").ToAction(RunCommand);
             Map("help", "?").ToAction(OnHelp);
 
-            Map("-server").ToProperty(v => ServerName = v);
+            Map("-server", "-s").ToProperty(v => ServerName = v);
             Map("-project", "-p").ToProperty(v => ProjectId = v);
             Map("-id").ToProperty(v => ProjectPackageId = v);
             Map("-v", "-version").ToProperty(v => ProjectPackageVersion = v);
@@ -42,7 +42,7 @@ namespace Photon.CLI.Commands
         {
             if (args.ContainsAny("help", "?")) {
                 await new HelpPrinter(typeof(DeployCommands), nameof(RunCommand))
-                    .Add("-server      ", "The name of the Server instance. Defaults to primary server.")
+                    .Add("-server  | -s", "The name of the Server instance. Defaults to primary server.")
                     .Add("-id          ", "The ID of the project package.")
                     .Add("-version | -v", "The version of the project package.")
                     //.Add("-script  | -s", "The name of the deploy script.")

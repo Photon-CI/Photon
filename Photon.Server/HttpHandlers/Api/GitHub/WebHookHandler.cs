@@ -42,7 +42,7 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
 
             var source = (ProjectGithubSource)project.Source;
             var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Id);
-            var buildNumber = projectData.StartNewBuild();
+            var build = projectData.StartNewBuild();
 
             var session = new ServerBuildSession {
                 Project = project,
@@ -50,10 +50,12 @@ namespace Photon.Server.HttpHandlers.Api.GitHub
                 PreBuild = project.PreBuild,
                 TaskName = source.HookTaskName,
                 GitRefspec = commit.Refspec,
-                BuildNumber = buildNumber,
+                Build = build,
                 Roles = source.HookTaskRoles,
                 Commit = commit,
             };
+
+            build.ServerSessionId = session.SessionId;
 
             if (source.NotifyOrigin == NotifyOrigin.Server && !string.IsNullOrEmpty(commit.Sha))
                 ApplyGithubNotification(session, source, commit);

@@ -23,7 +23,7 @@ namespace Photon.Server.HttpHandlers.Api.Build
                     throw new Exception($"Session '{sessionId}' is not a valid build session!");
 
                 var response = new HttpBuildResultResponse {
-                    BuildNumber = buildSession.BuildNumber,
+                    BuildNumber = buildSession.Build.Number,
                     Result = buildSession.Result,
                     ProjectPackages = buildSession.PushedProjectPackages
                         .Select(x => new HttpPackageReference(x)).ToArray(),

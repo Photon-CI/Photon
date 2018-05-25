@@ -74,6 +74,7 @@
     <Compile Include="HttpHandlers\Api\Agent\AgentDeleteHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\AgentVersionHandler.cs" />
     <Compile Include="HttpHandlers\Api\Agent\JsonHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Build\OutputStreamHandler.cs" />
     <Compile Include="HttpHandlers\Api\Project\DeleteHandler.cs" />
     <Compile Include="HttpHandlers\Api\Project\ProjectJsonHandler.cs" />
     <Compile Include="HttpHandlers\Api\Project\JsonHandler.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
     <Compile Include="HttpHandlers\Api\Variable\DeleteHandler.cs" />
     <Compile Include="HttpHandlers\Api\Variable\JsonHandler.cs" />
+    <Compile Include="HttpHandlers\Build\BuildDetailsHandler.cs" />
     <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
     <Compile Include="HttpHandlers\Session\SessionIndexHandler.cs" />
     <Compile Include="HttpHandlers\Package\PackageIndexHandler.cs" />
@@ -161,6 +163,7 @@
     <Compile Include="ViewModels\Agent\AgentEditVM.cs" />
     <Compile Include="ViewModels\Agent\AgentEditJsonVM.cs" />
     <Compile Include="ViewModels\Agent\AgentIndexVM.cs" />
+    <Compile Include="ViewModels\Build\BuildDetailsVM.cs" />
     <Compile Include="ViewModels\Build\BuildIndexVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\Project\ProjectEditVM.cs" />
@@ -302,6 +305,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Agent\EditJson.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Build\Details.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configuration.html">

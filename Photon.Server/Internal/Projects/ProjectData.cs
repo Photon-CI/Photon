@@ -46,7 +46,7 @@ namespace Photon.Server.Internal.Projects
             Builds.Load();
         }
 
-        public uint StartNewBuild()
+        public BuildData StartNewBuild()
         {
             uint buildNumber;
             lock (buildNumberLock) {
@@ -59,9 +59,6 @@ namespace Photon.Server.Internal.Projects
                 buildNumber = LastBuild.Number;
             }
 
-            var buildPath = Path.Combine(DataPath, "Builds", buildNumber.ToString());
-            PathEx.CreatePath(buildPath);
-
             try {
                 Save();
             }
@@ -69,7 +66,7 @@ namespace Photon.Server.Internal.Projects
                 Log.Error("Failed to update ProjectData index file!", error);
             }
 
-            return buildNumber;
+            return Builds.New(buildNumber);
         }
 
         public uint StartNewDeployment()

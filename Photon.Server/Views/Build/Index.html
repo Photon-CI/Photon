@@ -17,7 +17,7 @@
     {{#Each Builds.build}}
     <tr>
         <td>
-            <a href="#">#{{build.Number}}: {{build.ProjectName}}</a>
+            <a href="{{#Url build/details}}?project={{&build.ProjectId}}&number={{&build.Number}}">#{{build.Number}}: {{build.ProjectName}}</a>
         </td>
     </tr>
     {{#EndEach}}

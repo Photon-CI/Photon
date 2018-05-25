@@ -2,6 +2,8 @@
 using Photon.Framework.Server;
 using Photon.Library.GitHub;
 using Photon.Library.HttpMessages;
+using Photon.Server.Internal.Builds;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,7 +11,7 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerBuildSession : ServerSessionBase
     {
-        public uint BuildNumber {get; set;}
+        public BuildData Build {get; set;}
         public Project Project {get; set;}
         public string AssemblyFilename {get; set;}
         public string PreBuild {get; set;}
@@ -23,7 +25,7 @@ namespace Photon.Server.Internal.Sessions
         public override async Task RunAsync()
         {
             var context = new ServerBuildContext {
-                BuildNumber = BuildNumber,
+                BuildNumber = Build.Number,
                 Agents = PhotonServer.Instance.Agents.All.ToArray(),
                 Project = Project,
                 AssemblyFilename = AssemblyFilename,
@@ -39,13 +41,23 @@ namespace Photon.Server.Internal.Sessions
                 //Commit = Commit,
             };
 
-            switch (Mode) {
-                case AgentStartModes.All:
-                    await RunAll(context);
-                    break;
-                case AgentStartModes.Any:
-                    await RunAny(context);
-                    break;
+            try {
+                switch (Mode) {
+                    case AgentStartModes.All:
+                        await RunAll(context);
+                        break;
+                    case AgentStartModes.Any:
+                        await RunAny(context);
+                        break;
+                }
+            }
+            finally {
+                Build.Duration = DateTime.UtcNow - Build.Created;
+                Build.ProjectPackages = PushedProjectPackages.ToArray();
+                Build.Save();
+
+                await Build.SetOutput(Output.GetString());
+                // TODO: Save alternate version with ansi characters removed
             }
         }
 

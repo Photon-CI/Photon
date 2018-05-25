@@ -59,18 +59,20 @@ namespace Photon.CLI.Internal
         public PhotonServerDefinition Get(string name)
         {
             PhotonServerDefinition server;
-            if (name != null) {
+            if (!string.IsNullOrEmpty(name)) {
                 server = Definitions.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 
-                if (server == null) throw new ApplicationException($"Server '{name}' could not be found!");
-            }
-            else {
-                server = Definitions.FirstOrDefault(x => x.Primary);
+                return server ?? new PhotonServerDefinition {
+                    Name = "Custom",
+                    Url = name,
+                };
 
-                if (server == null) throw new ApplicationException("No primary Server could not be found!");
+                //if (server == null) throw new ApplicationException($"Server '{name}' could not be found!");
             }
 
-            return server;
+            server = Definitions.FirstOrDefault(x => x.Primary);
+
+            return server ?? throw new ApplicationException("No primary Server could not be found!");
         }
 
         public bool RemoveByName(string name)

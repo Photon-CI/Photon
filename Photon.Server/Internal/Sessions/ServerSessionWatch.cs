@@ -49,7 +49,7 @@ namespace Photon.Server.Internal.Sessions
             }
 
             if (session is ServerBuildSession buildSession) {
-                number = buildSession.BuildNumber;
+                number = buildSession.Build.Number;
                 name = buildSession.TaskName;
                 projectName = buildSession.Project?.Name;
                 gitRefspec = buildSession.GitRefspec;

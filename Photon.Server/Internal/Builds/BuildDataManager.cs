@@ -1,6 +1,10 @@
-﻿using log4net;
+﻿using System;
+using log4net;
 using System.Collections.Generic;
 using System.IO;
+using Photon.Framework;
+using Photon.Framework.Tools;
+using Photon.Framework.Extensions;
 
 namespace Photon.Server.Internal.Builds
 {
@@ -34,13 +38,41 @@ namespace Photon.Server.Internal.Builds
                     continue;
                 }
 
-                var buildData = new BuildData {
-                    Number = buildNumber,
-                    Path = path,
-                };
+                var indexFilename = Path.Combine(path, "index.json");
+                BuildData buildData;
+
+                if (File.Exists(indexFilename)) {
+                    using (var stream = File.Open(indexFilename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                        buildData = JsonSettings.Serializer.Deserialize<BuildData>(stream);
+
+                        //buildData.Number = buildNumber;
+                        buildData.ContentPath = path;
+                    }
+                }
+                else {
+                    buildData = new BuildData {
+                        Number = buildNumber,
+                        ContentPath = path,
+                    };
+                }
 
                 data[buildNumber] = buildData;
             }
+        }
+
+        public BuildData New(uint number)
+        {
+            var _path = Path.Combine(buildPath, number.ToString());
+            PathEx.CreatePath(_path);
+
+            var buildData = new BuildData {
+                Number = number,
+                ContentPath = _path,
+                Created = DateTime.UtcNow,
+            };
+
+            data[number] = buildData;
+            return buildData;
         }
 
         public bool TryGet(uint number, out BuildData buildData)
