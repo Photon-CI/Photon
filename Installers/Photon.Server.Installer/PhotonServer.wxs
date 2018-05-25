@@ -378,6 +378,9 @@
       <Component Id="Views_Build_Index.html" Guid="ffe034da-b210-4313-9782-c67c4890c82f">
         <File Id="Views_Build_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Build\Index.html" />
       </Component>
+      <Component Id="Views_Build_Details.html" Guid="2935d141-0443-47be-8131-157b92c9c2e4">
+        <File Id="Views_Build_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Build\Details.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
