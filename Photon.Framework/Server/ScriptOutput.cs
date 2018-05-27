@@ -15,6 +15,8 @@ namespace Photon.Framework.Server
 
         public int Length {
             get {
+                if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
                 lock (lockHandle) {
                     return builder.Length;
                 }
@@ -40,6 +42,8 @@ namespace Photon.Framework.Server
 
         public ScriptOutput Append(string text, ConsoleColor color = ConsoleColor.Gray)
         {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
             lock (lockHandle) {
                 ansiWriter.Write(text, color);
             }
@@ -50,6 +54,8 @@ namespace Photon.Framework.Server
 
         public ScriptOutput Append(object value, ConsoleColor color = ConsoleColor.Gray)
         {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
             lock (lockHandle) {
                 ansiWriter.Write(value, color);
             }
@@ -60,6 +66,8 @@ namespace Photon.Framework.Server
 
         public ScriptOutput AppendLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
             lock (lockHandle) {
                 ansiWriter.WriteLine(text, color);
             }
@@ -70,6 +78,8 @@ namespace Photon.Framework.Server
 
         public ScriptOutput AppendLine(object value, ConsoleColor color = ConsoleColor.Gray)
         {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
             lock (lockHandle) {
                 ansiWriter.WriteLine(value, color);
             }
@@ -80,6 +90,8 @@ namespace Photon.Framework.Server
 
         public ScriptOutput AppendRaw(string text)
         {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
             lock (lockHandle) {
                 writer.Flush();
                 builder.Append(text);
@@ -100,6 +112,8 @@ namespace Photon.Framework.Server
 
         public string GetString()
         {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
             lock (lockHandle) {
                 return builder.ToString();
             }
