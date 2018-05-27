@@ -11,7 +11,7 @@ namespace Photon.Framework.Server
         private readonly StringBuilder builder;
         private readonly StringWriter writer;
         private readonly AnsiWriter ansiWriter;
-        private readonly Lazy<object> lockHandle = new Lazy<object>();
+        protected Lazy<object> lockHandle = new Lazy<object>();
 
         public int Length {
             get {
