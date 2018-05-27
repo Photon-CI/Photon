@@ -18,7 +18,7 @@ namespace Photon.Publishing.Tasks
         private async Task BuildSolution()
         {
             await Context.RunCommandLineAsync(
-                ".\\bin\\msbuild.cmd", "/m", "/v:m",
+                "msbuild", "/m", "/v:m",
                 "Photon.sln",
                 "/p:Configuration=\"Linux\"",
                 "/p:Platform=\"Any CPU\"",
