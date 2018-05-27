@@ -4,18 +4,18 @@ using System.Text;
 
 namespace Photon.Framework.Server
 {
-    public class ScriptOutput : MarshalByRefObject, IDisposable
+    public class ScriptOutput : MarshalByRefObject, IWriteAnsi, IDisposable
     {
         public event EventHandler Changed;
 
         private readonly StringBuilder builder;
         private readonly StringWriter writer;
         private readonly AnsiWriter ansiWriter;
-        private readonly object lockHandle;
+        protected Lazy<object> lockHandle = new Lazy<object>();
 
         public int Length {
             get {
-                lock (lockHandle) {
+                lock (lockHandle.Value) {
                     return builder.Length;
                 }
             }
@@ -28,7 +28,7 @@ namespace Photon.Framework.Server
             writer = new StringWriter(builder);
             var x = TextWriter.Synchronized(writer);
             ansiWriter = new AnsiWriter(x);
-            lockHandle = new object();
+            //lockHandle = new Lazy<object>();
 
             writer.NewLine = "\n";
         }
@@ -38,9 +38,11 @@ namespace Photon.Framework.Server
             writer?.Dispose();
         }
 
-        public ScriptOutput Append(string text, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi Write(string text, ConsoleColor color = ConsoleColor.Gray)
         {
-            lock (lockHandle) {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
                 ansiWriter.Write(text, color);
             }
 
@@ -48,9 +50,11 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public ScriptOutput Append(object value, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi Write(object value, ConsoleColor color = ConsoleColor.Gray)
         {
-            lock (lockHandle) {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
                 ansiWriter.Write(value, color);
             }
 
@@ -58,9 +62,11 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public ScriptOutput AppendLine(string text, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
-            lock (lockHandle) {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
                 ansiWriter.WriteLine(text, color);
             }
 
@@ -68,9 +74,11 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public ScriptOutput AppendLine(object value, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi WriteLine(object value, ConsoleColor color = ConsoleColor.Gray)
         {
-            lock (lockHandle) {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
                 ansiWriter.WriteLine(value, color);
             }
 
@@ -80,7 +88,9 @@ namespace Photon.Framework.Server
 
         public ScriptOutput AppendRaw(string text)
         {
-            lock (lockHandle) {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
                 writer.Flush();
                 builder.Append(text);
             }
@@ -90,7 +100,11 @@ namespace Photon.Framework.Server
 
         public void Flush()
         {
-            writer.Flush();
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
+                writer.Flush();
+            }
         }
 
         protected virtual void OnChanged()
@@ -98,9 +112,11 @@ namespace Photon.Framework.Server
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
-        public override string ToString()
+        public string GetString()
         {
-            lock (lockHandle) {
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
                 return builder.ToString();
             }
         }

@@ -16,6 +16,7 @@ namespace Photon.Server.Internal.Sessions
         TaskResult Result {get;}
         bool IsComplete {get;}
 
+        Task InitializeAsync();
         Task PrepareWorkDirectoryAsync();
         Task RunAsync();
         Task ReleaseAsync();

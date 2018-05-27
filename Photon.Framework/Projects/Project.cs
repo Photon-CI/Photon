@@ -7,18 +7,26 @@ namespace Photon.Framework.Projects
     [Serializable]
     public class Project
     {
+        [JsonProperty("id", Order = 1)]
         public string Id {get; set;}
+
+        [JsonProperty("name", Order = 2)]
         public string Name {get; set;}
+
+        [JsonProperty("description", Order = 3)]
         public string Description {get; set;}
-        public string SourceType {get; set;}
+
+        [JsonProperty("assembly", Order = 4)]
+        public string AssemblyFile {get; set;}
+
+        [JsonProperty("preBuild", Order = 5)]
         public string PreBuild {get; set;}
 
+        [JsonProperty("source", Order = 6)]
         [JsonConverter(typeof(ProjectSourceSerializer))]
         public IProjectSource Source {get; set;}
 
-        [JsonProperty("assembly")]
-        public string AssemblyFile {get; set;}
-
+        [JsonProperty("environments", Order = 7)]
         public List<ProjectEnvironment> Environments {get; set;}
 
 

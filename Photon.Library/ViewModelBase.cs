@@ -7,6 +7,7 @@ namespace Photon.Library
     {
         public string PageTitle {get; set;}
         public string CopyrightYear {get; set;}
+        public bool SecurityEnabled {get; set;}
         public List<Exception> Errors {get;}
 
 
@@ -16,7 +17,5 @@ namespace Photon.Library
             CopyrightYear = DateTime.Now.Year.ToString();
             Errors = new List<Exception>();
         }
-
-        public virtual void Build() {}
     }
 }

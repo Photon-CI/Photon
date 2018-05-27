@@ -1,5 +1,4 @@
-﻿using Photon.Framework.Server;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,13 +9,13 @@ namespace Photon.Framework
 {
     public static class ProcessRunner
     {
-        public static ProcessResult Run(string workDir, string command, ScriptOutput output = null)
+        public static ProcessResult Run(string workDir, string command, IWriteAnsi output = null)
         {
             SplitCommand(command, out var _file, out var _args);
             return Run(workDir, _file, _args, output);
         }
 
-        public static ProcessResult Run(string workDir, string filename, string arguments, ScriptOutput output = null)
+        public static ProcessResult Run(string workDir, string filename, string arguments, IWriteAnsi output = null)
         {
             if (filename == null) throw new ArgumentNullException(nameof(filename));
 
@@ -56,7 +55,7 @@ namespace Photon.Framework
             }
         }
 
-        private static async Task<string> ReadToOutput(StreamReader reader, ScriptOutput output, ConsoleColor color)
+        private static async Task<string> ReadToOutput(StreamReader reader, IWriteAnsi output, ConsoleColor color)
         {
             var builder = new StringBuilder();
 
@@ -64,7 +63,7 @@ namespace Photon.Framework
                 var line = await reader.ReadLineAsync();
 
                 builder.AppendLine(line);
-                output?.AppendLine(line, color);
+                output?.WriteLine(line, color);
             }
 
             return builder.ToString();

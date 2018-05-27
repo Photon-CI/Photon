@@ -26,9 +26,8 @@ namespace Photon.Server.Internal.Sessions
         public event EventHandler ReleaseEvent;
 
         private readonly Lazy<ILog> _log;
-        private readonly DateTime utcCreated;
-        private DateTime? utcReleased;
-        private bool isReleased;
+        public DateTime TimeCreated {get;}
+        public DateTime? TimeReleased {get; private set;}
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
@@ -43,11 +42,13 @@ namespace Photon.Server.Internal.Sessions
         protected DomainConnectionFactory ConnectionFactory {get;}
         protected DomainPackageClient PackageClient {get;}
         public TaskResult Result {get; private set;}
-        public VariableSetCollection Variables {get;}
-        public bool IsReleased => isReleased;
+        public VariableSetCollection Variables {get; private set;}
+        public bool IsReleased { get; private set; }
+
         protected ILog Log => _log.Value;
 
         protected readonly CancellationTokenSource TokenSource;
+        //protected readonly DomainOutput DomainOutput;
         private readonly ProjectPackageManager projectPackages;
         private readonly ApplicationPackageManager applicationPackages;
 
@@ -57,7 +58,7 @@ namespace Photon.Server.Internal.Sessions
         protected ServerSessionBase()
         {
             SessionId = Guid.NewGuid().ToString("N");
-            utcCreated = DateTime.UtcNow;
+            TimeCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
             Output = new ScriptOutput();
@@ -69,6 +70,8 @@ namespace Photon.Server.Internal.Sessions
             BinDirectory = Path.Combine(WorkDirectory, "bin");
             ContentDirectory = Path.Combine(WorkDirectory, "content");
 
+            //DomainOutput
+
             projectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
             };
@@ -76,8 +79,6 @@ namespace Photon.Server.Internal.Sessions
             applicationPackages = new ApplicationPackageManager {
                 PackageDirectory = Configuration.ApplicationPackageDirectory,
             };
-
-            Variables = PhotonServer.Instance.Variables;
 
             ConnectionFactory = new DomainConnectionFactory();
             ConnectionFactory.OnConnectionRequest += ConnectionFactory_OnConnectionRequest;
@@ -91,9 +92,14 @@ namespace Photon.Server.Internal.Sessions
             TokenSource = new CancellationTokenSource();
         }
 
+        public virtual async Task InitializeAsync()
+        {
+            Variables = await PhotonServer.Instance.Variables.GetCollection();
+        }
+
         public virtual void Dispose()
         {
-            if (!isReleased)
+            if (!IsReleased)
                 ReleaseAsync().GetAwaiter().GetResult();
 
             TokenSource?.Dispose();
@@ -116,10 +122,10 @@ namespace Photon.Server.Internal.Sessions
 
         public async Task ReleaseAsync()
         {
-            if (isReleased) return;
-            isReleased = true;
+            if (IsReleased) return;
+            IsReleased = true;
 
-            utcReleased = DateTime.UtcNow;
+            TimeReleased = DateTime.UtcNow;
             OnReleased();
 
             foreach (var host in hostList.Values) {
@@ -178,12 +184,12 @@ namespace Photon.Server.Internal.Sessions
 
         public bool IsExpired()
         {
-            if (utcReleased.HasValue) {
-                if (DateTime.UtcNow - utcReleased > CacheSpan)
+            if (TimeReleased.HasValue) {
+                if (DateTime.UtcNow - TimeReleased > CacheSpan)
                     return true;
             }
 
-            return DateTime.UtcNow - utcCreated > LifeSpan;
+            return DateTime.UtcNow - TimeCreated > LifeSpan;
         }
 
         public bool GetAgentSession(string sessionClientId, out DomainAgentSessionHostBase sessionHost)

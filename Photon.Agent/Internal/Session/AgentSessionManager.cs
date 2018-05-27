@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Photon.Framework.Pooling;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Session
@@ -9,12 +10,18 @@ namespace Photon.Agent.Internal.Session
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AgentSessionManager));
 
-        private readonly ReferencePool<IAgentSession> pool;
+        public event EventHandler<SessionStateEventArgs> SessionChanged;
+        //public event EventHandler<SessionStateEventArgs> SessionReleased;
+
+        private readonly ReferencePool<AgentSessionBase> pool;
+
+        public IEnumerable<AgentSessionBase> All => pool.Items;
+        //public IEnumerable<AgentSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
 
 
         public AgentSessionManager()
         {
-            pool = new ReferencePool<IAgentSession> {
+            pool = new ReferencePool<AgentSessionBase> {
                 //Lifespan = 3600_000, // 60 minutes
                 PruneInterval = 60_000 // 1 minute
             };
@@ -45,13 +52,17 @@ namespace Photon.Agent.Internal.Session
                 session.Abort();
         }
 
-        public void BeginSession(IAgentSession session)
+        public void BeginSession(AgentSessionBase session)
         {
             pool.Add(session);
+
+            session.ReleaseEvent += Session_OnReleased;
+            OnSessionChanged(session);
+
             Log.Info($"Started Session '{session.SessionId}'.");
         }
 
-        public bool TryGetSession(string sessionId, out IAgentSession session)
+        public bool TryGet(string sessionId, out AgentSessionBase session)
         {
             return pool.TryGet(sessionId, out session);
         }
@@ -65,6 +76,18 @@ namespace Photon.Agent.Internal.Session
             await session.ReleaseAsync();
             Log.Info($"Session '{sessionId}' released.");
             return true;
+        }
+
+        protected void OnSessionChanged(AgentSessionBase session)
+        {
+            SessionChanged?.Invoke(this, new SessionStateEventArgs(session));
+        }
+
+        private void Session_OnReleased(object sender, EventArgs e)
+        {
+            var session = (AgentSessionBase)sender;
+
+            OnSessionChanged(session);
         }
     }
 }

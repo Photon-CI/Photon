@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" lang="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{PageTitle}}</title>
+    <link rel="SHORTCUT ICON" href="{{#Url SharedContent/photon_light.ico}}">
+    <link rel="stylesheet" href="{{#Url SharedContent/bootstrap-4.1.0/css/bootstrap.min.css}}">
+    <script defer src="{{#Url SharedContent/fontawesome-5.0.13/js/fontawesome-all.min.js}}"></script>
+    <link rel="stylesheet" href="{{#Url Content/site.css}}">
+</head>
+<body>
+    <div class="bg-secondary mb-4 px-2 py-1">
+        <h2 class="text-light my-0">Login</h2>
+    </div>
+
+    <div class="container">
+        <div id="errorList">
+            {{#Each Errors.error}}
+            <div class="alert alert-danger">
+                {{error}}
+            </div>
+            {{#EndEach}}
+        </div>
+
+        <form method="post" onsubmit="onSubmit()">
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    {{#If AuthMessage}}
+                    <span class="text-danger">{{AuthMessage}}</span>
+                    {{#EndIf}}
+
+                    <div class="form-group">
+                        <label for="txtUsername">Username:</label>
+                        <input id="txtUsername" name="Username" type="text" class="form-control" value="{{Username}}" autofocus />
+                    </div>
+                    <div class="form-group">
+                        <label for="txtPassword">Password:</label>
+                        <input id="txtPassword" name="Password" type="password" class="form-control" value="{{Password}}" />
+                    </div>
+                    <div class="form-group">
+                        <label for="chkRememberMe">
+                            <input id="chkRememberMe" name="RememberMe" type="checkbox" {{#If RememberMe}} checked="checked" {{#EndIf}} />
+                            Remember Me
+                        </label>
+                    </div>
+
+                    <hr />
+                    <div class="clearfix">
+                        <button type="submit" class="btn btn-primary float-right">
+                            <i class="fas fa-key"></i> Login
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="{{#Url SharedContent/jquery-3.3.1.min.js}}"></script>
+    <script src="{{#Url SharedContent/popper.min.js}}"></script>
+    <script src="{{#Url SharedContent/bootstrap-4.1.0/js/bootstrap.min.js}}"></script>
+    <script src="{{#Url SharedContent/js.cookie.js}}" type="text/javascript"></script>
+    <script>
+        function onSubmit() {
+            var remember = $('#chkRememberMe').is(':checked');
+            var username = '';
+
+            if (remember)
+                username = $('#txtUsername').val();
+
+            Cookies.set('photon.server.username', username, { expires: 365 });
+        }
+    </script>
+</body>
+</html>

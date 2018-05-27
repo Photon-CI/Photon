@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Photon.Framework.Tools;
 using System.Collections.Generic;
 using System.IO;
 
@@ -10,6 +11,8 @@ namespace Photon.Server.Internal.Projects
 
         private readonly Dictionary<string, ProjectData> data;
         private string projectDataPath;
+
+        public IEnumerable<ProjectData> AllData => data.Values;
 
 
         public ProjectDataManager()
@@ -47,11 +50,9 @@ namespace Photon.Server.Internal.Projects
             if (data.TryGetValue(projectId, out var projectData))
                 return projectData;
 
-            var path = Path.Combine(projectDataPath, projectId);
-            var filename = Path.Combine(path, "Index.json");
+            var filename = Path.Combine(projectDataPath, projectId, "Index.json");
 
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreateFilePath(filename);
 
             var index = ProjectData.Create(filename, projectId);
 

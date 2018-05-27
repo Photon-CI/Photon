@@ -45,11 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Internal\ApplicationPublisher.cs" />
-    <Compile Include="Tasks\PiBuildTask.cs" />
+    <Compile Include="Tasks\Build_LinuxCI.cs" />
+    <Compile Include="Tasks\Publish_Linux.cs" />
     <Compile Include="Tasks\BuildTask.cs" />
     <Compile Include="Tasks\PublishTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\TestDeployTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

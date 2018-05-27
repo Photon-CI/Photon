@@ -13,7 +13,7 @@ namespace Photon.Publishing.Tasks
 {
     public class PublishTask : IBuildTask
     {
-        private NuGetCore nugetClient;
+        //private NuGetCore nugetClient;
         private string nugetPackageDir;
         private string nugetApiKey;
         private string nugetExe;
@@ -33,27 +33,26 @@ namespace Photon.Publishing.Tasks
                 throw new ApplicationException("Photon Variables were not found!");
 
             nugetPackageDir = Path.Combine(Context.WorkDirectory, "Packages");
-            nugetApiKey = Context.ServerVariables.Global["nuget.apiKey"];
-            nugetExe = Context.AgentVariables.Global["nuget.exe"];
+            nugetApiKey = Context.ServerVariables["global"]["nuget.apiKey"];
+            nugetExe = Context.AgentVariables["global"]["nuget.exe"];
             apiUrl = photonVars["apiUrl"];
             ftpUrl = photonVars["ftp.url"];
             ftpUser = photonVars["ftp.user"];
             ftpPass = photonVars["ftp.pass"];
 
-            nugetClient = new NuGetCore {
-                EnableV3 = true,
-                Output = Context.Output,
-                ApiKey = nugetApiKey,
-            };
-            nugetClient.Initialize();
+            //nugetClient = new NuGetCore {
+            //    EnableV3 = true,
+            //    Output = Context.Output,
+            //    ApiKey = nugetApiKey,
+            //};
+            //nugetClient.Initialize();
 
             await BuildSolution();
             await PublishServer();
             await PublishAgent();
             await PublishCLI();
 
-            if (!Directory.Exists(nugetPackageDir))
-                Directory.CreateDirectory(nugetPackageDir);
+            PathEx.CreatePath(nugetPackageDir);
 
             await PublishFrameworkPackage(token);
             await PublishPluginPackage("Photon.IIS", token);
@@ -148,12 +147,16 @@ namespace Photon.Publishing.Tasks
 
         private async Task PublishPackage(string packageId, string packageDefinitionFilename, string assemblyVersion, CancellationToken token)
         {
-            var publisher = new NuGetPackagePublisher(nugetClient) {
-                ExeFilename = nugetExe,
+            var publisher = new NuGetPackagePublisher(Context) {
+                Mode = NugetModes.CommandLine,
                 PackageDirectory = nugetPackageDir,
                 PackageDefinition = packageDefinitionFilename,
                 PackageId = packageId,
                 Version = assemblyVersion,
+                CL = new NuGetCommandLine {
+                    ExeFilename = nugetExe,
+                    ApiKey = nugetApiKey,
+                },
             };
 
             await publisher.PublishAsync(token);

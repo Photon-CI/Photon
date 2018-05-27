@@ -4,14 +4,12 @@ using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Framework.Variables;
 using Photon.Library;
+using Photon.Library.Variables;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -33,7 +31,7 @@ namespace Photon.Agent.Internal
         public string WorkDirectory {get;}
         public AgentSessionManager Sessions {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
-        public VariableSetCollection Variables {get;}
+        public VariableSetDocumentManager Variables {get;}
         public RepositorySourceManager RepositorySources {get;}
 
 
@@ -43,7 +41,7 @@ namespace Photon.Agent.Internal
 
             Sessions = new AgentSessionManager();
             MessageRegistry = new MessageProcessorRegistry();
-            Variables = new VariableSetCollection();
+            Variables = new VariableSetDocumentManager();
             RepositorySources = new RepositorySourceManager();
             messageListener = new MessageListener(MessageRegistry);
 
@@ -81,7 +79,7 @@ namespace Photon.Agent.Internal
             if (isStarted) throw new Exception("Agent has already been started!");
             isStarted = true;
 
-            LoadVariables();
+            Log.Debug("Starting Agent...");
 
             // Load existing or default agent configuration
             Definition = ParseAgentDefinition() ?? new AgentDefinition {
@@ -102,21 +100,34 @@ namespace Photon.Agent.Internal
 
             Sessions.Start();
 
-            StartHttpServer();
+            var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
+            var taskRepositories = Task.Run(() => RepositorySources.Initialize());
+            var taskHttp = Task.Run(() => StartHttpServer());
 
-            RepositorySources.Initialize();
+            Task.WaitAll(
+                taskVariables,
+                taskRepositories,
+                taskHttp);
+
+            Log.Info("Agent started.");
         }
 
-        public void Stop()
+        public void Stop(TimeSpan? timeout = null)
         {
-            if (!isStarted) return;
-            isStarted = false;
+            Log.Debug("Stopping Agent...");
+
+            //if (!isStarted) return;
+            //isStarted = false;
+
+            // TODO: Enable timeout usage
 
             messageListener?.StopAsync()
                 .GetAwaiter().GetResult();
 
             Sessions?.Stop();
             receiver?.Stop();
+
+            Log.Info("Agent stopped.");
         }
 
         //public async Task Shutdown(TimeSpan timeout)
@@ -152,48 +163,24 @@ namespace Photon.Agent.Internal
             }
         }
 
-        private void LoadVariables()
-        {
-            var filename = Path.Combine(Configuration.Directory, "variables.json");
-            var errorList = new List<Exception>();
-
-            if (File.Exists(filename)) {
-                try {
-                    Variables.GlobalJson = File.ReadAllText(filename);
-                }
-                catch (Exception error) {
-                    errorList.Add(error);
-                }
-            }
-
-            if (Directory.Exists(Configuration.VariablesDirectory)) {
-                var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
-                Parallel.ForEach(fileEnum, file => {
-                    var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
-
-                    try {
-                        var json = File.ReadAllText(file);
-                        Variables.JsonList[file_name] = json;
-                    }
-                    catch (Exception error) {
-                        errorList.Add(error);
-                    }
-                });
-            }
-
-            if (errorList.Any()) throw new AggregateException(errorList);
-        }
-
         private void StartHttpServer()
         {
+            var contentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpContentDirectory,
+                UrlPath = "/Content/",
+            };
+
+            var sharedContentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpSharedContentDirectory,
+                UrlPath = "/SharedContent/",
+            };
+
             var context = new HttpReceiverContext {
-                //SecurityMgr = new Internal.Security.SecurityManager(),
+                SecurityMgr = new AgentHttpSecurity(),
                 ListenerPath = Definition.Http.Path,
                 ContentDirectories = {
-                    new ContentDirectory {
-                        DirectoryPath = Configuration.HttpContentDirectory,
-                        UrlPath = "/Content/",
-                    }
+                    contentDir,
+                    sharedContentDir,
                 },
             };
 

@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Packages;
+﻿using Photon.Framework.Domain;
+using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using System.IO;
@@ -43,6 +44,10 @@ namespace Photon.Server.Internal.Sessions
             Domain = new ServerDomain();
             Domain.Initialize(assemblyFilename);
 
+            var contextOutput = new DomainOutput();
+            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+
             var context = new ServerDeployContext {
                 DeploymentNumber = DeploymentNumber,
                 Project = Project,
@@ -56,7 +61,7 @@ namespace Photon.Server.Internal.Sessions
                 ContentDirectory = ContentDirectory,
                 Packages = PackageClient,
                 ConnectionFactory = ConnectionFactory,
-                Output = Output,
+                Output = contextOutput,
                 ServerVariables = Variables,
             };
 

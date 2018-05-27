@@ -8,6 +8,7 @@ namespace Photon.Communication
     public class MessageHandle
     {
         private readonly TaskCompletionSource<IResponseMessage> completionEvent;
+        private readonly object completionLock;
         private bool isComplete;
 
         public IRequestMessage Request {get;}
@@ -19,14 +20,17 @@ namespace Photon.Communication
             this.Request = request;
 
             isComplete = false;
+            completionLock = new object();
             completionEvent = new TaskCompletionSource<IResponseMessage>();
         }
 
         public async Task<IResponseMessage> GetResponseAsync(CancellationToken token = default(CancellationToken))
         {
             token.Register(() => {
-                if (isComplete) return;
-                isComplete = true;
+                lock (completionLock) {
+                    if (isComplete) return;
+                    isComplete = true;
+                }
                 
                 completionEvent.SetCanceled();
             });
@@ -42,7 +46,14 @@ namespace Photon.Communication
         public async Task<T> GetResponseAsync<T>(CancellationToken token)
             where T : class, IResponseMessage
         {
-            token.Register(() => completionEvent.SetCanceled());
+            token.Register(() => {
+                lock (completionLock) {
+                    if (isComplete) return;
+                    isComplete = true;
+                }
+                
+                completionEvent.SetCanceled();
+            });
 
             var response = await completionEvent.Task;
 
@@ -65,8 +76,10 @@ namespace Photon.Communication
         {
             this.Response = message;
 
-            if (isComplete) return;
-            isComplete = true;
+            lock (completionLock) {
+                if (isComplete) return;
+                isComplete = true;
+            }
 
             completionEvent.SetResult(message);
         }

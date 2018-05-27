@@ -1,0 +1,10 @@
+{
+	"project": "photon-ci",
+  "assembly": "Photon.Publishing/bin/Debug/Photon.Publishing.dll",
+  "preBuild": "sh ./bin/PreBuild.sh",
+	"refspec": "master",
+	"task": "Build_LinuxCI",
+	"roles": [
+		"build-ci"
+	]
+}

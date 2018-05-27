@@ -32,9 +32,9 @@ namespace Photon.Publishing.Internal
         public async Task PublishAsync(string packageName, string packageId)
         {
             context.Output
-                .Append("Updating Application ", ConsoleColor.DarkCyan)
-                .Append(packageName, ConsoleColor.Cyan)
-                .AppendLine("...", ConsoleColor.DarkCyan);
+                .Write("Updating Application ", ConsoleColor.DarkCyan)
+                .Write(packageName, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
 
             var photonVars = context.ServerVariables["photon"];
 
@@ -47,10 +47,10 @@ namespace Photon.Publishing.Internal
 
             if (!VersionTools.HasUpdates(webVersion, assemblyVersion)) {
                 context.Output
-                    .Append("Application ", ConsoleColor.DarkBlue)
-                    .Append(packageName, ConsoleColor.Blue)
-                    .Append(" is up-to-date. Version ", ConsoleColor.DarkBlue)
-                    .AppendLine(assemblyVersion, ConsoleColor.Blue);
+                    .Write("Application ", ConsoleColor.DarkBlue)
+                    .Write(packageName, ConsoleColor.Blue)
+                    .Write(" is up-to-date. Version ", ConsoleColor.DarkBlue)
+                    .WriteLine(assemblyVersion, ConsoleColor.Blue);
 
                 return;
             }
@@ -58,8 +58,7 @@ namespace Photon.Publishing.Internal
             // Publish
 
             // Create ZIP
-            if (!Directory.Exists(PackagePath))
-                Directory.CreateDirectory(PackagePath);
+            PathEx.CreatePath(PackagePath);
 
             var zipFilename = Path.Combine(PackagePath, $"{packageId}.zip");
             await CreateZip(BinPath, zipFilename);
@@ -87,11 +86,11 @@ namespace Photon.Publishing.Internal
             await UpdateLatest(assemblyVersion);
 
             context.Output
-                .Append("Application ", ConsoleColor.DarkGreen)
-                .Append(packageName, ConsoleColor.Green)
-                .Append(" updated successfully. ", ConsoleColor.DarkGreen)
-                .Append("Version ", ConsoleColor.DarkCyan)
-                .AppendLine(assemblyVersion, ConsoleColor.Cyan);
+                .Write("Application ", ConsoleColor.DarkGreen)
+                .Write(packageName, ConsoleColor.Green)
+                .Write(" updated successfully. ", ConsoleColor.DarkGreen)
+                .Write("Version ", ConsoleColor.DarkCyan)
+                .WriteLine(assemblyVersion, ConsoleColor.Cyan);
         }
 
         private async Task CreateWebPath(string assemblyVersion)

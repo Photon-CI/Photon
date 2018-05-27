@@ -6,7 +6,6 @@ using Photon.Library.TcpMessages;
 using System;
 using System.Linq;
 using System.Net.Sockets;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -15,8 +14,6 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerUpdateSession : ServerSessionBase
     {
-        private const int HandshakeTimeoutSec = 30;
-
         public string[] AgentIds {get; set;}
         public string UpdateFilename {get; set;}
         public string UpdateVersion {get; set;}
@@ -28,7 +25,7 @@ namespace Photon.Server.Internal.Sessions
                 .Where(x => AgentIds.Any(id => string.Equals(id, x.Id, StringComparison.OrdinalIgnoreCase))).ToArray();
 
             if (!agents.Any()) {
-                Output.AppendLine("No agents were found!", ConsoleColor.DarkYellow);
+                Output.WriteLine("No agents were found!", ConsoleColor.DarkYellow);
                 throw new ApplicationException("No agents were found!");
             }
 
@@ -54,54 +51,42 @@ namespace Photon.Server.Internal.Sessions
         private async Task AgentAction(ServerAgent agent)
         {
             using (var messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry)) {
-                Output.Append("Connecting to agent ", ConsoleColor.DarkCyan)
-                    .Append(agent.Name, ConsoleColor.Cyan)
-                    .AppendLine("...", ConsoleColor.DarkCyan);
+                Output.Write("Connecting to agent ", ConsoleColor.DarkCyan)
+                    .Write(agent.Name, ConsoleColor.Cyan)
+                    .WriteLine("...", ConsoleColor.DarkCyan);
 
                 try {
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
 
-                    var handshakeRequest = new HandshakeRequest {
-                        Key = Guid.NewGuid().ToString(),
-                        ServerVersion = Configuration.Version,
-                    };
-
-                    var timeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
-                    var handshakeResponse = await messageClient.Handshake<HandshakeResponse>(handshakeRequest, timeout, TokenSource.Token);
-
-                    if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
-                        throw new ApplicationException("Handshake Failed! An invalid key was returned.");
-
-                    if (!handshakeResponse.PasswordMatch)
-                        throw new ApplicationException("Handshake Failed! Unauthorized.");
+                    await ClientHandshake.Verify(messageClient, TokenSource.Token);
                 }
                 catch (Exception error) {
-                    Output.Append("Failed to connect to agent ", ConsoleColor.DarkRed)
-                        .Append(agent.Name, ConsoleColor.Red)
-                        .AppendLine("!", ConsoleColor.DarkRed)
-                        .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    Output.Write("Failed to connect to agent ", ConsoleColor.DarkRed)
+                        .Write(agent.Name, ConsoleColor.Red)
+                        .WriteLine("!", ConsoleColor.DarkRed)
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                     return;
                 }
 
-                Output.AppendLine("Agent connected.", ConsoleColor.DarkGreen);
+                Output.WriteLine("Agent connected.", ConsoleColor.DarkGreen);
 
-                Output.Append("Updating Agent ", ConsoleColor.DarkCyan)
-                    .Append(agent.Name, ConsoleColor.Cyan)
-                    .AppendLine("...", ConsoleColor.DarkCyan);
+                Output.Write("Updating Agent ", ConsoleColor.DarkCyan)
+                    .Write(agent.Name, ConsoleColor.Cyan)
+                    .WriteLine("...", ConsoleColor.DarkCyan);
 
                 try {
                     await UpdateAgent(agent, messageClient, TokenSource.Token);
 
-                    Output.Append("Agent ", ConsoleColor.DarkGreen)
-                        .Append(agent.Name, ConsoleColor.Green)
-                        .AppendLine(" updated successfully.", ConsoleColor.DarkGreen);
+                    Output.Write("Agent ", ConsoleColor.DarkGreen)
+                        .Write(agent.Name, ConsoleColor.Green)
+                        .WriteLine(" updated successfully.", ConsoleColor.DarkGreen);
                 }
                 catch (Exception error) {
-                    Output.Append("Failed to update agent ", ConsoleColor.DarkRed)
-                        .Append(agent.Name, ConsoleColor.Red)
-                        .AppendLine("!", ConsoleColor.DarkRed)
-                        .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    Output.Write("Failed to update agent ", ConsoleColor.DarkRed)
+                        .Write(agent.Name, ConsoleColor.Red)
+                        .WriteLine("!", ConsoleColor.DarkRed)
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
                 }
             }
         }
@@ -116,91 +101,77 @@ namespace Photon.Server.Internal.Sessions
                 await messageClient.Send(message)
                     .GetResponseAsync(token);
 
-                await messageClient.DisconnectAsync();
+                try {
+                    await messageClient.DisconnectAsync();
+                }
+                catch {}
             }
             finally {
                 messageClient?.Dispose();
             }
+
+            Output.Write("Agent update start on ", ConsoleColor.DarkCyan)
+                .Write(agent.Name, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
 
             await Task.Delay(3000, token);
 
             // TODO: Verify update was successful by polling for server and checking version
             messageClient = null;
 
+            var reconnectTimeout = TimeSpan.FromMinutes(2);
+
             try {
-                messageClient = await Reconnect(agent, TimeSpan.FromMinutes(2));
+                messageClient = await Reconnect(agent, reconnectTimeout, token);
+            }
+            catch (OperationCanceledException) {
+                // TODO: Better error messages
+                throw new ApplicationException($"A timeout occurred after {reconnectTimeout} while waiting for the update to complete.");
             }
             finally {
                 messageClient?.Dispose();
             }
         }
 
-        private async Task<MessageClient> Reconnect(ServerAgent agent, TimeSpan timeout)
+        private async Task<MessageClient> Reconnect(ServerAgent agent, TimeSpan timeout, CancellationToken token)
         {
             var client = new MessageClient(PhotonServer.Instance.MessageRegistry);
 
-            client.ThreadException += (o, e) => {
-                var error = (Exception) e.ExceptionObject;
-                Output.AppendLine("An error occurred while messaging the client!", ConsoleColor.DarkRed)
-                    .AppendLine(error.UnfoldMessages());
+            //client.ThreadException += (o, e) => {
+            //    var error = (Exception) e.ExceptionObject;
+            //    Output.AppendLine("An error occurred while messaging the client!", ConsoleColor.DarkRed)
+            //        .AppendLine(error.UnfoldMessages());
 
-                Log.Error("Message Client error after update!", error);
-            };
+            //    Log.Error("Message Client error after update!", error);
+            //};
 
-            var tokenSource = new CancellationTokenSource(timeout);
+            using (var timeoutTokenSource = new CancellationTokenSource(timeout))
+            using (var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token)) {
+                var _token = mergedTokenSource.Token;
 
-            var token = tokenSource.Token;
-            while (true) {
-                token.ThrowIfCancellationRequested();
+                while (true) {
+                    _token.ThrowIfCancellationRequested();
 
-                try {
-                    await client.ConnectAsync(agent.TcpHost, agent.TcpPort, tokenSource.Token);
+                    try {
+                        await client.ConnectAsync(agent.TcpHost, agent.TcpPort, _token);
 
-                    var handshakeRequest = new HandshakeRequest {
-                        Key = Guid.NewGuid().ToString(),
-                        ServerVersion = Configuration.Version,
-                    };
+                        await ClientHandshake.Verify(client, _token);
 
-                    var handshakeTimeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
-                    var handshakeResponse = await client.Handshake<HandshakeResponse>(handshakeRequest, handshakeTimeout, TokenSource.Token);
+                        var versionRequest = new AgentGetVersionRequest();
 
-                    if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
-                        throw new ApplicationException("Handshake Failed! An invalid key was returned.");
+                        var versionResponse = await client.Send(versionRequest)
+                            .GetResponseAsync<AgentGetVersionResponse>(_token);
 
-                    if (!handshakeResponse.PasswordMatch)
-                        throw new ApplicationException("Handshake Failed! Unauthorized.");
-
-                    var versionRequest = new AgentGetVersionRequest();
-
-                    var versionResponse = await client.Send(versionRequest)
-                        .GetResponseAsync<AgentGetVersionResponse>(token);
-
-                    if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
-                        break;
-                }
-                catch (SocketException) {
-                    await Task.Delay(1000, tokenSource.Token);
+                        if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
+                            break;
+                    }
+                    catch (SocketException) {
+                        await Task.Delay(1000, _token);
+                    }
                 }
             }
 
             return client;
-        }
-
-        private bool IncludesAgent(string agentName)
-        {
-            if (!(AgentIds?.Any() ?? false)) return true;
-
-            foreach (var name in AgentIds) {
-                var escapedName = Regex.Escape(name)
-                    .Replace("\\?", ".")
-                    .Replace("\\*", ".*");
-
-                var namePattern = $"^{escapedName}$";
-                if (Regex.IsMatch(agentName, namePattern, RegexOptions.IgnoreCase))
-                    return true;
-            }
-
-            return false;
         }
     }
 }

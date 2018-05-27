@@ -1,11 +1,10 @@
-﻿using Photon.Framework;
-
-namespace Photon.Server.Internal.ServerConfiguration
+﻿namespace Photon.Server.Internal.ServerConfiguration
 {
     internal class ServerConfiguration
     {
         public string Name {get; set;}
         public ServerHttpDefinition Http {get; set;}
+        public ServerSecurityDefinition Security {get; set;}
 
 
         public ServerConfiguration()

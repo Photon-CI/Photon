@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Tools;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Photon.Framework.Packages
         /// </summary>
         /// <param name="version">The version of the package to create.</param>
         /// <param name="outputFilename">The file name of the output package.</param>
-        public static async Task CreatePackage(PackageDefinition definition, string rootPath, string version, string outputFilename)
+        public static async Task CreatePackage(ApplicationPackageDefinition definition, string rootPath, string version, string outputFilename)
         {
             var outputFilenameFull = Path.GetFullPath(outputFilename);
             var outputPath = Path.GetDirectoryName(outputFilenameFull);
@@ -21,8 +22,7 @@ namespace Photon.Framework.Packages
             if (string.IsNullOrEmpty(outputPath))
                 throw new ApplicationException("Empty package output path!");
 
-            if (!Directory.Exists(outputPath))
-                Directory.CreateDirectory(outputPath);
+            PathEx.CreatePath(outputPath);
 
             await PackageTools.WriteArchive(outputFilename, async archive => {
                 AppendMetadata(archive, definition, version);
@@ -48,8 +48,7 @@ namespace Photon.Framework.Packages
 
         public static async Task<ApplicationPackage> UnpackAsync(string filename, string path)
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreatePath(path);
 
             ApplicationPackage metadata = null;
 
@@ -62,7 +61,7 @@ namespace Photon.Framework.Packages
             return metadata;
         }
 
-        private static void AppendMetadata(ZipArchive archive, PackageDefinition definition, string version)
+        private static void AppendMetadata(ZipArchive archive, ApplicationPackageDefinition definition, string version)
         {
             var metadata = new ApplicationPackage {
                 Id = definition.Id,

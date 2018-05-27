@@ -1,9 +1,10 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Framework;
-using Photon.Framework.Variables;
 using Photon.Library;
+using Photon.Library.HttpSecurity;
 using Photon.Library.Packages;
+using Photon.Library.Variables;
 using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.ServerAgents;
 using Photon.Server.Internal.ServerConfiguration;
@@ -11,8 +12,6 @@ using Photon.Server.Internal.Sessions;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,14 +26,14 @@ namespace Photon.Server.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public ProjectManager Projects {get;}
+        public ProjectManager2 Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
         public ProjectPackageManager ProjectPackages {get;}
         public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
-        public VariableSetCollection Variables {get;}
+        public VariableSetDocumentManager Variables {get;}
 
         public ServerConfigurationManager ServerConfiguration {get;}
         public ServerAgentManager Agents {get;}
@@ -42,11 +41,11 @@ namespace Photon.Server.Internal
 
         public PhotonServer()
         {
-            Projects = new ProjectManager();
+            Projects = new ProjectManager2();
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();
-            Variables = new VariableSetCollection();
+            Variables = new VariableSetDocumentManager();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
@@ -79,6 +78,8 @@ namespace Photon.Server.Internal
             if (isStarted) throw new Exception("Server has already been started!");
             isStarted = true;
 
+            Log.Debug("Starting Server...");
+
             // Load existing or default server configuration
             ServerConfiguration.Load();
 
@@ -92,8 +93,7 @@ namespace Photon.Server.Internal
             Sessions.Start();
             Queue.Start();
 
-
-            var taskVariables = LoadVariables();
+            var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskHttp = Task.Run(() => StartHttpServer());
             var taskAgents = Task.Run(() => Agents.Load());
             var taskProjects = Task.Run(() => Projects.Load());
@@ -105,10 +105,14 @@ namespace Photon.Server.Internal
                 taskProjects,
                 taskProjectData,
                 taskHttp);
+
+            Log.Info("Server started.");
         }
 
         public void Stop()
         {
+            Log.Debug("Stopping Server...");
+
             Queue.Stop();
             Sessions.Stop();
 
@@ -119,10 +123,14 @@ namespace Photon.Server.Internal
             catch (Exception error) {
                 Log.Error("Failed to stop HTTP Receiver!", error);
             }
+
+            Log.Info("Server stopped.");
         }
 
         public async Task Shutdown(TimeSpan timeout)
         {
+            Log.Debug("Shutdown started...");
+
             using (var tokenSource = new CancellationTokenSource(timeout)) {
                 var token = tokenSource.Token;
 
@@ -140,6 +148,8 @@ namespace Photon.Server.Internal
 
         public void Abort()
         {
+            Log.Debug("Server abort started...");
+
             Queue.Abort();
             Sessions.Abort();
 
@@ -152,57 +162,36 @@ namespace Photon.Server.Internal
             }
         }
 
-        private static async Task<string> ReadAsync(string filename)
-        {
-            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read))
-            using (var reader = new StreamReader(stream)) {
-                return await reader.ReadToEndAsync();
-            }
-        }
-
-        private async Task LoadVariables()
-        {
-            var taskList = new List<Task>();
-
-            var filename = Path.Combine(Configuration.Directory, "variables.json");
-
-            if (File.Exists(filename)) {
-                var task = ReadAsync(filename)
-                    .ContinueWith(t => Variables.GlobalJson = t.Result);
-
-                taskList.Add(task);
-            }
-
-            if (Directory.Exists(Configuration.VariablesDirectory)) {
-                var fileEnum = Directory.EnumerateFiles(Configuration.VariablesDirectory, "*.json");
-
-                foreach (var file in fileEnum) {
-                    var file_name = Path.GetFileNameWithoutExtension(file) ?? string.Empty;
-
-                    var task = ReadAsync(file)
-                        .ContinueWith(t => Variables.JsonList[file_name] = t.Result);
-
-                    taskList.Add(task);
-                }
-            }
-
-            await Task.WhenAll(taskList);
-        }
-
         private void StartHttpServer()
         {
+            var enableSecurity = ServerConfiguration.Value.Security?.Enabled ?? false;
             var http = ServerConfiguration.Value.Http;
 
+            var contentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpContentDirectory,
+                UrlPath = "/Content/",
+            };
+
+            var sharedContentDir = new ContentDirectory {
+                DirectoryPath = Configuration.HttpSharedContentDirectory,
+                UrlPath = "/SharedContent/",
+            };
+
             var context = new HttpReceiverContext {
-                //SecurityMgr = new Internal.Security.SecurityManager(),
                 ListenerPath = http.Path,
                 ContentDirectories = {
-                    new ContentDirectory {
-                        DirectoryPath = Configuration.HttpContentDirectory,
-                        UrlPath = "/Content/",
-                    }
+                    contentDir,
+                    sharedContentDir,
                 },
             };
+
+            if (enableSecurity) {
+                var ldapAuth = new LdapAuthorization();
+
+                context.SecurityMgr = new ServerHttpSecurity {
+                    Authorization = ldapAuth,
+                };
+            }
 
             context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
@@ -221,7 +210,7 @@ namespace Photon.Server.Internal
             try {
                 receiver.Start();
 
-                Log.Info($"HTTP Server listening at {httpPrefix}");
+                Log.Debug($"HTTP Server listening at {httpPrefix}");
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);

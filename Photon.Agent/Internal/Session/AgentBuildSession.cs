@@ -2,6 +2,7 @@
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
+using Photon.Framework.Domain;
 using Photon.Framework.Projects;
 using Photon.Library.GitHub;
 using System;
@@ -16,6 +17,7 @@ namespace Photon.Agent.Internal.Session
     {
         public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
+        //public string TaskName {get; set;}
         public uint BuildNumber {get; set;}
         public GithubCommit Commit {get; set;}
 
@@ -34,6 +36,12 @@ namespace Photon.Agent.Internal.Session
 
         public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
+            // TODO: Implement ClientSponsor
+
+            var contextOutput = new DomainOutput();
+            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+
             var context = new AgentBuildContext {
                 Project = Project,
                 Agent = Agent,
@@ -44,10 +52,10 @@ namespace Photon.Agent.Internal.Session
                 ContentDirectory = ContentDirectory,
                 BinDirectory = BinDirectory,
                 BuildNumber = BuildNumber,
-                Output = Output.Writer,
+                Output = contextOutput,
                 Packages = PackageClient,
                 ServerVariables = ServerVariables,
-                AgentVariables = PhotonAgent.Instance.Variables,
+                AgentVariables = AgentVariables,
             };
 
             var githubSource = Project?.Source as ProjectGithubSource;
@@ -77,6 +85,10 @@ namespace Photon.Agent.Internal.Session
                 await Domain.RunBuildTask(context, TokenSource.Token);
 
                 success = true;
+            }
+            catch (Exception error) {
+                Exception = error;
+                throw;
             }
             finally {
                 if (notifyGithub) {
@@ -117,8 +129,11 @@ namespace Photon.Agent.Internal.Session
 
                     handle.Username = githubSource.Username;
                     handle.Password = githubSource.Password;
+                    handle.UseCommandLine = githubSource.UseCommandLine;
+                    handle.CommandLineExe = githubSource.CommandLineExe;
+                    handle.Output = Output;
 
-                    handle.Checkout(Output, GitRefspec);
+                    handle.Checkout(GitRefspec);
 
                     Output.WriteLine("Copying repository to work content directory.", ConsoleColor.DarkCyan);
                     CopyDirectory(handle.Source.RepositoryPath, ContentDirectory);
@@ -130,7 +145,7 @@ namespace Photon.Agent.Internal.Session
                 return;
             }
 
-            throw new ApplicationException($"Unknown source type '{Project.SourceType}'!");
+            throw new ApplicationException($"Unknown source type '{Project.Source?.GetType().Name}'!");
         }
 
         private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout, CancellationToken token = default(CancellationToken))
@@ -140,8 +155,9 @@ namespace Photon.Agent.Internal.Session
             using (var timeoutTokenSource = new CancellationTokenSource(timeout)) 
             using (var joinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token)) {
                 while (!joinedTokenSource.IsCancellationRequested) {
-                    if (repositorySource.TryBegin(out var handle))
+                    if (repositorySource.TryBegin(out var handle)) {
                         return handle;
+                    }
 
                     await Task.Delay(200, joinedTokenSource.Token);
                 }
@@ -160,12 +176,11 @@ namespace Photon.Agent.Internal.Session
             var errorList = new Lazy<List<Exception>>();
             var abort = false;
 
-            var preBuildScript = PreBuild;
-            if (!string.IsNullOrWhiteSpace(preBuildScript)) {
+            if (!string.IsNullOrWhiteSpace(PreBuild)) {
                 Output.WriteLine("Running Pre-Build Script...", ConsoleColor.DarkCyan);
 
                 try {
-                    RunCommandScript(preBuildScript);
+                    RunCommandScript(PreBuild);
                 }
                 catch (Exception error) {
                     errorList.Value.Add(new ApplicationException($"Script Pre-Build failed! [{SessionId}]", error));
@@ -238,9 +253,8 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        protected void RunCommandScript(string filename)
+        protected void RunCommandScript(string command)
         {
-            var command = $"cmd.exe /c \"{filename}\"";
             var result = ProcessRunner.Run(ContentDirectory, command, Output.Writer);
 
             if (result.ExitCode != 0)

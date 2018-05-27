@@ -3,6 +3,7 @@ using Photon.Agent.Internal;
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Framework;
+using Photon.Framework.Tools;
 using Photon.Library.TcpMessages;
 using System;
 using System.IO;
@@ -20,50 +21,41 @@ namespace Photon.Agent.MessageHandlers
             var updatePath = Path.Combine(Configuration.Directory, "Updates");
             var msiFilename = Path.Combine(updatePath, "Photon.Agent.msi");
 
-            if (!Directory.Exists(updatePath))
-                Directory.CreateDirectory(updatePath);
+            PathEx.CreatePath(updatePath);
 
             if (File.Exists(msiFilename))
                 File.Delete(msiFilename);
 
             File.Move(requestMessage.Filename, msiFilename);
 
-            var _ = Task.Delay(100).ContinueWith(t => {
-                BeginInstall(updatePath, msiFilename);
-            });
+            BeginInstall(updatePath, msiFilename);
+
+            //var _ = Task.Delay(200).ContinueWith(t => {
+            //    try {
+            //        PhotonAgent.Instance.Stop(TimeSpan.FromSeconds(20));
+            //    }
+            //    catch (Exception error) {
+            //        Log.Error("An error occurred while shutting down!", error);
+            //    }
+            //});
 
             var response = new AgentUpdateResponse();
 
             return await Task.FromResult(response);
         }
 
-        //private static void Run(string updatePath, string msiFilename)
-        //{
-        //    try {
-        //        var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
-
-        //        ProcessRunner.Run(updatePath, cmd);
-        //    }
-        //    catch (Exception error) {
-        //        Log.Error("Failed to start agent update!", error);
-        //    }
-        //}
-
         private void BeginInstall(string updatePath, string msiFilename)
         {
             // TODO: Verify MSI?
 
-            try {
-                Program.Shutdown(); // TimeSpan.FromSeconds(20)
-            }
-            catch (Exception error) {
-                Log.Error("An error occurred while shutting down!", error);
-            }
+            Log.Debug("Starting agent update...");
 
             try {
                 var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
 
                 ProcessRunner.Run(updatePath, cmd);
+
+                Log.Info("Agent update started.");
             }
             catch (Exception error) {
                 Log.Error("Failed to start agent update!", error);

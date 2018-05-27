@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using System;
 using System.IO;
 
@@ -16,10 +18,11 @@ namespace Photon.Server.Internal
         {
             Serializer = new JsonSerializer {
                 Formatting = Formatting.Indented,
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
             };
         }
 
-        public void Load(Action<JObject> loadAction)
+        public void Load(Action<JToken> loadAction)
         {
             if (!File.Exists(Filename)) return;
 
@@ -30,36 +33,34 @@ namespace Photon.Server.Internal
             }
         }
 
-        public void Update(Action<JObject> updateAction)
+        public void Update(Action<JToken> updateAction)
         {
-            var path = Path.GetDirectoryName(Configuration.ServerFile);
+            PathEx.CreateFilePath(Filename);
 
-            if (path != null && !Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            using (var stream = File.Open(Configuration.ServerFile, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
-                var serializer = new JsonSerializer();
-                JObject document = serializer.Deserialize(stream, true) ?? new JObject();
-
+            AlterDocument(document => {
                 updateAction(document);
-
-                stream.SetLength(0);
-                serializer.Serialize(stream, document);
-            }
+                return true;
+            });
         }
 
-        public void Remove(Func<JObject, bool> removeAction)
+        public void Remove(Func<JToken, bool> removeAction)
         {
             if (!File.Exists(Filename)) return;
 
-            using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
-                var serializer = new JsonSerializer();
-                JObject document = serializer.Deserialize(stream, true) ?? new JObject();
+            AlterDocument(removeAction);
+        }
 
-                if (!removeAction(document)) return;
+        private void AlterDocument(Func<JToken, bool> alterFunc)
+        {
+            PathEx.CreateFilePath(Filename);
+
+            using (var stream = File.Open(Filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)) {
+                var document = Serializer.Deserialize(stream, true);
+
+                if (!alterFunc(document)) return;
 
                 stream.SetLength(0);
-                serializer.Serialize(stream, document);
+                JsonSerializerExtensions.Serialize(Serializer, stream, document);
             }
         }
     }

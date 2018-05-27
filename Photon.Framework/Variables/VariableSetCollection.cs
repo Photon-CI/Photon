@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,43 +9,40 @@ namespace Photon.Framework.Variables
     [Serializable]
     public class VariableSetCollection
     {
-        public Dictionary<string, string> JsonList {get;}
-        public string GlobalJson {get; set;}
+        public Dictionary<string, string> Json {get;}
 
-        public VariableSet Global => GlobalJson != null ? CreateSet(GlobalJson) : null;
+        public VariableSet this[string name] => GetSet(name);
 
 
         public VariableSetCollection()
         {
-            JsonList = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            Json = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public bool TryGet(string name, out VariableSet variableSet)
+        public bool TryGetSet(string name, out VariableSet variableSet)
         {
-            var result = JsonList.TryGetValue(name, out var json);
+            var result = Json.TryGetValue(name, out var json);
             variableSet = result ? CreateSet(json) : null;
             return result;
         }
 
-        public VariableSet Get(string name)
+        public VariableSet GetSet(string name)
         {
-            return JsonList.TryGetValue(name, out var json)
+            return Json.TryGetValue(name, out var json)
                 ? CreateSet(json) : null;
         }
 
-        private VariableSet CreateSet(string json)
+        private static VariableSet CreateSet(string json)
         {
-            var serializer = new JsonSerializer();
+            var serializer = JsonSerializer.CreateDefault();
+            serializer.Formatting = Formatting.Indented;
+            serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
-            object variable;
             using (var reader = new StringReader(json))
             using (var jsonReader = new JsonTextReader(reader)) {
-                variable = serializer.Deserialize(jsonReader);
+                var variable = serializer.Deserialize(jsonReader);
+                return new VariableSet(variable);
             }
-
-            return new VariableSet(variable);
         }
-
-        public VariableSet this[string name] => Get(name);
     }
 }

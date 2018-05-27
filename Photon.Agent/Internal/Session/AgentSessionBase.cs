@@ -17,11 +17,12 @@ namespace Photon.Agent.Internal.Session
 {
     internal abstract class AgentSessionBase : IAgentSession
     {
+        public event EventHandler ReleaseEvent;
+
         protected readonly CancellationTokenSource TokenSource;
         private readonly Lazy<ILog> _log;
-        private readonly DateTime utcCreated;
-        private DateTime? utcReleased;
-        private bool isReleased;
+        public DateTime TimeCreated {get;}
+        public DateTime? TimeReleased {get; private set;}
 
         public string SessionId {get;}
         public string ServerSessionId {get;}
@@ -40,6 +41,10 @@ namespace Photon.Agent.Internal.Session
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
         public VariableSetCollection ServerVariables {get; set;}
+        public VariableSetCollection AgentVariables {get; set;}
+        public bool IsReleased {get; set;}
+        //public bool IsComplete {get; set;}
+
         protected ILog Log => _log.Value;
 
 
@@ -50,7 +55,7 @@ namespace Photon.Agent.Internal.Session
             this.SessionClientId = sessionClientId;
 
             SessionId = Guid.NewGuid().ToString("N");
-            utcCreated = DateTime.UtcNow;
+            TimeCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
             TokenSource = new CancellationTokenSource();
@@ -70,7 +75,7 @@ namespace Photon.Agent.Internal.Session
 
         public virtual void Dispose()
         {
-            if (!isReleased)
+            if (!IsReleased)
                 Log.Error("Session was disposed without being released!");
                 //ReleaseAsync().GetAwaiter().GetResult();
             
@@ -88,6 +93,8 @@ namespace Photon.Agent.Internal.Session
 
         public virtual async Task InitializeAsync()
         {
+            AgentVariables = await PhotonAgent.Instance.Variables.GetCollection();
+
             await Task.Run(() => {
                 Directory.CreateDirectory(WorkDirectory);
                 Directory.CreateDirectory(ContentDirectory);
@@ -99,50 +106,63 @@ namespace Photon.Agent.Internal.Session
 
         public async Task ReleaseAsync()
         {
-            utcReleased = DateTime.UtcNow;
+            if (IsReleased) return;
+
+            IsReleased = true;
+            TimeReleased = DateTime.UtcNow;
+            OnReleased();
 
             if (Domain != null)
                 await Domain.Unload(true);
 
-            if (!isReleased) {
-                try {
-                    var _workDirectory = WorkDirectory;
-                    await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
-                }
-                catch (AggregateException errors) {
-                    errors.Flatten().Handle(e => {
-                        if (e is IOException ioError) {
-                            Log.Warn(ioError.Message);
-                            return true;
-                        }
-
-                        Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
+            try {
+                var _workDirectory = WorkDirectory;
+                await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
+            }
+            catch (AggregateException errors) {
+                errors.Flatten().Handle(e => {
+                    if (e is IOException ioError) {
+                        Log.Warn(ioError.Message);
                         return true;
-                    });
-                }
-                catch (Exception error) {
-                    Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
-                }
+                    }
 
-                isReleased = true;
+                    Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
+                    return true;
+                });
+            }
+            catch (Exception error) {
+                Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
             }
         }
 
         public void Abort()
         {
-            //TokenSource.Cancel();
+            TokenSource.Cancel();
 
             // TODO: Wait?
         }
 
+        //public void Complete(TaskResult result)
+        //{
+        //    this.Result = result;
+
+        //    Output.Flush();
+        //    IsComplete = true;
+        //}
+
         public bool IsExpired()
         {
-            if (utcReleased.HasValue) {
-                if (DateTime.UtcNow - utcReleased > CacheSpan)
+            if (TimeReleased.HasValue) {
+                if (DateTime.UtcNow - TimeReleased > CacheSpan)
                     return true;
             }
 
-            return DateTime.UtcNow - utcCreated > LifeSpan;
+            return DateTime.UtcNow - TimeCreated > LifeSpan;
+        }
+
+        protected void OnReleased()
+        {
+            ReleaseEvent?.Invoke(this, EventArgs.Empty);
         }
 
         private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)

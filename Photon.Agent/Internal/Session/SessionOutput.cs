@@ -5,14 +5,11 @@ using System;
 
 namespace Photon.Agent.Internal.Session
 {
-    //public interface ISessionOutput
-    //{
-    //    ISessionOutput Write(string text, ConsoleColor color = ConsoleColor.Gray);
-    //    ISessionOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray);
-    //}
-
-    //[Serializable]
-    public class SessionOutput //: ISessionOutput
+    /// <summary>
+    /// Wraps a <see cref="ScriptOutput"/> object
+    /// and sends updates to a TCP host.
+    /// </summary>
+    public class SessionOutput
     {
         private readonly string serverSessionId;
         private readonly string sessionClientId;
@@ -20,6 +17,8 @@ namespace Photon.Agent.Internal.Session
         private int readPos;
 
         public ScriptOutput Writer {get;}
+
+        public int Length => Writer.Length;
 
 
         public SessionOutput(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
@@ -39,13 +38,25 @@ namespace Photon.Agent.Internal.Session
 
         public SessionOutput Write(string text, ConsoleColor color = ConsoleColor.Gray)
         {
-            Writer.Append(text, color);
+            Writer.Write(text, color);
+            return this;
+        }
+
+        public SessionOutput Write(object value, ConsoleColor color = ConsoleColor.Gray)
+        {
+            Writer.Write(value, color);
             return this;
         }
 
         public SessionOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
-            Writer.AppendLine(text, color);
+            Writer.WriteLine(text, color);
+            return this;
+        }
+
+        public SessionOutput WriteLine(object value, ConsoleColor color = ConsoleColor.Gray)
+        {
+            Writer.WriteLine(value, color);
             return this;
         }
 
@@ -54,7 +65,7 @@ namespace Photon.Agent.Internal.Session
             var length = Writer.Length;
             if (length <= readPos) return;
 
-            var newText = Writer.ToString().Substring(readPos);
+            var newText = Writer.GetString().Substring(readPos);
             readPos = length;
 
             var message = new SessionOutputMessage {

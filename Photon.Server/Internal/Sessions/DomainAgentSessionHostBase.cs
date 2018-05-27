@@ -15,8 +15,6 @@ namespace Photon.Server.Internal.Sessions
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DomainAgentSessionHostBase));
 
-        private const int HandshakeTimeoutSec = 30;
-
         private readonly ClientSponsor sponsor;
         protected CancellationToken Token {get;}
         protected ServerAgent Agent {get;}
@@ -90,19 +88,8 @@ namespace Photon.Server.Internal.Sessions
                 Log.Info($"Connected to TCP Agent '{agentAddress}'.");
 
                 Log.Debug($"Performing TCP handshake... [{agentAddress}]");
-                var handshakeRequest = new HandshakeRequest {
-                    Key = Guid.NewGuid().ToString(),
-                    ServerVersion = Configuration.Version,
-                };
 
-                var timeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);
-                var handshakeResponse = await MessageClient.Handshake<HandshakeResponse>(handshakeRequest, timeout, Token);
-
-                if (!string.Equals(handshakeRequest.Key, handshakeResponse.Key, StringComparison.Ordinal))
-                    throw new ApplicationException("Handshake Failed! An invalid key was returned.");
-
-                if (!handshakeResponse.PasswordMatch)
-                    throw new ApplicationException("Handshake Failed! Unauthorized.");
+                await ClientHandshake.Verify(MessageClient, token);
 
                 Log.Info($"Handshake successful. [{agentAddress}].");
             }

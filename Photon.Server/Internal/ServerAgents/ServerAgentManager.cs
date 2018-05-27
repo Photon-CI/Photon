@@ -42,7 +42,7 @@ namespace Photon.Server.Internal.ServerAgents
             agentsDocument.Remove(d => Document_OnRemove(d, id));
         }
 
-        public void SaveAgent(ServerAgent agent, string prevId = null)
+        public void Save(ServerAgent agent, string prevId = null)
         {
             if (prevId != null) {
                 agentCollection.TryRemove(prevId, out var _);
@@ -60,9 +60,9 @@ namespace Photon.Server.Internal.ServerAgents
             agentsDocument.Update(d => Document_OnUpdate(d, agent, prevId));
         }
 
-        private void Document_OnLoad(JObject document)
+        private void Document_OnLoad(JToken document)
         {
-            if (!(document.GetValue("agents") is JArray agentArray)) return;
+            if (!(document.SelectToken("agents") is JArray agentArray)) return;
 
             foreach (var agentDef in agentArray) {
                 var agent = agentDef.ToObject<ServerAgent>();
@@ -76,11 +76,11 @@ namespace Photon.Server.Internal.ServerAgents
             }
         }
 
-        private void Document_OnUpdate(JObject document, ServerAgent agent, string prevId)
+        private void Document_OnUpdate(JToken document, ServerAgent agent, string prevId)
         {
             if (!(document.SelectToken("agents") is JArray agentArray)) {
                 agentArray = new JArray();
-                document.Add("agents", agentArray);
+                ((JObject)document).Add("agents", agentArray);
 
                 var token = JObject.FromObject(agent);
                 agentArray.Add(token);
@@ -106,7 +106,7 @@ namespace Photon.Server.Internal.ServerAgents
             }
         }
 
-        private bool Document_OnRemove(JObject document, string id)
+        private bool Document_OnRemove(JToken document, string id)
         {
             if (!(document.SelectToken("agents") is JArray agentArray))
                 return false;

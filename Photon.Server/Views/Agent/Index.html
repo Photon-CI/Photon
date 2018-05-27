@@ -1,0 +1,126 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="agents"]').addClass('active');
+
+        $('#SearchTextBox').on('input', onSearchChanged);
+
+        onSearchChanged();
+    });
+
+    function onSearchChanged() {
+        var searchText = $('#SearchTextBox').val();
+
+        $('div[data-card-name]').each(function (i, e) {
+            var visible = false;
+
+            if (searchText.length === 0) {
+                visible = true;
+            } else {
+                var name = $(e).attr('data-card-name');
+
+                if (name.match(new RegExp(searchText, "i")))
+                    visible = true;
+            }
+
+            $(e).toggle(visible);
+        });
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .layout-content > .container-fluid {
+        padding: 0;
+    }
+
+    .card-container {
+        margin: -4px 8px;
+        padding: 0;
+    }
+
+    .agent-card {
+        margin: 4px 4px;
+        min-height: 120px;
+    }
+
+        .agent-card .card-body {
+            padding: 8px;
+        }
+
+    .agent-status-holder {
+        width: 32px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+        font-size: 24px;
+    }
+
+    .agent-name-holder {
+        display: inline-block;
+        line-height: 20px;
+    }
+
+    .agent-name {
+        margin: 0;
+        display: inline-block;
+    }
+
+    .agent-address {
+        display: inline-block;
+    }
+</style>
+{{#EndStyle}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Agents</h3>
+    </div>
+    <ul class="navbar-nav">
+        <li class="nav-item px-2">
+            <a href="{{#Url agent/edit}}" class="nav-link">
+                New <i class="fas fa-plus"></i>
+            </a>
+        </li>
+    </ul>
+    <div class="form-inline">
+        <div class="input-group input-group-sm">
+            <input id="SearchTextBox" type="text" class="form-control" />
+            <div class="input-group-append">
+                <div class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid mt-3">
+    <div class="row no-gutters card-container">
+        {{#Each Agents.agent}}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3" data-card-name="{{agent.Name}}">
+            <div class="card agent-card">
+                <div class="card-header">
+                    <div class="agent-status-holder">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <div class="agent-name-holder">
+                        <h5 class="card-title agent-name">
+                            <a href="{{#Url Agent/Edit}}?id={{&agent.Id}}">{{agent.Name}}</a>
+                        </h5><br />
+                        <h6 class="card-subtitle agent-address text-muted">{{agent.TcpHost}} :{{agent.TcpPort}}</h6>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {{#Each agent.Roles.role}}
+                    <div class="badge badge-dark">{{role}}</div>
+                    {{#EndEach}}
+                </div>
+            </div>
+        </div>
+        {{#EndEach}}
+    </div>
+</div>

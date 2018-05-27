@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Tools;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 
@@ -35,21 +36,13 @@ namespace Photon.Agent.Internal.Git
             return sources.GetOrAdd(entry.Id, _ => CreateSource(entry));
         }
 
-        //public bool TryGet(string name, out RepositorySource repository)
-        //{
-        //    return sources.TryGetValue(name, out repository);
-        //}
-
         private RepositorySource CreateSource(RepositoryIndexEntry entry)
         {
             var repositoryPath = Path.Combine(RepositorySourceDirectory, entry.Id);
 
-            if (!Directory.Exists(repositoryPath))
-                Directory.CreateDirectory(repositoryPath);
+            PathEx.CreatePath(repositoryPath);
 
-            return new RepositorySource(entry.Url, repositoryPath) {
-                //...
-            };
+            return new RepositorySource(entry.Url, repositoryPath);
         }
     }
 }

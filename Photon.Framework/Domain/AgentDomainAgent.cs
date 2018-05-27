@@ -44,11 +44,6 @@ namespace Photon.Framework.Domain
                 .ContinueWith(completeEvent.FromTask);
         }
 
-        //class TaskRoleException : ApplicationException
-        //{
-        //    //
-        //}
-
         public void RunDeployTask(IAgentDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
             if (deployTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc)) {
@@ -63,11 +58,11 @@ namespace Photon.Framework.Domain
                 }
             }
 
-            context.Output.Append("Running deployment task ", ConsoleColor.DarkCyan)
-                .Append(context.TaskName, ConsoleColor.Cyan)
-                .Append(" on agent ", ConsoleColor.DarkCyan)
-                .Append(context.Agent?.Name, ConsoleColor.Cyan)
-                .AppendLine("...", ConsoleColor.DarkCyan);
+            context.Output.Write("Running deployment task ", ConsoleColor.DarkCyan)
+                .Write(context.TaskName, ConsoleColor.Cyan)
+                .Write(" on agent ", ConsoleColor.DarkCyan)
+                .Write(context.Agent?.Name, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
 
             deployTaskRegistry.ExecuteTask(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);

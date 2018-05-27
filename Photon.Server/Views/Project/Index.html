@@ -1,0 +1,74 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="projects"]').addClass('active');
+    });
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .card-container {
+        margin-top: -8px;
+        margin-bottom: -8px;
+    }
+    .card {
+        margin: 8px 0;
+    }
+    .card-header {
+        padding: 4px 8px;
+    }
+    .card-header h5 {
+        margin: 0;
+        line-height: 32px;
+    }
+    .card-body {
+        padding: 4px 8px;
+    }
+</style>
+{{#EndStyle}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Projects</h3>
+    </div>
+    <ul class="navbar-nav">
+        <li class="nav-item px-2">
+            <a href="{{#Url project/edit}}" class="nav-link">
+                New <i class="fas fa-plus"></i>
+            </a>
+        </li>
+    </ul>
+    <div class="form-inline">
+        <div class="input-group input-group-sm">
+            <input id="SearchTextBox" type="text" class="form-control" />
+            <div class="input-group-append">
+                <div class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    {{#Each Projects.project}}
+    <div class="row card-container">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <a href="{{#Url project/edit}}?id={{&project.Id}}" class="btn btn-primary btn-sm float-right">
+                        <i class="fas fa-cog"></i>
+                    </a>
+                    <h5>{{project.Name}}</h5>
+                </div>
+                <div class="card-body">
+                    <span>{{project.Description}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{#EndEach}}
+</div>

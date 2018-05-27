@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -26,6 +27,7 @@ namespace Photon.Framework.Packages
         }
 
         public static T LoadDefinition<T>(string filename)
+            where T : IPackageDefinition
         {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
                 return JsonSettings.Serializer.Deserialize<T>(stream);
@@ -33,6 +35,7 @@ namespace Photon.Framework.Packages
         }
 
         public static void AppendMetadata<T>(ZipArchive archive, T definition, string version)
+            where T : IPackageMetadata
         {
             var entry = archive.CreateEntry("metadata.json");
 
@@ -42,6 +45,7 @@ namespace Photon.Framework.Packages
         }
 
         public static async Task<T> ParseMetadataAsync<T>(ZipArchive archive)
+            where T : IPackageMetadata
         {
             var entry = archive.GetEntry("metadata.json");
             if (entry == null) throw new Exception("Project Package metadata.json not found!");
@@ -84,8 +88,7 @@ namespace Photon.Framework.Packages
                 var entryDestPath = Path.Combine(destPath, entryPathDest);
                 var entryDestFilename = Path.Combine(entryDestPath, entry.Name);
 
-                if (!Directory.Exists(entryDestPath))
-                    Directory.CreateDirectory(entryDestPath);
+                PathEx.CreatePath(entryDestPath);
 
                 using (var entryStream = entry.Open())
                 using (var fileStream = File.Open(entryDestFilename, FileMode.Create, FileAccess.Write)) {

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props" Condition="Exists('..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props')" />
   <Import Project="..\packages\LibGit2Sharp.NativeBinaries.1.0.205\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.205\build\LibGit2Sharp.NativeBinaries.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -14,6 +15,21 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,8 +53,8 @@
   <PropertyGroup>
     <StartupObject>Photon.Agent.Program</StartupObject>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PI|AnyCPU'">
-    <OutputPath>bin\PI\</OutputPath>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Linux|AnyCPU' ">
+    <OutputPath>bin\Linux\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -58,11 +74,12 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.2.3\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.2.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.2.4\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.ServiceProcess" />
   </ItemGroup>
   <ItemGroup>
@@ -74,15 +91,25 @@
     </Compile>
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="HttpHandlers\Api\LogHandler.cs" />
-    <Compile Include="HttpHandlers\Builds\BuildIndexHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Variable\DeleteHandler.cs" />
+    <Compile Include="HttpHandlers\Api\Variable\JsonHandler.cs" />
     <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\Deployments\DeploymentIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Variables\VariableIndexHandler.cs" />
+    <Compile Include="HttpHandlers\Session\SessionDetailsHandler.cs" />
+    <Compile Include="HttpHandlers\Session\SessionIndexHandler.cs" />
+    <Compile Include="HttpHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
+    <Compile Include="HttpHandlers\VariableSet\VariableSetIndexHandler.cs" />
+    <Compile Include="Internal\Git\CmdCheckout.cs" />
+    <Compile Include="Internal\Git\ICheckout.cs" />
+    <Compile Include="Internal\Git\LibCheckout.cs" />
     <Compile Include="Internal\Git\RepositoryHandle.cs" />
     <Compile Include="Internal\Git\RepositoryIndex.cs" />
     <Compile Include="Internal\Git\RepositoryIndexEntry.cs" />
     <Compile Include="Internal\Git\RepositorySourceManager.cs" />
     <Compile Include="Internal\Git\RepositorySource.cs" />
+    <Compile Include="Internal\AgentHttpSecurity.cs" />
     <Compile Include="Internal\Session\AgentBuildSession.cs" />
     <Compile Include="Internal\Session\AgentDeploySession.cs" />
     <Compile Include="Internal\Session\AgentSessionBase.cs" />
@@ -91,7 +118,9 @@
     <Compile Include="Internal\Session\IAgentSession.cs" />
     <Compile Include="Internal\PhotonAgent.cs" />
     <Compile Include="Internal\Configuration.cs" />
+    <Compile Include="Internal\Session\AgentSessionWatch.cs" />
     <Compile Include="Internal\Session\SessionOutput.cs" />
+    <Compile Include="Internal\Session\SessionStateEventArgs.cs" />
     <Compile Include="MessageHandlers\AgentUpdateProcessor.cs" />
     <Compile Include="MessageHandlers\SessionCancelProcessor.cs" />
     <Compile Include="MessageHandlers\DeploySessionBeginProcessor.cs" />
@@ -105,6 +134,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
+    <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
+    <Compile Include="ViewModels\VariableSet\VariableSetEditJsonVM.cs" />
+    <Compile Include="ViewModels\VariableSet\VariableSetIndexVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="agent.json" />
@@ -114,46 +146,94 @@
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="App.PI.config">
+    <None Include="App.Linux.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot">
+    <Content Include="..\SharedContent\ActiveSessions.js">
+      <Link>Content\ActiveSessions.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.ttf">
+    <Content Include="..\SharedContent\ansi_up.js">
+      <Link>Content\ansi_up.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap-grid.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap-grid.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff2">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap-reboot.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap-reboot.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.eot">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.ttf">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\js\bootstrap.bundle.min.js">
+      <Link>Content\bootstrap-4.1.0\js\bootstrap.bundle.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\js\bootstrap.min.js">
+      <Link>Content\bootstrap-4.1.0\js\bootstrap.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff2">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\css\fa-svg-with-js.css">
+      <Link>Content\fontawesome-5.0.13\css\fa-svg-with-js.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.eot">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-brands.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-brands.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.ttf">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-regular.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-regular.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-solid.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-solid.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff2">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-v4-shims.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-v4-shims.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fontawesome-all.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fontawesome-all.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fontawesome.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fontawesome.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jquery-3.3.1.min.js">
+      <Link>Content\jquery-3.3.1.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\img\jsoneditor-icons.svg">
+      <Link>Content\jsoneditor-5.15.0\img\jsoneditor-icons.svg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\jsoneditor.min.css">
+      <Link>Content\jsoneditor-5.15.0\jsoneditor.min.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\jsoneditor.min.js">
+      <Link>Content\jsoneditor-5.15.0\jsoneditor.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\photon_light.ico">
+      <Link>Content\photon_light.ico</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\popper.min.js">
+      <Link>Content\popper.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\SessionOutput.js">
+      <Link>Content\SessionOutput.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
@@ -173,73 +253,42 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Builds\Index.html">
+    <Content Include="Content\site.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configuration.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Deployments\Index.html">
+    <Content Include="Views\Session\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Variables\Index.html">
+    <Content Include="Views\Session\Details.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\VariableSet\EditJson.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\VariableSet\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap-grid.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap-reboot.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\js\bootstrap.bundle.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\js\bootstrap.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-brands.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-regular.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-solid.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fontawesome-all.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fontawesome.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Content\Images\photon_dark.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\jquery-3.3.1.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\photon_light.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\popper.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Master.html">
@@ -247,7 +296,7 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <UsingTask TaskName="TransformXml" AssemblyFile="..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\tools\VSToolsPath\Web\Microsoft.Web.Publishing.Tasks.dll" />
   <Target Name="App_config_AfterCompile" AfterTargets="AfterCompile" Condition="Exists('App.$(Configuration).config')">
     <!--Generate transformed app config in the intermediate directory-->
     <TransformXml Source="App.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />
@@ -272,5 +321,6 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\LibGit2Sharp.NativeBinaries.1.0.205\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LibGit2Sharp.NativeBinaries.1.0.205\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props'))" />
   </Target>
 </Project>

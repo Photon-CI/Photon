@@ -1,0 +1,84 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script src="{{#Url SharedContent/jsoneditor-5.15.0/jsoneditor.min.js}}"></script>
+<script>
+    var editor;
+
+    $(function () {
+        $('#layoutNavbarContent [data-link="agents"]').addClass('active');
+
+        var options = {
+            modes: ['code', 'tree']
+        };
+
+        var container = document.getElementById("jsoneditor");
+        editor = new JSONEditor(container, options);
+        editor.focus();
+
+        onLoad();
+    });
+
+    var agentJsonUrl = '{{#Url api/agent/json}}?id={{&AgentId}}';
+
+    function onLoad() {
+        $.ajax({
+            url: agentJsonUrl,
+            dataType: 'json',
+            method: 'get'
+        }).done(function(data) {
+            editor.set(data);
+        }).fail(function() {
+            alert('Failed to load agent JSON!');
+        });
+    }
+
+    function onSave() {
+        var json = editor.get();
+
+        $.ajax({
+            url: agentJsonUrl,
+            method: 'post',
+            data: JSON.stringify(json)
+        }).done(function() {
+            alert('Saved Successfully!');
+        }).fail(function() {
+            alert('Failed to save agent JSON!');
+        });
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<link href="{{#Url SharedContent/jsoneditor-5.15.0/jsoneditor.min.css}}" rel="stylesheet" type="text/css">
+<style>
+    .layout-content {
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    #jsoneditor {
+        flex: 1;
+    }
+</style>
+{{#EndStyle}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Edit Agent JSON</h3>
+    </div>
+    <div class="form-inline">
+        <!--{{#If !IsNew}}
+        <button type="button" class="btn btn-sm btn-danger my-2 my-sm-0 mr-2" data-toggle="modal" data-target="#DeleteModal">
+            Delete <i class="fas fa-trash"></i>
+        </button>
+        {{#EndIf}}-->
+        <button type="button" class="btn btn-sm btn-primary my-2 my-sm-0" onclick="onSave()">
+            Save <i class="fas fa-save"></i>
+        </button>
+    </div>
+</nav>
+
+<div id="jsoneditor"></div>

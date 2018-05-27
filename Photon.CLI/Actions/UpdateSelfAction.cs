@@ -49,8 +49,7 @@ namespace Photon.CLI.Actions
 
         private async Task DownloadUpdate(HttpPackageIndex index)
         {
-            if (!Directory.Exists(updateDirectory))
-                Directory.CreateDirectory(updateDirectory);
+            PathEx.CreatePath(updateDirectory);
 
             try {
                 var url = NetPath.Combine(Configuration.DownloadUrl, "CLI", index.Version, index.MsiFilename);

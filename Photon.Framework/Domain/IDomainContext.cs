@@ -1,5 +1,4 @@
 ﻿using Photon.Framework.Projects;
-using Photon.Framework.Server;
 using Photon.Framework.Variables;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ namespace Photon.Framework.Domain
         string WorkDirectory {get;}
         string ContentDirectory {get;}
         string BinDirectory {get;}
-        ScriptOutput Output {get;}
+        DomainOutput Output {get;}
         VariableSetCollection ServerVariables {get;}
         VariableSetCollection AgentVariables {get;}
 

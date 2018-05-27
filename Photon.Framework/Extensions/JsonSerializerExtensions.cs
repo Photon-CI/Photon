@@ -14,6 +14,14 @@ namespace Photon.Framework.Extensions
             }
         }
 
+        public static void Serialize(this JsonSerializer serializer, Stream stream, dynamic data, bool leaveOpen = false)
+        {
+            using (var streamWriter = new StreamWriter(stream, Encoding.UTF8, 4096, leaveOpen))
+            using (var jsonWriter = new JsonTextWriter(streamWriter)) {
+                serializer.Serialize(jsonWriter, data);
+            }
+        }
+
         public static T Deserialize<T>(this JsonSerializer serializer, Stream stream, bool leaveOpen = false)
         {
             using (var streamReader = new StreamReader(stream, Encoding.UTF8, true, 4096, leaveOpen))

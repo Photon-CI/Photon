@@ -1,33 +1,66 @@
 ﻿using Photon.Framework;
-using Photon.Library;
 using Photon.Server.Internal;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Photon.Server.ViewModels
 {
-    internal class IndexVM : ViewModelBase
+    internal class IndexVM : ServerViewModel
     {
-        public string Name {get; set;}
-        public string Version {get; set;}
-        public string Url {get; set;}
+        public string ServerName {get; set;}
+        public string ServerVersion {get; set;}
+        public string ServerHttpUrl {get; set;}
+
+        public string MachineName {get; set;}
+        public string MachineProcessorCount {get; set;}
+        public string MachineOsVersion {get; set;}
+        public string MachineClrVersion {get; set;}
+        public string MachineArchitecture {get; set;}
+        public string OsDescription {get; set;}
+        public string OsArchitecture {get; set;}
+        public string FrameworkDescription {get; set;}
+        public string ProcessArchitecture {get; set;}
 
 
-        public override void Build()
+        public void Build()
         {
-            Name = PhotonServer.Instance.ServerConfiguration.Value.Name;
-            Version = Configuration.Version;
+            ServerName = GetServerName();
+            ServerVersion = Configuration.Version;
+            ServerHttpUrl = GetServerHttpUrl();
+            ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
 
-            if (string.IsNullOrEmpty(Name))
-                Name = "Photon Server";
+            MachineName = Environment.MachineName;
+            MachineProcessorCount = Environment.ProcessorCount.ToString("N0");
+            MachineOsVersion = Environment.OSVersion.VersionString;
+            MachineClrVersion = Environment.Version.ToString();
+            MachineArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
 
+            OsDescription = RuntimeInformation.OSDescription;
+            OsArchitecture = RuntimeInformation.OSArchitecture.ToString();
+            FrameworkDescription = RuntimeInformation.FrameworkDescription;
+        }
+
+        private static string GetServerName()
+        {
+            var name = PhotonServer.Instance.ServerConfiguration.Value.Name;
+
+            return !string.IsNullOrEmpty(name)
+                ? name : "Photon Agent";
+        }
+
+        private static string GetServerHttpUrl()
+        {
             var http = PhotonServer.Instance.ServerConfiguration.Value.Http;
             var _port = http.Port != 80 ? $":{http.Port}" : string.Empty;
             var _hostIsWild = http.Host == "*" || http.Host == "+";
             var _host = _hostIsWild ? "localhost" : http.Host;
 
-            Url = $"http://{_host}{_port}/";
+            var url = $"http://{_host}{_port}/";
 
             if (!string.IsNullOrEmpty(http.Path))
-                Url = NetPath.Combine(Url, http.Path, string.Empty);
+                url = NetPath.Combine(url, http.Path, string.Empty);
+
+            return url;
         }
     }
 }

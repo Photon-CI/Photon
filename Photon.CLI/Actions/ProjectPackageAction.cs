@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Packages;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Photon.CLI.Actions
@@ -12,7 +13,9 @@ namespace Photon.CLI.Actions
 
         public async Task Run()
         {
-            await ProjectPackageTools.CreatePackage(MetadataFilename, PackageVersion, PackageFilename);
+            var rootPath = Path.GetDirectoryName(MetadataFilename);
+            var metadata = ProjectPackageTools.LoadDefinition(MetadataFilename);
+            await ProjectPackageTools.CreatePackage(metadata, rootPath, PackageVersion, PackageFilename);
         }
     }
 }

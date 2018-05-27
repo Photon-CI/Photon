@@ -25,7 +25,7 @@ namespace Photon.Server.Internal.Sessions
                 AssemblyFile = session.AssemblyFilename,
                 PreBuild = session.PreBuild,
                 GitRefspec = session.GitRefspec,
-                BuildNumber = session.BuildNumber,
+                BuildNumber = session.Build.Number,
                 Variables = session.Variables,
                 Commit = session.Commit,
             };

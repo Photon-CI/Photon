@@ -7,9 +7,10 @@ namespace Photon.Framework.Projects
     [Serializable]
     public class ProjectEnvironment
     {
+        [JsonProperty("name", Order = 1)]
         public string Name {get; set;}
 
-        [JsonProperty("agents")]
+        [JsonProperty("agents", Order = 2)]
         public List<string> AgentIdList {get; set;}
 
 

@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Photon.Framework;
+using Photon.Framework.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,10 +63,7 @@ namespace Photon.Agent.Internal.Git
 
         private void Save()
         {
-            var path = Path.GetDirectoryName(filename);
-
-            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            PathEx.CreateFilePath(filename);
 
             using (var stream = File.Open(filename, FileMode.Create, FileAccess.Write))
             using (var writer = new StreamWriter(stream))

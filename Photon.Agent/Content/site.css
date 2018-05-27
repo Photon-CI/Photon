@@ -1,0 +1,123 @@
+﻿html {
+    height: 100%;
+    overflow-x: hidden;
+}
+body {
+    min-height: 100%;
+}
+
+nav.sidebar {
+    -webkit-transition: margin 200ms ease-out;
+    -moz-transition: margin 200ms ease-out;
+    -o-transition: margin 200ms ease-out;
+    transition: margin 200ms ease-out;
+}
+
+.layout-content {
+    -webkit-transition: margin 200ms ease-out, width 200ms ease-out;
+    -moz-transition: margin 200ms ease-out, width 200ms ease-out;
+    -o-transition: margin 200ms ease-out, width 200ms ease-out;
+    transition: margin 200ms ease-out, width 200ms ease-out;
+}
+
+.nav-item-iconholder {
+    float: right;
+    text-align: center;
+}
+
+.photon-icon > img {
+    width: auto;
+    height: 50px;
+}
+
+nav.sidebar li.active a {
+    color: #47b5d6 !important;
+}
+
+@media (min-width: 768px) {
+    nav.sidebar {
+        position: fixed;
+        width: 200px;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        margin-left: -160px;
+        z-index: 8000;
+        margin-bottom: 0;
+        padding: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    nav.sidebar .container-fluid {
+        padding: 0;
+        height: 100%;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    #layoutNavbarContent {
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    nav.sidebar ul {
+        flex-direction: column !important;
+        width: 100%;
+    }
+
+    nav.sidebar li {
+        width: 100%;
+    }
+
+    .nav-item-iconholder {
+        width: 30px;
+    }
+
+    .photon-icon {
+        padding: 8px 4px;
+        border-bottom: 1px solid #2c2c2c;
+        width: 100%;
+    }
+
+    .photon-icon > img {
+        position: absolute;
+        right: 4px;
+        top: 8px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .layout-content {
+        width: calc(100% - 40px);
+        float: right;
+    }
+
+    nav.sidebar:hover + .layout-content {
+        width: calc(100% - 200px);
+    }
+
+    nav.sidebar:hover {
+        margin-left: 0;
+    }
+
+    .forAnimate {
+        opacity: 0;
+    }
+}
+
+@media (min-width: 1330px) {
+    nav.sidebar {
+        margin-left: 0;
+        float: left;
+    }
+
+    .layout-content {
+        width: calc(100% - 200px);
+        margin-left: 200px;
+    }
+
+    nav.sidebar .forAnimate {
+        opacity: 1;
+    }
+}

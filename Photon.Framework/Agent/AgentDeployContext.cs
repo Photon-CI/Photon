@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Photon.Framework.Server;
 
 namespace Photon.Framework.Agent
 {
@@ -13,7 +12,6 @@ namespace Photon.Framework.Agent
         public string TaskName {get; set;}
         public string ApplicationsDirectory {get; set;}
         public string EnvironmentName {get; set;}
-        public ServerAgent Agent {get; set;}
 
 
         public string GetApplicationDirectory(string applicationName, string applicationVersion)

@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
+using Photon.Server.Internal.Builds;
 using System;
 using System.IO;
 
@@ -23,7 +25,11 @@ namespace Photon.Server.Internal.Projects
         public string ProjectId {get; set;}
 
         public ProjectDataLastBuild LastBuild {get; set;}
+
         public ProjectDataLastBuild LastDeployment {get; set;}
+
+        [JsonIgnore]
+        public BuildDataManager Builds {get; private set;}
 
 
         public ProjectData()
@@ -32,7 +38,15 @@ namespace Photon.Server.Internal.Projects
             deployNumberLock = new object();
         }
 
-        public uint StartNewBuild()
+        public void Initialize()
+        {
+            var buildsPath = Path.Combine(DataPath, "builds");
+
+            Builds = new BuildDataManager(buildsPath);
+            Builds.Load();
+        }
+
+        public BuildData StartNewBuild()
         {
             uint buildNumber;
             lock (buildNumberLock) {
@@ -45,11 +59,6 @@ namespace Photon.Server.Internal.Projects
                 buildNumber = LastBuild.Number;
             }
 
-            var path = Path.Combine(DataPath, "Builds", buildNumber.ToString());
-
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
             try {
                 Save();
             }
@@ -57,7 +66,7 @@ namespace Photon.Server.Internal.Projects
                 Log.Error("Failed to update ProjectData index file!", error);
             }
 
-            return buildNumber;
+            return Builds.New(buildNumber);
         }
 
         public uint StartNewDeployment()
@@ -73,6 +82,9 @@ namespace Photon.Server.Internal.Projects
                 deployNumber = LastDeployment.Number;
             }
 
+            var deployPath = Path.Combine(DataPath, "Deployments", deployNumber.ToString());
+            PathEx.CreatePath(deployPath);
+
             try {
                 Save();
             }
@@ -85,6 +97,8 @@ namespace Photon.Server.Internal.Projects
 
         public void Save()
         {
+            PathEx.CreateFilePath(Filename);
+
             using (var stream = File.Open(Filename, FileMode.Create, FileAccess.Write)) {
                 JsonSettings.Serializer.Serialize(stream, this);
             }
@@ -98,6 +112,7 @@ namespace Photon.Server.Internal.Projects
                 DataPath = Path.GetDirectoryName(filename),
             };
 
+            index.Initialize();
             index.Save();
 
             return index;
@@ -112,6 +127,7 @@ namespace Photon.Server.Internal.Projects
 
             projectData.Filename = filename;
             projectData.DataPath = Path.GetDirectoryName(filename);
+            projectData.Initialize();
 
             return projectData;
         }

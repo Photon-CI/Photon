@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props" Condition="Exists('..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,6 +12,8 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,9 +37,9 @@
   <PropertyGroup>
     <StartupObject>Photon.Server.Program</StartupObject>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PI|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Linux|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\PI\</OutputPath>
+    <OutputPath>bin\Linux\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,61 +55,85 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.2.3\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.2.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.2.4\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.24.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\RootCommands.cs" />
-    <Compile Include="HttpHandlers\Agents\AgentEditHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\AgentDeleteHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\AgentVersionHandler.cs" />
-    <Compile Include="HttpHandlers\Api\ProjectsHandler.cs" />
-    <Compile Include="HttpHandlers\Api\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\ActiveHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
-    <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\Packages\PackageIndexHandler.cs" />
-    <Compile Include="HttpHandlers\BuildsHandler.cs" />
-    <Compile Include="HttpHandlers\DeploymentsHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\UpdateAgentResultHandler.cs" />
-    <Compile Include="HttpHandlers\Api\GitHub\WebHookHandler.cs" />
-    <Compile Include="HttpHandlers\Api\LogHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Server\UpdateServerStartHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\UpdateAgentStartHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Build\BuildResultHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Deploy\DeployResultHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\OutputHandler.cs" />
-    <Compile Include="HttpHandlers\Api\VersionHandler.cs" />
-    <Compile Include="HttpHandlers\Agents\AgentIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Projects\ProjectIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Session\DetailsHandler.cs" />
-    <Compile Include="HttpHandlers\Variables\VariableIndexHandler.cs" />
-    <Compile Include="Internal\ServerAgents\ServerAgentManager.cs" />
+    <Compile Include="Internal\Projects\ServerProject.cs" />
+    <Compile Include="Internal\ServerViewModel.cs" />
+    <Compile Include="ViewHandlers\Agent\AgentEditHandler.cs" />
+    <Compile Include="ViewHandlers\Agent\AgentEditJsonHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\AgentDeleteHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\AgentVersionHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\JsonHandler.cs" />
+    <Compile Include="ApiHandlers\Build\OutputStreamHandler.cs" />
+    <Compile Include="ApiHandlers\Project\DeleteHandler.cs" />
+    <Compile Include="ApiHandlers\Project\JsonHandler.cs" />
+    <Compile Include="ApiHandlers\ConfigurationHandler.cs" />
+    <Compile Include="ApiHandlers\Session\ListHandler.cs" />
+    <Compile Include="ApiHandlers\Session\CancelHandler.cs" />
+    <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
+    <Compile Include="ApiHandlers\Variable\DeleteHandler.cs" />
+    <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
+    <Compile Include="ViewHandlers\Build\BuildDetailsHandler.cs" />
+    <Compile Include="ViewHandlers\Build\BuildNewHandler.cs" />
+    <Compile Include="ViewHandlers\ConfigurationHandler.cs" />
+    <Compile Include="ViewHandlers\Deployment\DeploymentNewHandler.cs" />
+    <Compile Include="ViewHandlers\LoginHandler.cs" />
+    <Compile Include="ViewHandlers\LogoutHandler.cs" />
+    <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Package\PackageIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Build\BuildIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Deployment\DeploymentIndexHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\UpdateAgentResultHandler.cs" />
+    <Compile Include="ApiHandlers\GitHub\WebHookHandler.cs" />
+    <Compile Include="ApiHandlers\LogHandler.cs" />
+    <Compile Include="ApiHandlers\Server\UpdateServerStartHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\UpdateAgentStartHandler.cs" />
+    <Compile Include="ApiHandlers\Build\BuildResultHandler.cs" />
+    <Compile Include="ApiHandlers\Deploy\DeployResultHandler.cs" />
+    <Compile Include="ApiHandlers\Session\OutputHandler.cs" />
+    <Compile Include="ApiHandlers\VersionHandler.cs" />
+    <Compile Include="ViewHandlers\Agent\AgentIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Project\ProjectJsonHandler.cs" />
+    <Compile Include="ViewHandlers\Project\ProjectEditHandler.cs" />
+    <Compile Include="ViewHandlers\Project\ProjectIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Session\SessionDetailsHandler.cs" />
+    <Compile Include="ViewHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
+    <Compile Include="ViewHandlers\VariableSet\VariableSetIndexHandler.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
+    <Compile Include="Internal\ClientHandshake.cs" />
+    <Compile Include="Internal\Projects\ProjectManager2.cs" />
+    <Compile Include="Internal\ServerAgents\ServerAgentManager.cs" />
     <Compile Include="Internal\GitHub\HookEventHandler.cs" />
     <Compile Include="Internal\JsonDynamicDocument.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfiguration.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
+    <Compile Include="Internal\ServerConfiguration\ServerSecurityConfiguration.cs" />
+    <Compile Include="Internal\ServerConfiguration\ServerHttpConfiguration.cs" />
+    <Compile Include="Internal\ServerHttpSecurity.cs" />
     <Compile Include="Internal\Sessions\ServerSessionWatch.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
+    <Compile Include="Internal\Sessions\SessionStateEventArgs.cs" />
     <Compile Include="Internal\TaskRunner.cs" />
     <Compile Include="Internal\ServerBuildContext.cs" />
     <Compile Include="Internal\Projects\ProjectData.cs" />
     <Compile Include="Internal\Projects\ProjectDataManager.cs" />
     <Compile Include="Internal\Projects\ProjectDataLastBuild.cs" />
-    <Compile Include="Internal\Projects\ProjectManager.cs" />
     <Compile Include="Internal\ScriptQueue.cs" />
     <Compile Include="Internal\Sessions\DomainAgentDeploySessionHost.cs" />
     <Compile Include="Internal\Sessions\DomainAgentBuildSessionHost.cs" />
@@ -120,7 +147,6 @@
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\PhotonServer.cs" />
     <Compile Include="Internal\TaskRunnerManager.cs" />
-    <Compile Include="Internal\WebSocketHost.cs" />
     <Compile Include="MessageProcessors\AgentSessionOutputProcessor.cs" />
     <Compile Include="MessageProcessors\ApplicationPackagePullProcessor.cs" />
     <Compile Include="MessageProcessors\ApplicationPackagePushProcessor.cs" />
@@ -141,14 +167,24 @@
       <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HttpHandlers\Api\Build\BuildStartHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Deploy\DeployStartHandler.cs" />
-    <Compile Include="HttpHandlers\IndexHandler.cs" />
-    <Compile Include="ViewModels\Agents\AgentEditVM.cs" />
-    <Compile Include="ViewModels\Agents\AgentIndexVM.cs" />
+    <Compile Include="ApiHandlers\Build\BuildStartHandler.cs" />
+    <Compile Include="ApiHandlers\Deploy\DeployStartHandler.cs" />
+    <Compile Include="ViewHandlers\IndexHandler.cs" />
+    <Compile Include="ViewModels\Agent\AgentEditVM.cs" />
+    <Compile Include="ViewModels\Agent\AgentEditJsonVM.cs" />
+    <Compile Include="ViewModels\Agent\AgentIndexVM.cs" />
+    <Compile Include="ViewModels\Build\BuildDetailsVM.cs" />
+    <Compile Include="ViewModels\Build\BuildNewVM.cs" />
+    <Compile Include="ViewModels\Build\BuildIndexVM.cs" />
+    <Compile Include="ViewModels\Deployment\DeploymentNewVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
-    <Compile Include="ViewModels\Projects\ProjectIndexVM.cs" />
+    <Compile Include="ViewModels\LoginVM.cs" />
+    <Compile Include="ViewModels\Project\ProjectJsonVM.cs" />
+    <Compile Include="ViewModels\Project\ProjectEditVM.cs" />
+    <Compile Include="ViewModels\Project\ProjectIndexVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
+    <Compile Include="ViewModels\VariableSet\VariablesEditJsonVM.cs" />
+    <Compile Include="ViewModels\VariableSet\VariablesIndexVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -157,55 +193,94 @@
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="App.PI.config">
+    <None Include="App.Linux.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <Content Include="Content\ansi_up.js">
+    <Content Include="..\SharedContent\ActiveSessions.js">
+      <Link>Content\ActiveSessions.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\SessionOutput.js">
+    <Content Include="..\SharedContent\ansi_up.js">
+      <Link>Content\ansi_up.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\ActiveSessions.js">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap-grid.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap-grid.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.eot">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap-reboot.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap-reboot.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.ttf">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\css\bootstrap.min.css">
+      <Link>Content\bootstrap-4.1.0\css\bootstrap.min.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\js\bootstrap.bundle.min.js">
+      <Link>Content\bootstrap-4.1.0\js\bootstrap.bundle.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.woff2">
+    <Content Include="..\SharedContent\bootstrap-4.1.0\js\bootstrap.min.js">
+      <Link>Content\bootstrap-4.1.0\js\bootstrap.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.eot">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\css\fa-svg-with-js.css">
+      <Link>Content\fontawesome-5.0.13\css\fa-svg-with-js.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.ttf">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-brands.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-brands.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-regular.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-regular.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.woff2">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-solid.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-solid.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.eot">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fa-v4-shims.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fa-v4-shims.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.ttf">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fontawesome-all.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fontawesome-all.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff">
+    <Content Include="..\SharedContent\fontawesome-5.0.13\js\fontawesome.min.js">
+      <Link>Content\fontawesome-5.0.13\js\fontawesome.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.woff2">
+    <Content Include="..\SharedContent\jquery-3.3.1.min.js">
+      <Link>Content\jquery-3.3.1.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\img\jsoneditor-icons.svg">
+      <Link>Content\jsoneditor-5.15.0\img\jsoneditor-icons.svg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\jsoneditor.min.css">
+      <Link>Content\jsoneditor-5.15.0\jsoneditor.min.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\jsoneditor-5.15.0\jsoneditor.min.js">
+      <Link>Content\jsoneditor-5.15.0\jsoneditor.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\photon_light.ico">
+      <Link>Content\photon_light.ico</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\popper.min.js">
+      <Link>Content\popper.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\SessionOutput.js">
+      <Link>Content\SessionOutput.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
@@ -235,34 +310,64 @@
     <None Include="server.json" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Agents\Edit.html">
+    <Content Include="Content\site.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Agent\Edit.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Agent\EditJson.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Build\Details.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Build\New.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Deployment\New.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Login.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configuration.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Deployments.html">
+    <Content Include="Views\Deployment\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Builds.html">
+    <Content Include="Views\Build\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Packages\Index.html">
+    <Content Include="Views\Session\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Agents\Index.html">
+    <Content Include="Views\Package\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Agent\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Projects\Index.html">
+    <Content Include="Views\Project\Edit.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Project\Json.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Project\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Session\Details.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Variables\Index.html">
+    <Content Include="Views\VariableSet\EditJson.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\VariableSet\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -272,60 +377,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap-grid.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap-reboot.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\css\bootstrap.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\js\bootstrap.bundle.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bootstrap-4.1.0\js\bootstrap.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-brands.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-regular.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fa-solid.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fontawesome-all.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\css\fontawesome.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-brands-400.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-regular-400.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fontawesome-5.0.11\webfonts\fa-solid-900.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\Images\photon_dark.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\jquery-3.3.1.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\photon_light.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\popper.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <UsingTask TaskName="TransformXml" AssemblyFile="..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\tools\VSToolsPath\Web\Microsoft.Web.Publishing.Tasks.dll" />
   <Target Name="App_config_AfterCompile" AfterTargets="AfterCompile" Condition="Exists('App.$(Configuration).config')">
     <!--Generate transformed app config in the intermediate directory-->
     <TransformXml Source="App.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />
@@ -344,5 +401,11 @@
     </PropertyGroup>
     <!--Publish copies the untransformed App.config to deployment directory so overwrite it-->
     <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props'))" />
   </Target>
 </Project>
