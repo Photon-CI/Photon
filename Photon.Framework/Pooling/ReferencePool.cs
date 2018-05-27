@@ -55,9 +55,19 @@ namespace Photon.Framework.Pooling
             itemDictionary[task.SessionId] = task;
         }
 
+        public bool Remove(string id)
+        {
+            return itemDictionary.TryRemove(id, out _);
+        }
+
         public bool TryGet(string id, out T task)
         {
             return itemDictionary.TryGetValue(id, out task);
+        }
+
+        public bool Contains(string id)
+        {
+            return itemDictionary.ContainsKey(id);
         }
 
         private void Timer_OnElapsed(object sender, ElapsedEventArgs e)

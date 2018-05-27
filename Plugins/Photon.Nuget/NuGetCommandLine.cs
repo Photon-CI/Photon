@@ -22,12 +22,6 @@ namespace Photon.NuGetPlugin
 
         public void Pack(string nuspecFilename, string outputPath)
         {
-            var packageName = Path.GetFileName(nuspecFilename);
-
-            Output?.Append("Creating Package ", ConsoleColor.DarkCyan)
-                .Append(packageName, ConsoleColor.Cyan)
-                .AppendLine("...", ConsoleColor.DarkCyan);
-
             try {
                 var path = Path.GetDirectoryName(nuspecFilename);
                 var name = Path.GetFileName(nuspecFilename);
@@ -42,16 +36,8 @@ namespace Photon.NuGetPlugin
 
                 if (result.ExitCode != 0)
                     throw new ApplicationException($"NuGet Pack failed with exit code {result.ExitCode}!");
-
-                Output?.Append("Package ", ConsoleColor.DarkGreen)
-                    .Append(packageName, ConsoleColor.Green)
-                    .AppendLine(" created successfully.", ConsoleColor.DarkGreen);
             }
             catch (Exception error) {
-                Output?.Append("Failed to create package ", ConsoleColor.DarkRed)
-                    .Append(packageName, ConsoleColor.Red)
-                    .AppendLine("!", ConsoleColor.DarkRed)
-                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                 throw;
             }

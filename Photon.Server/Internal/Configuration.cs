@@ -15,7 +15,8 @@ namespace Photon.Server.Internal
         public static int Parallelism => ConfigurationReader.AppSetting("parallelism", 1);
         public static string DownloadUrl => ConfigurationReader.AppSetting("downloadUrl", "http://download.photon.ci");
         private static string ServerFilePath => ConfigurationReader.AppSetting("serverFile", "server.json");
-        private static string ProjectsFilePath => ConfigurationReader.AppSetting("projectsFile", "projects.json");
+        //private static string ProjectsFilePath => ConfigurationReader.AppSetting("projectsFile", "projects.json");
+        private static string ProjectsPath => ConfigurationReader.AppSetting("projects", "Projects");
         private static string WorkPath => ConfigurationReader.AppSetting("work", "Work");
         private static string ProjectDataPath => ConfigurationReader.AppSetting("projectData", "ProjectData");
         private static string ProjectPackagePath => ConfigurationReader.AppSetting("projectPackages", "ProjectPackages");
@@ -26,7 +27,8 @@ namespace Photon.Server.Internal
         private static string HttpViewPath => ConfigurationReader.AppSetting("httpViews", ".\\Views");
 
         public static string ServerFile => FullPath(Directory, ServerFilePath);
-        public static string ProjectsFile => FullPath(Directory, ProjectsFilePath);
+        //public static string ProjectsFile => FullPath(Directory, ProjectsFilePath);
+        public static string ProjectsDirectory => FullPath(Directory, ProjectsPath);
         public static string WorkDirectory => FullPath(Directory, WorkPath);
         public static string ProjectDataDirectory => FullPath(Directory, ProjectDataPath);
         public static string ProjectPackageDirectory => FullPath(Directory, ProjectPackagePath);

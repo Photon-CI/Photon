@@ -69,51 +69,59 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\RootCommands.cs" />
-    <Compile Include="HttpHandlers\Agent\AgentEditHandler.cs" />
-    <Compile Include="HttpHandlers\Agent\AgentEditJsonHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\AgentDeleteHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\AgentVersionHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\JsonHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Build\OutputStreamHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Project\DeleteHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Project\ProjectJsonHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Project\JsonHandler.cs" />
-    <Compile Include="HttpHandlers\Api\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\ListHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\CancelHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\OutputStreamHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Variable\DeleteHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Variable\JsonHandler.cs" />
-    <Compile Include="HttpHandlers\Build\BuildDetailsHandler.cs" />
-    <Compile Include="HttpHandlers\ConfigurationHandler.cs" />
-    <Compile Include="HttpHandlers\Session\SessionIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Package\PackageIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Build\BuildIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Deployment\DeploymentIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\UpdateAgentResultHandler.cs" />
-    <Compile Include="HttpHandlers\Api\GitHub\WebHookHandler.cs" />
-    <Compile Include="HttpHandlers\Api\LogHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Server\UpdateServerStartHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Agent\UpdateAgentStartHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Build\BuildResultHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Deploy\DeployResultHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Session\OutputHandler.cs" />
-    <Compile Include="HttpHandlers\Api\VersionHandler.cs" />
-    <Compile Include="HttpHandlers\Agent\AgentIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Project\ProjectJsonHandler.cs" />
-    <Compile Include="HttpHandlers\Project\ProjectEditHandler.cs" />
-    <Compile Include="HttpHandlers\Project\ProjectIndexHandler.cs" />
-    <Compile Include="HttpHandlers\Session\SessionDetailsHandler.cs" />
-    <Compile Include="HttpHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
-    <Compile Include="HttpHandlers\VariableSet\VariableSetIndexHandler.cs" />
+    <Compile Include="Internal\Projects\ServerProject.cs" />
+    <Compile Include="Internal\ServerViewModel.cs" />
+    <Compile Include="ViewHandlers\Agent\AgentEditHandler.cs" />
+    <Compile Include="ViewHandlers\Agent\AgentEditJsonHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\AgentDeleteHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\AgentVersionHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\JsonHandler.cs" />
+    <Compile Include="ApiHandlers\Build\OutputStreamHandler.cs" />
+    <Compile Include="ApiHandlers\Project\DeleteHandler.cs" />
+    <Compile Include="ApiHandlers\Project\JsonHandler.cs" />
+    <Compile Include="ApiHandlers\ConfigurationHandler.cs" />
+    <Compile Include="ApiHandlers\Session\ListHandler.cs" />
+    <Compile Include="ApiHandlers\Session\CancelHandler.cs" />
+    <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
+    <Compile Include="ApiHandlers\Variable\DeleteHandler.cs" />
+    <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
+    <Compile Include="ViewHandlers\Build\BuildDetailsHandler.cs" />
+    <Compile Include="ViewHandlers\Build\BuildNewHandler.cs" />
+    <Compile Include="ViewHandlers\ConfigurationHandler.cs" />
+    <Compile Include="ViewHandlers\Deployment\DeploymentNewHandler.cs" />
+    <Compile Include="ViewHandlers\LoginHandler.cs" />
+    <Compile Include="ViewHandlers\LogoutHandler.cs" />
+    <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Package\PackageIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Build\BuildIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Deployment\DeploymentIndexHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\UpdateAgentResultHandler.cs" />
+    <Compile Include="ApiHandlers\GitHub\WebHookHandler.cs" />
+    <Compile Include="ApiHandlers\LogHandler.cs" />
+    <Compile Include="ApiHandlers\Server\UpdateServerStartHandler.cs" />
+    <Compile Include="ApiHandlers\Agent\UpdateAgentStartHandler.cs" />
+    <Compile Include="ApiHandlers\Build\BuildResultHandler.cs" />
+    <Compile Include="ApiHandlers\Deploy\DeployResultHandler.cs" />
+    <Compile Include="ApiHandlers\Session\OutputHandler.cs" />
+    <Compile Include="ApiHandlers\VersionHandler.cs" />
+    <Compile Include="ViewHandlers\Agent\AgentIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Project\ProjectJsonHandler.cs" />
+    <Compile Include="ViewHandlers\Project\ProjectEditHandler.cs" />
+    <Compile Include="ViewHandlers\Project\ProjectIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Session\SessionDetailsHandler.cs" />
+    <Compile Include="ViewHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
+    <Compile Include="ViewHandlers\VariableSet\VariableSetIndexHandler.cs" />
     <Compile Include="Internal\Builds\BuildData.cs" />
     <Compile Include="Internal\Builds\BuildDataManager.cs" />
     <Compile Include="Internal\ClientHandshake.cs" />
+    <Compile Include="Internal\Projects\ProjectManager2.cs" />
     <Compile Include="Internal\ServerAgents\ServerAgentManager.cs" />
     <Compile Include="Internal\GitHub\HookEventHandler.cs" />
     <Compile Include="Internal\JsonDynamicDocument.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfiguration.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
+    <Compile Include="Internal\ServerConfiguration\ServerSecurityConfiguration.cs" />
+    <Compile Include="Internal\ServerConfiguration\ServerHttpConfiguration.cs" />
     <Compile Include="Internal\ServerHttpSecurity.cs" />
     <Compile Include="Internal\Sessions\ServerSessionWatch.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
@@ -123,7 +131,6 @@
     <Compile Include="Internal\Projects\ProjectData.cs" />
     <Compile Include="Internal\Projects\ProjectDataManager.cs" />
     <Compile Include="Internal\Projects\ProjectDataLastBuild.cs" />
-    <Compile Include="Internal\Projects\ProjectManager.cs" />
     <Compile Include="Internal\ScriptQueue.cs" />
     <Compile Include="Internal\Sessions\DomainAgentDeploySessionHost.cs" />
     <Compile Include="Internal\Sessions\DomainAgentBuildSessionHost.cs" />
@@ -157,15 +164,19 @@
       <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HttpHandlers\Api\Build\BuildStartHandler.cs" />
-    <Compile Include="HttpHandlers\Api\Deploy\DeployStartHandler.cs" />
-    <Compile Include="HttpHandlers\IndexHandler.cs" />
+    <Compile Include="ApiHandlers\Build\BuildStartHandler.cs" />
+    <Compile Include="ApiHandlers\Deploy\DeployStartHandler.cs" />
+    <Compile Include="ViewHandlers\IndexHandler.cs" />
     <Compile Include="ViewModels\Agent\AgentEditVM.cs" />
     <Compile Include="ViewModels\Agent\AgentEditJsonVM.cs" />
     <Compile Include="ViewModels\Agent\AgentIndexVM.cs" />
     <Compile Include="ViewModels\Build\BuildDetailsVM.cs" />
+    <Compile Include="ViewModels\Build\BuildNewVM.cs" />
     <Compile Include="ViewModels\Build\BuildIndexVM.cs" />
+    <Compile Include="ViewModels\Deployment\DeploymentNewVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
+    <Compile Include="ViewModels\LoginVM.cs" />
+    <Compile Include="ViewModels\Project\ProjectJsonVM.cs" />
     <Compile Include="ViewModels\Project\ProjectEditVM.cs" />
     <Compile Include="ViewModels\Project\ProjectIndexVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
@@ -290,9 +301,7 @@
       <Name>Photon.Library</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewModels\Deployment\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="projects.json" />
     <None Include="server.json" />
@@ -308,6 +317,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Build\Details.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Build\New.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Deployment\New.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Login.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configuration.html">

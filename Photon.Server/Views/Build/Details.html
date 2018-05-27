@@ -47,14 +47,18 @@
 </style>
 {{#EndStyle}}
 
-<div class="bg-secondary mb-4 px-2 py-1">
-    <h2 class="text-light my-0">Build Details <small>{{ProjectName}} #{{BuildNumber}}</small></h2>
-</div>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">
+            <i class="fas fa-cubes"></i> Build Details <small class="text-info pl-3">{{ProjectName}} #{{BuildNumber}}</small>
+        </h3>
+    </div>
+</nav>
 
-<div class="container">
+<div class="container mt-3">
     {{#If Errors}}
     <div class="alert alert-danger">
-        <ul>
+        <ul class="my-0">
             {{#Each Errors.error}}
             <li>{{error.Message}}</li>
             {{#EndEach}}
@@ -113,7 +117,7 @@
                             <tr>
                                 <td>{{package.PackageId}} <span class="text-muted">@</span>{{package.PackageVersion}}</td>
                                 <td class="c-icon">
-                                    <a href="#" class="btn btn-sm btn-primary">
+                                    <a href="{{#Url deployment/new}}?id={{&package.PackageId}}&version={{&package.PackageVersion}}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-play"></i>
                                     </a>
                                 </td>

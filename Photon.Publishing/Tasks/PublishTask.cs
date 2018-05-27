@@ -13,7 +13,7 @@ namespace Photon.Publishing.Tasks
 {
     public class PublishTask : IBuildTask
     {
-        private NuGetCore nugetClient;
+        //private NuGetCore nugetClient;
         private string nugetPackageDir;
         private string nugetApiKey;
         private string nugetExe;
@@ -40,12 +40,12 @@ namespace Photon.Publishing.Tasks
             ftpUser = photonVars["ftp.user"];
             ftpPass = photonVars["ftp.pass"];
 
-            nugetClient = new NuGetCore {
-                EnableV3 = true,
-                Output = Context.Output,
-                ApiKey = nugetApiKey,
-            };
-            nugetClient.Initialize();
+            //nugetClient = new NuGetCore {
+            //    EnableV3 = true,
+            //    Output = Context.Output,
+            //    ApiKey = nugetApiKey,
+            //};
+            //nugetClient.Initialize();
 
             await BuildSolution();
             await PublishServer();
@@ -147,12 +147,16 @@ namespace Photon.Publishing.Tasks
 
         private async Task PublishPackage(string packageId, string packageDefinitionFilename, string assemblyVersion, CancellationToken token)
         {
-            var publisher = new NuGetPackagePublisher(nugetClient) {
-                ExeFilename = nugetExe,
+            var publisher = new NuGetPackagePublisher(Context) {
+                Mode = NugetModes.CommandLine,
                 PackageDirectory = nugetPackageDir,
                 PackageDefinition = packageDefinitionFilename,
                 PackageId = packageId,
                 Version = assemblyVersion,
+                CL = new NuGetCommandLine {
+                    ExeFilename = nugetExe,
+                    ApiKey = nugetApiKey,
+                },
             };
 
             await publisher.PublishAsync(token);

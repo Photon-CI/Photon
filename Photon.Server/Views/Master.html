@@ -95,6 +95,16 @@
                             Configuration
                         </a>
                     </li>
+                    {{#If SecurityEnabled}}
+                    <li class="nav-item">
+                        <a href="{{#Url Logout}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-lock"></i>
+                            </div>
+                            Sign Out
+                        </a>
+                    </li>
+                    {{#EndIf}}
                 </ul>
             </div>
         </div>

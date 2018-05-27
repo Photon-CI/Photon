@@ -57,22 +57,25 @@
         line-height: 28px;
         height: 28px;
     }
-    tbody td > i {
-        float: left;
-        line-height: 28px;
-        margin-left: 4px;
-        margin-right: 4px;
-    }
-    tbody td .refspec {
-        padding-left: 8px;
-    }
-    tbody td .cancel {
-        float: right;
-        height: 28px;
-        line-height: 28px;
-        margin-right: 4px;
-        padding: 0 6px;
-    }
+
+        tbody td > i {
+            float: left;
+            line-height: 28px;
+            margin-left: 4px;
+            margin-right: 4px;
+        }
+
+        tbody td .refspec {
+            padding-left: 8px;
+        }
+
+        tbody td .cancel {
+            float: right;
+            height: 28px;
+            line-height: 28px;
+            margin-right: 4px;
+            padding: 0 6px;
+        }
 
     [data-session-template] {
         display: none;
@@ -80,19 +83,21 @@
 </style>
 {{#EndStyle}}
 
-<div class="bg-secondary mb-4 px-2 py-1">
-    <h2 class="text-light my-0">Sessions</h2>
-</div>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Sessions</h3>
+    </div>
+</nav>
 
 <div class="container">
     <table class="table" data-session-list>
         <thead>
-        <tr>
-            <td class="h4 text-center">
-                <i class="fas fa-spinner fa-spin text-muted" data-status-icon></i>
-                <span class="text-muted" data-status-text>Loading...</span>
-            </td>
-        </tr>
+            <tr>
+                <td class="h4 text-center">
+                    <i class="fas fa-spinner fa-spin text-muted" data-status-icon></i>
+                    <span class="text-muted" data-status-text>Loading...</span>
+                </td>
+            </tr>
         </thead>
         <tbody>
             <tr data-session-template="build">

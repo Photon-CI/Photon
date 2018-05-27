@@ -8,6 +8,87 @@
 </script>
 {{#EndScript}}
 
-<div class="bg-secondary mb-4 px-2 py-1">
-    <h2 class="text-light my-0">Configuration</h2>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Configuration</h3>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li id="ApplicationTabLink" class="nav-item">
+                    <a class="nav-link active" href="#application" data-toggle="tab" role="tab">Application</a>
+                </li>
+                <li id="SystemTabLink" class="nav-item">
+                    <a class="nav-link" href="#system" data-toggle="tab" role="tab">System</a>
+                </li>
+                <li id="NetworkTabLink" class="nav-item">
+                    <a class="nav-link" href="#network" data-toggle="tab" role="tab">Network</a>
+                </li>
+                <li id="SecurityTabLink" class="nav-item">
+                    <a class="nav-link" href="#security" data-toggle="tab" role="tab">Security</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <div id="application" class="tab-pane fade show active" role="tabpanel">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td style="width: 40%">Server Version</td>
+                                <td>{{ServerVersion}}</td>
+                            </tr>
+                            <tr>
+                                <td>Architecture</td>
+                                <td>{{ProcessArchitecture}}</td>
+                            </tr>
+                            <tr>
+                                <td>HTTP URL</td>
+                                <td>{{ServerHttpUrl}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="system" class="tab-pane fade" role="tabpanel">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td style="width: 40%">Operating System</td>
+                                <td>{{OsDescription}}</td>
+                            </tr>
+                            <tr>
+                                <td>Architecture</td>
+                                <td>{{OsArchitecture}}</td>
+                            </tr>
+                            <tr>
+                                <td>Processor Count</td>
+                                <td>{{MachineProcessorCount}}</td>
+                            </tr>
+                            <tr>
+                                <td>Machine Name</td>
+                                <td>{{MachineName}}</td>
+                            </tr>
+                            <tr>
+                                <td>Framework</td>
+                                <td>{{FrameworkDescription}}</td>
+                            </tr>
+                            <tr>
+                                <td>CLR Version</td>
+                                <td>{{MachineClrVersion}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="network" class="tab-pane fade" role="tabpanel">
+                    ...
+                </div>
+                <div id="security" class="tab-pane fade" role="tabpanel">
+                    ...
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

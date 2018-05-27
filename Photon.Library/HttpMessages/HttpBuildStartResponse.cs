@@ -6,5 +6,8 @@ namespace Photon.Library.HttpMessages
     {
         [JsonProperty("sessionId")]
         public string SessionId {get; set;}
+
+        [JsonProperty("buildNumber")]
+        public uint BuildNumber {get; set;}
     }
 }

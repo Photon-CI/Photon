@@ -59,17 +59,17 @@ namespace Photon.Server.Internal.Projects
             projectsDocument.Update(d => Document_OnUpdate(d, project, prevId));
         }
 
-        public static object GetSource(dynamic source, string type)
-        {
-            switch (type.ToLower()) {
-                case "github":
-                    return (ProjectGithubSource)source.ToObject<ProjectGithubSource>();
-                case "fs":
-                    return (ProjectFileSystemSource)source?.ToObject<ProjectFileSystemSource>();
-                default:
-                    throw new ApplicationException($"Unknown source type '{type}'!");
-            }
-        }
+        //public static object GetSource(dynamic source, string type)
+        //{
+        //    switch (type.ToLower()) {
+        //        case "github":
+        //            return (ProjectGithubSource)source.ToObject<ProjectGithubSource>();
+        //        case "fs":
+        //            return (ProjectFileSystemSource)source?.ToObject<ProjectFileSystemSource>();
+        //        default:
+        //            throw new ApplicationException($"Unknown source type '{type}'!");
+        //    }
+        //}
 
         private void Document_OnLoad(JToken document)
         {

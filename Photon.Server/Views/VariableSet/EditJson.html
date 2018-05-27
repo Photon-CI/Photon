@@ -75,7 +75,7 @@
 </script>
 {{#If SetId}}
 <script>
-    $(function() {
+    $(function () {
         onLoad();
     });
 </script>
@@ -93,31 +93,27 @@
         flex-direction: column;
         flex-wrap: nowrap;
     }
-
     #jsoneditor {
         flex: 1;
     }
 </style>
 {{#EndStyle}}
 
-<div class="bg-dark">
-    <div class="row">
-        <div class="col-12 clearfix">
-            <div class="float-right" style="padding: 4px">
-                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#DeleteModal">
-                    Delete <i class="fas fa-trash"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#SaveModal">
-                    Save <i class="fas fa-save"></i>
-                </button>
-            </div>
-            <a href="{{#Url variables}}" class="btn btn-sm btn-secondary float-left" style="margin: 4px">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-            <h4 class="text-light" style="line-height: 36px; margin: 0">Edit Variable Set JSON</h4>
-        </div>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Variable Set</h3>
     </div>
-</div>
+    <div class="form-inline">
+        {{#If !IsNew}}
+        <button type="button" class="btn btn-sm btn-danger my-2 my-sm-0 mr-2" data-toggle="modal" data-target="#DeleteModal">
+            Delete <i class="fas fa-trash"></i>
+        </button>
+        {{#EndIf}}
+        <button type="button" class="btn btn-sm btn-primary my-2 my-sm-0" data-toggle="modal" data-target="#SaveModal">
+            Save <i class="fas fa-save"></i>
+        </button>
+    </div>
+</nav>
 
 <input id="SetId" type="hidden" value="{{SetId}}" />
 <div id="jsoneditor"></div>

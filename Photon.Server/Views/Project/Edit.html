@@ -22,14 +22,27 @@
 {{#Style}}
 <style>
     .layout-content {
-        padding: 12px 0;
+        padding: 0 0 12px 0;
     }
 </style>
 {{#EndStyle}}
 
-<div class="container">
-    <h4>{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Project</h4>
-    <hr style="margin: 2px 0 8px 0" />
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Project</h3>
+    </div>
+    {{#If !IsNew}}
+    <ul class="navbar-nav">
+        <li class="nav-item px-2">
+            <a href="{{#Url project/json}}?id={{&ProjectId_Source}}" class="nav-link">
+                Json <i class="fas fa-code"></i>
+            </a>
+        </li>
+    </ul>
+    {{#EndIf}}
+</nav>
+
+<div class="container pt-3">
     {{#If Errors}}
     <div class="alert alert-danger">
         <ul>
@@ -40,7 +53,7 @@
     </div>
     {{#EndIf}}
     <form method="post">
-        <input name="ProjectId_Source" type="hidden" value="{{ProjectId}}" />
+        <input name="ProjectId_Source" type="hidden" value="{{ProjectId_Source}}" />
         <div class="form-row">
             <div class="form-group col-12 col-md-4">
                 <label for="ProjectIdTextBox">ID</label>

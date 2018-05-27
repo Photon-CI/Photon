@@ -1,11 +1,10 @@
-﻿using System.Linq;
-using Photon.Framework.Server;
-using Photon.Library;
+﻿using Photon.Framework.Server;
 using Photon.Server.Internal;
+using System.Linq;
 
 namespace Photon.Server.ViewModels.Agent
 {
-    internal class AgentIndexVM : ViewModelBase
+    internal class AgentIndexVM : ServerViewModel
     {
         public ServerAgent[] Agents {get; set;}
 

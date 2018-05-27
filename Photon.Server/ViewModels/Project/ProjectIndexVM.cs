@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Photon.Server.Internal;
+using System.Collections.Generic;
 using System.Linq;
-using Photon.Library;
-using Photon.Server.Internal;
 
 namespace Photon.Server.ViewModels.Project
 {
-    internal class ProjectIndexVM : ViewModelBase
+    internal class ProjectIndexVM : ServerViewModel
     {
         public List<Framework.Projects.Project> Projects {get; set;}
 
@@ -17,7 +16,8 @@ namespace Photon.Server.ViewModels.Project
 
         public void Build()
         {
-            Projects = PhotonServer.Instance.Projects.All.ToList();
+            Projects = PhotonServer.Instance.Projects.All
+                .Select(x => x.Description).ToList();
         }
     }
 }

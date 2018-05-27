@@ -19,7 +19,7 @@
         onLoad();
     });
 
-    var projectsJsonUrl = '{{#Url api/projects/json}}';
+    var projectsJsonUrl = '{{#Url api/project/json}}?id={{&ProjectId}}';
 
     function onLoad() {
         $.ajax({
@@ -63,33 +63,34 @@
         flex-direction: column;
         flex-wrap: nowrap;
     }
+
     #jsoneditor {
         flex: 1;
     }
 </style>
 {{#EndStyle}}
 
-<div class="bg-dark">
-    <div class="row">
-        <div class="col-12 clearfix">
-            <div class="float-right" style="padding: 4px">
-                <a href="{{#Url api/projects}}" target="_blank" class="btn btn-sm btn-secondary">
-                    Download <i class="fas fa-download"></i>
-                </a>
-                <button type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#ImportProjectsModal">
-                    Upload <i class="fas fa-upload"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-primary" onclick="onSave()">
-                    Save <i class="fas fa-save"></i>
-                </button>
-            </div>
-            <a href="{{#Url projects}}" class="btn btn-sm btn-secondary float-left" style="margin: 4px">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-            <h4 class="text-light" style="line-height: 36px; margin: 0">Edit Projects.json</h4>
-        </div>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Edit Project</h3>
     </div>
-</div>
+    <div class="form-inline">
+        {{#If !IsNew}}
+        <button type="button" class="btn btn-sm btn-danger my-2 my-sm-0 mr-2" data-toggle="modal" data-target="#DeleteModal">
+            Delete <i class="fas fa-trash"></i>
+        </button>
+        {{#EndIf}}
+        <!--<a href="{{#Url api/projects}}" target="_blank" class="btn btn-sm btn-secondary">
+            Download <i class="fas fa-download"></i>
+        </a>
+        <button type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#ImportProjectsModal">
+            Upload <i class="fas fa-upload"></i>
+        </button>-->
+        <button type="button" class="btn btn-sm btn-primary my-2 my-sm-0" onclick="onSave()">
+            Save <i class="fas fa-save"></i>
+        </button>
+    </div>
+</nav>
 
 <div id="jsoneditor"></div>
 

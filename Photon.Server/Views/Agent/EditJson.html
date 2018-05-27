@@ -65,20 +65,20 @@
 </style>
 {{#EndStyle}}
 
-<div class="bg-dark">
-    <div class="row">
-        <div class="col-12 clearfix">
-            <div class="float-right" style="padding: 4px">
-                <button type="button" class="btn btn-sm btn-primary" onclick="onSave()">
-                    Save <i class="fas fa-save"></i>
-                </button>
-            </div>
-            <a href="{{#Url agent/edit}}?id={{&AgentId}}" class="btn btn-sm btn-secondary float-left" style="margin: 4px">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-            <h4 class="text-light" style="line-height: 36px; margin: 0">Edit Agent JSON</h4>
-        </div>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Edit Agent JSON</h3>
     </div>
-</div>
+    <div class="form-inline">
+        <!--{{#If !IsNew}}
+        <button type="button" class="btn btn-sm btn-danger my-2 my-sm-0 mr-2" data-toggle="modal" data-target="#DeleteModal">
+            Delete <i class="fas fa-trash"></i>
+        </button>
+        {{#EndIf}}-->
+        <button type="button" class="btn btn-sm btn-primary my-2 my-sm-0" onclick="onSave()">
+            Save <i class="fas fa-save"></i>
+        </button>
+    </div>
+</nav>
 
 <div id="jsoneditor"></div>

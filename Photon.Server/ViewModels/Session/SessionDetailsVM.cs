@@ -1,8 +1,8 @@
-﻿using Photon.Library;
+﻿using Photon.Server.Internal;
 
 namespace Photon.Server.ViewModels.Session
 {
-    internal class SessionDetailsVM : ViewModelBase
+    internal class SessionDetailsVM : ServerViewModel
     {
         public string SessionId {get; set;}
     }

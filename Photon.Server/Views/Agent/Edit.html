@@ -62,7 +62,7 @@
 {{#Style}}
 <style>
     .layout-content {
-        padding: 12px 0;
+        padding: 0  0 12px 0;
     }
     .roles-header {
         padding: 2px;
@@ -89,14 +89,22 @@
 </style>
 {{#EndStyle}}
 
-<div class="container">
-    <div class="float-right">
-        <a href="{{#Url agent/edit/json}}?id={{&AgentId}}">
-            Edit JSON <i class="fas fa-code"></i>
-        </a>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Agent</h3>
     </div>
-    <h4>{{#If IsNew}}New{{#Else}}Edit{{#EndIf}} Agent</h4>
-    <hr style="margin: 2px 0 8px 0" />
+    <ul class="navbar-nav">
+        {{#If !IsNew}}
+        <li class="nav-item px-2">
+            <a href="{{#Url agent/edit/json}}?id={{&AgentId}}" class="nav-link">
+                JSON <i class="fas fa-code"></i>
+            </a>
+        </li>
+        {{#EndIf}}
+    </ul>
+</nav>
+
+<div class="container mt-3">
     {{#If Errors}}
     <div class="alert alert-danger">
         <ul>

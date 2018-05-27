@@ -4,7 +4,7 @@ namespace Photon.Framework.Pooling
 {
     public abstract class LifespanReferenceItem : IReferenceItem
     {
-        private readonly DateTime utcStarted;
+        private DateTime utcStarted;
 
         public string SessionId {get;}
         public TimeSpan Lifespan {get; set;}
@@ -20,6 +20,11 @@ namespace Photon.Framework.Pooling
         {
             var elapsed = DateTime.UtcNow - utcStarted;
             return elapsed > Lifespan;
+        }
+
+        public virtual void Restart()
+        {
+            utcStarted = DateTime.UtcNow;
         }
     }
 }

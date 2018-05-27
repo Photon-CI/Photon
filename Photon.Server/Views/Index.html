@@ -8,63 +8,65 @@
 </script>
 {{#EndScript}}
 
-<div class="bg-secondary mb-4 px-2 py-1">
-    <h2 class="text-light my-0">{{ServerName}}</h2>
-</div>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">{{ServerName}}</h3>
+    </div>
+</nav>
 
-<div class="container">
+<div class="container mt-3">
     <table class="table table-sm">
         <thead class="thead-light">
-        <tr>
-            <th colspan="2">Server</th>
-        </tr>
+            <tr>
+                <th colspan="2">Server</th>
+            </tr>
         </thead>
         <tbody>
-        <tr>
-            <td style="width: 40%">Server Version</td>
-            <td>{{ServerVersion}}</td>
-        </tr>
-        <tr>
-            <td>Architecture</td>
-            <td>{{ProcessArchitecture}}</td>
-        </tr>
-        <tr>
-            <td>HTTP URL</td>
-            <td>{{ServerHttpUrl}}</td>
-        </tr>
+            <tr>
+                <td style="width: 40%">Server Version</td>
+                <td>{{ServerVersion}}</td>
+            </tr>
+            <tr>
+                <td>Architecture</td>
+                <td>{{ProcessArchitecture}}</td>
+            </tr>
+            <tr>
+                <td>HTTP URL</td>
+                <td>{{ServerHttpUrl}}</td>
+            </tr>
         </tbody>
     </table>
     <table class="table table-sm">
         <thead class="thead-light">
-        <tr>
-            <th colspan="2">Machine</th>
-        </tr>
+            <tr>
+                <th colspan="2">Machine</th>
+            </tr>
         </thead>
         <tbody>
-        <tr>
-            <td style="width: 40%">Operating System</td>
-            <td>{{OsDescription}}</td>
-        </tr>
-        <tr>
-            <td>Architecture</td>
-            <td>{{OsArchitecture}}</td>
-        </tr>
-        <tr>
-            <td>Processor Count</td>
-            <td>{{MachineProcessorCount}}</td>
-        </tr>
-        <tr>
-            <td>Machine Name</td>
-            <td>{{MachineName}}</td>
-        </tr>
-        <tr>
-            <td>Framework</td>
-            <td>{{FrameworkDescription}}</td>
-        </tr>
-        <tr>
-            <td>CLR Version</td>
-            <td>{{MachineClrVersion}}</td>
-        </tr>
+            <tr>
+                <td style="width: 40%">Operating System</td>
+                <td>{{OsDescription}}</td>
+            </tr>
+            <tr>
+                <td>Architecture</td>
+                <td>{{OsArchitecture}}</td>
+            </tr>
+            <tr>
+                <td>Processor Count</td>
+                <td>{{MachineProcessorCount}}</td>
+            </tr>
+            <tr>
+                <td>Machine Name</td>
+                <td>{{MachineName}}</td>
+            </tr>
+            <tr>
+                <td>Framework</td>
+                <td>{{FrameworkDescription}}</td>
+            </tr>
+            <tr>
+                <td>CLR Version</td>
+                <td>{{MachineClrVersion}}</td>
+            </tr>
         </tbody>
     </table>
 </div>

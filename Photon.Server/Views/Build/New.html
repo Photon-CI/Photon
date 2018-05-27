@@ -1,0 +1,85 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    var buildStartUrl = '{{#Url api/build/start}}';
+    var buildDetailsUrl = '{{#Url build/details}}';
+
+    $(function () {
+        $('#layoutNavbarContent [data-link="builds"]').addClass('active');
+    });
+
+    function onSubmit() {
+        $('#ErrorContainer').empty();
+
+        var projectId = $('#ProjectSelect').val();
+        var gitRefspec = $('#RefspecText').val();
+        var taskName = $('#TaskNameText').val();
+
+        var request = {
+            project: projectId,
+            refspec: gitRefspec,
+            task: taskName
+        };
+
+        $.ajax({
+            url: buildStartUrl,
+            method: 'POST',
+            data: JSON.stringify(request)
+        }).done(function (data) {
+            var buildNumber = data.buildNumber;
+
+            document.location = buildDetailsUrl
+                + '?project=' + encodeURIComponent(projectId)
+                + '&number=' + encodeURIComponent(buildNumber);
+        }).fail(function() {
+            $('#ErrorContainer').append($('<div>')
+                .attr('class', 'alert alert-danger')
+                .append("Failed to start build!"));
+        });
+    }
+</script>
+{{#EndScript}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">
+            <i class="fas fa-cubes"></i> New Build
+        </h3>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    <div id="ErrorContainer"></div>
+    <div class="row">
+        <div class="col-12 form-group">
+            <label for="ProjectSelect">Project</label>
+            <select id="ProjectSelect" class="form-control">
+                {{#Each Projects.project}}
+                <option value="{{project.Id}}">{{project.Name}}</option>
+                {{#EndEach}}
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 form-group">
+            <label for="RefspecText">Git Refspec</label>
+            <input id="RefspecText" type="text" class="form-control" value="master" autocomplete="true" spellcheck="false" />
+            <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 form-group">
+            <label for="TaskNameText">Task Name</label>
+            <input id="TaskNameText" type="text" class="form-control" autocomplete="true" spellcheck="false" />
+            <small class="text-muted">The name of the <i>IBuildTask</i> method to run.</small>
+        </div>
+    </div>
+    <hr />
+    <div class="float-right">
+        <a href="#" class="btn btn-dark">Cancel</a>
+        <button type="button" class="btn btn-success">
+            Build <i class="fas fa-play"></i>
+        </button>
+    </div>
+</div>

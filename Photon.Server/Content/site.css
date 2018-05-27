@@ -17,6 +17,10 @@ nav.sidebar {
     transition: margin 200ms ease-out, width 200ms ease-out;
 }
 
+.content-navbar {
+    padding: 2px 8px 1px 8px;
+}
+
 .nav-item-iconholder {
     float: right;
     text-align: center;

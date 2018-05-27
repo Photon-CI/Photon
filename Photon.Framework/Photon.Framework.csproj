@@ -103,7 +103,6 @@
     <Compile Include="Domain\TypeRegistry.cs" />
     <Compile Include="Server\ScriptOutput.cs" />
     <Compile Include="Server\ServerDeployContext.cs" />
-    <Compile Include="ServerHttpDefinition.cs" />
     <Compile Include="Agent\AgentBuildContext.cs" />
     <Compile Include="Agent\AgentDeployContext.cs" />
     <Compile Include="Tasks\DeployTaskRegistry.cs" />

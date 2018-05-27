@@ -1,11 +1,10 @@
 ﻿using Photon.Framework.Packages;
-using Photon.Library;
 using Photon.Server.Internal;
 using System;
 
 namespace Photon.Server.ViewModels.Build
 {
-    internal class BuildDetailsVM : ViewModelBase
+    internal class BuildDetailsVM : ServerViewModel
     {
         public string ProjectId {get; set;}
         public string ProjectName {get; set;}
@@ -19,7 +18,7 @@ namespace Photon.Server.ViewModels.Build
         public void Build()
         {
             if (!string.IsNullOrEmpty(ProjectId) && PhotonServer.Instance.Projects.TryGet(ProjectId, out var project)) {
-                ProjectName = project.Name;
+                ProjectName = project.Description.Name;
             }
             else {
                 Errors.Add(new ApplicationException($"Project '{ProjectId}' not found!"));

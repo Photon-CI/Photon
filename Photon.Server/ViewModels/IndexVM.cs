@@ -1,12 +1,11 @@
 ﻿using Photon.Framework;
-using Photon.Library;
 using Photon.Server.Internal;
 using System;
 using System.Runtime.InteropServices;
 
 namespace Photon.Server.ViewModels
 {
-    internal class IndexVM : ViewModelBase
+    internal class IndexVM : ServerViewModel
     {
         public string ServerName {get; set;}
         public string ServerVersion {get; set;}

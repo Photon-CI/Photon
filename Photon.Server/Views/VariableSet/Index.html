@@ -54,36 +54,30 @@
 </style>
 {{#EndStyle}}
 
-<div class="bg-secondary mb-2 px-2 py-1">
-    <h2 class="text-light my-0">Variables</h2>
-</div>
-
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark rounded mb-2 mx-2">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#variablesNavbarMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="variablesNavbarMenu">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a href="{{#Url variable/edit/json}}" class="nav-link">
-                    <i class="fas fa-plus"></i> New Variable Set
-                </a>
-            </li>
-        </ul>
-        <div class="form-inline">
-            <div class="input-group">
-                <input id="SearchTextBox" type="text" class="form-control" />
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <i class="fas fa-search"></i>
-                    </div>
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">Variables</h3>
+    </div>
+    <ul class="navbar-nav">
+        <li class="nav-item px-2">
+            <a href="{{#Url variable/edit/json}}" class="nav-link">
+                New <i class="fas fa-plus"></i>
+            </a>
+        </li>
+    </ul>
+    <div class="form-inline">
+        <div class="input-group input-group-sm">
+            <input id="SearchTextBox" type="text" class="form-control" />
+            <div class="input-group-append">
+                <div class="input-group-text">
+                    <i class="fas fa-search"></i>
                 </div>
             </div>
         </div>
     </div>
 </nav>
 
-<div class="container-fluid">
+<div class="container-fluid mt-3">
     <div class="row no-gutters card-container">
         {{#Each Sets.set}}
         <div class="col-12 col-sm-6 col-md-4 col-lg-3" data-card-name="{{set.Id}}">

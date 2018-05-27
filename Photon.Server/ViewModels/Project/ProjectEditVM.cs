@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Photon.Server.Internal;
+using Photon.Server.Internal.Projects;
+using System;
 using System.Collections.Specialized;
-using Photon.Library;
-using Photon.Server.Internal;
 
 namespace Photon.Server.ViewModels.Project
 {
-    internal class ProjectEditVM : ViewModelBase
+    internal class ProjectEditVM : ServerViewModel
     {
         public string ProjectId_Source {get; set;}
         public string ProjectId {get; set;}
         public string ProjectName {get; set;}
         public string ProjectDescription {get; set;}
-        public bool IsNew {get; set;}
+
+        public bool IsNew => string.IsNullOrEmpty(ProjectId_Source);
 
 
         public void Restore(NameValueCollection form)
@@ -24,14 +25,13 @@ namespace Photon.Server.ViewModels.Project
 
         public void Build()
         {
-            IsNew = string.IsNullOrEmpty(ProjectId);
-
-            if (IsNew) {
-                ProjectId_Source = ProjectId = Guid.NewGuid().ToString("D");
+            if (string.IsNullOrEmpty(ProjectId)) {
+                ProjectId_Source = null;
+                ProjectId = Guid.NewGuid().ToString("D");
                 ProjectName = "New Project";
                 ProjectDescription = "";
             }
-            else if (PhotonServer.Instance.Projects.TryGet(ProjectId, out var project)) {
+            else if (PhotonServer.Instance.Projects.TryGetDescription(ProjectId, out var project)) {
                 ProjectId_Source = ProjectId = project.Id;
                 ProjectName = project.Name;
                 ProjectDescription = project.Description;
@@ -40,17 +40,25 @@ namespace Photon.Server.ViewModels.Project
 
         public void Save()
         {
-            if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out var project))
-                project = new Framework.Projects.Project {Id = ProjectId};
+            ServerProject project;
 
-            project.Name = ProjectName;
-            project.Description = ProjectDescription;
+            if (string.IsNullOrEmpty(ProjectId_Source)) {
+                project = PhotonServer.Instance.Projects.New(ProjectId);
+            }
+            else {
+                if (!string.Equals(ProjectId_Source, ProjectId, StringComparison.OrdinalIgnoreCase)) {
+                    if (!PhotonServer.Instance.Projects.Rename(ProjectId_Source, ProjectId))
+                        throw new ApplicationException($"Failed to rename project '{ProjectId}'!");
+                }
 
-            string prevId = null;
-            if (!string.Equals(ProjectId_Source, ProjectId, StringComparison.Ordinal))
-                prevId = ProjectId_Source;
+                if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out project))
+                    throw new ApplicationException($"Project '{ProjectId}' not found!");
+            }
 
-            PhotonServer.Instance.Projects.Save(project, prevId);
+            project.Description.Name = ProjectName;
+            project.Description.Description = ProjectDescription;
+
+            project.Save();
         }
     }
 }

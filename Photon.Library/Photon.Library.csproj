@@ -67,7 +67,10 @@
     <Compile Include="HttpMessages\HttpBuildStartResponse.cs" />
     <Compile Include="HttpMessages\HttpPackageIndex.cs" />
     <Compile Include="HttpMessages\HttpPackageReference.cs" />
-    <Compile Include="HttpSecurity\HttpSecurityManager.cs" />
+    <Compile Include="HttpSecurity\HttpUserContext.cs" />
+    <Compile Include="HttpSecurity\HttpUserCredentials.cs" />
+    <Compile Include="HttpSecurity\IAuthorize.cs" />
+    <Compile Include="HttpSecurity\LdapAuthorization.cs" />
     <Compile Include="ILibraryAssembly.cs" />
     <Compile Include="LazyAsync.cs" />
     <Compile Include="Packages\ApplicationPackageManager.cs" />

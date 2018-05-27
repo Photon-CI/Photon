@@ -1,12 +1,11 @@
-﻿using Photon.Library;
-using Photon.Server.Internal;
+﻿using Photon.Server.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Photon.Server.ViewModels.Build
 {
-    internal class BuildIndexVM : ViewModelBase
+    internal class BuildIndexVM : ServerViewModel
     {
         public BuildRow[] Builds {get; set;}
 
@@ -16,10 +15,10 @@ namespace Photon.Server.ViewModels.Build
             var allBuilds = new List<BuildRow>();
 
             foreach (var projectData in PhotonServer.Instance.ProjectData.AllData) {
-                var projectName = "<unknown>";
+                string projectName = null;
 
                 if (PhotonServer.Instance.Projects.TryGet(projectData.ProjectId, out var project))
-                    projectName = project.Name;
+                    projectName = project.Description.Name;
 
                 allBuilds.AddRange(projectData.Builds.AllBuilds.Select(projectBuild => new BuildRow {
                     ProjectId = projectData.ProjectId,
@@ -29,7 +28,8 @@ namespace Photon.Server.ViewModels.Build
                 }));
             }
 
-            Builds = allBuilds.OrderByDescending(x => x.Number).ToArray();
+            Builds = allBuilds.OrderByDescending(x => x.Created)
+                .ThenByDescending(x => x.Number).ToArray();
         }
     }
 

@@ -1,0 +1,11 @@
+[Unit]
+Description=OmniView Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/mono /home/pi/OmniView/bin/OmniView.Server.exe
+WorkingDirectory=/home/pi/OmniView/bin
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

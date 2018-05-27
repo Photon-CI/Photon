@@ -2,6 +2,7 @@
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Library;
+using Photon.Library.HttpSecurity;
 using Photon.Library.Packages;
 using Photon.Library.Variables;
 using Photon.Server.Internal.Projects;
@@ -25,7 +26,7 @@ namespace Photon.Server.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public ProjectManager Projects {get;}
+        public ProjectManager2 Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
@@ -40,7 +41,7 @@ namespace Photon.Server.Internal
 
         public PhotonServer()
         {
-            Projects = new ProjectManager();
+            Projects = new ProjectManager2();
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();
@@ -163,6 +164,9 @@ namespace Photon.Server.Internal
 
         private void StartHttpServer()
         {
+            var enableSecurity = ServerConfiguration.Value.Security?.Enabled ?? false;
+            var http = ServerConfiguration.Value.Http;
+
             var contentDir = new ContentDirectory {
                 DirectoryPath = Configuration.HttpContentDirectory,
                 UrlPath = "/Content/",
@@ -173,16 +177,21 @@ namespace Photon.Server.Internal
                 UrlPath = "/SharedContent/",
             };
 
-            var http = ServerConfiguration.Value.Http;
-
             var context = new HttpReceiverContext {
-                SecurityMgr = new ServerHttpSecurity(),
                 ListenerPath = http.Path,
                 ContentDirectories = {
                     contentDir,
                     sharedContentDir,
                 },
             };
+
+            if (enableSecurity) {
+                var ldapAuth = new LdapAuthorization();
+
+                context.SecurityMgr = new ServerHttpSecurity {
+                    Authorization = ldapAuth,
+                };
+            }
 
             context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
@@ -201,7 +210,7 @@ namespace Photon.Server.Internal
             try {
                 receiver.Start();
 
-                Log.Info($"HTTP Server listening at {httpPrefix}");
+                Log.Debug($"HTTP Server listening at {httpPrefix}");
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);

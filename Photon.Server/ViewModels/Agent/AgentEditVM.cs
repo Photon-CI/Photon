@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Specialized;
-using Photon.Framework.Extensions;
+﻿using Photon.Framework.Extensions;
 using Photon.Framework.Server;
-using Photon.Library;
 using Photon.Server.Internal;
+using System;
+using System.Collections.Specialized;
 
 namespace Photon.Server.ViewModels.Agent
 {
-    internal class AgentEditVM : ViewModelBase
+    internal class AgentEditVM : ServerViewModel
     {
         public string AgentId_Source {get; set;}
         public string AgentId {get; set;}

@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Photon.Library;
-using Photon.Server.Internal;
+﻿using Photon.Server.Internal;
+using System.Collections.Generic;
 
 namespace Photon.Server.ViewModels.VariableSet
 {
@@ -9,7 +8,7 @@ namespace Photon.Server.ViewModels.VariableSet
         public string Id {get; set;}
     }
 
-    internal class VariablesIndexVM : ViewModelBase
+    internal class VariablesIndexVM : ServerViewModel
     {
         public List<VariableSet> Sets {get; set;}
 
