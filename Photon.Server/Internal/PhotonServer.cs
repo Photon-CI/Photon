@@ -26,7 +26,7 @@ namespace Photon.Server.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public ProjectManager2 Projects {get;}
+        public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
@@ -41,7 +41,7 @@ namespace Photon.Server.Internal
 
         public PhotonServer()
         {
-            Projects = new ProjectManager2();
+            Projects = new ProjectManager();
             Sessions = new ServerSessionManager();
             ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();

@@ -44,6 +44,8 @@ namespace Photon.Server.ApiHandlers.Project
                 await HttpContext.Request.InputStream.CopyToAsync(fileStream);
             }
 
+            project.Load();
+
             return Response.Ok();
         }
     }

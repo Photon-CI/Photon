@@ -1,9 +1,13 @@
 ﻿using log4net;
-using Newtonsoft.Json.Linq;
 using Photon.Framework.Projects;
+using Photon.Library;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Photon.Server.Internal.Projects
 {
@@ -11,126 +15,132 @@ namespace Photon.Server.Internal.Projects
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectManager));
 
-        private readonly JsonDynamicDocument projectsDocument;
-        private readonly ConcurrentDictionary<string, Project> projectsCollection;
+        private readonly ConcurrentDictionary<string, ServerProject> projectsCollection;
 
-        public IEnumerable<Project> All => projectsCollection.Values;
+        public IEnumerable<ServerProject> All => projectsCollection.Values;
 
 
         public ProjectManager()
         {
-            projectsDocument = new JsonDynamicDocument {
-                Filename = Configuration.ProjectsFile,
-            };
-
-            projectsCollection = new ConcurrentDictionary<string, Project>();
+            projectsCollection = new ConcurrentDictionary<string, ServerProject>();
         }
 
-        public bool TryGet(string projectId, out Project project)
+        public bool TryGet(string projectId, out ServerProject project)
         {
             return projectsCollection.TryGetValue(projectId, out project);
         }
 
-        public void Load()
+        public bool TryGetDescription(string projectId, out Project projectDescription)
         {
-            projectsDocument.Load(Document_OnLoad);
-        }
-
-        public void Remove(string id)
-        {
-            projectsCollection.TryRemove(id, out var _);
-
-            projectsDocument.Remove(d => Document_OnRemove(d, id));
-        }
-
-        public void Save(Project project, string prevId = null)
-        {
-            if (prevId != null) {
-                projectsCollection.TryRemove(prevId, out var _);
+            if (projectsCollection.TryGetValue(projectId, out var project)) {
+                projectDescription = project.Description;
+                return true;
             }
 
-            projectsCollection.AddOrUpdate(project.Id, project, (k, a) => {
-                a.Id = project.Id;
-                a.Name = project.Name;
-                a.Description = project.Description;
-                return a;
-            });
-
-            projectsDocument.Update(d => Document_OnUpdate(d, project, prevId));
+            projectDescription = null;
+            return false;
         }
 
-        //public static object GetSource(dynamic source, string type)
-        //{
-        //    switch (type.ToLower()) {
-        //        case "github":
-        //            return (ProjectGithubSource)source.ToObject<ProjectGithubSource>();
-        //        case "fs":
-        //            return (ProjectFileSystemSource)source?.ToObject<ProjectFileSystemSource>();
-        //        default:
-        //            throw new ApplicationException($"Unknown source type '{type}'!");
-        //    }
-        //}
-
-        private void Document_OnLoad(JToken document)
+        public async Task Load(CancellationToken token = default(CancellationToken))
         {
-            if (!(document?.Root is JArray projectArray)) return;
+            if (!Directory.Exists(Configuration.ProjectsDirectory)) return;
 
-            projectsCollection.Clear();
-            foreach (var projectDef in projectArray) {
-                var project = projectDef.ToObject<Project>();
+            var blockOptions = new ExecutionDataflowBlockOptions {
+                MaxDegreeOfParallelism = Configuration.Parallelism,
+                CancellationToken = token,
+            };
 
-                if (string.IsNullOrEmpty(project?.Id)) {
-                    Log.Warn($"Unable to load project definition '{project?.Name}'! Project 'id' is undefined.");
+            var block = new ActionBlock<string>(projectIndexFile => {
+                var project = new ServerProject {
+                    ContentPath = Path.GetDirectoryName(projectIndexFile),
+                };
+
+                project.Load();
+
+                var projectId = project.Description?.Id ?? string.Empty;
+                projectsCollection[projectId] = project;
+            }, blockOptions);
+
+            var root = Configuration.ProjectsDirectory;
+            foreach (var path in Directory.EnumerateDirectories(root, "*", SearchOption.TopDirectoryOnly)) {
+                var projectIndexFile = Path.Combine(path, "project.json");
+                if (!File.Exists(projectIndexFile)) {
+                    Log.Warn($"Missing project.json in '{path}'.");
                     continue;
                 }
 
-                projectsCollection[project.Id] = project;
+                block.Post(projectIndexFile);
             }
+
+            block.Complete();
+            await block.Completion;
         }
 
-        private void Document_OnUpdate(JToken document, Project project, string prevId)
+        public ServerProject New(string id)
         {
-            if (!(document.Root is JArray projectArray)) {
-                projectArray = new JArray();
-                document.Replace(projectArray);
-                var token = JObject.FromObject(project);
-                projectArray.Add(token);
-            }
-            else {
-                var found = false;
-                foreach (var projectDef in projectArray) {
-                    var _project = projectDef.ToObject<Project>();
+            if (projectsCollection.ContainsKey(id))
+                throw new ApplicationException($"Project '{id}' already exists!");
 
-                    var _id = prevId ?? project.Id;
-                    if (!string.Equals(_project.Id, _id)) continue;
+            var path = GetProjectPath(id);
 
-                    var projectToken = JToken.FromObject(project);
-                    projectDef.Replace(projectToken);
-                    found = true;
-                    break;
+            var project = new ServerProject {
+                ContentPath = path,
+                Description = new Project {
+                    Id = id,
                 }
+            };
 
-                if (!found) {
-                    var projectToken = JToken.FromObject(project);
-                    projectArray.Add(projectToken);
-                }
-            }
+            projectsCollection[id] = project;
+            project.Save();
+
+            return project;
         }
 
-        private bool Document_OnRemove(JToken document, string id)
+        public bool Remove(string id)
         {
-            if (!(document.Root is JArray projectArray))
-                return false;
+            if (projectsCollection.TryRemove(id, out var project)) {
+                if (Directory.Exists(project.ContentPath))
+                    FileUtils.DestoryDirectory(project.ContentPath);
 
-            foreach (var projectDef in projectArray) {
-                var _project = projectDef.ToObject<Project>();
-                if (!string.Equals(_project.Id, id)) continue;
-
-                projectDef.Remove();
                 return true;
             }
 
             return false;
+        }
+
+        public bool Rename(string prevId, string newId)
+        {
+            if (string.Equals(prevId, newId)) return true;
+
+            if (!projectsCollection.TryGetValue(prevId, out var project)) return false;
+
+            var newPath = GetProjectPath(newId);
+
+            if (Directory.Exists(project.ContentPath)) {
+                try {
+                    Directory.Move(project.ContentPath, newPath);
+                }
+                catch (Exception error) {
+                    Log.Error($"Failed to move project directory '{prevId}' to '{newId}'!", error);
+                    return false;
+                }
+            }
+            else {
+                Log.Warn($"No directory found when renaming project '{prevId}' to '{newId}'.");
+            }
+
+            project.Description.Id = newId;
+            project.ContentPath = newPath;
+
+            projectsCollection.TryRemove(prevId, out _);
+            projectsCollection[newId] = project;
+
+            return true;
+        }
+
+        private static string GetProjectPath(string id)
+        {
+            return Path.Combine(Configuration.ProjectsDirectory, id);
         }
     }
 }
