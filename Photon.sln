@@ -35,12 +35,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Installer.Common", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Publishing", "Photon.Publishing\Photon.Publishing.csproj", "{5DCBC214-693F-474B-B5A4-7D90D0D05FB2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E05F3184-6762-4786-84B0-A592BB8EFE55}"
-	ProjectSection(SolutionItems) = preProject
-		Tasks\Build.json = Tasks\Build.json
-		Tasks\Publish.json = Tasks\Publish.json
-	EndProjectSection
-EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Photon.CLI.Installer", "Installers\Photon.CLI.Installer\Photon.CLI.Installer.wixproj", "{0DEF70A0-E6A9-4761-AD41-032D12D1AFBC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Config", "Plugins\Photon.Config\Photon.Config.csproj", "{DBEBE942-C5DC-47DB-A472-3FFF8C965285}"
