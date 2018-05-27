@@ -19,13 +19,19 @@ namespace Photon.Framework.Projects
         [JsonProperty("password", Order = 4)]
         public string Password {get; set;}
 
-        [JsonProperty("hookTask", Order = 5)]
+        [JsonProperty("commandLine", Order = 5)]
+        public bool UseCommandLine {get; set;}
+
+        [JsonProperty("exe", Order = 6)]
+        public string CommandLineExe {get; set;}
+
+        [JsonProperty("hookTask", Order = 7)]
         public string HookTaskName {get; set;}
 
-        [JsonProperty("hookRoles", Order = 6)]
+        [JsonProperty("hookRoles", Order = 8)]
         public string[] HookTaskRoles {get; set;}
 
-        [JsonProperty("notifyOrigin", Order = 7)]
+        [JsonProperty("notifyOrigin", Order = 9)]
         [JsonConverter(typeof(StringEnumConverter))]
         public NotifyOrigin NotifyOrigin {get; set;}
 

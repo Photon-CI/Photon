@@ -1,0 +1,8 @@
+{
+	"project": "photon-ci",
+	"refspec": "master",
+	"task": "Build_LinuxCI",
+	"roles": [
+		"build-ci"
+	]
+}

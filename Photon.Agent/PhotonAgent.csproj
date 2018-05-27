@@ -85,6 +85,9 @@
     <Compile Include="HttpHandlers\Session\SessionIndexHandler.cs" />
     <Compile Include="HttpHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
     <Compile Include="HttpHandlers\VariableSet\VariableSetIndexHandler.cs" />
+    <Compile Include="Internal\Git\CmdCheckout.cs" />
+    <Compile Include="Internal\Git\ICheckout.cs" />
+    <Compile Include="Internal\Git\LibCheckout.cs" />
     <Compile Include="Internal\Git\RepositoryHandle.cs" />
     <Compile Include="Internal\Git\RepositoryIndex.cs" />
     <Compile Include="Internal\Git\RepositoryIndexEntry.cs" />

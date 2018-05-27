@@ -122,8 +122,11 @@ namespace Photon.Agent.Internal.Session
 
                     handle.Username = githubSource.Username;
                     handle.Password = githubSource.Password;
+                    handle.UseCommandLine = githubSource.UseCommandLine;
+                    handle.CommandLineExe = githubSource.CommandLineExe;
+                    handle.Output = Output;
 
-                    handle.Checkout(Output, GitRefspec);
+                    handle.Checkout(GitRefspec);
 
                     Output.WriteLine("Copying repository to work content directory.", ConsoleColor.DarkCyan);
                     CopyDirectory(handle.Source.RepositoryPath, ContentDirectory);
@@ -145,8 +148,9 @@ namespace Photon.Agent.Internal.Session
             using (var timeoutTokenSource = new CancellationTokenSource(timeout)) 
             using (var joinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token)) {
                 while (!joinedTokenSource.IsCancellationRequested) {
-                    if (repositorySource.TryBegin(out var handle))
+                    if (repositorySource.TryBegin(out var handle)) {
                         return handle;
+                    }
 
                     await Task.Delay(200, joinedTokenSource.Token);
                 }
