@@ -20,32 +20,50 @@ namespace Photon.Agent.Internal.Git
 
         public void Checkout(string refspec = "master")
         {
-            if (!IsValidRepo()) {
-                CloneRepo();
+            if (!GitIsValidRepo()) {
+                GitClone();
             }
 
-            // TODO: Fetch
+            Gitfetch();
 
-            // TODO: Checkout
+            GitCheckout(refspec);
 
-            // TODO: Pull
+            GitPull();
         }
 
-        private bool IsValidRepo()
+        private bool GitIsValidRepo()
         {
             var r = GitCmd(Source.RepositoryPath, "rev-parse --is-inside-work-tree");
-            if (r.ExitCode != 0) throw new Exception("Failed to get repo isValid!");
-            return string.Equals(r.Output, "true");
+            return r.ExitCode == 0 && string.Equals(r.Output.Trim(), "true");
         }
 
-        private void CloneRepo()
+        private void GitClone()
         {
-            var r = GitCmd(Source.RepositoryPath, $"clone {Source.RepositoryUrl}");
-            if (r.ExitCode != 0) throw new Exception("Failed to clone repo!");
+            var r = GitCmd(Source.RepositoryPath, $"clone \"{Source.RepositoryUrl}\" \"{Source.RepositoryPath}\"");
+            if (r.ExitCode != 0) throw new Exception("Failed to clone repository!");
+        }
+
+        private void Gitfetch()
+        {
+            var r = GitCmd(Source.RepositoryPath, "fetch -p -t");
+            if (r.ExitCode != 0) throw new Exception("Failed to fetch remotes!");
+        }
+
+        private void GitCheckout(string refspec)
+        {
+            var r = GitCmd(Source.RepositoryPath, $"checkout -f {refspec}");
+            if (r.ExitCode != 0) throw new Exception($"Failed to checkout refspec '{refspec}'!");
+        }
+
+        private void GitPull()
+        {
+            var r = GitCmd(Source.RepositoryPath, "pull");
+            if (r.ExitCode != 0) throw new Exception("Failed to pull updates from remote!");
         }
 
         private ProcessResult GitCmd(string root, string arguments)
         {
+            Output.WriteLine($" > git {arguments}", ConsoleColor.White);
             return ProcessRunner.Run(root, Exe, arguments, Output.Writer);
         }
     }

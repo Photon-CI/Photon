@@ -1,10 +1,13 @@
 ﻿using Photon.Agent.Internal.Session;
 using System;
+using log4net;
 
 namespace Photon.Agent.Internal.Git
 {
     internal class RepositoryHandle : IDisposable
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RepositoryHandle));
+
         private readonly Action disposeAction;
 
         public SessionOutput Output {get; set;}
@@ -30,6 +33,9 @@ namespace Photon.Agent.Internal.Git
         {
             ICheckout checkout;
             if (UseCommandLine) {
+                Log.Debug("Using Git command-line.");
+                Output.WriteLine("Using Git Command-Line.", ConsoleColor.DarkCyan);
+
                 checkout = new CmdCheckout {
                     Output = Output,
                     Source = Source,
@@ -38,6 +44,9 @@ namespace Photon.Agent.Internal.Git
                 };
             }
             else {
+                Log.Debug("Using Git Core.");
+                Output.WriteLine("Using Git Core.", ConsoleColor.DarkCyan);
+
                 checkout = new LibCheckout {
                     Output = Output,
                     Source = Source,
