@@ -11,13 +11,11 @@ namespace Photon.Framework.Server
         private readonly StringBuilder builder;
         private readonly StringWriter writer;
         private readonly AnsiWriter ansiWriter;
-        private readonly object lockHandle;
+        private readonly Lazy<object> lockHandle;
 
         public int Length {
             get {
-                if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
-
-                lock (lockHandle) {
+                lock (lockHandle.Value) {
                     return builder.Length;
                 }
             }
@@ -30,7 +28,7 @@ namespace Photon.Framework.Server
             writer = new StringWriter(builder);
             var x = TextWriter.Synchronized(writer);
             ansiWriter = new AnsiWriter(x);
-            lockHandle = new object();
+            lockHandle = new Lazy<object>();
 
             writer.NewLine = "\n";
         }
@@ -44,7 +42,7 @@ namespace Photon.Framework.Server
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
-            lock (lockHandle) {
+            lock (lockHandle.Value) {
                 ansiWriter.Write(text, color);
             }
 
@@ -56,7 +54,7 @@ namespace Photon.Framework.Server
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
-            lock (lockHandle) {
+            lock (lockHandle.Value) {
                 ansiWriter.Write(value, color);
             }
 
@@ -68,7 +66,7 @@ namespace Photon.Framework.Server
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
-            lock (lockHandle) {
+            lock (lockHandle.Value) {
                 ansiWriter.WriteLine(text, color);
             }
 
@@ -80,7 +78,7 @@ namespace Photon.Framework.Server
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
-            lock (lockHandle) {
+            lock (lockHandle.Value) {
                 ansiWriter.WriteLine(value, color);
             }
 
@@ -92,7 +90,7 @@ namespace Photon.Framework.Server
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
-            lock (lockHandle) {
+            lock (lockHandle.Value) {
                 writer.Flush();
                 builder.Append(text);
             }
@@ -102,7 +100,11 @@ namespace Photon.Framework.Server
 
         public void Flush()
         {
-            writer.Flush();
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            lock (lockHandle.Value) {
+                writer.Flush();
+            }
         }
 
         protected virtual void OnChanged()
@@ -114,7 +116,7 @@ namespace Photon.Framework.Server
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
-            lock (lockHandle) {
+            lock (lockHandle.Value) {
                 return builder.ToString();
             }
         }
