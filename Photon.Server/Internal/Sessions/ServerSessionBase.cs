@@ -48,6 +48,7 @@ namespace Photon.Server.Internal.Sessions
         protected ILog Log => _log.Value;
 
         protected readonly CancellationTokenSource TokenSource;
+        //protected readonly DomainOutput DomainOutput;
         private readonly ProjectPackageManager projectPackages;
         private readonly ApplicationPackageManager applicationPackages;
 
@@ -68,6 +69,8 @@ namespace Photon.Server.Internal.Sessions
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
             BinDirectory = Path.Combine(WorkDirectory, "bin");
             ContentDirectory = Path.Combine(WorkDirectory, "content");
+
+            //DomainOutput
 
             projectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,

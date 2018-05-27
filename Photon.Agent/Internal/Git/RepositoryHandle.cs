@@ -1,6 +1,6 @@
-﻿using Photon.Agent.Internal.Session;
+﻿using log4net;
+using Photon.Agent.Internal.Session;
 using System;
-using log4net;
 
 namespace Photon.Agent.Internal.Git
 {
@@ -37,7 +37,7 @@ namespace Photon.Agent.Internal.Git
                 Output.WriteLine("Using Git Command-Line.", ConsoleColor.DarkCyan);
 
                 checkout = new CmdCheckout {
-                    Output = Output,
+                    Output = Output.Writer,
                     Source = Source,
                     Username = Username,
                     Password = Password,
@@ -48,7 +48,7 @@ namespace Photon.Agent.Internal.Git
                 Output.WriteLine("Using Git Core.", ConsoleColor.DarkCyan);
 
                 checkout = new LibCheckout {
-                    Output = Output,
+                    Output = Output.Writer,
                     Source = Source,
                     Username = Username,
                     Password = Password,

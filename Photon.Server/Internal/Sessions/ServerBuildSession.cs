@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Projects;
+﻿using Photon.Framework.Domain;
+using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Library.GitHub;
 using Photon.Library.HttpMessages;
@@ -24,6 +25,10 @@ namespace Photon.Server.Internal.Sessions
 
         public override async Task RunAsync()
         {
+            var contextOutput = new DomainOutput();
+            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+
             var context = new ServerBuildContext {
                 BuildNumber = Build.Number,
                 Agents = PhotonServer.Instance.Agents.All.ToArray(),
@@ -36,7 +41,7 @@ namespace Photon.Server.Internal.Sessions
                 BinDirectory = BinDirectory,
                 Packages = PackageClient,
                 ConnectionFactory = ConnectionFactory,
-                Output = Output,
+                Output = contextOutput,
                 ServerVariables = Variables,
                 //Commit = Commit,
             };

@@ -1,12 +1,12 @@
 ﻿using LibGit2Sharp;
-using Photon.Agent.Internal.Session;
+using Photon.Framework.Server;
 using System;
 
 namespace Photon.Agent.Internal.Git
 {
     internal class LibCheckout : ICheckout
     {
-        public SessionOutput Output {get; set;}
+        public ScriptOutput Output {get; set;}
         public RepositorySource Source {get; set;}
         public string Username {get; set;}
         public string Password {get; set;}

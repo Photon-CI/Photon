@@ -110,8 +110,8 @@ namespace Photon.Server.Internal
             }
             catch (Exception error) {
                 session.Output
-                    .Append("Pre-Build event failed! ", ConsoleColor.DarkRed)
-                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    .Write("Pre-Build event failed! ", ConsoleColor.DarkRed)
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                 Log.Error("Pre-Build Event Failed!", error);
                 return;
@@ -119,7 +119,7 @@ namespace Photon.Server.Internal
 
             try {
                 session.Output
-                    .AppendLine("Preparing working directory...", ConsoleColor.DarkCyan);
+                    .WriteLine("Preparing working directory...", ConsoleColor.DarkCyan);
 
                 await session.PrepareWorkDirectoryAsync();
             }
@@ -129,8 +129,8 @@ namespace Photon.Server.Internal
                     _e = _ae.Flatten();
 
                 session.Output
-                    .Append("Failed to prepare working directory! ", ConsoleColor.DarkRed)
-                    .AppendLine(_e.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    .Write("Failed to prepare working directory! ", ConsoleColor.DarkRed)
+                    .WriteLine(_e.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                 abort = true;
                 errorList.Add(_e);
@@ -140,7 +140,7 @@ namespace Photon.Server.Internal
             if (!abort) {
                 try {
                     session.Output
-                        .AppendLine("Running script...", ConsoleColor.DarkCyan);
+                        .WriteLine("Running script...", ConsoleColor.DarkCyan);
 
                     await session.RunAsync();
                     result = TaskResult.Ok();
@@ -151,20 +151,20 @@ namespace Photon.Server.Internal
                     //abort = true;
 
                     session.Output
-                        .Append("Script Failed! ", ConsoleColor.DarkRed)
-                        .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                        .Write("Script Failed! ", ConsoleColor.DarkRed)
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
                 }
             }
 
             session.Output
-                .AppendLine("Destroying working directory...", ConsoleColor.DarkCyan);
+                .WriteLine("Destroying working directory...", ConsoleColor.DarkCyan);
 
             try {
                 await session.ReleaseAsync();
             }
             catch (Exception error) {
                 session.Output
-                    .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                 errorList.Add(error);
             }

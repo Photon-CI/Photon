@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Photon.Framework.Server
 {
-    public class ScriptOutput : MarshalByRefObject, IDisposable
+    public class ScriptOutput : MarshalByRefObject, IWriteAnsi, IDisposable
     {
         public event EventHandler Changed;
 
@@ -38,7 +38,7 @@ namespace Photon.Framework.Server
             writer?.Dispose();
         }
 
-        public ScriptOutput Append(string text, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi Write(string text, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
@@ -50,7 +50,7 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public ScriptOutput Append(object value, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi Write(object value, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
@@ -62,7 +62,7 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public ScriptOutput AppendLine(string text, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
@@ -74,7 +74,7 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public ScriptOutput AppendLine(object value, ConsoleColor color = ConsoleColor.Gray)
+        public IWriteAnsi WriteLine(object value, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 

@@ -78,7 +78,7 @@ namespace Photon.Framework.Server
             if (context.Agents?.Any() ?? false)
                 return context.Agents;
 
-            context.Output.AppendLine("No agents have been defined!", ConsoleColor.DarkRed);
+            context.Output.WriteLine("No agents have been defined!", ConsoleColor.DarkRed);
             throw new ApplicationException("No agents have been defined!");
         }
 
@@ -88,17 +88,17 @@ namespace Photon.Framework.Server
 
             if (roleAgents.Any()) return roleAgents;
 
-            context.Output.Append("No agents were found in roles ", ConsoleColor.DarkYellow);
+            context.Output.Write("No agents were found in roles ", ConsoleColor.DarkYellow);
 
             var i = 0;
             foreach (var role in roles) {
-                if (i > 0) context.Output.Append(", ", ConsoleColor.DarkYellow);
+                if (i > 0) context.Output.Write(", ", ConsoleColor.DarkYellow);
                 i++;
 
-                context.Output.Append(role, ConsoleColor.Yellow);
+                context.Output.Write(role, ConsoleColor.Yellow);
             }
 
-            context.Output.AppendLine("!", ConsoleColor.DarkYellow);
+            context.Output.WriteLine("!", ConsoleColor.DarkYellow);
 
             throw new ApplicationException($"No agents were found in roles '{string.Join(", ", roles)}'!");
         }
@@ -108,7 +108,7 @@ namespace Photon.Framework.Server
             var environmentList = context.Project?.Environments;
 
             if (!(environmentList?.Any() ?? false)) {
-                context.Output.AppendLine("No environments have been defined!", ConsoleColor.DarkRed);
+                context.Output.WriteLine("No environments have been defined!", ConsoleColor.DarkRed);
                 throw new ApplicationException("No environments have been defined!");
             }
 
@@ -116,9 +116,9 @@ namespace Photon.Framework.Server
                 string.Equals(x.Name, environmentName, StringComparison.OrdinalIgnoreCase));
 
             if (environment == null) {
-                context.Output.Append("Environment ", ConsoleColor.DarkYellow)
-                    .Append(environmentName, ConsoleColor.Yellow)
-                    .AppendLine(" was not found!", ConsoleColor.DarkYellow);
+                context.Output.Write("Environment ", ConsoleColor.DarkYellow)
+                    .Write(environmentName, ConsoleColor.Yellow)
+                    .WriteLine(" was not found!", ConsoleColor.DarkYellow);
 
                 throw new ApplicationException($"Environment '{environmentName}' was not found!");
             }
@@ -130,9 +130,9 @@ namespace Photon.Framework.Server
             if (environmentAgents.Any())
                 return environmentAgents;
 
-            context.Output.Append("No agents were found in environment ", ConsoleColor.DarkYellow)
-                .Append(environmentName, ConsoleColor.Yellow)
-                .AppendLine("!", ConsoleColor.DarkYellow);
+            context.Output.Write("No agents were found in environment ", ConsoleColor.DarkYellow)
+                .Write(environmentName, ConsoleColor.Yellow)
+                .WriteLine("!", ConsoleColor.DarkYellow);
 
             throw new ApplicationException($"No agents were found in environment '{environmentName}'!");
         }
@@ -162,17 +162,17 @@ namespace Photon.Framework.Server
         private void PrintFoundAgents(IEnumerable<ServerAgent> agents)
         {
             var agentNames = agents.Select(x => x.Name);
-            context.Output.Append("Found Agents: ", ConsoleColor.DarkCyan);
+            context.Output.Write("Found Agents: ", ConsoleColor.DarkCyan);
 
             var i = 0;
             foreach (var name in agentNames) {
-                if (i > 0) context.Output.Append("; ", ConsoleColor.DarkCyan);
+                if (i > 0) context.Output.Write("; ", ConsoleColor.DarkCyan);
                 i++;
 
-                context.Output.Append(name, ConsoleColor.Cyan);
+                context.Output.Write(name, ConsoleColor.Cyan);
             }
 
-            context.Output.AppendLine(".", ConsoleColor.DarkCyan);
+            context.Output.WriteLine(".", ConsoleColor.DarkCyan);
         }
     }
 }

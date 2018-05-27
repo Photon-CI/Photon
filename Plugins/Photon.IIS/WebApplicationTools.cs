@@ -20,9 +20,9 @@ namespace Photon.Plugins.IIS
         {
             if (!TryFindWebSite(webSiteName, out var webSite)) {
                 handle.Context.Output
-                    .Append("WebSite ", ConsoleColor.DarkRed)
-                    .Append(webSiteName, ConsoleColor.Red)
-                    .AppendLine(" was not found!", ConsoleColor.DarkRed);
+                    .Write("WebSite ", ConsoleColor.DarkRed)
+                    .Write(webSiteName, ConsoleColor.Red)
+                    .WriteLine(" was not found!", ConsoleColor.DarkRed);
 
                 throw new Exception($"WebSite '{webSiteName}' was not found!");
             }
@@ -33,19 +33,19 @@ namespace Photon.Plugins.IIS
 
                 if (!TryFind(webSite, webAppPath, out webApp)) {
                     handle.Context.Output
-                        .Append("Unable to create Web Application ", ConsoleColor.DarkRed)
-                        .Append(webSiteName, ConsoleColor.Red)
-                        .AppendLine("!", ConsoleColor.DarkRed);
+                        .Write("Unable to create Web Application ", ConsoleColor.DarkRed)
+                        .Write(webSiteName, ConsoleColor.Red)
+                        .WriteLine("!", ConsoleColor.DarkRed);
 
                     throw new Exception($"Unable to create Web Application '{webSiteName}'!");
                 }
 
                 handle.Context.Output
-                    .Append("Created new Web Application ", ConsoleColor.DarkBlue)
-                    .Append(webAppPath, ConsoleColor.Blue)
-                    .Append(" under WebSite ", ConsoleColor.DarkBlue)
-                    .Append(webSiteName, ConsoleColor.Blue)
-                    .AppendLine(".", ConsoleColor.DarkBlue);
+                    .Write("Created new Web Application ", ConsoleColor.DarkBlue)
+                    .Write(webAppPath, ConsoleColor.Blue)
+                    .Write(" under WebSite ", ConsoleColor.DarkBlue)
+                    .Write(webSiteName, ConsoleColor.Blue)
+                    .WriteLine(".", ConsoleColor.DarkBlue);
             }
 
             configureAction(webApp);
@@ -53,9 +53,9 @@ namespace Photon.Plugins.IIS
             handle.CommitChanges();
 
             handle.Context.Output
-                .Append("Web Application ", ConsoleColor.DarkGreen)
-                .Append(webSiteName, ConsoleColor.Green)
-                .AppendLine(" configured successfully.", ConsoleColor.DarkGreen);
+                .Write("Web Application ", ConsoleColor.DarkGreen)
+                .Write(webSiteName, ConsoleColor.Green)
+                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
         }
 
         private bool TryFindWebSite(string webSiteName, out Site webSite)

@@ -1,5 +1,5 @@
-﻿using Photon.Agent.Internal.Session;
-using Photon.Framework;
+﻿using Photon.Framework;
+using Photon.Framework.Server;
 using System;
 
 namespace Photon.Agent.Internal.Git
@@ -7,7 +7,7 @@ namespace Photon.Agent.Internal.Git
     internal class CmdCheckout : ICheckout
     {
         public string Exe {get; set;}
-        public SessionOutput Output {get; set;}
+        public ScriptOutput Output {get; set;}
         public RepositorySource Source {get; set;}
         public string Username {get; set;}
         public string Password {get; set;}
@@ -64,7 +64,7 @@ namespace Photon.Agent.Internal.Git
         private ProcessResult GitCmd(string root, string arguments)
         {
             Output.WriteLine($" > git {arguments}", ConsoleColor.White);
-            return ProcessRunner.Run(root, Exe, arguments, Output.Writer);
+            return ProcessRunner.Run(root, Exe, arguments, Output);
         }
     }
 }

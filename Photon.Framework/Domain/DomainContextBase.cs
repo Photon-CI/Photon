@@ -1,7 +1,6 @@
 ﻿using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
-using Photon.Framework.Server;
 using Photon.Framework.Variables;
 using System;
 using System.ComponentModel;
@@ -18,7 +17,7 @@ namespace Photon.Framework.Domain
         public string WorkDirectory {get; set;}
         public string BinDirectory {get; set;}
         public string ContentDirectory {get; set;}
-        public ScriptOutput Output {get; set;}
+        public DomainOutput Output {get; set;}
         public DomainPackageClient Packages {get; set;}
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
@@ -26,29 +25,29 @@ namespace Photon.Framework.Domain
 
         public void RunCommandLine(string command)
         {
-            Output.Append("Running Command: ", ConsoleColor.DarkCyan)
-                .AppendLine(command, ConsoleColor.Cyan);
+            Output.Write("Running Command: ", ConsoleColor.DarkCyan)
+                .WriteLine(command, ConsoleColor.Cyan);
 
             ProcessResult result;
             try {
                 result = ProcessRunner.Run(ContentDirectory, command, Output);
             }
             catch (Win32Exception error) when (error.ErrorCode == -2147467259) {
-                Output.Append("Command Failed!", ConsoleColor.DarkYellow)
-                    .AppendLine(" Application not found!", ConsoleColor.Yellow);
+                Output.Write("Command Failed!", ConsoleColor.DarkYellow)
+                    .WriteLine(" Application not found!", ConsoleColor.Yellow);
 
                 throw;
             }
             catch (Exception error) {
-                Output.Append("Command Failed!", ConsoleColor.DarkRed)
-                    .AppendLine($" {error.UnfoldMessages()}", ConsoleColor.Red);
+                Output.Write("Command Failed!", ConsoleColor.DarkRed)
+                    .WriteLine($" {error.UnfoldMessages()}", ConsoleColor.Red);
 
                 throw;
             }
 
             if (result.ExitCode != 0) {
-                Output.Append("Command Failed! Exit Code ", ConsoleColor.DarkYellow)
-                    .AppendLine(result.ExitCode.ToString(), ConsoleColor.Yellow);
+                Output.Write("Command Failed! Exit Code ", ConsoleColor.DarkYellow)
+                    .WriteLine(result.ExitCode.ToString(), ConsoleColor.Yellow);
 
                 throw new ApplicationException("Process terminated with a non-zero exit code!");
             }

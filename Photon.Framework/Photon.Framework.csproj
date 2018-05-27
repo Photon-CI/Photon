@@ -54,6 +54,7 @@
     <Compile Include="Domain\DomainAgentSessionHandle.cs" />
     <Compile Include="Domain\DomainConnectionFactory.cs" />
     <Compile Include="Domain\DomainContextBase.cs" />
+    <Compile Include="Domain\DomainOutput.cs" />
     <Compile Include="Domain\IDomainContext.cs" />
     <Compile Include="Domain\ServerDomainAgent.cs" />
     <Compile Include="Domain\AgentDomainAgent.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="IFrameworkAssembly.cs" />
+    <Compile Include="IWriteAnsi.cs" />
     <Compile Include="JsonSettings.cs" />
     <Compile Include="Packages\ApplicationPackageDefinition.cs" />
     <Compile Include="Packages\ProjectPackageDefinition.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Server\AgentSelector.cs" />
     <Compile Include="Server\IServerContext.cs" />
     <Compile Include="Server\IServerBuildContext.cs" />
+    <Compile Include="Server\ScriptOutput.cs" />
     <Compile Include="Server\ServerAgent.cs" />
     <Compile Include="Server\ServerContextBase.cs" />
     <Compile Include="NetPath.cs" />
@@ -101,7 +104,6 @@
     <Compile Include="Server\IServerDeployContext.cs" />
     <Compile Include="Server\AgentSessionHandleCollection.cs" />
     <Compile Include="Domain\TypeRegistry.cs" />
-    <Compile Include="Server\ScriptOutput.cs" />
     <Compile Include="Server\ServerDeployContext.cs" />
     <Compile Include="Agent\AgentBuildContext.cs" />
     <Compile Include="Agent\AgentDeployContext.cs" />

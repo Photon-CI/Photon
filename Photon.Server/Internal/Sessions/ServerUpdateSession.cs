@@ -25,7 +25,7 @@ namespace Photon.Server.Internal.Sessions
                 .Where(x => AgentIds.Any(id => string.Equals(id, x.Id, StringComparison.OrdinalIgnoreCase))).ToArray();
 
             if (!agents.Any()) {
-                Output.AppendLine("No agents were found!", ConsoleColor.DarkYellow);
+                Output.WriteLine("No agents were found!", ConsoleColor.DarkYellow);
                 throw new ApplicationException("No agents were found!");
             }
 
@@ -51,9 +51,9 @@ namespace Photon.Server.Internal.Sessions
         private async Task AgentAction(ServerAgent agent)
         {
             using (var messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry)) {
-                Output.Append("Connecting to agent ", ConsoleColor.DarkCyan)
-                    .Append(agent.Name, ConsoleColor.Cyan)
-                    .AppendLine("...", ConsoleColor.DarkCyan);
+                Output.Write("Connecting to agent ", ConsoleColor.DarkCyan)
+                    .Write(agent.Name, ConsoleColor.Cyan)
+                    .WriteLine("...", ConsoleColor.DarkCyan);
 
                 try {
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
@@ -61,32 +61,32 @@ namespace Photon.Server.Internal.Sessions
                     await ClientHandshake.Verify(messageClient, TokenSource.Token);
                 }
                 catch (Exception error) {
-                    Output.Append("Failed to connect to agent ", ConsoleColor.DarkRed)
-                        .Append(agent.Name, ConsoleColor.Red)
-                        .AppendLine("!", ConsoleColor.DarkRed)
-                        .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    Output.Write("Failed to connect to agent ", ConsoleColor.DarkRed)
+                        .Write(agent.Name, ConsoleColor.Red)
+                        .WriteLine("!", ConsoleColor.DarkRed)
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
 
                     return;
                 }
 
-                Output.AppendLine("Agent connected.", ConsoleColor.DarkGreen);
+                Output.WriteLine("Agent connected.", ConsoleColor.DarkGreen);
 
-                Output.Append("Updating Agent ", ConsoleColor.DarkCyan)
-                    .Append(agent.Name, ConsoleColor.Cyan)
-                    .AppendLine("...", ConsoleColor.DarkCyan);
+                Output.Write("Updating Agent ", ConsoleColor.DarkCyan)
+                    .Write(agent.Name, ConsoleColor.Cyan)
+                    .WriteLine("...", ConsoleColor.DarkCyan);
 
                 try {
                     await UpdateAgent(agent, messageClient, TokenSource.Token);
 
-                    Output.Append("Agent ", ConsoleColor.DarkGreen)
-                        .Append(agent.Name, ConsoleColor.Green)
-                        .AppendLine(" updated successfully.", ConsoleColor.DarkGreen);
+                    Output.Write("Agent ", ConsoleColor.DarkGreen)
+                        .Write(agent.Name, ConsoleColor.Green)
+                        .WriteLine(" updated successfully.", ConsoleColor.DarkGreen);
                 }
                 catch (Exception error) {
-                    Output.Append("Failed to update agent ", ConsoleColor.DarkRed)
-                        .Append(agent.Name, ConsoleColor.Red)
-                        .AppendLine("!", ConsoleColor.DarkRed)
-                        .AppendLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    Output.Write("Failed to update agent ", ConsoleColor.DarkRed)
+                        .Write(agent.Name, ConsoleColor.Red)
+                        .WriteLine("!", ConsoleColor.DarkRed)
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
                 }
             }
         }
@@ -110,9 +110,9 @@ namespace Photon.Server.Internal.Sessions
                 messageClient?.Dispose();
             }
 
-            Output.Append("Agent update start on ", ConsoleColor.DarkCyan)
-                .Append(agent.Name, ConsoleColor.Cyan)
-                .AppendLine("...", ConsoleColor.DarkCyan);
+            Output.Write("Agent update start on ", ConsoleColor.DarkCyan)
+                .Write(agent.Name, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
 
             await Task.Delay(3000, token);
 

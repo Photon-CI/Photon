@@ -38,13 +38,25 @@ namespace Photon.Agent.Internal.Session
 
         public SessionOutput Write(string text, ConsoleColor color = ConsoleColor.Gray)
         {
-            Writer.Append(text, color);
+            Writer.Write(text, color);
+            return this;
+        }
+
+        public SessionOutput Write(object value, ConsoleColor color = ConsoleColor.Gray)
+        {
+            Writer.Write(value, color);
             return this;
         }
 
         public SessionOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
-            Writer.AppendLine(text, color);
+            Writer.WriteLine(text, color);
+            return this;
+        }
+
+        public SessionOutput WriteLine(object value, ConsoleColor color = ConsoleColor.Gray)
+        {
+            Writer.WriteLine(value, color);
             return this;
         }
 

@@ -1,19 +1,13 @@
-﻿using Photon.Framework.Tools;
+﻿using Photon.Framework.Domain;
+using Photon.Framework.Tools;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Framework.Domain;
 
 namespace Photon.NuGetPlugin
 {
-    public enum NugetModes
-    {
-        Core,
-        CommandLine,
-    }
-
     public class NuGetPackagePublisher
     {
         private readonly IDomainContext context;
@@ -22,7 +16,6 @@ namespace Photon.NuGetPlugin
         public NuGetCommandLine CL {get; set;}
         public NuGetCore Client {get; set;}
 
-        //public string ExeFilename {get; set;}
         public string PackageId {get; set;}
         public string Version {get; set;}
         public string PackageDirectory {get; set;}
@@ -65,9 +58,9 @@ namespace Photon.NuGetPlugin
 
             var packageName = Path.GetFileName(packageFilename);
 
-            context?.Output?.Append("Publishing Package ", ConsoleColor.DarkCyan)
-                .Append(packageName, ConsoleColor.Cyan)
-                .AppendLine("...", ConsoleColor.DarkCyan);
+            context?.Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
+                .Write(packageName, ConsoleColor.Cyan)
+                .WriteLine("...", ConsoleColor.DarkCyan);
 
             switch (Mode) {
                 case NugetModes.Core:
@@ -82,17 +75,17 @@ namespace Photon.NuGetPlugin
         private async Task<bool> PreCheckUsingCore(CancellationToken token)
         {
             // Pre-Check Version
-            Client.Output?.Append("Checking Package ", ConsoleColor.DarkCyan)
-                .Append(PackageId, ConsoleColor.Cyan)
-                .AppendLine(" for updates...", ConsoleColor.DarkCyan);
+            Client.Output?.Write("Checking Package ", ConsoleColor.DarkCyan)
+                .Write(PackageId, ConsoleColor.Cyan)
+                .WriteLine(" for updates...", ConsoleColor.DarkCyan);
 
             var versionList = await Client.GetAllPackageVersions(PackageId, token);
             var packageVersion = versionList.Any() ? versionList.Max() : null;
 
             if (!VersionTools.HasUpdates(packageVersion, Version)) {
                 Client.Output?
-                    .Append($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
-                    .AppendLine(packageVersion, ConsoleColor.Blue);
+                    .Write($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
+                    .WriteLine(packageVersion, ConsoleColor.Blue);
 
                 return false;
             }
@@ -109,10 +102,6 @@ namespace Photon.NuGetPlugin
 
         private async Task PushUsingCore(CancellationToken token)
         {
-            //var packageFilename = Directory
-            //    .GetFiles(PackageDirectory, $"{PackageId}.*.nupkg")
-            //    .FirstOrDefault();
-
             var packageFilename = Path.Combine(PackageDirectory, $"{PackageId}.{Version}.nupkg");
 
             await Client.PushAsync(packageFilename, token);
@@ -120,13 +109,13 @@ namespace Photon.NuGetPlugin
 
         private bool PreCheckUsingCL()
         {
-            Client.Output?.AppendLine("Package version pre-check is not implemented in NuGet command-line mode!", ConsoleColor.DarkYellow);
+            Client.Output?.WriteLine("Package version pre-check is not implemented in NuGet command-line mode!", ConsoleColor.DarkYellow);
             return true;
         }
 
         private void PackUsingCL()
         {
-
+            // TODO: ?
 
             CL.Pack(PackageDefinition, PackageDirectory);
         }
@@ -139,5 +128,11 @@ namespace Photon.NuGetPlugin
 
             CL.Push(packageFilename, token);
         }
+    }
+
+    public enum NugetModes
+    {
+        Core,
+        CommandLine,
     }
 }

@@ -2,6 +2,7 @@
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
+using Photon.Framework.Domain;
 using Photon.Framework.Projects;
 using Photon.Library.GitHub;
 using System;
@@ -35,6 +36,12 @@ namespace Photon.Agent.Internal.Session
 
         public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
+            // TODO: Implement ClientSponsor
+
+            var contextOutput = new DomainOutput();
+            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+
             var context = new AgentBuildContext {
                 Project = Project,
                 Agent = Agent,
@@ -45,7 +52,7 @@ namespace Photon.Agent.Internal.Session
                 ContentDirectory = ContentDirectory,
                 BinDirectory = BinDirectory,
                 BuildNumber = BuildNumber,
-                Output = Output.Writer,
+                Output = contextOutput,
                 Packages = PackageClient,
                 ServerVariables = ServerVariables,
                 AgentVariables = AgentVariables,

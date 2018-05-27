@@ -1,5 +1,6 @@
 ﻿using Photon.Communication;
 using Photon.Framework.Agent;
+using Photon.Framework.Domain;
 using Photon.Framework.Packages;
 using Photon.Library.TcpMessages;
 using System;
@@ -82,6 +83,10 @@ namespace Photon.Agent.Internal.Session
 
         public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
+            var domainOutput = new DomainOutput();
+            domainOutput.OnWrite += (text, color) => Output.Write(text, color);
+            domainOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+
             var context = new AgentDeployContext {
                 DeploymentNumber = DeploymentNumber,
                 Project = Project,
@@ -93,7 +98,7 @@ namespace Photon.Agent.Internal.Session
                 ContentDirectory = ContentDirectory,
                 BinDirectory = BinDirectory,
                 ApplicationsDirectory = ApplicationsDirectory,
-                Output = Output.Writer,
+                Output = domainOutput,
                 Packages = PackageClient,
                 AgentVariables = AgentVariables,
                 ServerVariables = ServerVariables,
