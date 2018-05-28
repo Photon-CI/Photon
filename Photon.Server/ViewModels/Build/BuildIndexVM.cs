@@ -7,11 +7,15 @@ namespace Photon.Server.ViewModels.Build
 {
     internal class BuildIndexVM : ServerViewModel
     {
+        public bool IsLoading {get; set;}
         public BuildRow[] Builds {get; set;}
 
 
         public void Build()
         {
+            IsLoading = PhotonServer.Instance.Projects.IsLoading;
+            if (IsLoading) return;
+
             var allBuilds = new List<BuildRow>();
 
             foreach (var project in PhotonServer.Instance.Projects.All) {

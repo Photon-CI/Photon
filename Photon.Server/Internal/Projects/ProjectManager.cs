@@ -16,13 +16,17 @@ namespace Photon.Server.Internal.Projects
         private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectManager));
 
         private readonly ConcurrentDictionary<string, ServerProject> projectsCollection;
+        private readonly TaskCompletionSource<object> loadTask;
+        private volatile bool isLoaded;
 
+        public bool IsLoading => !isLoaded;
         public IEnumerable<ServerProject> All => projectsCollection.Values;
 
 
         public ProjectManager()
         {
             projectsCollection = new ConcurrentDictionary<string, ServerProject>();
+            loadTask = new TaskCompletionSource<object>();
         }
 
         public bool TryGet(string projectId, out ServerProject project)
@@ -74,10 +78,15 @@ namespace Photon.Server.Internal.Projects
 
             block.Complete();
             await block.Completion;
+
+            isLoaded = true;
+            loadTask.SetResult(null);
         }
 
         public ServerProject New(string id)
         {
+            if (!isLoaded) Task.WaitAll(loadTask.Task);
+
             if (projectsCollection.ContainsKey(id))
                 throw new ApplicationException($"Project '{id}' already exists!");
 
@@ -98,6 +107,8 @@ namespace Photon.Server.Internal.Projects
 
         public bool Remove(string id)
         {
+            if (!isLoaded) Task.WaitAll(loadTask.Task);
+
             if (projectsCollection.TryRemove(id, out var project)) {
                 if (Directory.Exists(project.ContentPath))
                     FileUtils.DestoryDirectory(project.ContentPath);
@@ -110,6 +121,8 @@ namespace Photon.Server.Internal.Projects
 
         public bool Rename(string prevId, string newId)
         {
+            if (!isLoaded) Task.WaitAll(loadTask.Task);
+
             if (string.Equals(prevId, newId)) return true;
 
             if (!projectsCollection.TryGetValue(prevId, out var project)) return false;

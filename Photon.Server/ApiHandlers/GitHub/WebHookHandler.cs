@@ -27,12 +27,12 @@ namespace Photon.Server.ApiHandlers.GitHub
             var commit = HookEventHandler.ParseEvent(eventType, json);
 
             if (commit != null)
-                StartBuild(commit);
+                await StartBuild(commit);
 
             return Response.Ok();
         }
 
-        private void StartBuild(GithubCommit commit)
+        private async Task StartBuild(GithubCommit commit)
         {
             var project = PhotonServer.Instance.Projects.All.FirstOrDefault(x =>
                 string.Equals((x.Description.Source as ProjectGithubSource)?.CloneUrl, commit.RepositoryUrl, StringComparison.OrdinalIgnoreCase));
@@ -41,7 +41,7 @@ namespace Photon.Server.ApiHandlers.GitHub
                 throw new ApplicationException($"No project found matching git url '{commit.RepositoryUrl}'!");
 
             var source = (ProjectGithubSource)project.Description.Source;
-            var build = project.StartNewBuild();
+            var build = await project.StartNewBuild();
 
             var session = new ServerBuildSession {
                 Project = project.Description,

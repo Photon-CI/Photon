@@ -7,16 +7,18 @@ using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Build
 {
     [HttpHandler("/api/build/start")]
-    internal class BuildStartHandler : HttpHandler
+    internal class BuildStartHandler : HttpHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BuildStartHandler));
 
 
-        public override HttpHandlerResult Post()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var qProject = GetQuery("project");
             var qGitRefspec = GetQuery("refspec");
@@ -38,7 +40,7 @@ namespace Photon.Server.ApiHandlers.Build
                 if (!PhotonServer.Instance.Projects.TryGet(_projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{_projectId}' was not found!");
 
-                var build = project.StartNewBuild();
+                var build = await project.StartNewBuild();
 
                 var session = new ServerBuildSession {
                     Project = project.Description,

@@ -7,6 +7,7 @@ using Photon.Server.Internal.Builds;
 using Photon.Server.Internal.Deployments;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Projects
 {
@@ -16,6 +17,8 @@ namespace Photon.Server.Internal.Projects
 
         private readonly object buildNumberLock;
         private readonly object deployNumberLock;
+        private readonly TaskCompletionSource<object> loadTask;
+        private volatile bool isLoaded;
 
         public string ContentPath {get; set;}
         public Project Description {get; set;}
@@ -24,6 +27,7 @@ namespace Photon.Server.Internal.Projects
         public BuildDataManager Builds {get; private set;}
         public DeploymentDataManager Deployments {get; private set;}
 
+        public bool IsLoading => !isLoaded;
         public string ProjectFilename => Path.Combine(ContentPath, "project.json");
         public string LastBuildFilename => Path.Combine(ContentPath, "lastBuild.json");
         public string LastDeploymentFilename => Path.Combine(ContentPath, "lastDeployment.json");
@@ -35,6 +39,7 @@ namespace Photon.Server.Internal.Projects
         {
             buildNumberLock = new object();
             deployNumberLock = new object();
+            loadTask = new TaskCompletionSource<object>();
         }
 
         public void Load()
@@ -48,6 +53,9 @@ namespace Photon.Server.Internal.Projects
 
             Deployments = new DeploymentDataManager(ContentBuildPath);
             Builds.Load();
+
+            isLoaded = true;
+            loadTask.SetResult(null);
         }
 
         public void SaveProject()
@@ -59,8 +67,10 @@ namespace Photon.Server.Internal.Projects
             }
         }
 
-        public BuildData StartNewBuild()
+        public async Task<BuildData> StartNewBuild()
         {
+            if (!isLoaded) await loadTask.Task;
+
             uint buildNumber;
             lock (buildNumberLock) {
                 if (LastBuild == null)
@@ -82,8 +92,10 @@ namespace Photon.Server.Internal.Projects
             return Builds.New(buildNumber);
         }
 
-        public DeploymentData StartNewDeployment()
+        public async Task<DeploymentData> StartNewDeployment()
         {
+            if (!isLoaded) await loadTask.Task;
+
             uint deployNumber;
             lock (deployNumberLock) {
                 if (LastDeployment == null)

@@ -42,19 +42,27 @@
 <div class="container">
     <table class="table table-sm mt-3">
         <tbody>
-        {{#Each Builds.build}}
+        {{#If IsLoading}}
         <tr>
             <td>
-                <i class="{{build.Class}}"></i>
-                <a href="{{#Url build/details}}?project={{&build.ProjectId}}&number={{&build.Number}}">
-                    #{{build.Number}}: {{#If build.ProjectName}}{{build.ProjectName}}{{#Else}}{{build.ProjectId}}{{#EndIf}}
-                </a>
-            </td>
-            <td class="c-time">
-                {{build.CreatedDisplay}}
+                <i class="fas fa-spinner fa-spin"></i> Loading...
             </td>
         </tr>
-        {{#EndEach}}
+        {{#Else}}
+            {{#Each Builds.build}}
+            <tr>
+                <td>
+                    <i class="{{build.Class}}"></i>
+                    <a href="{{#Url build/details}}?project={{&build.ProjectId}}&number={{&build.Number}}">
+                        #{{build.Number}}: {{#If build.ProjectName}}{{build.ProjectName}}{{#Else}}{{build.ProjectId}}{{#EndIf}}
+                    </a>
+                </td>
+                <td class="c-time">
+                    {{build.CreatedDisplay}}
+                </td>
+            </tr>
+            {{#EndEach}}
+        {{#EndIf}}
         </tbody>
     </table>
 </div>

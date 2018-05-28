@@ -2,6 +2,7 @@
 using log4net;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Photon.Framework;
 using Photon.Framework.Tools;
 using Photon.Framework.Extensions;

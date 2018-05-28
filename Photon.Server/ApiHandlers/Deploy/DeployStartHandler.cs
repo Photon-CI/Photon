@@ -46,7 +46,7 @@ namespace Photon.Server.ApiHandlers.Deploy
                 if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
 
-                var deployment = project.StartNewDeployment();
+                var deployment = await project.StartNewDeployment();
 
                 var session = new ServerDeploySession {
                     Project = project.Description,
