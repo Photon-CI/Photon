@@ -20,7 +20,8 @@ namespace Photon.NuGetPlugin
 {
     public class NuGetCore
     {
-        private readonly Regex existsExp;
+        private static readonly Regex existsExp;
+
         private SourceRepository sourceRepository;
 
         public PackageSource PackageSource {get; private set;}
@@ -34,6 +35,11 @@ namespace Photon.NuGetPlugin
         public int PushTimeout {get; set;}
 
 
+        static NuGetCore()
+        {
+            existsExp = new Regex(@":\s*409\s*\(A package with ID '\S+' and version '\S+' already exists", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        }
+
         public NuGetCore()
         {
             SourceUrl = "https://api.nuget.org/v3/index.json";
@@ -44,8 +50,6 @@ namespace Photon.NuGetPlugin
                 DirectDownload = true,
                 NoCache = true,
             };
-
-            existsExp = new Regex(@":\s*409\s*\(A package with ID '\S+' and version '\S+' already exists", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
         public void Initialize()
@@ -144,9 +148,8 @@ namespace Photon.NuGetPlugin
                 .WriteLine("...", ConsoleColor.DarkCyan);
 
             try {
-                var apiKeyFunc = (Func<string, string>) (x => ApiKey);
                 var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
-                await updateResource.Push(packageFilename, null, PushTimeout, false, apiKeyFunc, null, Logger);
+                await updateResource.Push(packageFilename, null, PushTimeout, false, x => ApiKey, null, Logger);
 
                 Output?.Write("Package ", ConsoleColor.DarkGreen)
                     .Write(packageName, ConsoleColor.Green)

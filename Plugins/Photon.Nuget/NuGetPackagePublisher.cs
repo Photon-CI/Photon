@@ -52,15 +52,15 @@ namespace Photon.NuGetPlugin
                     break;
             }
 
-            var packageFilename = Directory
-                .GetFiles(PackageDirectory, $"{PackageId}.*.nupkg")
-                .FirstOrDefault();
+            //var packageFilename = Directory
+            //    .GetFiles(PackageDirectory, $"{PackageId}.*.nupkg")
+            //    .FirstOrDefault();
 
-            var packageName = Path.GetFileName(packageFilename);
+            //var packageName = Path.GetFileName(packageFilename);
 
-            context.Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
-                .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan);
+            //context.Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
+            //    .Write(packageName, ConsoleColor.Cyan)
+            //    .WriteLine("...", ConsoleColor.DarkCyan);
 
             switch (Mode) {
                 case NugetModes.Core:
