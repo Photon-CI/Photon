@@ -171,6 +171,9 @@
       <Component Id="Views_Master.html" Guid="9ad3ccf7-5a97-4e64-9dea-80920112b474">
         <File Id="Views_Master.html" Name="Master.html" Source="$(var.PhotonServer_TargetDir)Views\Master.html" />
       </Component>
+      <Component Id="Views_Login.html" Guid="6b570aa8-bbcb-4485-960e-e7b61e169fc0">
+        <File Id="Views_Login.html" Name="Login.html" Source="$(var.PhotonServer_TargetDir)Views\Login.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -381,12 +384,18 @@
       <Component Id="Views_Build_Details.html" Guid="2935d141-0443-47be-8131-157b92c9c2e4">
         <File Id="Views_Build_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Build\Details.html" />
       </Component>
+      <Component Id="Views_Build_New.html" Guid="4b0a51f3-c496-4f0b-804d-6ab0591cc870">
+        <File Id="Views_Build_New.html" Name="New.html" Source="$(var.PhotonServer_TargetDir)Views\Build\New.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Deployment_files" Directory="Views_Deployment">
       <Component Id="Views_Deployment_Index.html" Guid="0002200d-61fb-471f-8352-f39c4a6f55e6">
         <File Id="Views_Deployment_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\Index.html" />
+      </Component>
+      <Component Id="Views_Deployment_New.html" Guid="b0bf2f2f-d9e6-4b96-81e8-d6f0413c5836">
+        <File Id="Views_Deployment_New.html" Name="New.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\New.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
