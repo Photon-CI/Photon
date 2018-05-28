@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Publishing.Tasks
 {
-    public class BuildTask : IBuildTask
+    public class Build_WinCI : IBuildTask
     {
         public IAgentBuildContext Context {get; set;}
 

@@ -1,8 +1,0 @@
-{
-	"project": "photon",
-	"refspec": "master",
-	"task": "BuildTask",
-	"roles": [
-		"build"
-	]
-}
