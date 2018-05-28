@@ -58,7 +58,7 @@ namespace Photon.NuGetPlugin
 
             var packageName = Path.GetFileName(packageFilename);
 
-            context?.Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
+            context.Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
                 .Write(packageName, ConsoleColor.Cyan)
                 .WriteLine("...", ConsoleColor.DarkCyan);
 
@@ -75,22 +75,19 @@ namespace Photon.NuGetPlugin
         private async Task<bool> PreCheckUsingCore(CancellationToken token)
         {
             // Pre-Check Version
-            Client.Output?.Write("Checking Package ", ConsoleColor.DarkCyan)
+            context.Output.Write("Checking Package ", ConsoleColor.DarkCyan)
                 .Write(PackageId, ConsoleColor.Cyan)
                 .WriteLine(" for updates...", ConsoleColor.DarkCyan);
 
             var versionList = await Client.GetAllPackageVersions(PackageId, token);
             var packageVersion = versionList.Any() ? versionList.Max() : null;
 
-            if (!VersionTools.HasUpdates(packageVersion, Version)) {
-                Client.Output?
-                    .Write($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
-                    .WriteLine(packageVersion, ConsoleColor.Blue);
+            if (VersionTools.HasUpdates(packageVersion, Version)) return true;
 
-                return false;
-            }
+            context.Output.Write($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
+                .WriteLine(packageVersion, ConsoleColor.Blue);
 
-            return true;
+            return false;
         }
 
         private void PackUsingCore()
@@ -109,7 +106,7 @@ namespace Photon.NuGetPlugin
 
         private bool PreCheckUsingCL()
         {
-            Client.Output?.WriteLine("Package version pre-check is not implemented in NuGet command-line mode!", ConsoleColor.DarkYellow);
+            context.Output.WriteLine("Package version pre-check is not implemented in NuGet command-line mode!", ConsoleColor.DarkYellow);
             return true;
         }
 
