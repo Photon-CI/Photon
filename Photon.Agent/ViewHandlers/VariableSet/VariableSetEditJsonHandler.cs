@@ -1,7 +1,7 @@
 ﻿using Photon.Agent.ViewModels.VariableSet;
 using PiServerLite.Http.Handlers;
 
-namespace Photon.Agent.HttpHandlers.VariableSet
+namespace Photon.Agent.ViewHandlers.VariableSet
 {
     [HttpHandler("/variable/edit/json")]
     internal class VariableEditJsonHandler : HttpHandler

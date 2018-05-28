@@ -1,10 +1,10 @@
-﻿using Photon.Agent.Internal;
-using PiServerLite.Http.Handlers;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Photon.Agent.Internal;
+using PiServerLite.Http.Handlers;
 
-namespace Photon.Agent.HttpHandlers.Api.Session
+namespace Photon.Agent.ApiHandlers.Session
 {
     [HttpHandler("api/session/output-stream")]
     internal class OutputStreamHandler : HttpHandler

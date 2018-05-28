@@ -1,12 +1,12 @@
-﻿using log4net;
+﻿using System.IO;
+using System.Linq;
+using System.Net;
+using log4net;
 using log4net.Appender;
 using log4net.Repository.Hierarchy;
 using PiServerLite.Http.Handlers;
-using System.IO;
-using System.Linq;
-using System.Net;
 
-namespace Photon.Agent.HttpHandlers.Api
+namespace Photon.Agent.ApiHandlers
 {
     [HttpHandler("api/log")]
     internal class LogHandler : HttpHandler

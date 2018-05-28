@@ -1,7 +1,7 @@
 ﻿using Photon.Library;
 using PiServerLite.Http.Handlers;
 
-namespace Photon.Agent.HttpHandlers.Session
+namespace Photon.Agent.ViewHandlers.Session
 {
     [HttpHandler("/sessions")]
     [HttpHandler("/session/index")]

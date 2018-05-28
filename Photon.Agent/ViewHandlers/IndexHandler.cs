@@ -1,8 +1,8 @@
-﻿using Photon.Agent.ViewModels;
+﻿using System;
+using Photon.Agent.ViewModels;
 using PiServerLite.Http.Handlers;
-using System;
 
-namespace Photon.Agent.HttpHandlers
+namespace Photon.Agent.ViewHandlers
 {
     [HttpHandler("/")]
     [HttpHandler("/index")]
