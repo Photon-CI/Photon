@@ -10,12 +10,10 @@ namespace Photon.Server.Internal.Sessions
         private static readonly ILog Log = LogManager.GetLogger(typeof(ServerSessionManager));
 
         public event EventHandler<SessionStateEventArgs> SessionChanged;
-        //public event EventHandler<SessionStateEventArgs> SessionReleased;
 
         private readonly ReferencePool<ServerSessionBase> pool;
 
         public IEnumerable<ServerSessionBase> All => pool.Items;
-        //public IEnumerable<ServerSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
 
 
         public ServerSessionManager()

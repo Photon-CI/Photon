@@ -58,7 +58,7 @@ namespace Photon.Server.ViewModels.Project
             project.Description.Name = ProjectName;
             project.Description.Description = ProjectDescription;
 
-            project.Save();
+            project.SaveProject();
         }
     }
 }

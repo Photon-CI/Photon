@@ -19,13 +19,8 @@ namespace Photon.Server.ViewModels.Build
         {
             if (!string.IsNullOrEmpty(ProjectId) && PhotonServer.Instance.Projects.TryGet(ProjectId, out var project)) {
                 ProjectName = project.Description.Name;
-            }
-            else {
-                Errors.Add(new ApplicationException($"Project '{ProjectId}' not found!"));
-            }
 
-            if (!string.IsNullOrEmpty(ProjectId) && PhotonServer.Instance.ProjectData.TryGet(ProjectId, out var projectData)) {
-                if (projectData.Builds.TryGet(BuildNumber, out var buildData)) {
+                if (project.Builds.TryGet(BuildNumber, out var buildData)) {
                     BuildCreated = buildData.Created.ToLocalTime().ToString("F");
                     BuildDuration = buildData.Duration?.ToString("g");
                     ProjectPackages = buildData.ProjectPackages;
@@ -39,7 +34,7 @@ namespace Photon.Server.ViewModels.Build
                 }
             }
             else {
-                Errors.Add(new ApplicationException($"Project Data '{ProjectId}' not found!"));
+                Errors.Add(new ApplicationException($"Project '{ProjectId}' not found!"));
             }
         }
     }

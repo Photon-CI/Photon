@@ -41,8 +41,7 @@ namespace Photon.Server.ApiHandlers.GitHub
                 throw new ApplicationException($"No project found matching git url '{commit.RepositoryUrl}'!");
 
             var source = (ProjectGithubSource)project.Description.Source;
-            var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(project.Description.Id);
-            var build = projectData.StartNewBuild();
+            var build = project.StartNewBuild();
 
             var session = new ServerBuildSession {
                 Project = project.Description,

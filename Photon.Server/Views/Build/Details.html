@@ -34,15 +34,43 @@
 
 {{#Style}}
 <style>
+    .layout-content {
+        
+    }
     #OutputText {
         overflow-x: auto;
         background: #111;
         color: #CCC;
-        height: 85vh;
     }
     td.c-icon {
         width: 1px;
         white-space: nowrap;
+    }
+
+    @media (min-width: 768px) {
+        .layout-content {
+            height: 100vh;
+            flex-direction: column;
+            display: flex;
+            overflow-y: hidden;
+        }
+        .tab-content {
+            flex: 1;
+        }
+        .output-container {
+            position: relative;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        #output {
+            height: 100%;
+        }
+        #OutputText {
+            position: absolute;
+            min-width: 100%;
+            min-height: 100%;
+        }
     }
 </style>
 {{#EndStyle}}
@@ -55,7 +83,7 @@
     </div>
 </nav>
 
-<div class="container mt-3">
+<div class="bg-light">
     {{#If Errors}}
     <div class="alert alert-danger">
         <ul class="my-0">
@@ -65,27 +93,26 @@
         </ul>
     </div>
     {{#EndIf}}
-
-    <div class="card">
-        <div class="card-header">
-            <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                <li id="SummaryTabLink" class="nav-item">
-                    <a class="nav-link active" href="#summary" data-toggle="tab" role="tab">Summary</a>
-                </li>
-                <li id="OutputTabLink" class="nav-item">
-                    <a class="nav-link" href="#output" data-toggle="tab" role="tab">Output</a>
-                </li>
-            </ul>
-        </div>
-        <div class="card-body">
-            <div class="tab-content">
-                <div id="summary" class="tab-pane fade show active" role="tabpanel">
-                    {{#If IsRunning}}
-                    <div class="alert alert-info">
-                        <h4><i class="fas fa-spinner fa-spin"></i> Build is running...</h4>
-                    </div>
-                    {{#Else}}
-                    <table class="table table-sm">
+    <ul class="nav nav-tabs px-2 pt-2" role="tablist">
+        <li id="SummaryTabLink" class="nav-item">
+            <a class="nav-link active" href="#summary" data-toggle="tab" role="tab">Summary</a>
+        </li>
+        <li id="OutputTabLink" class="nav-item">
+            <a class="nav-link" href="#output" data-toggle="tab" role="tab">Output</a>
+        </li>
+    </ul>
+</div>
+<div class="tab-content">
+    <div id="summary" class="tab-pane fade show active" role="tabpanel">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-7">
+                    <table class="table table-sm my-2">
+                        <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Details</th>
+                        </tr>
+                        </thead>
                         <tbody>
                         <tr>
                             <td>Project</td>
@@ -105,45 +132,56 @@
                         </tr>
                         </tbody>
                     </table>
-                    <table class="table table-sm table-hover mt-4">
-                        <thead>
-                        <tr>
-                            <th colspan="2">Packages</th>
-                        </tr>
+                </div>
+                <div class="col-lg-5">
+                    <table class="table table-sm table-hover my-2">
+                        <thead class="thead-light">
+                            <tr>
+                                <th colspan="2">Packages</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {{#If ProjectPackages}}
-                            {{#Each ProjectPackages.package}}
+                            {{#If IsRunning}}
                             <tr>
-                                <td>{{package.PackageId}} <span class="text-muted">@</span>{{package.PackageVersion}}</td>
-                                <td class="c-icon">
-                                    <a href="{{#Url deployment/new}}?id={{&package.PackageId}}&version={{&package.PackageVersion}}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-play"></i>
-                                    </a>
+                                <td class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin"></i> Pending...
                                 </td>
                             </tr>
-                            {{#EndEach}}
-                        {{#Else}}
-                        <tr>
-                            <td class="text-center text-muted">
-                                None
-                            </td>
-                        </tr>
-                        {{#EndIf}}
+                            {{#Else}}
+                                {{#If ProjectPackages}}
+                                {{#Each ProjectPackages.package}}
+                                <tr>
+                                    <td>{{package.PackageId}} <span class="text-muted">@</span>{{package.PackageVersion}}</td>
+                                    <td class="c-icon">
+                                        <a href="{{#Url deployment/new}}?id={{&package.PackageId}}&version={{&package.PackageVersion}}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-play"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {{#EndEach}}
+                                {{#Else}}
+                                <tr>
+                                    <td class="text-center text-muted">
+                                        None
+                                    </td>
+                                </tr>
+                                {{#EndIf}}
+                            {{#EndIf}}
                         </tbody>
                     </table>
-                    {{#EndIf}}
-                </div>
-                <div id="output" class="tab-pane fade" role="tabpanel">
-                    {{#If IsRunning}}
-                    <div class="alert alert-info">
-                        <h4><i class="fas fa-spinner fa-spin"></i> Build is running...</h4>
-                    </div>
-                    {{#Else}}
-                    <pre id="OutputText" class="rounded px-2 py-1"></pre>
-                    {{#EndIf}}
                 </div>
             </div>
         </div>
+    </div>
+    <div id="output" class="tab-pane fade" role="tabpanel">
+        {{#If IsRunning}}
+        <div class="alert alert-info">
+            <h4><i class="fas fa-spinner fa-spin"></i> Build is running...</h4>
+        </div>
+        {{#Else}}
+        <div class="output-container">
+            <pre id="OutputText" class="px-2 py-1"></pre>
+        </div>
+        {{#EndIf}}
     </div>
 </div>

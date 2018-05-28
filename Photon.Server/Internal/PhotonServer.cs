@@ -28,7 +28,7 @@ namespace Photon.Server.Internal
 
         public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
-        public ProjectDataManager ProjectData {get;}
+        //public ProjectDataManager ProjectData {get;}
         public ScriptQueue Queue {get;}
         public ProjectPackageManager ProjectPackages {get;}
         public ApplicationPackageManager ApplicationPackages {get;}
@@ -43,7 +43,7 @@ namespace Photon.Server.Internal
         {
             Projects = new ProjectManager();
             Sessions = new ServerSessionManager();
-            ProjectData = new ProjectDataManager();
+            //ProjectData = new ProjectDataManager();
             MessageRegistry = new MessageProcessorRegistry();
             Variables = new VariableSetDocumentManager();
 
@@ -97,13 +97,13 @@ namespace Photon.Server.Internal
             var taskHttp = Task.Run(() => StartHttpServer());
             var taskAgents = Task.Run(() => Agents.Load());
             var taskProjects = Task.Run(() => Projects.Load());
-            var taskProjectData = Task.Run(() => ProjectData.Initialize());
+            //var taskProjectData = Task.Run(() => ProjectData.Initialize());
 
             Task.WaitAll(
                 taskVariables,
                 taskAgents,
                 taskProjects,
-                taskProjectData,
+                //taskProjectData,
                 taskHttp);
 
             Log.Info("Server started.");

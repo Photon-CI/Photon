@@ -24,9 +24,9 @@ namespace Photon.Server.Internal.Projects
 
         public string ProjectId {get; set;}
 
-        public ProjectDataLastBuild LastBuild {get; set;}
+        public ProjectLastBuild LastBuild {get; set;}
 
-        public ProjectDataLastBuild LastDeployment {get; set;}
+        public ProjectLastBuild LastDeployment {get; set;}
 
         [JsonIgnore]
         public BuildDataManager Builds {get; private set;}
@@ -51,7 +51,7 @@ namespace Photon.Server.Internal.Projects
             uint buildNumber;
             lock (buildNumberLock) {
                 if (LastBuild == null)
-                    LastBuild = new ProjectDataLastBuild();
+                    LastBuild = new ProjectLastBuild();
 
                 LastBuild.Number++;
                 LastBuild.Time = DateTime.Now;
@@ -74,7 +74,7 @@ namespace Photon.Server.Internal.Projects
             uint deployNumber;
             lock (deployNumberLock) {
                 if (LastDeployment == null)
-                    LastDeployment = new ProjectDataLastBuild();
+                    LastDeployment = new ProjectLastBuild();
 
                 LastDeployment.Number++;
                 LastDeployment.Time = DateTime.Now;

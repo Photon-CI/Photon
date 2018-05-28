@@ -14,18 +14,37 @@ namespace Photon.Server.ViewModels.Build
         {
             var allBuilds = new List<BuildRow>();
 
-            foreach (var projectData in PhotonServer.Instance.ProjectData.AllData) {
-                string projectName = null;
+            foreach (var project in PhotonServer.Instance.Projects.All) {
+                var projectName = project.Description.Name;
 
-                if (PhotonServer.Instance.Projects.TryGet(projectData.ProjectId, out var project))
-                    projectName = project.Description.Name;
+                foreach (var projectBuild in project.Builds.AllBuilds) {
+                    string @class;
 
-                allBuilds.AddRange(projectData.Builds.AllBuilds.Select(projectBuild => new BuildRow {
-                    ProjectId = projectData.ProjectId,
-                    ProjectName = projectName,
-                    Number = projectBuild.Number,
-                    Created = projectBuild.Created,
-                }));
+                    if (projectBuild.Created == DateTime.MinValue) {
+                        @class = "fas fa-ellipsis-h text-muted";
+                    }
+                    else if (projectBuild.IsComplete) {
+                        @class = projectBuild.IsSuccess
+                            ? "fas fa-check text-success"
+                            : "fas fa-exclamation-triangle text-danger";
+                    }
+                    else {
+                        @class = "fas fa-spinner fa-spin text-info";
+                    }
+
+                    var displayTime = projectBuild.Created > DateTime.MinValue
+                        ? projectBuild.Created.ToLocalTime().ToString("MMM d, yyyy  h:mm:ss tt")
+                        : "---";
+
+                    allBuilds.Add(new BuildRow {
+                        ProjectId = project.Description.Id,
+                        ProjectName = projectName,
+                        Number = projectBuild.Number,
+                        Created = projectBuild.Created,
+                        CreatedDisplay = displayTime,
+                        Class = @class,
+                    });
+                }
             }
 
             Builds = allBuilds.OrderByDescending(x => x.Created)
@@ -39,5 +58,7 @@ namespace Photon.Server.ViewModels.Build
         public string ProjectName {get; set;}
         public uint Number {get; set;}
         public DateTime Created {get; set;}
+        public string Class {get; set;}
+        public string CreatedDisplay {get; set;}
     }
 }

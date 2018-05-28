@@ -38,8 +38,7 @@ namespace Photon.Server.ApiHandlers.Build
                 if (!PhotonServer.Instance.Projects.TryGet(_projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{_projectId}' was not found!");
 
-                var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(_projectId);
-                var build = projectData.StartNewBuild();
+                var build = project.StartNewBuild();
 
                 var session = new ServerBuildSession {
                     Project = project.Description,

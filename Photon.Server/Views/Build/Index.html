@@ -8,19 +8,22 @@
 </script>
 {{#EndScript}}
 
+{{#Style}}
+<style>
+    .c-time {
+        width: 1px;
+        white-space: nowrap;
+        text-align: center;
+    }
+</style>
+{{#EndStyle}}
+
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto">
         <h3 class="text-primary my-0">
             <i class="fas fa-cubes"></i> Builds
         </h3>
     </div>
-    <!--<ul class="navbar-nav">
-        <li class="nav-item px-2">
-            <a href="{{#Url build/new}}" class="nav-link">
-                New <i class="fas fa-plus"></i>
-            </a>
-        </li>
-    </ul>-->
     <div class="form-inline">
         <a href="{{#Url build/new}}" class="btn btn-sm btn-success mr-2">
             New <i class="fas fa-plus"></i>
@@ -36,16 +39,22 @@
     </div>
 </nav>
 
-<table class="table table-sm mt-3">
-    <tbody>
+<div class="container">
+    <table class="table table-sm mt-3">
+        <tbody>
         {{#Each Builds.build}}
         <tr>
             <td>
+                <i class="{{build.Class}}"></i>
                 <a href="{{#Url build/details}}?project={{&build.ProjectId}}&number={{&build.Number}}">
                     #{{build.Number}}: {{#If build.ProjectName}}{{build.ProjectName}}{{#Else}}{{build.ProjectId}}{{#EndIf}}
                 </a>
             </td>
+            <td class="c-time">
+                {{build.CreatedDisplay}}
+            </td>
         </tr>
         {{#EndEach}}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

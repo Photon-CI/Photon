@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Domain;
+using Photon.Framework.Extensions;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Library.GitHub;
@@ -55,8 +56,19 @@ namespace Photon.Server.Internal.Sessions
                         await RunAny(context);
                         break;
                 }
+
+                Build.IsSuccess = true;
+            }
+            catch (OperationCanceledException) {
+                Build.IsCancelled = true;
+                throw;
+            }
+            catch (Exception error) {
+                Build.Exception = error.UnfoldMessages();
+                throw;
             }
             finally {
+                Build.IsComplete = true;
                 Build.Duration = DateTime.UtcNow - Build.Created;
                 Build.ProjectPackages = PushedProjectPackages.ToArray();
                 Build.Save();

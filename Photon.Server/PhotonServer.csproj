@@ -72,6 +72,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\RootCommands.cs" />
+    <Compile Include="Internal\Deployments\DeploymentData.cs" />
+    <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
+    <Compile Include="Internal\Projects\ProjectLastDeployment.cs" />
     <Compile Include="Internal\Projects\ServerProject.cs" />
     <Compile Include="Internal\ServerViewModel.cs" />
     <Compile Include="ViewHandlers\Agent\AgentEditHandler.cs" />
@@ -131,9 +134,7 @@
     <Compile Include="Internal\Sessions\SessionStateEventArgs.cs" />
     <Compile Include="Internal\TaskRunner.cs" />
     <Compile Include="Internal\ServerBuildContext.cs" />
-    <Compile Include="Internal\Projects\ProjectData.cs" />
-    <Compile Include="Internal\Projects\ProjectDataManager.cs" />
-    <Compile Include="Internal\Projects\ProjectDataLastBuild.cs" />
+    <Compile Include="Internal\Projects\ProjectLastBuild.cs" />
     <Compile Include="Internal\ScriptQueue.cs" />
     <Compile Include="Internal\Sessions\DomainAgentDeploySessionHost.cs" />
     <Compile Include="Internal\Sessions\DomainAgentBuildSessionHost.cs" />

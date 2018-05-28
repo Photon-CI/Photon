@@ -1,16 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Framework.Packages;
 using Photon.Framework.Tools;
 using Photon.Library;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Photon.Server.Internal.Builds
+namespace Photon.Server.Internal.Deployments
 {
-    internal class BuildData
+    internal class DeploymentData
     {
         private const string outputFilename = "output.txt";
 
@@ -23,14 +22,14 @@ namespace Photon.Server.Internal.Builds
         public DateTime Created {get; set;}
         public TimeSpan? Duration {get; set;}
         public string ServerSessionId {get; set;}
-        public PackageReference[] ProjectPackages {get; set;}
+        //public PackageReference[] ProjectPackages {get; set;}
         public bool IsComplete {get; set;}
         public bool IsSuccess {get; set;}
         public bool IsCancelled {get; set;}
         public string Exception {get; set;}
 
 
-        public BuildData()
+        public DeploymentData()
         {
             outputData = new LazyAsync<string>(LoadOutput);
         }

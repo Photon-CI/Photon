@@ -91,7 +91,7 @@ namespace Photon.Server.Internal.Projects
             };
 
             projectsCollection[id] = project;
-            project.Save();
+            project.SaveProject();
 
             return project;
         }
