@@ -156,6 +156,7 @@ namespace Photon.Publishing.Tasks
                 CL = new NuGetCommandLine {
                     ExeFilename = nugetExe,
                     ApiKey = nugetApiKey,
+                    Output = Context.Output,
                 },
             };
 
