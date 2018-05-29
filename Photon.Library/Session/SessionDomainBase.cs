@@ -44,20 +44,29 @@ namespace Photon.Library.Session
                 ConfigurationFile = $"{assemblyFilename}.config",
             };
 
-            Sponsor = new ClientSponsor();
+            Sponsor = new ClientSponsor {
+                RenewalTime = TimeSpan.FromMinutes(2),
+            };
+            //var lease = Sponsor.InitializeLifetimeService();
+
             domain = AppDomain.CreateDomain(assemblyName, null, domainSetup);
 
             var agentType = typeof(T);
             Agent = (T)domain.CreateInstanceAndUnwrap(agentType.Assembly.FullName, agentType.FullName);
             Agent.LoadAssembly(assemblyFilename);
 
+            //var leaseX = (ILease)Agent.GetLifetimeService();
             Sponsor.Register(Agent);
+
+            //var lease = (ILease)RemotingServices.GetLifetimeService(Agent);
+            //lease.Register(Sponsor);
         }
 
         public async Task Unload(bool wait)
         {
             // A ThreadAbortException will be called
             // if we immediately close the AppDomain.
+            Sponsor.Close();
 
             try {
                 if (wait) await Task.Delay(200);
