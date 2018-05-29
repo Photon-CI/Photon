@@ -12,4 +12,11 @@
     <copyright>Copyright 2018</copyright>
     <tags>photon net automation iis</tags>
   </metadata>
+  <files>
+    <file src="bin\$configuration$\*.dll" exclude="**\Photon.Framework.dll" />
+    <file src="bin\$configuration$\*.config" />
+  </files>
+  <dependencies>
+    <dependency id="Photon.Framework" version="$frameworkVersion$" />
+  </dependencies>
 </package>

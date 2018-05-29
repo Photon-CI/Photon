@@ -52,6 +52,7 @@
     <ProjectReference Include="..\..\Photon.Framework\Photon.Framework.csproj">
       <Project>{E49360FD-BEAC-4713-A421-579564FB0992}</Project>
       <Name>Photon.Framework</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
