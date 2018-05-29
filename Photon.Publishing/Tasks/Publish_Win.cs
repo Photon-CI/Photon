@@ -5,7 +5,6 @@ using Photon.Framework.Tools;
 using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -159,13 +158,14 @@ namespace Photon.Publishing.Tasks
                     Output = Context.Output,
                     ApiKey = nugetApiKey,
                 },
-                PackProperties = new Dictionary<string, string> {
+                PackProperties = {
                     ["Configuration"] = "Release",
                     ["Platform"] = "AnyCPU",
                     ["frameworkVersion"] = frameworkVersion,
                 },
             };
 
+            publisher.Client.Initialize();
 
             await publisher.PublishAsync(token);
         }
