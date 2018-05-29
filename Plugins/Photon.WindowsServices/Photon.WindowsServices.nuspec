@@ -11,5 +11,12 @@
     <description>A Photon plugin for managing Windows Services.</description>
     <copyright>Copyright 2018</copyright>
     <tags>photon net automation windows service win svc</tags>
+    <dependencies>
+      <dependency id="Photon.Framework" version="$frameworkVersion$" />
+    </dependencies>
   </metadata>
+  <files>
+    <file src="bin\$configuration$\*.dll" exclude="**\Photon.Framework.dll" />
+    <file src="bin\$configuration$\*.config" />
+  </files>
 </package>
