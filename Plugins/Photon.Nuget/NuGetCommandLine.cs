@@ -2,6 +2,7 @@
 using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -28,7 +29,7 @@ namespace Photon.NuGetPlugin
             SourceUrl = "https://api.nuget.org/v3/index.json";
         }
 
-        public void Pack(string nuspecFilename, string outputPath)
+        public void Pack(string nuspecFilename, string outputPath, IDictionary<string, string> properties)
         {
             var path = Path.GetDirectoryName(nuspecFilename);
             var nuspecName = Path.GetFileName(nuspecFilename);
@@ -38,13 +39,18 @@ namespace Photon.NuGetPlugin
                 .WriteLine("...", ConsoleColor.DarkCyan);
 
             try {
-                var args = string.Join(" ",
+                var args = new List<string>(new[] {
                     "pack", $"\"{nuspecName}\"", "-NonInteractive",
-                    "-Prop Configuration=\"Release\"",
-                    "-Prop Platform=\"AnyCPU\"",
-                    $"-OutputDirectory \"{outputPath}\"");
+                    $"-OutputDirectory \"{outputPath}\"",
+                    //"-Prop Configuration=\"Release\"",
+                    //"-Prop Platform=\"AnyCPU\"",
+                });
 
-                var result = ProcessRunner.Run(path, ExeFilename, args, Output);
+                foreach (var prop in properties)
+                    args.Add($"-Prop {prop.Key}=\"{prop.Value}\"");
+
+                var argStr = string.Join(" ", args);
+                var result = ProcessRunner.Run(path, ExeFilename, argStr, Output);
 
                 if (result.ExitCode != 0)
                     throw new ApplicationException($"NuGet Pack failed with exit code {result.ExitCode}!");

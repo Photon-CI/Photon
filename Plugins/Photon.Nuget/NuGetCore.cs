@@ -79,7 +79,7 @@ namespace Photon.NuGetPlugin
             return versionList.Select(x => x.ToString()).ToArray();
         }
 
-        public void Pack(string nuspecFilename, string packageFilename)
+        public void Pack(string nuspecFilename, string packageFilename, IDictionary<string, string> properties)
         {
             var nuspecName = Path.GetFileName(nuspecFilename);
             var packageName = Path.GetFileName(packageFilename);
@@ -120,6 +120,7 @@ namespace Photon.NuGetPlugin
 
                 var builder = new PackageBuilder();
                 builder.Populate(nuspec.Metadata);
+                // TODO: Apply pack properties
 
                 using (var packageStream = File.Open(packageFilename, FileMode.Create, FileAccess.Write)) {
                     builder.Save(packageStream);

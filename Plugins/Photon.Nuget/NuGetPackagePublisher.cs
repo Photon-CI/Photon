@@ -1,6 +1,7 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Tools;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -22,6 +23,7 @@ namespace Photon.NuGetPlugin
         public string PackageDefinition {get; set;}
         public string Configuration {get; set;}
         public string Platform {get; set;}
+        public Dictionary<string, string> PackProperties {get; set;}
 
 
         public NuGetPackagePublisher(IDomainContext context)
@@ -30,6 +32,7 @@ namespace Photon.NuGetPlugin
 
             Configuration = "Release";
             Platform = "AnyCPU";
+            PackProperties = new Dictionary<string, string>();
         }
 
         public async Task PublishAsync(CancellationToken token)
@@ -86,7 +89,7 @@ namespace Photon.NuGetPlugin
         {
             var packageFilename = Path.Combine(PackageDirectory, $"{PackageId}.{Version}.nupkg");
 
-            Client.Pack(PackageDefinition, packageFilename);
+            Client.Pack(PackageDefinition, packageFilename, PackProperties);
         }
 
         private async Task PushUsingCore(CancellationToken token)
@@ -106,7 +109,7 @@ namespace Photon.NuGetPlugin
         {
             // TODO: ?
 
-            CL.Pack(PackageDefinition, PackageDirectory);
+            CL.Pack(PackageDefinition, PackageDirectory, PackProperties);
         }
 
         private void PushUsingCL(CancellationToken token)
