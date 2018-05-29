@@ -56,8 +56,7 @@ namespace Photon.Server.Internal.Projects
                 Builds.Load();
             }
             finally {
-                isLoaded = true;
-                loadTask.SetResult(null);
+                CompleteLoading();
             }
         }
 
@@ -69,11 +68,7 @@ namespace Photon.Server.Internal.Projects
                 JsonSettings.Serializer.Serialize(stream, Description);
             }
 
-            if (!isLoaded) {
-                // This marks newly created projects as 'load completed'
-                isLoaded = true;
-                loadTask.SetResult(null);
-            }
+            CompleteLoading();
         }
 
         public async Task<BuildData> StartNewBuild()
@@ -178,6 +173,14 @@ namespace Photon.Server.Internal.Projects
             using (var stream = File.Open(LastDeploymentFilename, FileMode.Create, FileAccess.Write)) {
                 JsonSettings.Serializer.Serialize(stream, LastDeployment);
             }
+        }
+
+        private void CompleteLoading()
+        {
+            if (isLoaded) return;
+
+            isLoaded = true;
+            loadTask.SetResult(null);
         }
     }
 }
