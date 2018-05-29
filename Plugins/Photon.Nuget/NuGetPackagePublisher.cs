@@ -36,6 +36,7 @@ namespace Photon.NuGetPlugin
         {
             switch (Mode) {
                 case NugetModes.Core:
+                case NugetModes.Hybrid:
                     if (!await PreCheckUsingCore(token)) return;
                     break;
                 case NugetModes.CommandLine:
@@ -48,22 +49,14 @@ namespace Photon.NuGetPlugin
                     PackUsingCore();
                     break;
                 case NugetModes.CommandLine:
+                case NugetModes.Hybrid:
                     PackUsingCL();
                     break;
             }
 
-            //var packageFilename = Directory
-            //    .GetFiles(PackageDirectory, $"{PackageId}.*.nupkg")
-            //    .FirstOrDefault();
-
-            //var packageName = Path.GetFileName(packageFilename);
-
-            //context.Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
-            //    .Write(packageName, ConsoleColor.Cyan)
-            //    .WriteLine("...", ConsoleColor.DarkCyan);
-
             switch (Mode) {
                 case NugetModes.Core:
+                case NugetModes.Hybrid:
                     await PushUsingCore(token);
                     break;
                 case NugetModes.CommandLine:
@@ -74,7 +67,6 @@ namespace Photon.NuGetPlugin
 
         private async Task<bool> PreCheckUsingCore(CancellationToken token)
         {
-            // Pre-Check Version
             context.Output.Write("Checking Package ", ConsoleColor.DarkCyan)
                 .Write(PackageId, ConsoleColor.Cyan)
                 .WriteLine(" for updates...", ConsoleColor.DarkCyan);
@@ -129,7 +121,20 @@ namespace Photon.NuGetPlugin
 
     public enum NugetModes
     {
+        /// <summary>
+        /// Uses the internal NuGet.Core library to pack and push packages.
+        /// </summary>
         Core,
+
+        /// <summary>
+        /// Uses an external NuGet executable to pack and push packages.
+        /// </summary>
         CommandLine,
+
+        /// <summary>
+        /// Uses an external NuGet executable to pack packages,
+        /// and the NuGet.Core library to push packages.
+        /// </summary>
+        Hybrid,
     }
 }
