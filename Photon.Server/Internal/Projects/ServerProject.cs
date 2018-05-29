@@ -44,18 +44,21 @@ namespace Photon.Server.Internal.Projects
 
         public void Load()
         {
-            LoadProject();
-            LoadLastBuild();
-            LoadLastDeployment();
+            try {
+                LoadProject();
+                LoadLastBuild();
+                LoadLastDeployment();
 
-            Builds = new BuildDataManager(ContentBuildPath);
-            Builds.Load();
+                Builds = new BuildDataManager(ContentBuildPath);
+                Builds.Load();
 
-            Deployments = new DeploymentDataManager(ContentBuildPath);
-            Builds.Load();
-
-            isLoaded = true;
-            loadTask.SetResult(null);
+                Deployments = new DeploymentDataManager(ContentBuildPath);
+                Builds.Load();
+            }
+            finally {
+                isLoaded = true;
+                loadTask.SetResult(null);
+            }
         }
 
         public void SaveProject()
@@ -64,6 +67,12 @@ namespace Photon.Server.Internal.Projects
 
             using (var stream = File.Open(ProjectFilename, FileMode.Create, FileAccess.Write)) {
                 JsonSettings.Serializer.Serialize(stream, Description);
+            }
+
+            if (!isLoaded) {
+                // This marks newly created projects as 'load completed'
+                isLoaded = true;
+                loadTask.SetResult(null);
             }
         }
 

@@ -47,8 +47,19 @@ namespace Photon.Server.Internal.Projects
 
         public async Task Load(CancellationToken token = default(CancellationToken))
         {
-            if (!Directory.Exists(Configuration.ProjectsDirectory)) return;
+            try {
+                if (!Directory.Exists(Configuration.ProjectsDirectory)) return;
 
+                await LoadProjectsAsync(token);
+            }
+            finally {
+                isLoaded = true;
+                loadTask.SetResult(null);
+            }
+        }
+
+        private async Task LoadProjectsAsync(CancellationToken token)
+        {
             var blockOptions = new ExecutionDataflowBlockOptions {
                 MaxDegreeOfParallelism = Configuration.Parallelism,
                 CancellationToken = token,
@@ -78,9 +89,6 @@ namespace Photon.Server.Internal.Projects
 
             block.Complete();
             await block.Completion;
-
-            isLoaded = true;
-            loadTask.SetResult(null);
         }
 
         public ServerProject New(string id)
