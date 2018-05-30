@@ -25,9 +25,9 @@
         </h3>
     </div>
     <div class="form-inline">
-        <a href="{{#Url build/new}}" class="btn btn-sm btn-success mr-2">
+        <button class="btn btn-sm btn-success mr-2" data-toggle="modal" data-target="#NewBuildModal">
             New <i class="fas fa-plus"></i>
-        </a>
+        </button>
         <div class="input-group input-group-sm">
             <input id="SearchTextBox" type="text" class="form-control" />
             <div class="input-group-append">
@@ -65,4 +65,26 @@
         {{#EndIf}}
         </tbody>
     </table>
+</div>
+
+<div class="modal fade" id="NewBuildModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Build</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="list-group list-group-flush">
+                    {{#Each Projects.project}}
+                    <a href="{{#Url build/new}}?project={{&project.Id}}" class="list-group-item">
+                        <h3>{{project.Name}}</h3>
+                    </a>
+                    {{#EndEach}}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

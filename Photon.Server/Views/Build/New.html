@@ -2,42 +2,9 @@
 
 {{#Script}}
 <script>
-    var buildStartUrl = '{{#Url api/build/start}}';
-    var buildDetailsUrl = '{{#Url build/details}}';
-
     $(function () {
         $('#layoutNavbarContent [data-link="builds"]').addClass('active');
     });
-
-    function onSubmit() {
-        $('#ErrorContainer').empty();
-
-        var projectId = $('#ProjectSelect').val();
-        var gitRefspec = $('#RefspecText').val();
-        var taskName = $('#TaskNameText').val();
-
-        var request = {
-            project: projectId,
-            refspec: gitRefspec,
-            task: taskName
-        };
-
-        $.ajax({
-            url: buildStartUrl,
-            method: 'POST',
-            data: JSON.stringify(request)
-        }).done(function (data) {
-            var buildNumber = data.buildNumber;
-
-            document.location = buildDetailsUrl
-                + '?project=' + encodeURIComponent(projectId)
-                + '&number=' + encodeURIComponent(buildNumber);
-        }).fail(function() {
-            $('#ErrorContainer').append($('<div>')
-                .attr('class', 'alert alert-danger')
-                .append("Failed to start build!"));
-        });
-    }
 </script>
 {{#EndScript}}
 
@@ -49,37 +16,59 @@
     </div>
 </nav>
 
-<div class="container mt-3">
-    <div id="ErrorContainer"></div>
-    <div class="row">
-        <div class="col-12 form-group">
-            <label for="ProjectSelect">Project</label>
-            <select id="ProjectSelect" class="form-control">
-                {{#Each Projects.project}}
-                <option value="{{project.Id}}">{{project.Name}}</option>
+<form method="post">
+    <input type="hidden" Name="ProjectId" value="{{ProjectId}}"/>
+    <div class="container mt-3">
+        {{#If Errors}}
+        <div class="alert alert-danger">
+            <ul class="my-0">
+                {{#Each Errors.error}}
+                <li>{{error.Message}}</li>
                 {{#EndEach}}
-            </select>
+            </ul>
+        </div>
+        {{#EndIf}}
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="RefspecText">Git Refspec</label>
+                <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" autocomplete="true" spellcheck="false" />
+                <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="TaskNameText">Task Name</label>
+                <input id="TaskNameText" name="TaskName" type="text" class="form-control" value="{{TaskName}}" autocomplete="true" spellcheck="false" />
+                <small class="text-muted">The name of the <i>IBuildTask</i> method to run.</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="TaskRolesText">Task Roles</label>
+                <input id="TaskRolesText" name="TaskRoles" type="text" class="form-control" value="{{TaskRoles}}" autocomplete="true" spellcheck="false" />
+                <small class="text-muted">A list of Agent Roles that the task may be run on. Separate multiple entries using '<code>,</code>' or '<code>;</code>'.</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="PreBuildText">PreBuild Command</label>
+                <input id="PreBuildText" name="PreBuildCommand" type="text" class="form-control" value="{{PreBuildCommand}}" autocomplete="false" spellcheck="false" />
+                <small class="text-muted">A (optional) command that is run to build the publishing assembly.</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="AssemblyText">Assembly Filename</label>
+                <input id="AssemblyText" name="AssemblyFilename" type="text" class="form-control" value="{{AssemblyFilename}}" autocomplete="false" spellcheck="false" />
+                <small class="text-muted">The path and file name of the publishing assembly, relative to the root of the repository.</small>
+            </div>
+        </div>
+        <hr />
+        <div class="float-right">
+            <a href="#" class="btn btn-dark">Cancel</a>
+            <button type="submit" class="btn btn-success">
+                Build <i class="fas fa-play"></i>
+            </button>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12 form-group">
-            <label for="RefspecText">Git Refspec</label>
-            <input id="RefspecText" type="text" class="form-control" value="master" autocomplete="true" spellcheck="false" />
-            <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 form-group">
-            <label for="TaskNameText">Task Name</label>
-            <input id="TaskNameText" type="text" class="form-control" autocomplete="true" spellcheck="false" />
-            <small class="text-muted">The name of the <i>IBuildTask</i> method to run.</small>
-        </div>
-    </div>
-    <hr />
-    <div class="float-right">
-        <a href="#" class="btn btn-dark">Cancel</a>
-        <button type="button" class="btn btn-success">
-            Build <i class="fas fa-play"></i>
-        </button>
-    </div>
-</div>
+</form>
