@@ -78,7 +78,7 @@
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto">
         <h3 class="text-primary my-0">
-            <i class="fas fa-cubes"></i> Build Details <small class="text-info pl-3">{{ProjectName}} #{{BuildNumber}}</small>
+            <i class="{{IconClass}}"></i> {{ProjectName}} #{{BuildNumber}}
         </h3>
     </div>
 </nav>
@@ -99,6 +99,9 @@
         </li>
         <li id="OutputTabLink" class="nav-item">
             <a class="nav-link" href="#output" data-toggle="tab" role="tab">Output</a>
+        </li>
+        <li id="ArtifactsTabLink" class="nav-item">
+            <a class="nav-link" href="#artifacts" data-toggle="tab" role="tab">Artifacts</a>
         </li>
     </ul>
 </div>
@@ -183,5 +186,37 @@
             <pre id="OutputText" class="px-2 py-1"></pre>
         </div>
         {{#EndIf}}
+    </div>
+    <div id="artifacts" class="tab-pane fade" role="tabpanel">
+        <div class="container my-3">
+            {{#If IsRunning}}
+            <div class="alert alert-info">
+                <h4><i class="fas fa-spinner fa-spin"></i> Build is running...</h4>
+            </div>
+            {{#Else}}
+            <table class="table table-sm">
+                <thead class="thead-light">
+                <tr>
+                    <th>Filename</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#If Artifacts}}
+                    {{#Each Artifacts.artifact}}
+                    <tr>
+                        <td>{{artifact.Filename}}</td>
+                    </tr>
+                    {{#EndEach}}
+                {{#Else}}
+                <tr>
+                    <td class="text-center text-muted">
+                        None
+                    </td>
+                </tr>
+                {{#EndIf}}
+                </tbody>
+            </table>
+            {{#EndIf}}
+        </div>
     </div>
 </div>

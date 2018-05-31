@@ -1,4 +1,5 @@
-﻿using PiServerLite.Http;
+﻿using Photon.Library.HttpSecurity;
+using PiServerLite.Http;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System.Net;
@@ -14,7 +15,7 @@ namespace Photon.Agent.Internal
             return true;
         }
 
-        public bool Authenticate(HttpListenerResponse response, ISecurityUser user)
+        public bool Authenticate(HttpListenerResponse response, HttpUserCredentials user)
         {
             // TODO: Verify new credentials
 

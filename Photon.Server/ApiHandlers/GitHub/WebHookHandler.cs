@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Projects;
+﻿using log4net;
+using Photon.Framework.Projects;
 using Photon.Library.GitHub;
 using Photon.Server.Internal;
 using Photon.Server.Internal.GitHub;
@@ -14,6 +15,9 @@ namespace Photon.Server.ApiHandlers.GitHub
     [HttpHandler("api/github/webhook")]
     internal class WebHookHandler : HttpHandlerAsync
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(WebHookHandler));
+
+
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var eventType = HttpContext.Request.Headers["X-GitHub-Event"];
@@ -24,7 +28,19 @@ namespace Photon.Server.ApiHandlers.GitHub
                 return Response.BadRequest().SetText("GitHub Webhook Event-Type is undefined!");
 
             var json = await Request.TextAsync();
-            var commit = HookEventHandler.ParseEvent(eventType, json);
+            GithubCommit commit;
+
+            try {
+                commit = HookEventHandler.ParseEvent(eventType, json);
+            }
+            catch (Exception error) {
+                var subtext = json;
+                if (subtext.Length > 96) {
+                    subtext = subtext.Substring(0, 96)+$"...+{subtext.Length-96})";
+                }
+                Log.Error($"Failed to parse GitHub webhook event! [{subtext}]", error);
+                throw;
+            }
 
             if (commit != null)
                 await StartBuild(commit);

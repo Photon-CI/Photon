@@ -71,6 +71,11 @@ namespace Photon.Server.Internal.Projects
             CompleteLoading();
         }
 
+        public void ReloadDescription()
+        {
+            LoadProject();
+        }
+
         public async Task<BuildData> StartNewBuild()
         {
             if (!isLoaded) await loadTask.Task;

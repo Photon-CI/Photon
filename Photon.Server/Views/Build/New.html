@@ -29,18 +29,18 @@
         </div>
         {{#EndIf}}
         <div class="row">
-            <div class="col-12 form-group">
+            <div class="col-12 col-lg-6 form-group">
                 <label for="RefspecText">Git Refspec</label>
                 <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" autocomplete="true" spellcheck="false" />
                 <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12 form-group">
+            <div class="col-12 col-lg-6 form-group">
                 <label for="TaskNameText">Task Name</label>
                 <input id="TaskNameText" name="TaskName" type="text" class="form-control" value="{{TaskName}}" autocomplete="true" spellcheck="false" />
                 <small class="text-muted">The name of the <i>IBuildTask</i> method to run.</small>
             </div>
+        </div>
+        <div class="row">
         </div>
         <div class="row">
             <div class="col-12 form-group">
@@ -65,7 +65,7 @@
         </div>
         <hr />
         <div class="float-right">
-            <a href="#" class="btn btn-dark">Cancel</a>
+            <a href="{{#Url builds}}" class="btn btn-dark">Cancel</a>
             <button type="submit" class="btn btn-success">
                 Build <i class="fas fa-play"></i>
             </button>
