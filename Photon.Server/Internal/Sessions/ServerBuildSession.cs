@@ -44,7 +44,7 @@ namespace Photon.Server.Internal.Sessions
                 ConnectionFactory = ConnectionFactory,
                 Output = contextOutput,
                 ServerVariables = Variables,
-                //Commit = Commit,
+                Commit = Commit,
             };
 
             try {
@@ -70,6 +70,9 @@ namespace Photon.Server.Internal.Sessions
             finally {
                 Build.IsComplete = true;
                 Build.Duration = DateTime.UtcNow - Build.Created;
+                Build.GitRefspec = GitRefspec;
+                Build.Commit = Commit;
+                Build.TaskName = TaskName;
                 Build.ProjectPackages = PushedProjectPackages.ToArray();
                 Build.Save();
 

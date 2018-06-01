@@ -1,11 +1,10 @@
-﻿using System;
-using log4net;
+﻿using log4net;
+using Photon.Framework;
+using Photon.Framework.Extensions;
+using Photon.Framework.Tools;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using Photon.Framework;
-using Photon.Framework.Tools;
-using Photon.Framework.Extensions;
 
 namespace Photon.Server.Internal.Builds
 {

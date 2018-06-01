@@ -176,6 +176,7 @@
     <Compile Include="ViewModels\Build\BuildDetailsVM.cs" />
     <Compile Include="ViewModels\Build\BuildNewVM.cs" />
     <Compile Include="ViewModels\Build\BuildIndexVM.cs" />
+    <Compile Include="ViewModels\Deployment\DeploymentIndexVM.cs" />
     <Compile Include="ViewModels\Deployment\DeploymentNewVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\LoginVM.cs" />

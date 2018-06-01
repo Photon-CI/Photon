@@ -6,11 +6,11 @@ namespace Photon.Library.HttpSecurity
     {
         public HttpUserContext Authorize(HttpUserCredentials credentials)
         {
-            if (!string.Equals("user", credentials.Username, StringComparison.OrdinalIgnoreCase)) return null;
-            if (!string.Equals("pass", credentials.Password, StringComparison.Ordinal)) return null;
+            if (!string.Equals("photon", credentials.Username, StringComparison.OrdinalIgnoreCase)) return null;
+            if (!string.Equals("ci", credentials.Password, StringComparison.Ordinal)) return null;
 
             return new HttpUserContext {
-                Username = "UserPass",
+                Username = "photon",
             };
         }
     }

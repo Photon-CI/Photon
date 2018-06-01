@@ -48,7 +48,6 @@ namespace Photon.Server.Internal.Sessions
         protected ILog Log => _log.Value;
 
         protected readonly CancellationTokenSource TokenSource;
-        //protected readonly DomainOutput DomainOutput;
         private readonly ProjectPackageManager projectPackages;
         private readonly ApplicationPackageManager applicationPackages;
 
@@ -59,8 +58,8 @@ namespace Photon.Server.Internal.Sessions
         {
             SessionId = Guid.NewGuid().ToString("N");
             TimeCreated = DateTime.UtcNow;
-            CacheSpan = TimeSpan.FromHours(1);
-            LifeSpan = TimeSpan.FromHours(8);
+            CacheSpan = TimeSpan.FromHours(8);
+            LifeSpan = TimeSpan.FromHours(12);
             Output = new ScriptOutput();
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
@@ -69,8 +68,6 @@ namespace Photon.Server.Internal.Sessions
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
             BinDirectory = Path.Combine(WorkDirectory, "bin");
             ContentDirectory = Path.Combine(WorkDirectory, "content");
-
-            //DomainOutput
 
             projectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,

@@ -19,8 +19,7 @@ namespace Photon.Server.Internal.Sessions
         public ServerSessionManager()
         {
             pool = new ReferencePool<ServerSessionBase> {
-                //Lifespan = 3600_000, // 60 minutes
-                PruneInterval = 60_000 // 1 minute
+                PruneInterval = 600_000, // 10 minutes
             };
         }
 

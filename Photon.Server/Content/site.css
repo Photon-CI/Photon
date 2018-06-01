@@ -19,6 +19,7 @@ nav.sidebar {
 
 .content-navbar {
     padding: 2px 8px 1px 8px;
+    min-height: 47px;
 }
 
 .nav-item-iconholder {

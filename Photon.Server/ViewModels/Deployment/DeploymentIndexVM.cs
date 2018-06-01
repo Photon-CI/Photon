@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Photon.Server.ViewModels.Build
+namespace Photon.Server.ViewModels.Deployment
 {
-    internal class BuildIndexVM : ServerViewModel
+    internal class DeploymentIndexVM : ServerViewModel
     {
         public bool IsLoading {get; private set;}
-        public BuildRow[] Builds {get; private set;}
+        public DeploymentRow[] Deployments {get; private set;}
         public Framework.Projects.Project[] Projects {get; private set;}
 
 
@@ -20,52 +20,48 @@ namespace Photon.Server.ViewModels.Build
             Projects = PhotonServer.Instance.Projects.All
                 .Select(x => x.Description).ToArray();
 
-            var allBuilds = new List<BuildRow>();
+            var allDeployments = new List<DeploymentRow>();
 
             foreach (var project in PhotonServer.Instance.Projects.All) {
                 var projectName = project.Description.Name;
 
-                foreach (var projectBuild in project.Builds.AllBuilds) {
+                foreach (var projectDeployment in project.Deployments.AllDeployments) {
                     string @class;
 
-                    if (projectBuild.Created == DateTime.MinValue) {
+                    if (projectDeployment.Created == DateTime.MinValue) {
                         @class = "fas fa-ellipsis-h text-muted";
                     }
                     else {
-                        @class = !projectBuild.IsComplete ? "fas fa-spinner fa-spin text-info"
-                            : projectBuild.IsCancelled ? "fas fa-trash text-warning"
-                            : projectBuild.IsSuccess ? "fas fa-check text-success"
+                        @class = !projectDeployment.IsComplete ? "fas fa-spinner fa-spin text-info"
+                            : projectDeployment.IsCancelled ? "fas fa-trash text-warning"
+                            : projectDeployment.IsSuccess ? "fas fa-check text-success"
                             : "fas fa-exclamation-triangle text-danger";
                     }
 
-                    var displayTime = projectBuild.Created > DateTime.MinValue
-                        ? projectBuild.Created.ToLocalTime().ToString("MMM d, yyyy  h:mm:ss tt")
+                    var displayTime = projectDeployment.Created > DateTime.MinValue
+                        ? projectDeployment.Created.ToLocalTime().ToString("MMM d, yyyy  h:mm:ss tt")
                         : "---";
 
-                    allBuilds.Add(new BuildRow {
+                    allDeployments.Add(new DeploymentRow {
                         ProjectId = project.Description.Id,
                         ProjectName = projectName,
-                        TaskName = projectBuild.TaskName,
-                        Refspec = projectBuild.GitRefspec,
-                        Number = projectBuild.Number,
-                        Created = projectBuild.Created,
+                        Number = projectDeployment.Number,
+                        Created = projectDeployment.Created,
                         CreatedDisplay = displayTime,
                         Class = @class,
                     });
                 }
             }
 
-            Builds = allBuilds.OrderByDescending(x => x.Created)
+            Deployments = allDeployments.OrderByDescending(x => x.Created)
                 .ThenByDescending(x => x.Number).ToArray();
         }
     }
 
-    internal class BuildRow
+    internal class DeploymentRow
     {
         public string ProjectId {get; set;}
         public string ProjectName {get; set;}
-        public string TaskName {get; set;}
-        public string Refspec {get; set;}
         public uint Number {get; set;}
         public DateTime Created {get; set;}
         public string Class {get; set;}
