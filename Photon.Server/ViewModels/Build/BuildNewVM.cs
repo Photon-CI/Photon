@@ -60,6 +60,8 @@ namespace Photon.Server.ViewModels.Build
                 throw new ApplicationException($"Project '{ProjectId}' was not found!");
 
             var build = await project.StartNewBuild();
+            build.TaskName = TaskName;
+            build.GitRefspec = GitRefspec;
 
             var session = new ServerBuildSession {
                 Project = project.Description,

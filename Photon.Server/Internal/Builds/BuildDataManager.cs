@@ -2,9 +2,11 @@
 using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Framework.Tools;
+using Photon.Library;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Photon.Server.Internal.Builds
 {
@@ -44,8 +46,6 @@ namespace Photon.Server.Internal.Builds
                 if (File.Exists(indexFilename)) {
                     using (var stream = File.Open(indexFilename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                         buildData = JsonSettings.Serializer.Deserialize<BuildData>(stream);
-
-                        //buildData.Number = buildNumber;
                         buildData.ContentPath = path;
                     }
                 }
@@ -78,6 +78,28 @@ namespace Photon.Server.Internal.Builds
         public bool TryGet(uint number, out BuildData buildData)
         {
             return data.TryGetValue(number, out buildData);
+        }
+
+        public void Cleanup(int maxBuilds)
+        {
+            var numbers = data.Keys.ToArray();
+            if (numbers.Length <= maxBuilds) return;
+
+            var removeNumbers = numbers.OrderBy(x => x)
+                .Take(numbers.Length - maxBuilds)
+                .ToArray();
+
+            foreach (var number in removeNumbers) {
+                var build = data[number];
+                data.Remove(number);
+
+                try {
+                    FileUtils.DestoryDirectory(build.ContentPath);
+                }
+                catch (Exception error) {
+                    Log.Error($"Failed to cleanup build #{number}!", error);
+                }
+            }
         }
     }
 }

@@ -41,6 +41,8 @@ namespace Photon.Server.ApiHandlers.Build
                     return Response.BadRequest().SetText($"Project '{_projectId}' was not found!");
 
                 var build = await project.StartNewBuild();
+                build.TaskName = _taskName;
+                build.GitRefspec = _gitRefspec;
 
                 var session = new ServerBuildSession {
                     Project = project.Description,

@@ -54,6 +54,9 @@ namespace Photon.Server.Internal.Projects
 
                 Deployments = new DeploymentDataManager(ContentBuildPath);
                 Builds.Load();
+
+                if (Description.MaxBuilds.HasValue)
+                    Builds.Cleanup((int)Description.MaxBuilds.Value);
             }
             finally {
                 CompleteLoading();
@@ -98,7 +101,16 @@ namespace Photon.Server.Internal.Projects
                 Log.Error("Failed to update project lastBuild file!", error);
             }
 
-            return Builds.New(buildNumber);
+            var newBuild = Builds.New(buildNumber);
+
+            if (Description.MaxBuilds.HasValue) {
+                try {
+                    Builds.Cleanup((int)Description.MaxBuilds.Value);
+                }
+                catch {}
+            }
+
+            return newBuild;
         }
 
         public async Task<DeploymentData> StartNewDeployment()

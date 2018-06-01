@@ -22,11 +22,14 @@ namespace Photon.Framework.Projects
         [JsonProperty("preBuild", Order = 5)]
         public string PreBuild {get; set;}
 
-        [JsonProperty("source", Order = 6)]
+        [JsonProperty("maxBuilds", Order = 6)]
+        public uint? MaxBuilds {get; set;}
+
+        [JsonProperty("source", Order = 7)]
         [JsonConverter(typeof(ProjectSourceSerializer))]
         public IProjectSource Source {get; set;}
 
-        [JsonProperty("environments", Order = 7)]
+        [JsonProperty("environments", Order = 8)]
         public List<ProjectEnvironment> Environments {get; set;}
 
 
