@@ -39,6 +39,7 @@
         $.ajax({
             url: projectsJsonUrl,
             method: 'post',
+            contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(json)
         }).done(function() {
             alert('Saved Successfully!');
