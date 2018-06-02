@@ -1,5 +1,4 @@
 ﻿using Photon.Framework.Domain;
-using System;
 
 namespace Photon.Framework.Packages
 {
@@ -7,7 +6,7 @@ namespace Photon.Framework.Packages
 
     public delegate void PullPackageFunc(string id, string version, RemoteTaskCompletionSource<string> taskHandle);
 
-    public class DomainPackageClient : MarshalByRefObject
+    public class DomainPackageClient : MarshalByRefInstance
     {
         public event PushPackageFunc OnPushProjectPackage;
         public event PushPackageFunc OnPushApplicationPackage;

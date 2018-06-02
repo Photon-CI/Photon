@@ -36,76 +36,75 @@ namespace Photon.Agent.Internal.Session
 
         public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
-            // TODO: Implement ClientSponsor
+            using (var contextOutput = new DomainOutput()) {
+                contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+                contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
 
-            var contextOutput = new DomainOutput();
-            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
-            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
-
-            var context = new AgentBuildContext {
-                Project = Project,
-                Agent = Agent,
-                AssemblyFilename = AssemblyFilename,
-                GitRefspec = GitRefspec,
-                TaskName = taskName,
-                WorkDirectory = WorkDirectory,
-                ContentDirectory = ContentDirectory,
-                BinDirectory = BinDirectory,
-                BuildNumber = BuildNumber,
-                Output = contextOutput,
-                Packages = PackageClient,
-                ServerVariables = ServerVariables,
-                AgentVariables = AgentVariables,
-            };
-
-            var githubSource = Project?.Source as ProjectGithubSource;
-            var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent && Commit != null;
-            CommitStatusUpdater su = null;
-
-            if (notifyGithub) {
-                su = new CommitStatusUpdater {
-                    Username = githubSource.Username,
-                    Password = githubSource.Password,
-                    StatusUrl = Commit.StatusesUrl,
-                    Sha = Commit.Sha,
+                var context = new AgentBuildContext {
+                    Project = Project,
+                    Agent = Agent,
+                    AssemblyFilename = AssemblyFilename,
+                    GitRefspec = GitRefspec,
+                    TaskName = taskName,
+                    WorkDirectory = WorkDirectory,
+                    ContentDirectory = ContentDirectory,
+                    BinDirectory = BinDirectory,
+                    BuildNumber = BuildNumber,
+                    Output = contextOutput,
+                    Packages = PackageClient,
+                    ServerVariables = ServerVariables,
+                    AgentVariables = AgentVariables,
                 };
 
-                var status = new CommitStatus {
-                    State = CommitStates.Pending,
-                    Context = "Photon",
-                    Description = "Build in progress..."
-                };
+                var githubSource = Project?.Source as ProjectGithubSource;
+                var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent && Commit != null;
+                CommitStatusUpdater su = null;
 
-                await su.Post(status);
-            }
-
-            var success = false;
-
-            try {
-                await Domain.RunBuildTask(context, TokenSource.Token);
-
-                success = true;
-            }
-            catch (Exception error) {
-                Exception = error;
-                throw;
-            }
-            finally {
                 if (notifyGithub) {
-                    var status = new CommitStatus {
-                        Context = "Photon",
+                    su = new CommitStatusUpdater {
+                        Username = githubSource.Username,
+                        Password = githubSource.Password,
+                        StatusUrl = Commit.StatusesUrl,
+                        Sha = Commit.Sha,
                     };
 
-                    if (success) {
-                        status.State = CommitStates.Success;
-                        status.Description = "Build Successful.";
-                    }
-                    else {
-                        status.State = CommitStates.Failure;
-                        status.Description = "Build Failed!";
-                    }
+                    var status = new CommitStatus {
+                        State = CommitStates.Pending,
+                        Context = "Photon",
+                        Description = "Build in progress..."
+                    };
 
                     await su.Post(status);
+                }
+
+                var success = false;
+
+                try {
+                    await Domain.RunBuildTask(context, TokenSource.Token);
+
+                    success = true;
+                }
+                catch (Exception error) {
+                    Exception = error;
+                    throw;
+                }
+                finally {
+                    if (notifyGithub) {
+                        var status = new CommitStatus {
+                            Context = "Photon",
+                        };
+
+                        if (success) {
+                            status.State = CommitStates.Success;
+                            status.Description = "Build Successful.";
+                        }
+                        else {
+                            status.State = CommitStates.Failure;
+                            status.Description = "Build Failed!";
+                        }
+
+                        await su.Post(status);
+                    }
                 }
             }
         }

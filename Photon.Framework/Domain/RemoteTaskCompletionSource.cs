@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
 {
-    public class RemoteTaskCompletionSource : MarshalByRefObject
+    public class RemoteTaskCompletionSource : MarshalByRefInstance
     {
         private readonly TaskCompletionSource<object> taskEvent;
-        private bool isComplete;
+        private volatile bool isComplete;
 
         public Task Task => taskEvent.Task;
 
@@ -62,10 +62,10 @@ namespace Photon.Framework.Domain
         }
     }
 
-    public class RemoteTaskCompletionSource<T> : MarshalByRefObject
+    public class RemoteTaskCompletionSource<T> : MarshalByRefInstance
     {
         private readonly TaskCompletionSource<T> taskEvent;
-        private bool isComplete;
+        private volatile bool isComplete;
 
         public Task<T> Task => taskEvent.Task;
 

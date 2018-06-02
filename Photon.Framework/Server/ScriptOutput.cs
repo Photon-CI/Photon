@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Photon.Framework.Domain;
+using System;
 using System.IO;
 using System.Text;
 
 namespace Photon.Framework.Server
 {
-    public class ScriptOutput : MarshalByRefObject, IWriteAnsi, IDisposable
+    public class ScriptOutput : MarshalByRefInstance, IWriteAnsi
     {
         public event EventHandler Changed;
 
         private readonly StringBuilder builder;
         private readonly StringWriter writer;
         private readonly AnsiWriter ansiWriter;
-        protected Lazy<object> lockHandle = new Lazy<object>();
+        protected Lazy<object> lockHandle;
 
         public int Length {
             get {
@@ -28,13 +29,15 @@ namespace Photon.Framework.Server
             writer = new StringWriter(builder);
             var x = TextWriter.Synchronized(writer);
             ansiWriter = new AnsiWriter(x);
-            //lockHandle = new Lazy<object>();
+            lockHandle = new Lazy<object>();
 
             writer.NewLine = "\n";
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
             writer?.Dispose();
         }
 

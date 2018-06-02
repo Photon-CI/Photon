@@ -80,6 +80,7 @@ namespace Photon.Agent.Internal.Session
                 //ReleaseAsync().GetAwaiter().GetResult();
             
             TokenSource?.Dispose();
+            PackageClient?.Dispose();
             Domain?.Dispose();
         }
 

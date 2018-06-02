@@ -5,7 +5,7 @@ namespace Photon.Framework.Domain
     public delegate void WriteFunc(object text, ConsoleColor color);
     public delegate void WriteLineFunc(object text, ConsoleColor color);
 
-    public class DomainOutput : MarshalByRefObject, IWriteAnsi
+    public class DomainOutput : MarshalByRefInstance, IWriteAnsi
     {
         public event WriteFunc OnWrite;
         public event WriteLineFunc OnWriteLine;
@@ -34,11 +34,5 @@ namespace Photon.Framework.Domain
             OnWriteLine?.Invoke(value, color);
             return this;
         }
-
-        //public IWriteAnsi WriteLine()
-        //{
-        //    OnWriteLine?.Invoke(null, ConsoleColor.Black);
-        //    return this;
-        //}
     }
 }

@@ -55,6 +55,7 @@
     <Compile Include="Domain\DomainContextBase.cs" />
     <Compile Include="Domain\DomainOutput.cs" />
     <Compile Include="Domain\IDomainContext.cs" />
+    <Compile Include="Domain\MarshalByRefInstance.cs" />
     <Compile Include="Domain\ServerDomainAgent.cs" />
     <Compile Include="Domain\AgentDomainAgent.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />

@@ -100,6 +100,8 @@ namespace Photon.Server.Internal.Sessions
                 ReleaseAsync().GetAwaiter().GetResult();
 
             TokenSource?.Dispose();
+            ConnectionFactory?.Dispose();
+            PackageClient?.Dispose();
             Domain?.Dispose();
             Domain = null;
         }

@@ -44,28 +44,29 @@ namespace Photon.Server.Internal.Sessions
             Domain = new ServerDomain();
             Domain.Initialize(assemblyFilename);
 
-            var contextOutput = new DomainOutput();
-            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
-            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+            using (var contextOutput = new DomainOutput()) {
+                contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+                contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
 
-            var context = new ServerDeployContext {
-                DeploymentNumber = DeploymentNumber,
-                Project = Project,
-                Agents = PhotonServer.Instance.Agents.All.ToArray(),
-                ProjectPackageId = ProjectPackageId,
-                ProjectPackageVersion = ProjectPackageVersion,
-                EnvironmentName = EnvironmentName,
-                ScriptName = ScriptName,
-                WorkDirectory = WorkDirectory,
-                BinDirectory = BinDirectory,
-                ContentDirectory = ContentDirectory,
-                Packages = PackageClient,
-                ConnectionFactory = ConnectionFactory,
-                Output = contextOutput,
-                ServerVariables = Variables,
-            };
+                var context = new ServerDeployContext {
+                    DeploymentNumber = DeploymentNumber,
+                    Project = Project,
+                    Agents = PhotonServer.Instance.Agents.All.ToArray(),
+                    ProjectPackageId = ProjectPackageId,
+                    ProjectPackageVersion = ProjectPackageVersion,
+                    EnvironmentName = EnvironmentName,
+                    ScriptName = ScriptName,
+                    WorkDirectory = WorkDirectory,
+                    BinDirectory = BinDirectory,
+                    ContentDirectory = ContentDirectory,
+                    Packages = PackageClient,
+                    ConnectionFactory = ConnectionFactory,
+                    Output = contextOutput,
+                    ServerVariables = Variables,
+                };
 
-            await Domain.RunDeployScript(context, TokenSource.Token);
+                await Domain.RunDeployScript(context, TokenSource.Token);
+            }
         }
     }
 }
