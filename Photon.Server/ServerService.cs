@@ -21,7 +21,7 @@ namespace Photon.Server
                 PhotonServer.Instance.Start();
             }
             catch (Exception error) {
-                Log.Error("Failed to start service!", error);
+                Log.Fatal("Failed to start service!", error);
             }
         }
 

@@ -35,9 +35,8 @@ namespace Photon.Server.ViewHandlers.Build
                 vm.Restore(Request.FormData());
                 await vm.StartBuild();
 
-                return Response.Redirect("build/details", new {
-                    project = vm.ProjectId,
-                    number = vm.BuildNumber,
+                return Response.Redirect("session/details", new {
+                    id = vm.ServerSessionId,
                 });
             }
             catch (Exception error) {

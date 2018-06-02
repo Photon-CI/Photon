@@ -19,6 +19,7 @@ namespace Photon.Server.ViewModels.Build
         public string TaskName {get; private set;}
         public string TaskRoles {get; private set;}
         public uint BuildNumber {get; private set;}
+        public string ServerSessionId {get; private set;}
 
 
         public BuildNewVM()
@@ -79,7 +80,7 @@ namespace Photon.Server.ViewModels.Build
             PhotonServer.Instance.Sessions.BeginSession(session);
             PhotonServer.Instance.Queue.Add(session);
 
-            //SessionId = session.SessionId;
+            ServerSessionId = session.SessionId;
             BuildNumber = session.Build.Number;
         }
     }
