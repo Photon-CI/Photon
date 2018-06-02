@@ -28,16 +28,28 @@ namespace Photon.Agent.MessageHandlers
 
             File.Move(requestMessage.Filename, msiFilename);
 
-            BeginInstall(updatePath, msiFilename);
+            var _ = Task.Delay(100)
+                .ContinueWith(async t => {
+                    await BeginInstall(updatePath, msiFilename);
+                });
+
+            //BeginInstall(updatePath, msiFilename);
 
             var response = new AgentUpdateResponse();
 
             return await Task.FromResult(response);
         }
 
-        private void BeginInstall(string updatePath, string msiFilename)
+        private async Task BeginInstall(string updatePath, string msiFilename)
         {
             // TODO: Verify MSI?
+
+            try {
+                await PhotonAgent.Instance.Shutdown(TimeSpan.FromSeconds(30));
+            }
+            catch (Exception error) {
+                Log.Error("An error occurred while shutting down!", error);
+            }
 
             Log.Debug("Starting agent update...");
 

@@ -110,11 +110,11 @@ namespace Photon.Server.Internal.Sessions
                 messageClient?.Dispose();
             }
 
-            Output.Write("Agent update start on ", ConsoleColor.DarkCyan)
+            Output.Write("Agent update started on ", ConsoleColor.DarkCyan)
                 .Write(agent.Name, ConsoleColor.Cyan)
                 .WriteLine("...", ConsoleColor.DarkCyan);
 
-            await Task.Delay(3000, token);
+            await Task.Delay(1000, token);
 
             // TODO: Verify update was successful by polling for server and checking version
             messageClient = null;
@@ -129,7 +129,10 @@ namespace Photon.Server.Internal.Sessions
                 throw new ApplicationException($"A timeout occurred after {reconnectTimeout} while waiting for the update to complete.");
             }
             finally {
-                messageClient?.Dispose();
+                if (messageClient != null) {
+                    await messageClient.DisconnectAsync();
+                    messageClient.Dispose();
+                }
             }
         }
 

@@ -145,7 +145,7 @@ namespace Photon.Communication.Packets
             }
             else if (message is IFileMessage fileMessage) {
                 try {
-                    streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read, FileShare.Read);
                 }
                 catch (Exception error) {
                     OnThreadError(new ApplicationException("Failed to open message file source!", error));

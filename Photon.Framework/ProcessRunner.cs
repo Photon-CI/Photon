@@ -9,7 +9,7 @@ namespace Photon.Framework
 {
     public static class ProcessRunner
     {
-        public static Process Start(string workDir, string filename, string arguments, IWriteAnsi output = null)
+        public static Process Start(string workDir, string filename, string arguments)
         {
             if (filename == null) throw new ArgumentNullException(nameof(filename));
 
@@ -34,15 +34,15 @@ namespace Photon.Framework
             return Process.Start(startInfo);
         }
 
-        public static Process Start(string workDir, string command, IWriteAnsi output = null)
+        public static Process Start(string workDir, string command)
         {
             SplitCommand(command, out var _file, out var _args);
-            return Start(workDir, _file, _args, output);
+            return Start(workDir, _file, _args);
         }
 
         public static ProcessResult Run(string workDir, string filename, string arguments, IWriteAnsi output = null)
         {
-            using (var process = Start(workDir, filename, arguments, output)) {
+            using (var process = Start(workDir, filename, arguments)) {
                 if (process == null)
                     throw new ApplicationException("Failed to start process!");
 

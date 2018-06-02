@@ -130,20 +130,22 @@ namespace Photon.Agent.Internal
             Log.Info("Agent stopped.");
         }
 
-        //public async Task Shutdown(TimeSpan timeout)
-        //{
-        //    using (var tokenSource = new CancellationTokenSource(timeout)) {
-        //        var token = tokenSource.Token;
+        public async Task Shutdown(TimeSpan timeout)
+        {
+            Log.Debug("Shutdown started...");
 
-        //        token.Register(() => {
-        //            Sessions.Abort();
-        //        });
+            using (var tokenSource = new CancellationTokenSource(timeout)) {
+                var token = tokenSource.Token;
 
-        //        await Task.Run(() => {
-        //            Sessions.Stop();
-        //        }, token);
-        //    }
-        //}
+                token.Register(() => {
+                    Sessions.Abort();
+                });
+
+                await Task.Run(() => {
+                    Sessions.Stop();
+                }, token);
+            }
+        }
 
         private AgentDefinition ParseAgentDefinition()
         {
