@@ -42,7 +42,7 @@ namespace Photon.Communication
             Tcp?.Dispose();
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token = default(CancellationToken))
         {
             if (!isConnected) return;
             isConnected = false;
@@ -50,12 +50,16 @@ namespace Photon.Communication
             handshakeResult.TrySetCanceled();
 
             try {
-                await Transceiver.StopAsync();
+                Transceiver.Stop(token);
+            }
+            catch {}
+
+            try {
                 Tcp.Close();
             }
-            finally {
-                OnStopped();
-            }
+            catch {}
+
+            OnStopped();
         }
 
         public void SendOneWay(IRequestMessage message)

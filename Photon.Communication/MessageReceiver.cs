@@ -57,12 +57,17 @@ namespace Photon.Communication
             });
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token = default(CancellationToken))
         {
             tokenSource.Cancel();
+
             try {
                 stream.Close();
-                await task;
+            }
+            catch {}
+
+            try {
+                task.Wait(token);
             }
             catch {}
         }

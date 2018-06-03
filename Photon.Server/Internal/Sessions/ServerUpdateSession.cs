@@ -102,12 +102,13 @@ namespace Photon.Server.Internal.Sessions
                     .GetResponseAsync(token);
 
                 try {
-                    await messageClient.DisconnectAsync();
+                    messageClient.Disconnect();
                 }
                 catch {}
             }
             finally {
                 messageClient?.Dispose();
+                messageClient = null;
             }
 
             Output.Write("Agent update started on ", ConsoleColor.DarkCyan)
@@ -116,8 +117,6 @@ namespace Photon.Server.Internal.Sessions
 
             await Task.Delay(1000, token);
 
-            // TODO: Verify update was successful by polling for server and checking version
-            messageClient = null;
 
             var reconnectTimeout = TimeSpan.FromMinutes(2);
 
@@ -125,12 +124,11 @@ namespace Photon.Server.Internal.Sessions
                 messageClient = await Reconnect(agent, reconnectTimeout, token);
             }
             catch (OperationCanceledException) {
-                // TODO: Better error messages
                 throw new ApplicationException($"A timeout occurred after {reconnectTimeout} while waiting for the update to complete.");
             }
             finally {
                 if (messageClient != null) {
-                    await messageClient.DisconnectAsync();
+                    messageClient.Disconnect();
                     messageClient.Dispose();
                 }
             }
@@ -168,9 +166,12 @@ namespace Photon.Server.Internal.Sessions
                         if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
                             break;
                     }
-                    catch (SocketException) {
-                        await Task.Delay(1000, _token);
+                    catch (SocketException) {}
+                    catch (Exception error) {
+                        Log.Warn("An unhandled exception occurred while attempting to reconnect to an updating agent.", error);
                     }
+
+                    await Task.Delay(1000, _token);
                 }
             }
 

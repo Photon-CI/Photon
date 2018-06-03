@@ -119,10 +119,16 @@ namespace Photon.Agent.Internal
             //if (!isStarted) return;
             //isStarted = false;
 
-            // TODO: Enable timeout usage
-
-            messageListener?.StopAsync()
-                .GetAwaiter().GetResult();
+            if (messageListener != null) {
+                if (timeout.HasValue) {
+                    using (var tokenSource = new CancellationTokenSource(timeout.Value)) {
+                        messageListener.Stop(tokenSource.Token);
+                    }
+                }
+                else {
+                    messageListener.Stop(CancellationToken.None);
+                }
+            }
 
             Sessions?.Stop();
             receiver?.Stop();

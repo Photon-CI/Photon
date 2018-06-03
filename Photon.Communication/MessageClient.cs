@@ -52,10 +52,17 @@ namespace Photon.Communication
             Transceiver.Start(Tcp);
         }
 
-        public async Task DisconnectAsync()
+        public void Disconnect()
         {
-            await Transceiver.StopAsync();
-            Tcp.Close();
+            try {
+                Transceiver.Stop();
+            }
+            catch {}
+
+            try {
+                Tcp.Close();
+            }
+            catch {}
         }
 
         public async Task<TResponse> Handshake<TResponse>(IRequestMessage handshakeRequest, TimeSpan timeout, CancellationToken token)

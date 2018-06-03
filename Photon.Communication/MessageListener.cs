@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication
@@ -66,7 +66,7 @@ namespace Photon.Communication
             listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token = default(CancellationToken))
         {
             lock (startStopLock) {
                 if (!isListening) return;
@@ -75,8 +75,9 @@ namespace Photon.Communication
 
             listener.Stop();
 
-            var tasks = hostList.Select(x => x.StopAsync());
-            await Task.WhenAll(tasks.ToArray());
+            Parallel.ForEach(hostList, host => {
+                host.Stop(token);
+            });
         }
 
         private void Listener_OnConnectionReceived(IAsyncResult result)

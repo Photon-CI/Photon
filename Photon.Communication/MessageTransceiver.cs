@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
@@ -61,18 +60,32 @@ namespace Photon.Communication
             messageReceiver.Start(stream);
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token = default(CancellationToken))
         {
             lock (startStopLock) {
                 if (!IsStarted) return;
                 IsStarted = false;
             }
 
-            await messageSender.StopAsync();
-            await messageReceiver.StopAsync();
-            await Processor.StopAsync();
+            try {
+                messageReceiver.Stop(token);
+            }
+            catch {}
 
-            stream.Close();
+            try {
+                messageSender.Stop(token);
+            }
+            catch {}
+
+            try {
+                Processor.Stop(token);
+            }
+            catch {}
+
+            try {
+                stream.Close();
+            }
+            catch {}
         }
 
         public void SendOneWay(IRequestMessage message)

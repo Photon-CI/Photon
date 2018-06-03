@@ -28,14 +28,14 @@ namespace Photon.Tests.Messaging
 
                 DelayedTestProcessor.Complete = false;
                 var message = new DelayedTestRequest();
-                var task = client.Send(message).GetResponseAsync<DelayedTestResponse>();
+                var _ = client.Send(message).GetResponseAsync<DelayedTestResponse>();
 
-                await client.DisconnectAsync();
+                client.Disconnect();
                 //await task;
 
                 Assert.That(DelayedTestProcessor.Complete, Is.True);
 
-                await listener.StopAsync();
+                listener.Stop();
             }
         }
 

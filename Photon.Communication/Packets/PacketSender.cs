@@ -64,11 +64,11 @@ namespace Photon.Communication.Packets
             task = Task.Run(Process);
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token = default(CancellationToken))
         {
             enabled = false;
             waitEvent.Set();
-            await task;
+            task.Wait(token);
         }
 
         public void Enqueue(IMessage message)

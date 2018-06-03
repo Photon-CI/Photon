@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
@@ -48,14 +47,14 @@ namespace Photon.Communication
             packetSender.Start();
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token)
         {
             lock (startStopLock) {
                 if (!isStarted) return;
                 isStarted = false;
             }
 
-            await packetSender.StopAsync();
+            packetSender.Stop(token);
         }
 
         public void Send(IMessage message)

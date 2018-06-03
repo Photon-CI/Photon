@@ -1,5 +1,6 @@
 ﻿using Photon.Communication.Messages;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
@@ -26,10 +27,10 @@ namespace Photon.Communication
             queue = new ActionBlock<MessageProcessorHandle>(OnProcess);
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token = default(CancellationToken))
         {
             queue.Complete();
-            await queue.Completion;
+            queue.Completion.Wait(token);
         }
 
         public MessageProcessorHandle Process(IRequestMessage requestMessage)
