@@ -42,6 +42,20 @@ namespace Photon.Server.Internal.Projects
             loadTask = new TaskCompletionSource<object>();
         }
 
+        public void InitializeNew()
+        {
+            try {
+                Builds = new BuildDataManager(ContentBuildPath);
+                Builds.Load();
+
+                Deployments = new DeploymentDataManager(ContentDeploymentPath);
+                Deployments.Load();
+            }
+            finally {
+                CompleteLoading();
+            }
+        }
+
         public void Load()
         {
             try {
@@ -52,8 +66,8 @@ namespace Photon.Server.Internal.Projects
                 Builds = new BuildDataManager(ContentBuildPath);
                 Builds.Load();
 
-                Deployments = new DeploymentDataManager(ContentBuildPath);
-                Builds.Load();
+                Deployments = new DeploymentDataManager(ContentDeploymentPath);
+                Deployments.Load();
 
                 if (Description.MaxBuilds.HasValue)
                     Builds.Cleanup((int)Description.MaxBuilds.Value);

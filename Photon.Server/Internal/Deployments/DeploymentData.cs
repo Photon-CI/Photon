@@ -6,6 +6,7 @@ using Photon.Library;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Photon.Framework.Packages;
 
 namespace Photon.Server.Internal.Deployments
 {
@@ -21,8 +22,9 @@ namespace Photon.Server.Internal.Deployments
         public uint Number {get; set;}
         public DateTime Created {get; set;}
         public TimeSpan? Duration {get; set;}
+        public string ScriptName {get; set;}
         public string ServerSessionId {get; set;}
-        //public PackageReference[] ProjectPackages {get; set;}
+        public PackageReference[] ApplicationPackages {get; set;}
         public bool IsComplete {get; set;}
         public bool IsSuccess {get; set;}
         public bool IsCancelled {get; set;}

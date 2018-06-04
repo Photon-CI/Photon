@@ -50,7 +50,7 @@ namespace Photon.Server.ApiHandlers.Deploy
 
                 var session = new ServerDeploySession {
                     Project = project.Description,
-                    DeploymentNumber = deployment.Number,
+                    Deployment = deployment,
                     ProjectPackageId = projectPackageId,
                     ProjectPackageVersion = projectPackageVersion,
                     ProjectPackageFilename = packageFilename,

@@ -55,7 +55,7 @@ namespace Photon.Server.Internal.Sessions
                 gitRefspec = buildSession.GitRefspec;
             }
             else if (session is ServerDeploySession deploySession) {
-                number = deploySession.DeploymentNumber;
+                number = deploySession.Deployment.Number;
                 name = deploySession.ScriptName;
                 projectName = deploySession.Project?.Name;
                 projectVersion = $"{deploySession.ProjectPackageId} @{deploySession.ProjectPackageVersion}";

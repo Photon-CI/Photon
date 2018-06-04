@@ -49,34 +49,45 @@
     </div>
 </nav>
 
-<div class="container mt-3">
-    <div id="ErrorContainer"></div>
-    <div class="row">
-        <div class="col-12 form-group">
-            <label for="PackageIdText">Package ID</label>
-            <input type="text" id="PackageIdText" class="form-control" />
-            <small class="text-muted">The ID of the Project Package to deploy.</small>
+<form method="post">
+    <input type="hidden" Name="ProjectId" value="{{ProjectId}}" />
+    <div class="container mt-3">
+        {{#If Errors}}
+        <div class="alert alert-danger">
+            <ul class="my-0">
+                {{#Each Errors.error}}
+                <li>{{error.Message}}</li>
+                {{#EndEach}}
+            </ul>
+        </div>
+        {{#EndIf}}
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="PackageIdText">Package ID</label>
+                <input type="text" id="PackageIdText" name="PackageId" class="form-control" value="{{PackageId}}" />
+                <small class="text-muted">The ID of the Project Package to deploy.</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="PackageVersionText">Package Version</label>
+                <input type="text" id="PackageVersionText" name="PackageVersion" class="form-control" value="{{PackageVersion}}" />
+                <small class="text-muted">The version of the Project Package to deploy.</small>
+            </div>
+        </div>
+        <!--<div class="row">
+            <div class="col-12 form-group">
+                <label for="TaskNameText">Script Name</label>
+                <input id="TaskNameText" type="text" class="form-control" autocomplete="true" spellcheck="false" />
+                <small class="text-muted">The name of the <i>IDeployScript</i> class to run.</small>
+            </div>
+        </div>-->
+        <hr />
+        <div class="float-right">
+            <a href="{{#Url deployments}}" class="btn btn-dark">Cancel</a>
+            <button type="submit" class="btn btn-success">
+                Deploy <i class="fas fa-play"></i>
+            </button>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12 form-group">
-            <label for="PackageVersionText">Package Version</label>
-            <input type="text" id="PackageVersionText" class="form-control" />
-            <small class="text-muted">The version of the Project Package to deploy.</small>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 form-group">
-            <label for="TaskNameText">Script Name</label>
-            <input id="TaskNameText" type="text" class="form-control" autocomplete="true" spellcheck="false" />
-            <small class="text-muted">The name of the <i>IDeployScript</i> class to run.</small>
-        </div>
-    </div>
-    <hr />
-    <div class="float-right">
-        <a href="{{#Url deployments}}" class="btn btn-dark">Cancel</a>
-        <button type="button" class="btn btn-success">
-            Deploy <i class="fas fa-play"></i>
-        </button>
-    </div>
-</div>
+</form>
