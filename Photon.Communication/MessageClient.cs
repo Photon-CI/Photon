@@ -55,7 +55,10 @@ namespace Photon.Communication
         public void Disconnect()
         {
             try {
-                Transceiver.Stop();
+                var timeout = TimeSpan.FromSeconds(30);
+                using (var tokenSource = new CancellationTokenSource(timeout)) {
+                    Transceiver.Stop(tokenSource.Token);
+                }
             }
             catch {}
 

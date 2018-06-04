@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication.Packets
@@ -11,32 +12,51 @@ namespace Photon.Communication.Packets
     {
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        private readonly BufferedStream streamBuffer;
+        private readonly Stream stream;
+        private readonly ManualResetEventSlim completeEvent;
         private readonly BinaryReader reader;
         private readonly Dictionary<string, PacketBuilder> packetBuilderList;
+
+        public int Count => packetBuilderList.Count;
 
 
         public PacketReceiver(Stream stream)
         {
-            streamBuffer = new BufferedStream(stream);
+            this.stream = stream;
+
             reader = new BinaryReader(stream, Encoding.UTF8, true);
             packetBuilderList = new Dictionary<string, PacketBuilder>(StringComparer.Ordinal);
+            completeEvent = new ManualResetEventSlim(false);
         }
 
         public void Dispose()
         {
+            completeEvent?.Dispose();
             reader?.Dispose();
-            streamBuffer?.Dispose();
+            stream?.Dispose();
         }
 
-        public async Task ReadPacket()
+        public void Stop(CancellationToken token)
         {
-            var packet = ParsePacket();
+            try {
+                completeEvent.Wait(token);
+            }
+            catch (OperationCanceledException) {}
+
+            stream.Close();
+        }
+
+        public async Task ReadPacket(CancellationToken token = default(CancellationToken))
+        {
+            var packet = await ParsePacket(token);
             var messageId = packet.MessageId;
 
             if (!packetBuilderList.TryGetValue(messageId, out var packetBuilder)) {
                 packetBuilder = new PacketBuilder(messageId);
                 packetBuilderList[messageId] = packetBuilder;
+
+                // TODO: Lock Access
+                completeEvent.Reset();
             }
 
             await packetBuilder.Append(packet);
@@ -47,13 +67,23 @@ namespace Photon.Communication.Packets
 
                 packetBuilderList.Remove(messageId);
                 packetBuilder.Dispose();
+
+                // TODO: Lock Access
+                if (packetBuilderList.Count == 0)
+                    completeEvent.Set();
             }
         }
 
-        private IPacket ParsePacket()
+        private async Task<IPacket> ParsePacket(CancellationToken token)
         {
-            var messageId = reader.ReadString();
-            var packetType = reader.ReadByte();
+            var packetHeader = await ReadBlockAsync(17, token);
+
+            var bufferId = new byte[16];
+            Array.Copy(packetHeader, 0, bufferId, 0, 16);
+            var _id = new Guid(bufferId);
+
+            var messageId = _id.ToString("N");
+            var packetType = packetHeader[16];
 
             switch (packetType) {
                 case PacketTypes.Header:
@@ -70,6 +100,22 @@ namespace Photon.Communication.Packets
                 default:
                     throw new Exception($"Unknown packet type '{packetType}'!");
             }
+        }
+
+        private async Task<byte[]> ReadBlockAsync(int length, CancellationToken token)
+        {
+            var buffer = new byte[length];
+            var bufferPos = 0;
+
+            while (bufferPos < buffer.Length) {
+                token.ThrowIfCancellationRequested();
+
+                var remainingSize = buffer.Length - bufferPos;
+                var readSize = await stream.ReadAsync(buffer, bufferPos, remainingSize, token);
+                bufferPos += readSize;
+            }
+
+            return buffer;
         }
 
         protected virtual void OnMessageReceived(IMessage message)

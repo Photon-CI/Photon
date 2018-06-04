@@ -2,11 +2,11 @@
 using Newtonsoft.Json.Bson;
 using Photon.Communication.Messages;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Photon.Communication.Packets
 {
@@ -15,13 +15,11 @@ namespace Photon.Communication.Packets
         public event ThreadExceptionEventHandler ThreadError;
 
         private readonly BinaryWriter writer;
-        private readonly ManualResetEventSlim waitEvent;
         private readonly JsonSerializer jsonSerializer;
-        private volatile bool enabled;
         private CancellationTokenSource tokenSource;
         private Task task;
 
-        private readonly ConcurrentQueue<IMessage> messageQueue;
+        private BufferBlock<IMessage> queue;
         private readonly List<PacketSource> packetSourceList;
 
         public int BufferSize {get;}
@@ -36,16 +34,13 @@ namespace Photon.Communication.Packets
 
             BufferSize = 4;
             packetSourceList = new List<PacketSource>();
-            messageQueue = new ConcurrentQueue<IMessage>();
             jsonSerializer = new JsonSerializer();
-            waitEvent = new ManualResetEventSlim();
         }
 
         public void Dispose()
         {
             try {
                 tokenSource?.Cancel();
-                waitEvent.Set();
             }
             catch { }
 
@@ -54,78 +49,64 @@ namespace Photon.Communication.Packets
 
             packetSourceList.Clear();
             tokenSource?.Dispose();
-            waitEvent?.Dispose();
         }
 
         public void Start()
         {
-            enabled = true;
             tokenSource = new CancellationTokenSource();
-            task = Task.Run(Process);
+
+            queue = new BufferBlock<IMessage>();
+
+            task = Process(queue, tokenSource.Token);
         }
 
         public void Stop(CancellationToken token = default(CancellationToken))
         {
-            enabled = false;
-            waitEvent.Set();
+            queue.Complete();
+            queue.Completion.Wait(token);
+
             task.Wait(token);
         }
 
         public void Enqueue(IMessage message)
         {
-            messageQueue.Enqueue(message);
-
-            if (!waitEvent.IsSet)
-                waitEvent.Set();
+            queue.Post(message);
         }
 
-        private async Task Process()
+        private async Task Process(BufferBlock<IMessage> queue, CancellationToken token)
         {
-            while (!tokenSource.IsCancellationRequested) {
-                var token = tokenSource.Token;
+            while (await queue.OutputAvailableAsync(token)) {
+                var firstRun = true;
+                while (firstRun || packetSourceList.Count > 0) {
+                    token.ThrowIfCancellationRequested();
+                    firstRun = false;
 
-                var hasAny = await OnProcess(token);
+                    var emptyCount = BufferSize - packetSourceList.Count;
 
-                if (!hasAny && messageQueue.IsEmpty) {
-                    if (!enabled) return;
+                    if (emptyCount > 0) {
+                        for (var i = 0; i < emptyCount; i++) {
+                            if (!queue.TryReceive(null, out var message)) break;
 
-                    waitEvent.Reset();
-                    waitEvent.Wait(token);
+                            var packetSource = await CreatePacketSource(message, token);
+                            packetSourceList.Add(packetSource);
+                        }
+                    }
+
+                    var count = packetSourceList.Count;
+                    for (var i = count - 1; i >= 0; i--) {
+                        var packetSource = packetSourceList[i];
+
+                        var packet = await packetSource.TryTakePacket(token);
+
+                        packet?.WriteTo(writer);
+
+                        if (packetSource.IsComplete) {
+                            packetSourceList.RemoveAt(i);
+                            packetSource.Dispose();
+                        }
+                    }
                 }
             }
-        }
-
-        private async Task<bool> OnProcess(CancellationToken token)
-        {
-            var emptyCount = BufferSize - packetSourceList.Count;
-
-            if (emptyCount > 0) {
-                for (var i = 0; i < emptyCount; i++) {
-                    if (messageQueue.IsEmpty) break;
-
-                    if (!messageQueue.TryDequeue(out var message))
-                        continue;
-
-                    var packetSource = await CreatePacketSource(message, token);
-                    packetSourceList.Add(packetSource);
-                }
-            }
-
-            var count = packetSourceList.Count;
-            for (var i = count - 1; i >= 0; i--) {
-                var packetSource = packetSourceList[i];
-
-                var packet = await packetSource.TryTakePacket(token);
-
-                packet?.WriteTo(writer);
-
-                if (packetSource.IsComplete) {
-                    packetSourceList.RemoveAt(i);
-                    packetSource.Dispose();
-                }
-            }
-
-            return count > 0;
         }
 
         private async Task<PacketSource> CreatePacketSource(IMessage message, CancellationToken token)

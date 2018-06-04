@@ -21,7 +21,7 @@ namespace Photon.Communication
         private readonly List<MessageHost> hostList;
         private readonly object startStopLock;
         private TcpListener listener;
-        private bool isListening;
+        private volatile bool isListening;
 
 
         public MessageListener(MessageProcessorRegistry registry)
@@ -60,7 +60,6 @@ namespace Photon.Communication
                 }
             };
 
-            //listener.AllowNatTraversal(true);
             listener.Start();
 
             listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
@@ -75,7 +74,8 @@ namespace Photon.Communication
 
             listener.Stop();
 
-            Parallel.ForEach(hostList, host => {
+            var _hosts = hostList.ToArray();
+            Parallel.ForEach(_hosts, host => {
                 host.Stop(token);
             });
         }
@@ -93,7 +93,8 @@ namespace Photon.Communication
                 return;
             }
             finally {
-                listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
+                if (isListening)
+                    listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
             }
 
             var host = AcceptClient(client);

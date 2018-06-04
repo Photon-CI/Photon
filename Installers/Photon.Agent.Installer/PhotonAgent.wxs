@@ -125,7 +125,7 @@
 		    <ServiceInstall Id="ServiceInstaller" Name="Photon.Agent" Type="ownProcess" DisplayName="Photon Agent" Description="Agent instance for Photon." Start="auto" ErrorControl="normal" Account="[LocalSystem]" />
 		    <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Agent" Wait="yes" />
 		  </Component>
-		  <Component Id="PhotonAgent.exe.config" Guid="d0f39cfc-d34d-42ca-b5ac-ce782557433e">
+		  <Component Id="PhotonAgent.exe.config" Guid="">
 		    <File Id="PhotonAgent.exe.config" Name="PhotonAgent.exe.config" Source="$(var.PhotonAgent_TargetDir)PhotonAgent.exe.config" />
 		  </Component>
 		  <Component Id="LibGit2Sharp.dll" Guid="557a7665-f021-49c2-ae97-3832dd8597b5">

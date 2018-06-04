@@ -11,18 +11,15 @@ namespace Photon.Agent.Internal.Session
         private static readonly ILog Log = LogManager.GetLogger(typeof(AgentSessionManager));
 
         public event EventHandler<SessionStateEventArgs> SessionChanged;
-        //public event EventHandler<SessionStateEventArgs> SessionReleased;
 
         private readonly ReferencePool<AgentSessionBase> pool;
 
         public IEnumerable<AgentSessionBase> All => pool.Items;
-        //public IEnumerable<AgentSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
 
 
         public AgentSessionManager()
         {
             pool = new ReferencePool<AgentSessionBase> {
-                //Lifespan = 3600_000, // 60 minutes
                 PruneInterval = 60_000 // 1 minute
             };
         }

@@ -37,7 +37,7 @@ namespace Photon.Server.Internal.Sessions
 
         protected override async Task OnReleaseSessionAsync(CancellationToken token)
         {
-            var message = new BuildSessionReleaseRequest {
+            var message = new DeploySessionReleaseRequest {
                 AgentSessionId = AgentSessionId,
             };
 

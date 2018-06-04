@@ -12,14 +12,17 @@ namespace Photon.Communication
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
         public event UnhandledExceptionEventHandler ThreadException;
 
+        private volatile bool isDisposed;
         private PacketReceiver packetReceiver;
         private CancellationTokenSource tokenSource;
         private Stream stream;
-        private Task task;
 
 
         public void Dispose()
         {
+            if (isDisposed) return;
+            isDisposed = true;
+
             packetReceiver?.Dispose();
             stream?.Dispose();
         }
@@ -33,28 +36,31 @@ namespace Photon.Communication
 
             tokenSource = new CancellationTokenSource();
 
-            task = Task.Run(async () => {
-                while (!tokenSource.IsCancellationRequested) {
-                    try {
-                        await packetReceiver.ReadPacket();
-                    }
-                    catch (IOException error) when (error.HResult == -2146232800 && (error.InnerException?.HResult ?? 0) == -2147467259) {
-                        // Client Disconnected
-                        return;
-                    }
-                    catch (ObjectDisposedException) {
-                        // Stream Closed
-                        return;
-                    }
-                    catch (EndOfStreamException) {
-                        // Stream Closed
-                        return;
-                    }
-                    catch (Exception error) {
-                        OnThreadException(error);
-                    }
+            var _ = OnProcess(tokenSource.Token);
+        }
+
+        private async Task OnProcess(CancellationToken token)
+        {
+            while (!isDisposed && !token.IsCancellationRequested) {
+                try {
+                    await packetReceiver.ReadPacket(token);
                 }
-            });
+                catch (IOException error) when (error.HResult == -2146232800 && (error.InnerException?.HResult ?? 0) == -2147467259) {
+                    // Client Disconnected
+                    return;
+                }
+                catch (ObjectDisposedException) {
+                    // Stream Closed
+                    return;
+                }
+                catch (EndOfStreamException) {
+                    // Stream Closed
+                    return;
+                }
+                catch (Exception error) {
+                    OnThreadException(error);
+                }
+            }
         }
 
         public void Stop(CancellationToken token = default(CancellationToken))
@@ -62,12 +68,7 @@ namespace Photon.Communication
             tokenSource.Cancel();
 
             try {
-                stream.Close();
-            }
-            catch {}
-
-            try {
-                task.Wait(token);
+                packetReceiver.Stop(token);
             }
             catch {}
         }
@@ -79,7 +80,10 @@ namespace Photon.Communication
 
         protected virtual void OnMessageReceived(IMessage message)
         {
-            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
+            // TODO: Track Tasks
+            Task.Run(() => {
+                MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
+            });
         }
 
         protected virtual void OnThreadException(object exceptionObject)
