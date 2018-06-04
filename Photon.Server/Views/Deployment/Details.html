@@ -3,10 +3,10 @@
 {{#Script}}
 <script src="{{#Url SharedContent/ansi_up.js}}"></script>
 <script>
-    var outputStreamUrl = '{{#Url api/build/output-stream}}?project={{&ProjectId}}&number={{&BuildNumber}}';
+    var outputStreamUrl = '{{#Url api/deployment/output-stream}}?project={{&ProjectId}}&number={{&DeploymentNumber}}';
 
     $(function () {
-        $('#layoutNavbarContent [data-link="builds"]').addClass('active');
+        $('#layoutNavbarContent [data-link="deployments"]').addClass('active');
 
         loadOutput();
     });
@@ -18,7 +18,7 @@
         }).done(function(data) {
             onAppend(data);
         }).fail(function() {
-            alert("Failed to load build output!");
+            alert("Failed to load deployment output!");
         });
     }
 
@@ -78,7 +78,7 @@
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto">
         <h3 class="text-primary my-0">
-            <i class="{{IconClass}}"></i> {{ProjectName}} #{{BuildNumber}}
+            <i class="{{IconClass}}"></i> {{ProjectName}} #{{DeploymentNumber}}
         </h3>
     </div>
 </nav>
@@ -123,16 +123,22 @@
                         </tr>
                         <tr>
                             <td>Number</td>
-                            <td>{{BuildNumber}}</td>
+                            <td>{{DeploymentNumber}}</td>
                         </tr>
                         <tr>
                             <td>Created</td>
-                            <td>{{BuildCreated}}</td>
+                            <td>{{DeploymentCreated}}</td>
                         </tr>
                         <tr>
                             <td>Duration</td>
-                            <td>{{BuildDuration}}</td>
+                            <td>{{DeploymentDuration}}</td>
                         </tr>
+                        {{#If DeploymentEnvironment}}
+                        <tr>
+                            <td>Environment</td>
+                            <td>{{DeploymentEnvironment}}</td>
+                        </tr>
+                        {{#EndIf}}
                         </tbody>
                     </table>
                 </div>
@@ -140,7 +146,7 @@
                     <table class="table table-sm table-hover my-2">
                         <thead class="thead-light">
                             <tr>
-                                <th colspan="2">Packages</th>
+                                <th>Packages</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -151,21 +157,16 @@
                                 </td>
                             </tr>
                             {{#Else}}
-                            {{#If !ProjectPackages}}
+                            {{#If !ApplicationPackages}}
                             <tr>
                                 <td class="text-center text-muted">
                                     None
                                 </td>
                             </tr>
                             {{#EndIf}}
-                            {{#Each ProjectPackages.package}}
+                            {{#Each ApplicationPackages.package}}
                             <tr>
                                 <td>{{package.PackageId}} <span class="text-muted">@</span>{{package.PackageVersion}}</td>
-                                <td class="c-icon">
-                                    <a href="{{#Url deployment/new}}?project={{&ProjectId}}&package={{&package.PackageId}}&version={{&package.PackageVersion}}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-play"></i>
-                                    </a>
-                                </td>
                             </tr>
                             {{#EndEach}}
                             {{#EndIf}}
@@ -178,7 +179,7 @@
     <div id="output" class="tab-pane fade" role="tabpanel">
         {{#If IsRunning}}
         <div class="alert alert-info">
-            <h4><i class="fas fa-spinner fa-spin"></i> Build is running...</h4>
+            <h4><i class="fas fa-spinner fa-spin"></i> Deployment is running...</h4>
         </div>
         {{#Else}}
         <div class="output-container">
@@ -190,7 +191,7 @@
         <div class="container my-3">
             {{#If IsRunning}}
             <div class="alert alert-info">
-                <h4><i class="fas fa-spinner fa-spin"></i> Build is running...</h4>
+                <h4><i class="fas fa-spinner fa-spin"></i> Deployment is running...</h4>
             </div>
             {{#Else}}
             <table class="table table-sm">

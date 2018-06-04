@@ -47,6 +47,8 @@ namespace Photon.Server.ApiHandlers.Deploy
                     return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
 
                 var deployment = await project.StartNewDeployment();
+                deployment.EnvironmentName = environmentName;
+                //deployment.ScriptName = ?;
 
                 var session = new ServerDeploySession {
                     Project = project.Description,
@@ -56,6 +58,8 @@ namespace Photon.Server.ApiHandlers.Deploy
                     ProjectPackageFilename = packageFilename,
                     EnvironmentName = environmentName,
                 };
+
+                deployment.ServerSessionId = session.SessionId;
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);

@@ -85,6 +85,9 @@ namespace Photon.Server.Internal.GitHub
             Log.Debug("[WEBHOOK] Commit Pushed.");
 
             var _ref = (string)data.@ref;
+            var _deleted = (bool)data.deleted;
+
+            if (_deleted) return null;
 
             if (_ref.StartsWith("refs/heads/"))
                 _ref = _ref.Substring(11);

@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
+using Photon.Framework.Packages;
 using Photon.Framework.Tools;
 using Photon.Library;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Framework.Packages;
 
 namespace Photon.Server.Internal.Deployments
 {
@@ -23,6 +23,7 @@ namespace Photon.Server.Internal.Deployments
         public DateTime Created {get; set;}
         public TimeSpan? Duration {get; set;}
         public string ScriptName {get; set;}
+        public string EnvironmentName {get; set;}
         public string ServerSessionId {get; set;}
         public PackageReference[] ApplicationPackages {get; set;}
         public bool IsComplete {get; set;}

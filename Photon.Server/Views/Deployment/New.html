@@ -82,6 +82,19 @@
                 <small class="text-muted">The name of the <i>IDeployScript</i> class to run.</small>
             </div>
         </div>-->
+        {{#If Environments}}
+        <div class="row">
+            <div class="col-12 form-group">
+                <label for="EnvironmentSelect">Environment</label>
+                <select id="EnvironmentSelect" name="EnvironmentName" class="form-control">
+                    {{#Each Environments.env}}
+                    <option value="{{env.Name}}" {{#If env.Selected}}selected="selected"{{#EndIf}}>{{env.Name}}</option>
+                    {{#EndEach}}
+                </select>
+                <small class="text-muted">The environment where the deployment should be performed.</small>
+            </div>
+        </div>
+        {{#EndIf}}
         <hr />
         <div class="float-right">
             <a href="{{#Url deployments}}" class="btn btn-dark">Cancel</a>
