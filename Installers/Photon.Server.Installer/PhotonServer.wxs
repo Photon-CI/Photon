@@ -390,6 +390,9 @@
       <Component Id="Views_Deployment_New.html" Guid="b0bf2f2f-d9e6-4b96-81e8-d6f0413c5836">
         <File Id="Views_Deployment_New.html" Name="New.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\New.html" />
       </Component>
+      <Component Id="Views_Deployment_Details.html" Guid="2d8b0c12-6c14-44d2-a9e9-2f6a12469caf">
+        <File Id="Views_Deployment_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\Details.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>
