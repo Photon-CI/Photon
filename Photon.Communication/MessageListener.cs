@@ -67,7 +67,7 @@ namespace Photon.Communication
                 }
             };
 
-            listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
             listener.Start();
 
             listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
