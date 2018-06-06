@@ -34,17 +34,13 @@ namespace Photon.Framework.Tasks
                 .ToArray();
 
             foreach (var type in scriptTypeList) {
-                string[] roles = null;
-
-                var roleAttr = type.GetCustomAttribute<RolesAttribute>();
-                if (roleAttr != null) {
-                    roles = roleAttr.Roles;
-                }
+                var roles = type.GetCustomAttributes<RolesAttribute>()
+                    .SelectMany(x => x.Roles).ToArray();
 
                 mapType[type.Name] = type;
                 mapDesc[type.Name] = new TaskDescription {
                     Name = type.Name,
-                    Roles = roles,
+                    Roles = roles.Length > 0 ? roles : null,
                 };
             }
         }

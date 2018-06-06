@@ -90,6 +90,8 @@ namespace Photon.Communication
 
         public void SendOneWay(IRequestMessage message)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             message.MessageId = Guid.NewGuid().ToString("N");
 
             messageSender.Send(message);
@@ -97,6 +99,8 @@ namespace Photon.Communication
 
         public MessageHandle Send(IRequestMessage message)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             message.MessageId = Guid.NewGuid().ToString("N");
 
             var handle = new MessageHandle(message);
