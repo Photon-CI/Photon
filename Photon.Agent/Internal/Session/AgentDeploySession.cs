@@ -83,6 +83,9 @@ namespace Photon.Agent.Internal.Session
 
         public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
+            if (taskName == null) throw new ArgumentNullException(nameof(taskName));
+            if (taskSessionId == null) throw new ArgumentNullException(nameof(taskSessionId));
+
             var domainOutput = new DomainOutput();
             domainOutput.OnWrite += (text, color) => Output.Write(text, color);
             domainOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);

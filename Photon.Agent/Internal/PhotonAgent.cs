@@ -68,10 +68,27 @@ namespace Photon.Agent.Internal
         {
             //if (isStarted) Stop();
 
-            messageListener?.Dispose();
-            Sessions?.Dispose();
-            receiver?.Dispose();
-            receiver = null;
+            try {
+                messageListener?.Dispose();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to dispose TCP message listener!", error);
+            }
+
+            try {
+                Sessions?.Dispose();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to dispose session manager!", error);
+            }
+
+            try {
+                receiver?.Dispose();
+                receiver = null;
+            }
+            catch (Exception error) {
+                Log.Error("Failed to dispose HTTP receiver!", error);
+            }
         }
 
         public void Start()
@@ -112,7 +129,7 @@ namespace Photon.Agent.Internal
             Log.Info("Agent started.");
         }
 
-        public void Stop(TimeSpan? timeout = null)
+        public void Stop()
         {
             Log.Debug("Stopping Agent...");
 
@@ -120,18 +137,30 @@ namespace Photon.Agent.Internal
             //isStarted = false;
 
             if (messageListener != null) {
-                if (timeout.HasValue) {
-                    using (var tokenSource = new CancellationTokenSource(timeout.Value)) {
+                try {
+                    var timeout = TimeSpan.FromSeconds(30);
+                    using (var tokenSource = new CancellationTokenSource(timeout)) {
                         messageListener.Stop(tokenSource.Token);
                     }
                 }
-                else {
-                    messageListener.Stop(CancellationToken.None);
+                catch (Exception error) {
+                    Log.Error("Failed to stop TCP message listener!", error);
                 }
             }
 
-            Sessions?.Stop();
-            receiver?.Stop();
+            try {
+                Sessions?.Stop();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to stop session manager!", error);
+            }
+
+            try {
+                receiver?.Stop();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to stop HTTP receiver!", error);
+            }
 
             Log.Info("Agent stopped.");
         }

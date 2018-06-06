@@ -40,9 +40,16 @@ namespace Photon.Communication
                 }
                 catch {}
             }
+
             hostList.Clear();
 
-            listener?.Stop();
+            try {
+                listener?.Stop();
+            }
+            catch {}
+            finally {
+                listener = null;
+            }
         }
 
         public void Listen(IPAddress address, int port)
@@ -60,6 +67,7 @@ namespace Photon.Communication
                 }
             };
 
+            listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             listener.Start();
 
             listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
@@ -72,12 +80,18 @@ namespace Photon.Communication
                 isListening = false;
             }
 
-            listener.Stop();
-
             var _hosts = hostList.ToArray();
             Parallel.ForEach(_hosts, host => {
-                host.Stop(token);
+                try {
+                    host.Stop(token);
+                }
+                catch {}
             });
+
+            try {
+                listener.Stop();
+            }
+            catch {}
         }
 
         private void Listener_OnConnectionReceived(IAsyncResult result)

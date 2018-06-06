@@ -33,6 +33,13 @@ namespace Photon.Agent
             catch (Exception error) {
                 Log.Error("Failed to stop service!", error);
             }
+
+            try {
+                PhotonAgent.Instance.Dispose();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to dispose service!", error);
+            }
         }
     }
 }
