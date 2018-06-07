@@ -99,6 +99,9 @@
     <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
     <Compile Include="ApiHandlers\Variable\DeleteHandler.cs" />
     <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
+    <Compile Include="Internal\AgentDefinition.cs" />
+    <Compile Include="Internal\AgentHttpDefinition.cs" />
+    <Compile Include="Internal\AgentTcpDefinition.cs" />
     <Compile Include="ViewHandlers\ConfigurationHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />

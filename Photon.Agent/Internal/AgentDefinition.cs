@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Framework
+namespace Photon.Agent.Internal
 {
-    public class AgentDefinition
+    internal class AgentDefinition
     {
         [JsonProperty("name")]
         public string Name {get; set;}

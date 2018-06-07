@@ -115,7 +115,7 @@ namespace Photon.Server.Internal.Sessions
                 .Write(agent.Name, ConsoleColor.Cyan)
                 .WriteLine("...", ConsoleColor.DarkCyan);
 
-            await Task.Delay(1000, token);
+            await Task.Delay(6_000, token);
 
 
             var reconnectTimeout = TimeSpan.FromMinutes(2);
@@ -138,40 +138,34 @@ namespace Photon.Server.Internal.Sessions
         {
             var client = new MessageClient(PhotonServer.Instance.MessageRegistry);
 
-            //client.ThreadException += (o, e) => {
-            //    var error = (Exception) e.ExceptionObject;
-            //    Output.AppendLine("An error occurred while messaging the client!", ConsoleColor.DarkRed)
-            //        .AppendLine(error.UnfoldMessages());
-
-            //    Log.Error("Message Client error after update!", error);
-            //};
-
             using (var timeoutTokenSource = new CancellationTokenSource(timeout))
             using (var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token)) {
-                var _token = mergedTokenSource.Token;
-
                 while (true) {
-                    _token.ThrowIfCancellationRequested();
+                    mergedTokenSource.Token.ThrowIfCancellationRequested();
 
                     try {
-                        await client.ConnectAsync(agent.TcpHost, agent.TcpPort, _token);
+                        using (var connectionTimeoutTokenSource = new CancellationTokenSource(20_000))
+                        using (var connectTokenSource = CancellationTokenSource.CreateLinkedTokenSource(mergedTokenSource.Token, connectionTimeoutTokenSource.Token)) {
+                            await client.ConnectAsync(agent.TcpHost, agent.TcpPort, connectTokenSource.Token);
 
-                        await ClientHandshake.Verify(client, _token);
+                            await ClientHandshake.Verify(client, connectTokenSource.Token);
 
-                        var versionRequest = new AgentGetVersionRequest();
+                            var versionRequest = new AgentGetVersionRequest();
 
-                        var versionResponse = await client.Send(versionRequest)
-                            .GetResponseAsync<AgentGetVersionResponse>(_token);
+                            var versionResponse = await client.Send(versionRequest)
+                                .GetResponseAsync<AgentGetVersionResponse>(connectTokenSource.Token);
 
-                        if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
-                            break;
+                            if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
+                                break;
+                        }
                     }
                     catch (SocketException) {}
+                    catch (OperationCanceledException) {}
                     catch (Exception error) {
                         Log.Warn("An unhandled exception occurred while attempting to reconnect to an updating agent.", error);
                     }
 
-                    await Task.Delay(1000, _token);
+                    await Task.Delay(3_000, mergedTokenSource.Token);
                 }
             }
 
