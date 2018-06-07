@@ -4,12 +4,18 @@
     <id>Photon.Config</id>
     <title>Photon Config Plugin</title>
     <version>$version$</version>
-    <authors>null511</authors>
-    <projectUrl>http://github.com/null511/Photon</projectUrl>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <licenseUrl>https://raw.githubusercontent.com/null511/Photon/master/LICENSE</licenseUrl>
+    <authors>null511, Photon.CI</authors>
+    <projectUrl>https://github.com/Photon-CI/Photon/tree/master/Plugins/Photon.Config</projectUrl>
+    <iconUrl>https://github.com/Photon-CI/Photon/raw/master/media/plugin_light.png</iconUrl>
     <description>A Photon plugin for modifying and transforming VS App/Web config files.</description>
     <copyright>Copyright 2018</copyright>
     <tags>photon net automation appconfig webconfig config transform xdt</tags>
+    <dependencies>
+      <dependency id="Photon.Framework" version="$frameworkVersion$" />
+    </dependencies>
   </metadata>
+  <files>
+    <file src="bin\$configuration$\*.dll" exclude="**\Photon.Framework.dll" />
+    <file src="bin\$configuration$\*.config" />
+  </files>
 </package>
