@@ -18,7 +18,7 @@ namespace Photon.Server.Internal.Sessions
         protected override async Task OnBeginSession(CancellationToken token)
         {
             var message = new DeploySessionBeginRequest {
-                DeploymentNumber = session.DeploymentNumber,
+                DeploymentNumber = session.Deployment.Number,
                 Project = session.Project,
                 Agent = Agent,
                 ServerSessionId = session.SessionId,
@@ -37,7 +37,7 @@ namespace Photon.Server.Internal.Sessions
 
         protected override async Task OnReleaseSessionAsync(CancellationToken token)
         {
-            var message = new BuildSessionReleaseRequest {
+            var message = new DeploySessionReleaseRequest {
                 AgentSessionId = AgentSessionId,
             };
 

@@ -26,9 +26,6 @@ namespace Photon.Server.Internal
 
         public bool Authorize(HttpListenerRequest request)
         {
-            //var securityEnabled = PhotonServer.Instance.ServerConfiguration.Value.Security?.Enabled ?? false;
-            //if (!securityEnabled || Authorization == null) return true;
-
             // Authorization Cookie
             var authCookie = request.Cookies[CookieName];
             var token = authCookie?.Value;
@@ -55,6 +52,7 @@ namespace Photon.Server.Internal
                         };
 
                         userContext = Authorization.Authorize(userCreds);
+
                         if (userContext != null) {
                             userContext.Restart();
                             return true;
@@ -68,9 +66,6 @@ namespace Photon.Server.Internal
 
         public bool Authorize(HttpListenerResponse response, HttpUserCredentials user)
         {
-            //var securityEnabled = PhotonServer.Instance.ServerConfiguration.Value.Security?.Enabled ?? false;
-            //if (!securityEnabled || Authorization == null) return true;
-
             var _user = Authorization.Authorize(user);
             if (_user == null) return false;
 

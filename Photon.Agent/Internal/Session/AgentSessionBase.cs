@@ -43,7 +43,6 @@ namespace Photon.Agent.Internal.Session
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
         public bool IsReleased {get; set;}
-        //public bool IsComplete {get; set;}
 
         protected ILog Log => _log.Value;
 
@@ -77,9 +76,9 @@ namespace Photon.Agent.Internal.Session
         {
             if (!IsReleased)
                 Log.Error("Session was disposed without being released!");
-                //ReleaseAsync().GetAwaiter().GetResult();
             
             TokenSource?.Dispose();
+            PackageClient?.Dispose();
             Domain?.Dispose();
         }
 
@@ -141,14 +140,6 @@ namespace Photon.Agent.Internal.Session
 
             // TODO: Wait?
         }
-
-        //public void Complete(TaskResult result)
-        //{
-        //    this.Result = result;
-
-        //    Output.Flush();
-        //    IsComplete = true;
-        //}
 
         public bool IsExpired()
         {

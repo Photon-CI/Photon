@@ -110,7 +110,7 @@
 			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal" />
 			  <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Server" Wait="yes" />
 			</Component>
-			<Component Id="PhotonServer.exe.config" Guid="fd623cf8-ddf8-4950-b7b9-7a91b3596794">
+			<Component Id="PhotonServer.exe.config" Guid="">
 			  <File Id="PhotonServer.exe.config" Name="PhotonServer.exe.config" Source="$(var.PhotonServer_TargetDir)PhotonServer.exe.config" />
 			</Component>
 			<Component Id="log4net.dll" Guid="4472635c-5818-463c-b3be-5971ca8dbd7c">
@@ -140,8 +140,6 @@
 			<Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="e4e34802-30ef-4e84-a9d1-f0144093b078">
 			  <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" Name="System.Runtime.InteropServices.RuntimeInformation.dll" Source="$(var.PhotonServer_TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
 			</Component>
-			
-			
 		</ComponentGroup>
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
       <Component Id="ServerConfigTemplate" Guid="">
@@ -153,9 +151,6 @@
 	</Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Agents_files" Directory="Views_Agents">
-      
-      
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -163,13 +158,14 @@
       <Component Id="Views_Configuration.html" Guid="8e668301-0b6a-4c15-8bee-1bf0a4139eca">
         <File Id="Views_Configuration.html" Name="Configuration.html" Source="$(var.PhotonServer_TargetDir)Views\Configuration.html" />
       </Component>
-      
-      
       <Component Id="Views_Index.html" Guid="00b3c93f-90c5-48c8-b873-77b8dd3a62d9">
         <File Id="Views_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Index.html" />
       </Component>
       <Component Id="Views_Master.html" Guid="9ad3ccf7-5a97-4e64-9dea-80920112b474">
         <File Id="Views_Master.html" Name="Master.html" Source="$(var.PhotonServer_TargetDir)Views\Master.html" />
+      </Component>
+      <Component Id="Views_Login.html" Guid="6b570aa8-bbcb-4485-960e-e7b61e169fc0">
+        <File Id="Views_Login.html" Name="Login.html" Source="$(var.PhotonServer_TargetDir)Views\Login.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -381,12 +377,21 @@
       <Component Id="Views_Build_Details.html" Guid="2935d141-0443-47be-8131-157b92c9c2e4">
         <File Id="Views_Build_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Build\Details.html" />
       </Component>
+      <Component Id="Views_Build_New.html" Guid="4b0a51f3-c496-4f0b-804d-6ab0591cc870">
+        <File Id="Views_Build_New.html" Name="New.html" Source="$(var.PhotonServer_TargetDir)Views\Build\New.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Deployment_files" Directory="Views_Deployment">
       <Component Id="Views_Deployment_Index.html" Guid="0002200d-61fb-471f-8352-f39c4a6f55e6">
         <File Id="Views_Deployment_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\Index.html" />
+      </Component>
+      <Component Id="Views_Deployment_New.html" Guid="b0bf2f2f-d9e6-4b96-81e8-d6f0413c5836">
+        <File Id="Views_Deployment_New.html" Name="New.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\New.html" />
+      </Component>
+      <Component Id="Views_Deployment_Details.html" Guid="2d8b0c12-6c14-44d2-a9e9-2f6a12469caf">
+        <File Id="Views_Deployment_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\Details.html" />
       </Component>
     </ComponentGroup>
   </Fragment>

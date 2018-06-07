@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
+using Photon.Framework;
+using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Tools;
 using Photon.Library;
+using Photon.Library.GitHub;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Framework;
-using Photon.Framework.Extensions;
 
 namespace Photon.Server.Internal.Builds
 {
@@ -22,8 +23,15 @@ namespace Photon.Server.Internal.Builds
         public uint Number {get; set;}
         public DateTime Created {get; set;}
         public TimeSpan? Duration {get; set;}
+        public string GitRefspec {get; set;}
+        public string TaskName {get; set;}
         public string ServerSessionId {get; set;}
         public PackageReference[] ProjectPackages {get; set;}
+        public GithubCommit Commit {get; set;}
+        public bool IsComplete {get; set;}
+        public bool IsSuccess {get; set;}
+        public bool IsCancelled {get; set;}
+        public string Exception {get; set;}
 
 
         public BuildData()

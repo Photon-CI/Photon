@@ -3,7 +3,7 @@ using System;
 
 namespace Photon.Server.Internal.Projects
 {
-    internal class ProjectDataLastBuild
+    internal class ProjectLastBuild
     {
         [JsonProperty("number")]
         public uint Number {get; set;}

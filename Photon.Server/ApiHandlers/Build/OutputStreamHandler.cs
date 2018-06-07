@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Server.Internal;
-using PiServerLite.Http.Handlers;
 
 namespace Photon.Server.ApiHandlers.Build
 {
@@ -21,10 +21,10 @@ namespace Photon.Server.ApiHandlers.Build
                 return Response.BadRequest().SetText("'number' is undefined!");
 
             try {
-                if (!PhotonServer.Instance.ProjectData.TryGet(projectId, out var projectData))
+                if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{projectId}' not found!");
 
-                if (!projectData.Builds.TryGet(buildNumber.Value, out var buildData))
+                if (!project.Builds.TryGet(buildNumber.Value, out var buildData))
                     return Response.BadRequest().SetText($"Build '{buildNumber.Value}' not found!");
 
                 var buildOutput = await buildData.GetOutput();

@@ -38,7 +38,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentDefinition.cs" />
@@ -56,6 +55,7 @@
     <Compile Include="Domain\DomainContextBase.cs" />
     <Compile Include="Domain\DomainOutput.cs" />
     <Compile Include="Domain\IDomainContext.cs" />
+    <Compile Include="Domain\MarshalByRefInstance.cs" />
     <Compile Include="Domain\ServerDomainAgent.cs" />
     <Compile Include="Domain\AgentDomainAgent.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
@@ -102,7 +102,7 @@
     <Compile Include="Server\DeployScriptRegistry.cs" />
     <Compile Include="Server\IDeployScript.cs" />
     <Compile Include="Server\IServerDeployContext.cs" />
-    <Compile Include="Server\AgentSessionHandleCollection.cs" />
+    <Compile Include="Domain\AgentSessionHandleCollection.cs" />
     <Compile Include="Domain\TypeRegistry.cs" />
     <Compile Include="Server\ServerDeployContext.cs" />
     <Compile Include="Agent\AgentBuildContext.cs" />

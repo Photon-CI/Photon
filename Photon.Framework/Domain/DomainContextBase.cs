@@ -80,28 +80,28 @@ namespace Photon.Framework.Domain
 
         public async Task PushProjectPackageAsync(string filename, CancellationToken token = default(CancellationToken))
         {
-            await RemoteTaskCompletionSource.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run(task => {
                 Packages.PushProjectPackage(filename, task);
             }, token);
         }
 
         public async Task PushApplicationPackageAsync(string filename, CancellationToken token = default(CancellationToken))
         {
-            await RemoteTaskCompletionSource.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run(task => {
                 Packages.PushApplicationPackage(filename, task);
             }, token);
         }
 
         public async Task<string> PullProjectPackageAsync(string id, string version)
         {
-            return await RemoteTaskCompletionSource<string>.Run((task, sponsor) => {
+            return await RemoteTaskCompletionSource<string>.Run(task => {
                 Packages.PullProjectPackage(id, version, task);
             });
         }
 
         public async Task<string> PullApplicationPackageAsync(string id, string version)
         {
-            return await RemoteTaskCompletionSource<string>.Run((task, sponsor) => {
+            return await RemoteTaskCompletionSource<string>.Run(task => {
                 Packages.PullApplicationPackage(id, version, task);
             });
         }

@@ -45,10 +45,10 @@ namespace Photon.Tests.Messaging
         }
 
         [OneTimeTearDown]
-        public async Task End()
+        public void End()
         {
-            await client.DisconnectAsync();
-            await listener.StopAsync();
+            client.Disconnect();
+            listener.Stop();
         }
 
         [Test]

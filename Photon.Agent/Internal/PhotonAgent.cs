@@ -68,10 +68,27 @@ namespace Photon.Agent.Internal
         {
             //if (isStarted) Stop();
 
-            messageListener?.Dispose();
-            Sessions?.Dispose();
-            receiver?.Dispose();
-            receiver = null;
+            try {
+                messageListener?.Dispose();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to dispose TCP message listener!", error);
+            }
+
+            try {
+                Sessions?.Dispose();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to dispose session manager!", error);
+            }
+
+            try {
+                receiver?.Dispose();
+                receiver = null;
+            }
+            catch (Exception error) {
+                Log.Error("Failed to dispose HTTP receiver!", error);
+            }
         }
 
         public void Start()
@@ -112,38 +129,58 @@ namespace Photon.Agent.Internal
             Log.Info("Agent started.");
         }
 
-        public void Stop(TimeSpan? timeout = null)
+        public void Stop()
         {
             Log.Debug("Stopping Agent...");
 
             //if (!isStarted) return;
             //isStarted = false;
 
-            // TODO: Enable timeout usage
+            if (messageListener != null) {
+                try {
+                    var timeout = TimeSpan.FromSeconds(30);
+                    using (var tokenSource = new CancellationTokenSource(timeout)) {
+                        messageListener.Stop(tokenSource.Token);
+                    }
+                }
+                catch (Exception error) {
+                    Log.Error("Failed to stop TCP message listener!", error);
+                }
+            }
 
-            messageListener?.StopAsync()
-                .GetAwaiter().GetResult();
+            try {
+                Sessions?.Stop();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to stop session manager!", error);
+            }
 
-            Sessions?.Stop();
-            receiver?.Stop();
+            try {
+                receiver?.Stop();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to stop HTTP receiver!", error);
+            }
 
             Log.Info("Agent stopped.");
         }
 
-        //public async Task Shutdown(TimeSpan timeout)
-        //{
-        //    using (var tokenSource = new CancellationTokenSource(timeout)) {
-        //        var token = tokenSource.Token;
+        public async Task Shutdown(TimeSpan timeout)
+        {
+            Log.Debug("Shutdown started...");
 
-        //        token.Register(() => {
-        //            Sessions.Abort();
-        //        });
+            using (var tokenSource = new CancellationTokenSource(timeout)) {
+                var token = tokenSource.Token;
 
-        //        await Task.Run(() => {
-        //            Sessions.Stop();
-        //        }, token);
-        //    }
-        //}
+                token.Register(() => {
+                    Sessions.Abort();
+                });
+
+                await Task.Run(() => {
+                    Sessions.Stop();
+                }, token);
+            }
+        }
 
         private AgentDefinition ParseAgentDefinition()
         {

@@ -20,7 +20,8 @@ namespace Photon.NuGetPlugin
 {
     public class NuGetCore
     {
-        private readonly Regex existsExp;
+        private static readonly Regex existsExp;
+
         private SourceRepository sourceRepository;
 
         public PackageSource PackageSource {get; private set;}
@@ -34,6 +35,11 @@ namespace Photon.NuGetPlugin
         public int PushTimeout {get; set;}
 
 
+        static NuGetCore()
+        {
+            existsExp = new Regex(@":\s*409\s*\(A package with ID '\S+' and version '\S+' already exists", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        }
+
         public NuGetCore()
         {
             SourceUrl = "https://api.nuget.org/v3/index.json";
@@ -44,8 +50,6 @@ namespace Photon.NuGetPlugin
                 DirectDownload = true,
                 NoCache = true,
             };
-
-            existsExp = new Regex(@":\s*409\s*\(A package with ID '\S+' and version '\S+' already exists", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
         public void Initialize()
@@ -75,7 +79,7 @@ namespace Photon.NuGetPlugin
             return versionList.Select(x => x.ToString()).ToArray();
         }
 
-        public void Pack(string nuspecFilename, string packageFilename)
+        public void Pack(string nuspecFilename, string packageFilename, IDictionary<string, string> properties)
         {
             var nuspecName = Path.GetFileName(nuspecFilename);
             var packageName = Path.GetFileName(packageFilename);
@@ -116,6 +120,7 @@ namespace Photon.NuGetPlugin
 
                 var builder = new PackageBuilder();
                 builder.Populate(nuspec.Metadata);
+                // TODO: Apply pack properties
 
                 using (var packageStream = File.Open(packageFilename, FileMode.Create, FileAccess.Write)) {
                     builder.Save(packageStream);
@@ -144,9 +149,8 @@ namespace Photon.NuGetPlugin
                 .WriteLine("...", ConsoleColor.DarkCyan);
 
             try {
-                var apiKeyFunc = (Func<string, string>) (x => ApiKey);
                 var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
-                await updateResource.Push(packageFilename, null, PushTimeout, false, apiKeyFunc, null, Logger);
+                await updateResource.Push(packageFilename, null, PushTimeout, false, x => ApiKey, null, Logger);
 
                 Output?.Write("Package ", ConsoleColor.DarkGreen)
                     .Write(packageName, ConsoleColor.Green)

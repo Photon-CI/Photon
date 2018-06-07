@@ -1,8 +1,8 @@
 {
 	"project": "photon",
 	"refspec": "master",
-	"task": "PiBuildTask",
+	"task": "Build_WinCI",
 	"roles": [
-		"pi"
+		"build"
 	]
 }

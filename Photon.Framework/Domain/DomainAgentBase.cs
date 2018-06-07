@@ -1,9 +1,8 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Photon.Framework.Domain
 {
-    public abstract class DomainAgentBase : MarshalByRefObject
+    public abstract class DomainAgentBase : MarshalByRefInstance
     {
         public virtual void LoadAssembly(string filename)
         {

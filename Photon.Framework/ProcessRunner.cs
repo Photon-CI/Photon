@@ -9,13 +9,7 @@ namespace Photon.Framework
 {
     public static class ProcessRunner
     {
-        public static ProcessResult Run(string workDir, string command, IWriteAnsi output = null)
-        {
-            SplitCommand(command, out var _file, out var _args);
-            return Run(workDir, _file, _args, output);
-        }
-
-        public static ProcessResult Run(string workDir, string filename, string arguments, IWriteAnsi output = null)
+        public static Process Start(string workDir, string filename, string arguments)
         {
             if (filename == null) throw new ArgumentNullException(nameof(filename));
 
@@ -37,7 +31,18 @@ namespace Photon.Framework
                 RedirectStandardError = true,
             };
 
-            using (var process = Process.Start(startInfo)) {
+            return Process.Start(startInfo);
+        }
+
+        public static Process Start(string workDir, string command)
+        {
+            SplitCommand(command, out var _file, out var _args);
+            return Start(workDir, _file, _args);
+        }
+
+        public static ProcessResult Run(string workDir, string filename, string arguments, IWriteAnsi output = null)
+        {
+            using (var process = Start(workDir, filename, arguments)) {
                 if (process == null)
                     throw new ApplicationException("Failed to start process!");
 
@@ -53,6 +58,12 @@ namespace Photon.Framework
                     Error = readErrorTask.Result,
                 };
             }
+        }
+
+        public static ProcessResult Run(string workDir, string command, IWriteAnsi output = null)
+        {
+            SplitCommand(command, out var _file, out var _args);
+            return Run(workDir, _file, _args, output);
         }
 
         private static async Task<string> ReadToOutput(StreamReader reader, IWriteAnsi output, ConsoleColor color)

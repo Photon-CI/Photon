@@ -20,10 +20,10 @@ namespace Photon.Server.ApiHandlers.Project
             if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
                 return Response.BadRequest().SetText($"Project '{projectId}' not found!");
 
-            if (!File.Exists(project.DescriptionFilename))
+            if (!File.Exists(project.ProjectFilename))
                 return Response.BadRequest().SetText("'project.json' file could not be found!");
 
-            return await Response.File(project.DescriptionFilename)
+            return await Response.File(project.ProjectFilename)
                 .SetHeader("Content-Disposition", $"attachment; filename={projectId}.json")
                 .AsAsync();
         }
@@ -40,11 +40,11 @@ namespace Photon.Server.ApiHandlers.Project
 
             PathEx.CreatePath(project.ContentPath);
 
-            using (var fileStream = File.Open(project.DescriptionFilename, FileMode.Create, FileAccess.Write)) {
+            using (var fileStream = File.Open(project.ProjectFilename, FileMode.Create, FileAccess.Write)) {
                 await HttpContext.Request.InputStream.CopyToAsync(fileStream);
             }
 
-            project.Load();
+            project.ReloadDescription();
 
             return Response.Ok();
         }

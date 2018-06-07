@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Photon.Communication.Packets
 {
@@ -20,7 +21,10 @@ namespace Photon.Communication.Packets
 
         public void WriteTo(BinaryWriter writer)
         {
-            writer.Write(MessageId);
+            var _id = Guid.ParseExact(MessageId, "N");
+            var bufferId = _id.ToByteArray();
+
+            writer.Write(bufferId);
             writer.Write(PacketType);
             writer.Write(PacketSize);
             writer.Write(PacketBuffer, 0, PacketSize);

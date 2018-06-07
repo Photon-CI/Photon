@@ -5,7 +5,6 @@ using Photon.Framework.Extensions;
 using Photon.Framework.Server;
 using Photon.Library.TcpMessages;
 using System;
-using System.Runtime.Remoting.Lifetime;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,13 +14,12 @@ namespace Photon.Server.Internal.Sessions
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DomainAgentSessionHostBase));
 
-        private readonly ClientSponsor sponsor;
         protected CancellationToken Token {get;}
         protected ServerAgent Agent {get;}
         public DomainAgentSessionClient SessionClient {get;}
         public MessageClient MessageClient {get;}
-
         public TaskRunnerManager Tasks {get;}
+
         public string AgentSessionId {get; protected set;}
         public string SessionClientId => SessionClient.Id;
 
@@ -38,9 +36,6 @@ namespace Photon.Server.Internal.Sessions
             SessionClient.OnSessionRelease += SessionClient_OnSessionRelease;
             SessionClient.OnSessionRunTask += SessionClient_OnSessionRunTask;
 
-            sponsor = new ClientSponsor();
-            sponsor.Register(SessionClient);
-
             MessageClient = new MessageClient(PhotonServer.Instance.MessageRegistry);
             MessageClient.Transceiver.Context = sessionBase;
 
@@ -50,8 +45,8 @@ namespace Photon.Server.Internal.Sessions
         public virtual void Dispose()
         {
             Tasks?.Dispose();
+            SessionClient.Dispose();
             MessageClient?.Dispose();
-            sponsor?.Close();
         }
 
         public void Abort()
@@ -128,7 +123,7 @@ namespace Photon.Server.Internal.Sessions
                         }
                     }
 
-                    await MessageClient.DisconnectAsync();
+                    MessageClient.Disconnect();
                 }
             }, Token)
                 .ContinueWith(taskHandle.FromTask, Token);

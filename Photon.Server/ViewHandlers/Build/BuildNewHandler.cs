@@ -1,18 +1,20 @@
-﻿using System;
-using Photon.Server.ViewModels.Build;
+﻿using Photon.Server.ViewModels.Build;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.ViewHandlers.Build
 {
     [Secure]
     [HttpHandler("/build/new")]
-    internal class BuildNewHandler : HttpHandler
+    internal class BuildNewHandler : HttpHandlerAsync
     {
-        public override HttpHandlerResult Get()
+        public override Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
             var vm = new BuildNewVM {
-                PageTitle = "Photon Server New Build",
+                ProjectId = GetQuery("project"),
             };
 
             try {
@@ -22,7 +24,25 @@ namespace Photon.Server.ViewHandlers.Build
                 vm.Errors.Add(error);
             }
 
-            return Response.View("Build\\New.html", vm);
+            return Response.View("Build\\New.html", vm).AsAsync();
+        }
+
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
+        {
+            var vm = new BuildNewVM();
+
+            try {
+                vm.Restore(Request.FormData());
+                await vm.StartBuild();
+
+                return Response.Redirect("session/details", new {
+                    id = vm.ServerSessionId,
+                });
+            }
+            catch (Exception error) {
+                vm.Errors.Add(error);
+                return Response.View("Build\\New.html", vm);
+            }
         }
     }
 }

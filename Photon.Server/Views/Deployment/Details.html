@@ -1,0 +1,222 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script src="{{#Url SharedContent/ansi_up.js}}"></script>
+<script>
+    var outputStreamUrl = '{{#Url api/deployment/output-stream}}?project={{&ProjectId}}&number={{&DeploymentNumber}}';
+
+    $(function () {
+        $('#layoutNavbarContent [data-link="deployments"]').addClass('active');
+
+        loadOutput();
+    });
+
+    function loadOutput() {
+        $.ajax({
+            url: outputStreamUrl,
+            dataType: 'text'
+        }).done(function(data) {
+            onAppend(data);
+        }).fail(function() {
+            alert("Failed to load deployment output!");
+        });
+    }
+
+    function onAppend(text) {
+        var text_out = ansi_up.escape_for_html(text);
+        text_out = ansi_up.ansi_to_html(text_out);
+        //text_out = ansi_up.linkify(text_out);
+
+        $('#OutputText').append(text_out);
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .layout-content {
+        
+    }
+    #OutputText {
+        overflow-x: auto;
+        background: #111;
+        color: #CCC;
+    }
+    td.c-icon {
+        width: 1px;
+        white-space: nowrap;
+    }
+
+    @media (min-width: 768px) {
+        .layout-content {
+            height: 100vh;
+            flex-direction: column;
+            display: flex;
+            overflow-y: hidden;
+        }
+        .tab-content {
+            flex: 1;
+        }
+        .output-container {
+            position: relative;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        #output {
+            height: 100%;
+        }
+        #OutputText {
+            position: absolute;
+            min-width: 100%;
+            min-height: 100%;
+        }
+    }
+</style>
+{{#EndStyle}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">
+            <i class="{{IconClass}}"></i> {{ProjectName}} #{{DeploymentNumber}}
+        </h3>
+    </div>
+</nav>
+
+<div class="bg-light">
+    {{#If Errors}}
+    <div class="alert alert-danger">
+        <ul class="my-0">
+            {{#Each Errors.error}}
+            <li>{{error.Message}}</li>
+            {{#EndEach}}
+        </ul>
+    </div>
+    {{#EndIf}}
+    <ul class="nav nav-tabs px-2 pt-2" role="tablist">
+        <li id="SummaryTabLink" class="nav-item">
+            <a class="nav-link active" href="#summary" data-toggle="tab" role="tab">Summary</a>
+        </li>
+        <li id="OutputTabLink" class="nav-item">
+            <a class="nav-link" href="#output" data-toggle="tab" role="tab">Output</a>
+        </li>
+        <li id="ArtifactsTabLink" class="nav-item">
+            <a class="nav-link" href="#artifacts" data-toggle="tab" role="tab">Artifacts</a>
+        </li>
+    </ul>
+</div>
+<div class="tab-content">
+    <div id="summary" class="tab-pane fade show active" role="tabpanel">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-7">
+                    <table class="table table-sm my-2">
+                        <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Details</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Project</td>
+                            <td>{{ProjectName}}</td>
+                        </tr>
+                        <tr>
+                            <td>Number</td>
+                            <td>{{DeploymentNumber}}</td>
+                        </tr>
+                        <tr>
+                            <td>Created</td>
+                            <td>{{DeploymentCreated}}</td>
+                        </tr>
+                        <tr>
+                            <td>Duration</td>
+                            <td>{{DeploymentDuration}}</td>
+                        </tr>
+                        {{#If DeploymentEnvironment}}
+                        <tr>
+                            <td>Environment</td>
+                            <td>{{DeploymentEnvironment}}</td>
+                        </tr>
+                        {{#EndIf}}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-xl-5">
+                    <table class="table table-sm table-hover my-2">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Packages</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#If IsRunning}}
+                            <tr>
+                                <td class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin"></i> Pending...
+                                </td>
+                            </tr>
+                            {{#Else}}
+                            {{#If !ApplicationPackages}}
+                            <tr>
+                                <td class="text-center text-muted">
+                                    None
+                                </td>
+                            </tr>
+                            {{#EndIf}}
+                            {{#Each ApplicationPackages.package}}
+                            <tr>
+                                <td>{{package.PackageId}} <span class="text-muted">@</span>{{package.PackageVersion}}</td>
+                            </tr>
+                            {{#EndEach}}
+                            {{#EndIf}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="output" class="tab-pane fade" role="tabpanel">
+        {{#If IsRunning}}
+        <div class="alert alert-info">
+            <h4><i class="fas fa-spinner fa-spin"></i> Deployment is running...</h4>
+        </div>
+        {{#Else}}
+        <div class="output-container">
+            <pre id="OutputText" class="px-2 py-1"></pre>
+        </div>
+        {{#EndIf}}
+    </div>
+    <div id="artifacts" class="tab-pane fade" role="tabpanel">
+        <div class="container my-3">
+            {{#If IsRunning}}
+            <div class="alert alert-info">
+                <h4><i class="fas fa-spinner fa-spin"></i> Deployment is running...</h4>
+            </div>
+            {{#Else}}
+            <table class="table table-sm">
+                <thead class="thead-light">
+                <tr>
+                    <th>Filename</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#If Artifacts}}
+                    {{#Each Artifacts.artifact}}
+                    <tr>
+                        <td>{{artifact.Filename}}</td>
+                    </tr>
+                    {{#EndEach}}
+                {{#Else}}
+                <tr>
+                    <td class="text-center text-muted">
+                        None
+                    </td>
+                </tr>
+                {{#EndIf}}
+                </tbody>
+            </table>
+            {{#EndIf}}
+        </div>
+    </div>
+</div>

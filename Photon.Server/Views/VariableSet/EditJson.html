@@ -51,6 +51,7 @@
             url: agentJsonUrl + '?id=' + encodeURIComponent(setId)
                 +'&prevId='+encodeURIComponent(setIdPrev),
             method: 'post',
+            contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(json)
         }).done(function () {
             //$('#SetId').val(setId);

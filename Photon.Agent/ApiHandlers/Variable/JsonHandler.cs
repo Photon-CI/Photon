@@ -1,10 +1,10 @@
-﻿using Photon.Agent.Internal;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Photon.Agent.Internal;
 using Photon.Library.Variables;
 using PiServerLite.Http.Handlers;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Photon.Agent.HttpHandlers.Api.Variable
+namespace Photon.Agent.ApiHandlers.Variable
 {
     [HttpHandler("/api/variable/json")]
     internal class JsonHandler : HttpHandlerAsync

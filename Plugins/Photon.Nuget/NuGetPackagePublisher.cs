@@ -1,6 +1,7 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Tools;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -22,6 +23,7 @@ namespace Photon.NuGetPlugin
         public string PackageDefinition {get; set;}
         public string Configuration {get; set;}
         public string Platform {get; set;}
+        public Dictionary<string, string> PackProperties {get; set;}
 
 
         public NuGetPackagePublisher(IDomainContext context)
@@ -30,12 +32,14 @@ namespace Photon.NuGetPlugin
 
             Configuration = "Release";
             Platform = "AnyCPU";
+            PackProperties = new Dictionary<string, string>();
         }
 
         public async Task PublishAsync(CancellationToken token)
         {
             switch (Mode) {
                 case NugetModes.Core:
+                case NugetModes.Hybrid:
                     if (!await PreCheckUsingCore(token)) return;
                     break;
                 case NugetModes.CommandLine:
@@ -48,22 +52,14 @@ namespace Photon.NuGetPlugin
                     PackUsingCore();
                     break;
                 case NugetModes.CommandLine:
+                case NugetModes.Hybrid:
                     PackUsingCL();
                     break;
             }
 
-            var packageFilename = Directory
-                .GetFiles(PackageDirectory, $"{PackageId}.*.nupkg")
-                .FirstOrDefault();
-
-            var packageName = Path.GetFileName(packageFilename);
-
-            context?.Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
-                .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan);
-
             switch (Mode) {
                 case NugetModes.Core:
+                case NugetModes.Hybrid:
                     await PushUsingCore(token);
                     break;
                 case NugetModes.CommandLine:
@@ -74,30 +70,26 @@ namespace Photon.NuGetPlugin
 
         private async Task<bool> PreCheckUsingCore(CancellationToken token)
         {
-            // Pre-Check Version
-            Client.Output?.Write("Checking Package ", ConsoleColor.DarkCyan)
+            context.Output.Write("Checking Package ", ConsoleColor.DarkCyan)
                 .Write(PackageId, ConsoleColor.Cyan)
                 .WriteLine(" for updates...", ConsoleColor.DarkCyan);
 
             var versionList = await Client.GetAllPackageVersions(PackageId, token);
             var packageVersion = versionList.Any() ? versionList.Max() : null;
 
-            if (!VersionTools.HasUpdates(packageVersion, Version)) {
-                Client.Output?
-                    .Write($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
-                    .WriteLine(packageVersion, ConsoleColor.Blue);
+            if (VersionTools.HasUpdates(packageVersion, Version)) return true;
 
-                return false;
-            }
+            context.Output.Write($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
+                .WriteLine(packageVersion, ConsoleColor.Blue);
 
-            return true;
+            return false;
         }
 
         private void PackUsingCore()
         {
             var packageFilename = Path.Combine(PackageDirectory, $"{PackageId}.{Version}.nupkg");
 
-            Client.Pack(PackageDefinition, packageFilename);
+            Client.Pack(PackageDefinition, packageFilename, PackProperties);
         }
 
         private async Task PushUsingCore(CancellationToken token)
@@ -109,7 +101,7 @@ namespace Photon.NuGetPlugin
 
         private bool PreCheckUsingCL()
         {
-            Client.Output?.WriteLine("Package version pre-check is not implemented in NuGet command-line mode!", ConsoleColor.DarkYellow);
+            context.Output.WriteLine("Package version pre-check is not implemented in NuGet command-line mode!", ConsoleColor.DarkYellow);
             return true;
         }
 
@@ -117,7 +109,7 @@ namespace Photon.NuGetPlugin
         {
             // TODO: ?
 
-            CL.Pack(PackageDefinition, PackageDirectory);
+            CL.Pack(PackageDefinition, PackageDirectory, PackProperties);
         }
 
         private void PushUsingCL(CancellationToken token)
@@ -132,7 +124,20 @@ namespace Photon.NuGetPlugin
 
     public enum NugetModes
     {
+        /// <summary>
+        /// Uses the internal NuGet.Core library to pack and push packages.
+        /// </summary>
         Core,
+
+        /// <summary>
+        /// Uses an external NuGet executable to pack and push packages.
+        /// </summary>
         CommandLine,
+
+        /// <summary>
+        /// Uses an external NuGet executable to pack packages,
+        /// and the NuGet.Core library to push packages.
+        /// </summary>
+        Hybrid,
     }
 }

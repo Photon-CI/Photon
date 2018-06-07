@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{#Url SharedContent/bootstrap-4.1.0/css/bootstrap.min.css}}">
     <script defer src="{{#Url SharedContent/fontawesome-5.0.13/js/fontawesome-all.min.js}}"></script>
     <link rel="stylesheet" href="{{#Url Content/site.css}}">
-    {{style-content}}
+    {{$style-content}}
 </head>
 <body>
     <div class="clearfix">
@@ -60,12 +60,12 @@
             </div>
         </nav>
         <div class="layout-content">
-            {{master-content}}
+            {{$master-content}}
         </div>
     </div>
     <script src="{{#Url SharedContent/jquery-3.3.1.min.js}}"></script>
     <script src="{{#Url SharedContent/popper.min.js}}"></script>
     <script src="{{#Url SharedContent/bootstrap-4.1.0/js/bootstrap.min.js}}"></script>
-    {{script-content}}
+    {{$script-content}}
 </body>
 </html>

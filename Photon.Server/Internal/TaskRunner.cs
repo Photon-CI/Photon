@@ -19,19 +19,19 @@ namespace Photon.Server.Internal
 
         public TaskRunner(MessageClient messageClient, string agentSessionId)
         {
-            this.messageClient = messageClient;
-            this.agentSessionId = agentSessionId;
+            this.messageClient = messageClient ?? throw new ArgumentNullException(nameof(messageClient));
+            this.agentSessionId = agentSessionId ?? throw new ArgumentNullException(nameof(agentSessionId));
 
             Lifespan = TimeSpan.FromHours(1);
             output = new StringBuilder();
         }
 
-        public async Task Run(string taskName, CancellationToken token)
+        public async Task Run(string taskName, CancellationToken token = default(CancellationToken))
         {
             var runRequest = new TaskRunRequest {
                 AgentSessionId = agentSessionId,
                 TaskSessionId = SessionId,
-                TaskName = taskName,
+                TaskName = taskName ?? throw new ArgumentNullException(nameof(taskName)),
             };
 
             await messageClient.Send(runRequest)

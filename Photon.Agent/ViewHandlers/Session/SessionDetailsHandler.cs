@@ -1,7 +1,7 @@
 ﻿using Photon.Agent.ViewModels.Session;
 using PiServerLite.Http.Handlers;
 
-namespace Photon.Agent.HttpHandlers.Session
+namespace Photon.Agent.ViewHandlers.Session
 {
     [HttpHandler("session/details")]
     internal class SessionDetailsHandler : HttpHandler

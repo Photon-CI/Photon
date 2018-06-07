@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Communication
@@ -21,7 +21,7 @@ namespace Photon.Communication
         private readonly List<MessageHost> hostList;
         private readonly object startStopLock;
         private TcpListener listener;
-        private bool isListening;
+        private volatile bool isListening;
 
 
         public MessageListener(MessageProcessorRegistry registry)
@@ -40,9 +40,16 @@ namespace Photon.Communication
                 }
                 catch {}
             }
+
             hostList.Clear();
 
-            listener?.Stop();
+            try {
+                listener?.Stop();
+            }
+            catch {}
+            finally {
+                listener = null;
+            }
         }
 
         public void Listen(IPAddress address, int port)
@@ -60,23 +67,31 @@ namespace Photon.Communication
                 }
             };
 
-            //listener.AllowNatTraversal(true);
+            listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
             listener.Start();
 
             listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
         }
 
-        public async Task StopAsync()
+        public void Stop(CancellationToken token = default(CancellationToken))
         {
             lock (startStopLock) {
                 if (!isListening) return;
                 isListening = false;
             }
 
-            listener.Stop();
+            var _hosts = hostList.ToArray();
+            Parallel.ForEach(_hosts, host => {
+                try {
+                    host.Stop(token);
+                }
+                catch {}
+            });
 
-            var tasks = hostList.Select(x => x.StopAsync());
-            await Task.WhenAll(tasks.ToArray());
+            try {
+                listener.Stop();
+            }
+            catch {}
         }
 
         private void Listener_OnConnectionReceived(IAsyncResult result)
@@ -92,7 +107,8 @@ namespace Photon.Communication
                 return;
             }
             finally {
-                listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
+                if (isListening)
+                    listener.BeginAcceptTcpClient(Listener_OnConnectionReceived, new object());
             }
 
             var host = AcceptClient(client);

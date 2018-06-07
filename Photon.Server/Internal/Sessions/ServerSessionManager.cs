@@ -10,19 +10,16 @@ namespace Photon.Server.Internal.Sessions
         private static readonly ILog Log = LogManager.GetLogger(typeof(ServerSessionManager));
 
         public event EventHandler<SessionStateEventArgs> SessionChanged;
-        //public event EventHandler<SessionStateEventArgs> SessionReleased;
 
         private readonly ReferencePool<ServerSessionBase> pool;
 
         public IEnumerable<ServerSessionBase> All => pool.Items;
-        //public IEnumerable<ServerSessionBase> Active => pool.Items.Where(i => !i.IsReleased);
 
 
         public ServerSessionManager()
         {
             pool = new ReferencePool<ServerSessionBase> {
-                //Lifespan = 3600_000, // 60 minutes
-                PruneInterval = 60_000 // 1 minute
+                PruneInterval = 600_000, // 10 minutes
             };
         }
 

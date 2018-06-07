@@ -1,7 +1,6 @@
 ﻿using Photon.Framework.Domain;
 using System;
 using System.IO;
-using System.Runtime.Remoting.Lifetime;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,23 +11,18 @@ namespace Photon.Library.Session
     {
         private bool isUnloaded;
         private AppDomain domain;
-        protected ClientSponsor Sponsor;
+        //protected ClientSponsor Sponsor;
         protected T Agent;
 
 
         public virtual void Dispose()
         {
-            if (Sponsor != null) {
-                if (Agent != null) {
-                    //...
-                    Sponsor.Unregister(Agent);
-                }
-
-                Sponsor.Close();
-                Sponsor = null;
-            }
-
             if (!isUnloaded) Unload(false).GetAwaiter().GetResult();
+
+            if (Agent != null) {
+                Agent.Dispose();
+                Agent = null;
+            }
         }
 
         public void Initialize(string assemblyFilename)
@@ -44,20 +38,29 @@ namespace Photon.Library.Session
                 ConfigurationFile = $"{assemblyFilename}.config",
             };
 
-            Sponsor = new ClientSponsor();
+            //Sponsor = new ClientSponsor {
+            //    RenewalTime = TimeSpan.FromMinutes(2),
+            //};
+            //var lease = Sponsor.InitializeLifetimeService();
+
             domain = AppDomain.CreateDomain(assemblyName, null, domainSetup);
 
             var agentType = typeof(T);
             Agent = (T)domain.CreateInstanceAndUnwrap(agentType.Assembly.FullName, agentType.FullName);
             Agent.LoadAssembly(assemblyFilename);
 
-            Sponsor.Register(Agent);
+            //var leaseX = (ILease)Agent.GetLifetimeService();
+            //Sponsor.Register(Agent);
+
+            //var lease = (ILease)RemotingServices.GetLifetimeService(Agent);
+            //lease.Register(Sponsor);
         }
 
         public async Task Unload(bool wait)
         {
             // A ThreadAbortException will be called
             // if we immediately close the AppDomain.
+            //Sponsor.Close();
 
             try {
                 if (wait) await Task.Delay(200);
@@ -68,7 +71,9 @@ namespace Photon.Library.Session
             catch (ThreadAbortException) {
                 Thread.ResetAbort();
             }
-            catch (Exception) {}
+            catch (Exception) {
+                //Log.Warn("", error);
+            }
             finally {
                 isUnloaded = true;
             }

@@ -1,12 +1,12 @@
-﻿using log4net;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using log4net;
 using Photon.Agent.Internal.Session;
 using Photon.Library;
 using PiServerLite.Http.Handlers;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Photon.Agent.HttpHandlers.Api.Session
+namespace Photon.Agent.ApiHandlers.Session
 {
     [HttpHandler("/api/sessions/active")]
     internal class ActiveHandler : HttpHandler

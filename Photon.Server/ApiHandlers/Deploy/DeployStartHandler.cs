@@ -46,17 +46,20 @@ namespace Photon.Server.ApiHandlers.Deploy
                 if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
 
-                var projectData = PhotonServer.Instance.ProjectData.GetOrCreate(projectId);
-                var deploymentNumber = projectData.StartNewDeployment();
+                var deployment = await project.StartNewDeployment();
+                deployment.EnvironmentName = environmentName;
+                //deployment.ScriptName = ?;
 
                 var session = new ServerDeploySession {
                     Project = project.Description,
-                    DeploymentNumber = deploymentNumber,
+                    Deployment = deployment,
                     ProjectPackageId = projectPackageId,
                     ProjectPackageVersion = projectPackageVersion,
                     ProjectPackageFilename = packageFilename,
                     EnvironmentName = environmentName,
                 };
+
+                deployment.ServerSessionId = session.SessionId;
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);

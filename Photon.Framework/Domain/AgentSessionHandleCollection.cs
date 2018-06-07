@@ -1,17 +1,18 @@
-﻿using Photon.Framework.Domain;
+﻿using Photon.Framework.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.Framework.Server
+namespace Photon.Framework.Domain
 {
     [Serializable]
     public class AgentSessionHandleCollection
     {
         private readonly IServerContext context;
         private readonly DomainAgentSessionHandle[] agentSessionList;
+        private volatile bool isInitialized;
 
         public string ProjectPackageId;
         public string ProjectPackageVersion;
@@ -23,6 +24,8 @@ namespace Photon.Framework.Server
 
             this.agentSessionList = agentSessions as DomainAgentSessionHandle[] ?? agentSessions?.ToArray()
                 ?? throw new ArgumentNullException(nameof(agentSessions));
+
+            isInitialized = false;
         }
 
         public async Task InitializeAsync(CancellationToken token)
@@ -32,12 +35,11 @@ namespace Photon.Framework.Server
                 .ToArray();
 
             await Task.WhenAll(taskList);
+            isInitialized = true;
         }
 
         public async Task ReleaseAllAsync(CancellationToken token)
         {
-            if (agentSessionList == null) return;
-
             var taskList = agentSessionList
                 .Select(x => x.ReleaseAsync(token))
                 .ToArray();
@@ -47,12 +49,14 @@ namespace Photon.Framework.Server
 
         public async Task RunTasksAsync(params string[] taskNames)
         {
+            if (!isInitialized) throw new ApplicationException("Agent collection has not been initialized!");
+
             await RunTasksAsync(taskNames, CancellationToken.None);
         }
 
         public async Task RunTasksAsync(string[] taskNames, CancellationToken token)
         {
-            if (agentSessionList == null) return;
+            if (!isInitialized) throw new ApplicationException("Agent collection has not been initialized!");
 
             var taskList = new List<Task>();
             foreach (var task in taskNames) {

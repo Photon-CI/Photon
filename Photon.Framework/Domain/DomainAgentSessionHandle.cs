@@ -25,29 +25,23 @@ namespace Photon.Framework.Domain
 
         public async Task BeginAsync(CancellationToken token)
         {
-            await RemoteTaskCompletionSource.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run(task => {
                 Client.Begin(task);
             }, token);
         }
 
         public async Task ReleaseAsync(CancellationToken token)
         {
-            await RemoteTaskCompletionSource.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run(task => {
                 Client.ReleaseAsync(task);
             }, token);
         }
 
         public async Task RunTaskAsync(string taskName, CancellationToken token = default(CancellationToken))
         {
-            await RemoteTaskCompletionSource.Run((task, sponsor) => {
+            await RemoteTaskCompletionSource.Run(task => {
                 Client.RunTaskAsync(taskName, task);
             }, token);
         }
-
-        //public string[] GetBuildTaskRoles(string taskName)
-        //{
-        //    return (context as IServerBuildContext)?.BuildTasks?
-        //        .FirstOrDefault(x => string.Equals(x.Name, taskName, StringComparison.OrdinalIgnoreCase))?.Roles;
-        //}
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Photon.Library;
 using PiServerLite.Http.Handlers;
 
-namespace Photon.Agent.HttpHandlers
+namespace Photon.Agent.ViewHandlers
 {
     [HttpHandler("/configuration")]
     internal class ConfigurationHandler : HttpHandler

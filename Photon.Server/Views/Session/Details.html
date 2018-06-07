@@ -62,9 +62,11 @@
 {{#EndStyle}}
 
 <div class="inner-content">
-    <div class="bg-secondary px-2 py-1">
-        <h2 class="text-light my-0">Session Output</h2>
-    </div>
+    <nav class="navbar navbar-dark bg-dark content-navbar">
+        <div class="navbar-brand mr-auto">
+            <h3 class="text-primary my-0">Session <small class="text-info">{{SessionId}}</small></h3>
+        </div>
+    </nav>
 
     <pre id="SessionOutput" class="session-output px-2 py-1"></pre>
 </div>

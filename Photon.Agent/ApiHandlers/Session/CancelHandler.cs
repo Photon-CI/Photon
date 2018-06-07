@@ -1,9 +1,9 @@
-﻿using log4net;
+﻿using System;
+using log4net;
 using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
-using System;
 
-namespace Photon.Agent.HttpHandlers.Api.Session
+namespace Photon.Agent.ApiHandlers.Session
 {
     [HttpHandler("/api/session/cancel")]
     internal class CancelHandler : HttpHandler

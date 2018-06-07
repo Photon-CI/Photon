@@ -8,11 +8,13 @@ namespace Photon.Agent.MessageHandlers
 {
     public class BuildSessionReleaseProcessor : MessageProcessorBase<BuildSessionReleaseRequest>
     {
-        public override async Task<IResponseMessage> Process(BuildSessionReleaseRequest requestMessage)
+        public override Task<IResponseMessage> Process(BuildSessionReleaseRequest requestMessage)
         {
-            await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
+            var _ = Task.Delay(100).ContinueWith(async t => {
+                await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
+            });
 
-            return new BuildSessionReleaseResponse();
+            return Task.FromResult<IResponseMessage>(new BuildSessionReleaseResponse());
         }
     }
 }

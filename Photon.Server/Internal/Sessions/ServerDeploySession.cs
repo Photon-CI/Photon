@@ -1,7 +1,10 @@
 ﻿using Photon.Framework.Domain;
+using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
+using Photon.Server.Internal.Deployments;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +13,7 @@ namespace Photon.Server.Internal.Sessions
 {
     internal class ServerDeploySession : ServerSessionBase
     {
-        public uint DeploymentNumber {get; set;}
+        public DeploymentData Deployment {get; set;}
         public Project Project {get; set;}
         public string AssemblyFilename {get; set;}
         public string ScriptName {get; set;}
@@ -44,28 +47,50 @@ namespace Photon.Server.Internal.Sessions
             Domain = new ServerDomain();
             Domain.Initialize(assemblyFilename);
 
-            var contextOutput = new DomainOutput();
-            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
-            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+            using (var contextOutput = new DomainOutput()) {
+                contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+                contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
 
-            var context = new ServerDeployContext {
-                DeploymentNumber = DeploymentNumber,
-                Project = Project,
-                Agents = PhotonServer.Instance.Agents.All.ToArray(),
-                ProjectPackageId = ProjectPackageId,
-                ProjectPackageVersion = ProjectPackageVersion,
-                EnvironmentName = EnvironmentName,
-                ScriptName = ScriptName,
-                WorkDirectory = WorkDirectory,
-                BinDirectory = BinDirectory,
-                ContentDirectory = ContentDirectory,
-                Packages = PackageClient,
-                ConnectionFactory = ConnectionFactory,
-                Output = contextOutput,
-                ServerVariables = Variables,
-            };
+                var context = new ServerDeployContext {
+                    DeploymentNumber = Deployment.Number,
+                    Project = Project,
+                    Agents = PhotonServer.Instance.Agents.All.ToArray(),
+                    ProjectPackageId = ProjectPackageId,
+                    ProjectPackageVersion = ProjectPackageVersion,
+                    EnvironmentName = EnvironmentName,
+                    ScriptName = ScriptName,
+                    WorkDirectory = WorkDirectory,
+                    BinDirectory = BinDirectory,
+                    ContentDirectory = ContentDirectory,
+                    Packages = PackageClient,
+                    ConnectionFactory = ConnectionFactory,
+                    Output = contextOutput,
+                    ServerVariables = Variables,
+                };
 
-            await Domain.RunDeployScript(context, TokenSource.Token);
+                try {
+                    await Domain.RunDeployScript(context, TokenSource.Token);
+
+                    Deployment.IsSuccess = true;
+                }
+                catch (OperationCanceledException) {
+                    Deployment.IsCancelled = true;
+                    throw;
+                }
+                catch (Exception error) {
+                    Deployment.Exception = error.UnfoldMessages();
+                    throw;
+                }
+                finally {
+                    Deployment.IsComplete = true;
+                    Deployment.Duration = DateTime.UtcNow - Deployment.Created;
+                    //Deployment.ApplicationPackages = ?;
+                    Deployment.Save();
+
+                    await Deployment.SetOutput(Output.GetString());
+                    // TODO: Save alternate version with ansi characters removed
+                }
+            }
         }
     }
 }

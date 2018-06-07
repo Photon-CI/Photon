@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Photon.Publishing.Tasks
 {
-    public class PublishTask : IBuildTask
+    public class Publish_Win : IBuildTask
     {
-        //private NuGetCore nugetClient;
+        private string frameworkVersion;
         private string nugetPackageDir;
         private string nugetApiKey;
         private string nugetExe;
@@ -40,19 +40,16 @@ namespace Photon.Publishing.Tasks
             ftpUser = photonVars["ftp.user"];
             ftpPass = photonVars["ftp.pass"];
 
-            //nugetClient = new NuGetCore {
-            //    EnableV3 = true,
-            //    Output = Context.Output,
-            //    ApiKey = nugetApiKey,
-            //};
-            //nugetClient.Initialize();
-
             await BuildSolution();
             await PublishServer();
             await PublishAgent();
             await PublishCLI();
 
             PathEx.CreatePath(nugetPackageDir);
+
+            var projectPath = Path.Combine(Context.ContentDirectory, "Photon.Framework");
+            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.Framework.dll");
+            frameworkVersion = AssemblyTools.GetVersion(assemblyFilename);
 
             await PublishFrameworkPackage(token);
             await PublishPluginPackage("Photon.IIS", token);
@@ -129,10 +126,8 @@ namespace Photon.Publishing.Tasks
         {
             var projectPath = Path.Combine(Context.ContentDirectory, "Photon.Framework");
             var packageDefinition = Path.Combine(projectPath, "Photon.Framework.csproj");
-            var assemblyFilename = Path.Combine(projectPath, "bin", "Release", "Photon.Framework.dll");
-            var assemblyVersion = AssemblyTools.GetVersion(assemblyFilename);
 
-            await PublishPackage("Photon.Framework", packageDefinition, assemblyVersion, token);
+            await PublishPackage("Photon.Framework", packageDefinition, frameworkVersion, token);
         }
 
         private async Task PublishPluginPackage(string id, CancellationToken token)
@@ -148,7 +143,7 @@ namespace Photon.Publishing.Tasks
         private async Task PublishPackage(string packageId, string packageDefinitionFilename, string assemblyVersion, CancellationToken token)
         {
             var publisher = new NuGetPackagePublisher(Context) {
-                Mode = NugetModes.CommandLine,
+                Mode = NugetModes.Hybrid,
                 PackageDirectory = nugetPackageDir,
                 PackageDefinition = packageDefinitionFilename,
                 PackageId = packageId,
@@ -156,8 +151,21 @@ namespace Photon.Publishing.Tasks
                 CL = new NuGetCommandLine {
                     ExeFilename = nugetExe,
                     ApiKey = nugetApiKey,
+                    Output = Context.Output,
+                },
+                Client = new NuGetCore {
+                    EnableV3 = true,
+                    Output = Context.Output,
+                    ApiKey = nugetApiKey,
+                },
+                PackProperties = {
+                    ["Configuration"] = "Release",
+                    ["Platform"] = "AnyCPU",
+                    ["frameworkVersion"] = frameworkVersion,
                 },
             };
+
+            publisher.Client.Initialize();
 
             await publisher.PublishAsync(token);
         }

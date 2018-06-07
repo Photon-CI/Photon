@@ -1,7 +1,7 @@
-﻿using System;
-using Photon.Server.ViewModels.Build;
+﻿using Photon.Server.ViewModels.Build;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
+using System;
 
 namespace Photon.Server.ViewHandlers.Build
 {

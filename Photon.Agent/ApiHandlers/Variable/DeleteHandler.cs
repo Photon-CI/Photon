@@ -1,7 +1,7 @@
 ﻿using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
 
-namespace Photon.Agent.HttpHandlers.Api.Variable
+namespace Photon.Agent.ApiHandlers.Variable
 {
     [HttpHandler("/api/variable/delete")]
     internal class DeleteHandler : HttpHandler

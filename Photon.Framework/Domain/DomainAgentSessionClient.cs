@@ -7,7 +7,7 @@ namespace Photon.Framework.Domain
     public delegate void SessionRunTaskFunc(string taskName, RemoteTaskCompletionSource taskHandle);
     public delegate void SessionDisposedFunc();
 
-    public class DomainAgentSessionClient : MarshalByRefObject
+    public class DomainAgentSessionClient : MarshalByRefInstance
     {
         public string Id {get;}
         public event SessionBeginFunc OnSessionBegin;
@@ -36,8 +36,10 @@ namespace Photon.Framework.Domain
             OnSessionRunTask?.Invoke(taskName, taskHandle);
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
             OnSessionDisposed?.Invoke();
         }
     }

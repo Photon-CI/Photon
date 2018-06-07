@@ -1,16 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:firewall="http://schemas.microsoft.com/wix/FirewallExtension">
   <?define EXE=$(var.PhotonAgent.TargetFileName)?>
   <?define VERSION=!(bind.FileVersion.$(var.EXE))?>
   <?define PhotonAgent_TargetDir=$(var.PhotonAgent.TargetDir)?>
   <Product Id="*" Name="Photon Agent $(var.VERSION)" Language="1033" Version="$(var.VERSION)" Manufacturer="Joshua Miller" UpgradeCode="06ac1f64-d492-40c4-9de6-3ada579880a8">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon Agent." />
-
-	  <Media Id="1" Cabinet="Photon.Agent.cab" EmbedCab="yes" />
-
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Manufacturer="Joshua Miller" Description="Windows Installer for Photon Agent." />
+    <Media Id="1" Cabinet="Photon.Agent.cab" EmbedCab="yes" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of Photon Agent is already installed." />
-
-		<Feature Id="Complete" Title="Photon Agent" Description="Install Photon Agent." Level="1" Display="expand" ConfigurableDirectory="INSTALLDIR">
+    <Feature Id="Complete" Title="Photon Agent" Description="Install Photon Agent." Level="1" Display="expand" ConfigurableDirectory="INSTALLDIR">
       <Feature Id="AgentExecutable" Title="Photon Agent" Description="Photon Agent application." Level="1">
         <ComponentGroupRef Id="ProductComponents" />
         <ComponentGroupRef Id="AgentTemplates" />
@@ -32,27 +29,47 @@
       <ComponentGroupRef Id="Content_fontawesome_5.0.13_js_files" />
       <ComponentGroupRef Id="Content_fontawesome_5.0.13_css_files" />
       <ComponentGroupRef Id="Views_VariableSet_files" />
-		</Feature>
-
-	  <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
-	  <CustomAction Id="SetPhotonUrl" BinaryKey="ConfigTools" DllEntry="LoadAgentUrl" Impersonate="yes" />
-
-	  <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
-	  <CustomAction Id="LaunchAgentConfiguration" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-
+    </Feature>
+    <Property Id="CREATEFIREWALLEXCEPTION" Value="1">
+      <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="CreateFirewallException" />
+    </Property>
+    <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
+    <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
+    <CustomAction Id="SetPhotonUrl" BinaryKey="ConfigTools" DllEntry="LoadAgentUrl" Impersonate="yes" />
+    <CustomAction Id="LaunchAgentConfiguration" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+    <CustomAction Id="SaveCmdLineValueFirewallException" Property="CL_CREATEFIREWALLEXCEPTION" Value="[CREATEFIREWALLEXCEPTION]" Execute="firstSequence" />
+    <CustomAction Id="SetFromCmdLineValueFirewallException" Property="X_CREATEFIREWALLEXCEPTION" Value="[CL_CREATEFIREWALLEXCEPTION]" Execute="firstSequence" />
+    <CustomAction Id="SetFromRegValueFirewallException" Property="X_CREATEFIREWALLEXCEPTION" Value="[REG_CREATEFIREWALLEXCEPTION]" Execute="firstSequence" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Agent Configuration" />
-	  <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
-
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Agent Configuration" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
     <WixVariable Id="WixUILicenseRtf" Value="Content\gpl-3.0.rtf" />
-
-	  <UI>
-	    <UIRef Id="WixUI_InstallDir" />
-	    <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="SetPhotonUrl" Order="1">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
-	    <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchAgentConfiguration" Order="2">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
-	  </UI>
-	</Product>
-
+    <UIRef Id="WixUI_MinimalCustom" />
+  </Product>
+  <Fragment>
+    <UI Id="WixUI_MinimalCustom">
+      <UIRef Id="WixUI_InstallDir" />
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="InstallOptionsDlg" Order="5">1</Publish>
+      <Publish Dialog="InstallOptionsDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+      <Publish Dialog="InstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallOptionsDlg" Order="2">1</Publish>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="SetPhotonUrl" Order="1">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchAgentConfiguration" Order="2">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+      <Dialog Id="InstallOptionsDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.InstallDirDlgDescription)" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.InstallDirDlgTitle)" />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Type="CheckBox" Id="FirewallCheckbox" Width="321" Height="17" X="26" Y="68" CheckBoxValue="1" Property="CREATEFIREWALLEXCEPTION" Text="Create a Windows Firewall exception" />
+      </Dialog>
+    </UI>
+  </Fragment>
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="CommonAppDataFolder">
@@ -116,48 +133,51 @@
       </Directory>
     </Directory>
   </Fragment>
-
-	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="InstallBin">
-		  <Component Id="PhotonAgent.exe" Guid="fef62b5b-45af-437f-90cb-676f626ecaef">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="InstallBin">
+      <Component Id="PhotonAgent.exe" Guid="fef62b5b-45af-437f-90cb-676f626ecaef">
         <File Id="PhotonAgent.exe" Name="PhotonAgent.exe" Source="$(var.PhotonAgent_TargetDir)PhotonAgent.exe" KeyPath="yes" />
-		    <fire:FirewallException Id="PhotonAgentFirewallException" File="PhotonAgent.exe" Name="Photon Agent" Protocol="tcp" Scope="any" />
-		    <ServiceInstall Id="ServiceInstaller" Name="Photon.Agent" Type="ownProcess" DisplayName="Photon Agent" Description="Agent instance for Photon." Start="auto" ErrorControl="normal" Account="[LocalSystem]" />
-		    <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Agent" Wait="yes" />
-		  </Component>
-		  <Component Id="PhotonAgent.exe.config" Guid="d0f39cfc-d34d-42ca-b5ac-ce782557433e">
-		    <File Id="PhotonAgent.exe.config" Name="PhotonAgent.exe.config" Source="$(var.PhotonAgent_TargetDir)PhotonAgent.exe.config" />
-		  </Component>
-		  <Component Id="LibGit2Sharp.dll" Guid="557a7665-f021-49c2-ae97-3832dd8597b5">
-		    <File Id="LibGit2Sharp.dll" Name="LibGit2Sharp.dll" Source="$(var.PhotonAgent_TargetDir)LibGit2Sharp.dll" />
-		  </Component>
-		  <Component Id="log4net.dll" Guid="2e4d6cf2-7d84-4935-97f9-54f8aba5151d">
-		    <File Id="log4net.dll" Name="log4net.dll" Source="$(var.PhotonAgent_TargetDir)log4net.dll" />
-		  </Component>
-		  <Component Id="Newtonsoft.Json.dll" Guid="b144599d-9dee-40ad-81d6-ec647f4e7ed0">
-		    <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.PhotonAgent_TargetDir)Newtonsoft.Json.dll" />
-		  </Component>
-		  <Component Id="PiServerLite.dll" Guid="950d9b75-58ed-4b66-9e49-689dffdafab3">
-		    <File Id="PiServerLite.dll" Name="PiServerLite.dll" Source="$(var.PhotonAgent_TargetDir)PiServerLite.dll" />
-		  </Component>
-		  <Component Id="System.Threading.Tasks.Dataflow.dll" Guid="0348dec5-6727-4b49-8e83-96ccf1f9ad76">
-		    <File Id="System.Threading.Tasks.Dataflow.dll" Name="System.Threading.Tasks.Dataflow.dll" Source="$(var.PhotonAgent_TargetDir)System.Threading.Tasks.Dataflow.dll" />
-		  </Component>
-		  <Component Id="Photon.Framework.dll" Guid="9c4927e8-baec-44c6-92b3-3cde538043ea">
-		    <File Id="Photon.Framework.dll" Name="Photon.Framework.dll" Source="$(var.PhotonAgent_TargetDir)Photon.Framework.dll" />
-		  </Component>
-		  <Component Id="Photon.Library.dll" Guid="a2b30868-de4d-423b-985c-b2d55729159c">
-		    <File Id="Photon.Library.dll" Name="Photon.Library.dll" Source="$(var.PhotonAgent_TargetDir)Photon.Library.dll" />
-		  </Component>
-		  <Component Id="Photon.Communication.dll" Guid="85dd80ad-4519-45b0-aed9-039bf05fbe48">
-		    <File Id="Photon.Communication.dll" Name="Photon.Communication.dll" Source="$(var.PhotonAgent_TargetDir)Photon.Communication.dll" />
-		  </Component>
-		  <Component Id="Newtonsoft.Json.Bson.dll" Guid="07c6f689-26e7-4f2c-b500-efe4ba3dc574">
-		    <File Id="Newtonsoft.Json.Bson.dll" Name="Newtonsoft.Json.Bson.dll" Source="$(var.PhotonAgent_TargetDir)Newtonsoft.Json.Bson.dll" />
-		  </Component>
-		  <Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="f214c9de-3714-40c6-88e5-e42dab35e526">
-		    <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" Name="System.Runtime.InteropServices.RuntimeInformation.dll" Source="$(var.PhotonAgent_TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
-		  </Component>
+        <ServiceInstall Id="ServiceInstaller" Name="Photon.Agent" Type="ownProcess" DisplayName="Photon Agent" Description="Agent instance for Photon." Start="auto" ErrorControl="normal" Account="[LocalSystem]" />
+        <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Agent" Wait="yes" />
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Photon\Agent" Name="CreateFirewallException" Value="[CREATEFIREWALLEXCEPTION]" Type="string" />
+      </Component>
+      <Component Id="FirewallException" Guid="C2CC1E1E-7DC8-451C-8708-F105F383EE11" KeyPath="yes">
+        <Condition>CREATEFIREWALLEXCEPTION</Condition>
+        <firewall:FirewallException Id="PhotonAgentFirewallException" File="PhotonAgent.exe" Name="Photon Agent" Scope="any" />
+      </Component>
+      <Component Id="PhotonAgent.exe.config" Guid="">
+        <File Id="PhotonAgent.exe.config" Name="PhotonAgent.exe.config" Source="$(var.PhotonAgent_TargetDir)PhotonAgent.exe.config" />
+      </Component>
+      <Component Id="LibGit2Sharp.dll" Guid="557a7665-f021-49c2-ae97-3832dd8597b5">
+        <File Id="LibGit2Sharp.dll" Name="LibGit2Sharp.dll" Source="$(var.PhotonAgent_TargetDir)LibGit2Sharp.dll" />
+      </Component>
+      <Component Id="log4net.dll" Guid="2e4d6cf2-7d84-4935-97f9-54f8aba5151d">
+        <File Id="log4net.dll" Name="log4net.dll" Source="$(var.PhotonAgent_TargetDir)log4net.dll" />
+      </Component>
+      <Component Id="Newtonsoft.Json.dll" Guid="b144599d-9dee-40ad-81d6-ec647f4e7ed0">
+        <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.PhotonAgent_TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+      <Component Id="PiServerLite.dll" Guid="950d9b75-58ed-4b66-9e49-689dffdafab3">
+        <File Id="PiServerLite.dll" Name="PiServerLite.dll" Source="$(var.PhotonAgent_TargetDir)PiServerLite.dll" />
+      </Component>
+      <Component Id="System.Threading.Tasks.Dataflow.dll" Guid="0348dec5-6727-4b49-8e83-96ccf1f9ad76">
+        <File Id="System.Threading.Tasks.Dataflow.dll" Name="System.Threading.Tasks.Dataflow.dll" Source="$(var.PhotonAgent_TargetDir)System.Threading.Tasks.Dataflow.dll" />
+      </Component>
+      <Component Id="Photon.Framework.dll" Guid="9c4927e8-baec-44c6-92b3-3cde538043ea">
+        <File Id="Photon.Framework.dll" Name="Photon.Framework.dll" Source="$(var.PhotonAgent_TargetDir)Photon.Framework.dll" />
+      </Component>
+      <Component Id="Photon.Library.dll" Guid="a2b30868-de4d-423b-985c-b2d55729159c">
+        <File Id="Photon.Library.dll" Name="Photon.Library.dll" Source="$(var.PhotonAgent_TargetDir)Photon.Library.dll" />
+      </Component>
+      <Component Id="Photon.Communication.dll" Guid="85dd80ad-4519-45b0-aed9-039bf05fbe48">
+        <File Id="Photon.Communication.dll" Name="Photon.Communication.dll" Source="$(var.PhotonAgent_TargetDir)Photon.Communication.dll" />
+      </Component>
+      <Component Id="Newtonsoft.Json.Bson.dll" Guid="07c6f689-26e7-4f2c-b500-efe4ba3dc574">
+        <File Id="Newtonsoft.Json.Bson.dll" Name="Newtonsoft.Json.Bson.dll" Source="$(var.PhotonAgent_TargetDir)Newtonsoft.Json.Bson.dll" />
+      </Component>
+      <Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="f214c9de-3714-40c6-88e5-e42dab35e526">
+        <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" Name="System.Runtime.InteropServices.RuntimeInformation.dll" Source="$(var.PhotonAgent_TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="LibGit2SharpComponents">
       <ComponentRef Id="LibGit2Sharp_linux_x86x64" />
@@ -165,17 +185,16 @@
       <ComponentRef Id="LibGit2Sharp_win32_x86" />
       <ComponentRef Id="LibGit2Sharp_win32_x64" />
     </ComponentGroup>
-	  <ComponentGroup Id="AgentTemplates" Directory="INSTALLDIR">
-	    <Component Id="AgentConfigTemplate" Guid="">
+    <ComponentGroup Id="AgentTemplates" Directory="INSTALLDIR">
+      <Component Id="AgentConfigTemplate" Guid="">
         <File Source="$(var.PhotonAgent.ProjectDir)agent.json" KeyPath="yes">
           <util:PermissionEx User="Users" GenericAll="yes" />
         </File>
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Builds_files" Directory="Views_Builds">
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -193,13 +212,10 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Deployments_files" Directory="Views_Deployments">
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Variables_files" Directory="Views_Variables">
-      
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -227,30 +243,10 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.11_css_files" Directory="Content_fontawesome_5.0.11_css">
-      
-      
-      
-      
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.11_webfonts_files" Directory="Content_fontawesome_5.0.11_webfonts">
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>

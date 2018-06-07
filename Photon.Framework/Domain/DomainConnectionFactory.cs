@@ -1,11 +1,10 @@
 ﻿using Photon.Framework.Server;
-using System;
 
 namespace Photon.Framework.Domain
 {
     public delegate DomainAgentSessionClient ConnectionRequestFunc(ServerAgent agent);
 
-    public class DomainConnectionFactory : MarshalByRefObject
+    public class DomainConnectionFactory : MarshalByRefInstance
     {
         public event ConnectionRequestFunc OnConnectionRequest;
 

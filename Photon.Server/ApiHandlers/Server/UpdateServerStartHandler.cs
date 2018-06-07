@@ -1,12 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using log4net;
+﻿using log4net;
 using Photon.Framework;
 using Photon.Framework.Tools;
 using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Server
 {
@@ -55,10 +55,14 @@ namespace Photon.Server.ApiHandlers.Server
                 Log.Error("An error occurred while shutting down!", error);
             }
 
+            Log.Debug("Starting server update...");
+
             try {
                 var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
 
-                ProcessRunner.Run(updatePath, cmd);
+                ProcessRunner.Start(updatePath, cmd);
+
+                Log.Info("Server update started.");
             }
             catch (Exception error) {
                 Log.Error("Failed to start server update!", error);

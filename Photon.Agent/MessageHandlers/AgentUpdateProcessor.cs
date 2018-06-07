@@ -28,32 +28,38 @@ namespace Photon.Agent.MessageHandlers
 
             File.Move(requestMessage.Filename, msiFilename);
 
-            BeginInstall(updatePath, msiFilename);
+            var _ = Task.Delay(100)
+                .ContinueWith(async t => {
+                    await BeginInstall(updatePath, msiFilename);
+                });
 
-            //var _ = Task.Delay(200).ContinueWith(t => {
-            //    try {
-            //        PhotonAgent.Instance.Stop(TimeSpan.FromSeconds(20));
-            //    }
-            //    catch (Exception error) {
-            //        Log.Error("An error occurred while shutting down!", error);
-            //    }
-            //});
+            //BeginInstall(updatePath, msiFilename);
 
             var response = new AgentUpdateResponse();
 
             return await Task.FromResult(response);
         }
 
-        private void BeginInstall(string updatePath, string msiFilename)
+        private async Task BeginInstall(string updatePath, string msiFilename)
         {
             // TODO: Verify MSI?
+
+            try {
+                await PhotonAgent.Instance.Shutdown(TimeSpan.FromSeconds(30));
+            }
+            catch (Exception error) {
+                Log.Error("An error occurred while shutting down!", error);
+            }
 
             Log.Debug("Starting agent update...");
 
             try {
                 var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
 
-                ProcessRunner.Run(updatePath, cmd);
+                using (var process = ProcessRunner.Start(updatePath, cmd)) {
+                    if (process == null)
+                        throw new ApplicationException("Failed to start process!");
+                }
 
                 Log.Info("Agent update started.");
             }

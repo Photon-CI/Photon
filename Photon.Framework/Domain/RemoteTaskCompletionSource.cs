@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Runtime.Remoting.Lifetime;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
 {
-    public class RemoteTaskCompletionSource : MarshalByRefObject
+    public class RemoteTaskCompletionSource : MarshalByRefInstance
     {
         private readonly TaskCompletionSource<object> taskEvent;
-        private bool isComplete;
+        private volatile bool isComplete;
 
         public Task Task => taskEvent.Task;
 
@@ -43,29 +42,25 @@ namespace Photon.Framework.Domain
             taskEvent.SetException(error);
         }
 
-        public static async Task Run(Action<RemoteTaskCompletionSource, ISponsor> action, CancellationToken token = default(CancellationToken))
+        public static async Task Run(Action<RemoteTaskCompletionSource> action, CancellationToken token = default(CancellationToken))
         {
-            var sponsor = new ClientSponsor();
-            var taskHandle = new RemoteTaskCompletionSource();
+            using (var taskHandle = new RemoteTaskCompletionSource()) {
+                var _task = new WeakReference(taskHandle);
+                token.Register(() => {
+                    if (!_task.IsAlive) return;
+                    ((RemoteTaskCompletionSource) _task.Target).SetCancelled();
+                });
 
-            token.Register(() => taskHandle.SetCancelled());
-
-            try {
-                sponsor.Register(taskHandle);
-
-                action(taskHandle, sponsor);
+                action(taskHandle);
                 await taskHandle.Task;
-            }
-            finally {
-                sponsor.Close();
             }
         }
     }
 
-    public class RemoteTaskCompletionSource<T> : MarshalByRefObject
+    public class RemoteTaskCompletionSource<T> : MarshalByRefInstance
     {
         private readonly TaskCompletionSource<T> taskEvent;
-        private bool isComplete;
+        private volatile bool isComplete;
 
         public Task<T> Task => taskEvent.Task;
 
@@ -99,21 +94,17 @@ namespace Photon.Framework.Domain
             taskEvent.SetException(error);
         }
 
-        public static async Task<T> Run(Action<RemoteTaskCompletionSource<T>, ISponsor> action, CancellationToken token = default(CancellationToken))
+        public static async Task<T> Run(Action<RemoteTaskCompletionSource<T>> action, CancellationToken token = default(CancellationToken))
         {
-            var sponsor = new ClientSponsor();
-            var taskHandle = new RemoteTaskCompletionSource<T>();
+            using (var taskHandle = new RemoteTaskCompletionSource<T>()) {
+                var _task = new WeakReference(taskHandle);
+                token.Register(() => {
+                    if (!_task.IsAlive) return;
+                    ((RemoteTaskCompletionSource) _task.Target).SetCancelled();
+                });
 
-            token.Register(() => taskHandle.SetCancelled());
-
-            try {
-                sponsor.Register(taskHandle);
-
-                action(taskHandle, sponsor);
+                action(taskHandle);
                 return await taskHandle.Task;
-            }
-            finally {
-                sponsor.Close();
             }
         }
     }
