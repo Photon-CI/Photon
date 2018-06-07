@@ -30,11 +30,16 @@
       <ComponentGroupRef Id="Content_fontawesome_5.0.13_css_files" />
       <ComponentGroupRef Id="Views_VariableSet_files" />
     </Feature>
-    <Property Id="CREATEFIREWALLEXCEPTION" Value="1" />
+    <Property Id="CREATEFIREWALLEXCEPTION" Value="1">
+      <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="CreateFirewallException" />
+    </Property>
+    <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
     <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
     <CustomAction Id="SetPhotonUrl" BinaryKey="ConfigTools" DllEntry="LoadAgentUrl" Impersonate="yes" />
-    <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
     <CustomAction Id="LaunchAgentConfiguration" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+    <CustomAction Id="SaveCmdLineValueFirewallException" Property="CL_CREATEFIREWALLEXCEPTION" Value="[CREATEFIREWALLEXCEPTION]" Execute="firstSequence" />
+    <CustomAction Id="SetFromCmdLineValueFirewallException" Property="X_CREATEFIREWALLEXCEPTION" Value="[CL_CREATEFIREWALLEXCEPTION]" Execute="firstSequence" />
+    <CustomAction Id="SetFromRegValueFirewallException" Property="X_CREATEFIREWALLEXCEPTION" Value="[REG_CREATEFIREWALLEXCEPTION]" Execute="firstSequence" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Agent Configuration" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
@@ -44,39 +49,12 @@
   <Fragment>
     <UI Id="WixUI_MinimalCustom">
       <UIRef Id="WixUI_InstallDir" />
-      <!--<TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
-      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
-      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
-      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
-      <Property Id="WixUI_Mode" Value="Minimal" />
-      <DialogRef Id="ErrorDlg" />
-      <DialogRef Id="FatalError" />
-      <DialogRef Id="FilesInUse" />
-      <DialogRef Id="MsiRMFilesInUse" />
-      <DialogRef Id="PrepareDlg" />
-      <DialogRef Id="ProgressDlg" />
-      <DialogRef Id="ResumeDlg" />
-      <DialogRef Id="UserExit" />
-      <DialogRef Id="WelcomeDlg" />
-      <DialogRef Id="WelcomeEulaDlg" />-->
-      <!--<Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>-->
       <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="InstallOptionsDlg" Order="5">1</Publish>
       <Publish Dialog="InstallOptionsDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
       <Publish Dialog="InstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
       <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallOptionsDlg" Order="2">1</Publish>
       <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="SetPhotonUrl" Order="1">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
       <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchAgentConfiguration" Order="2">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
-      <!--<InstallUISequence>
-        --><!--<Show Dialog="WelcomeDlg" Before="WelcomeEulaDlg">Installed AND PATCH</Show>
-        <Show Dialog="WelcomeEulaDlg" Before="InstallOptionsDlg">NOT Installed</Show>--><!--
-        <Show Dialog="InstallOptionsDlg" Before="ProgressDlg" Sequence="2">NOT Installed</Show>
-      </InstallUISequence>-->
-      <!--<Property Id="ARPNOMODIFY" Value="1" />-->
       <Dialog Id="InstallOptionsDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
         <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
         <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
@@ -161,6 +139,7 @@
         <File Id="PhotonAgent.exe" Name="PhotonAgent.exe" Source="$(var.PhotonAgent_TargetDir)PhotonAgent.exe" KeyPath="yes" />
         <ServiceInstall Id="ServiceInstaller" Name="Photon.Agent" Type="ownProcess" DisplayName="Photon Agent" Description="Agent instance for Photon." Start="auto" ErrorControl="normal" Account="[LocalSystem]" />
         <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Agent" Wait="yes" />
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Photon\Agent" Name="CreateFirewallException" Value="[CREATEFIREWALLEXCEPTION]" Type="string" />
       </Component>
       <Component Id="FirewallException" Guid="C2CC1E1E-7DC8-451C-8708-F105F383EE11" KeyPath="yes">
         <Condition>CREATEFIREWALLEXCEPTION</Condition>

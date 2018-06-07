@@ -102,7 +102,7 @@
     <Compile Include="Server\DeployScriptRegistry.cs" />
     <Compile Include="Server\IDeployScript.cs" />
     <Compile Include="Server\IServerDeployContext.cs" />
-    <Compile Include="Server\AgentSessionHandleCollection.cs" />
+    <Compile Include="Domain\AgentSessionHandleCollection.cs" />
     <Compile Include="Domain\TypeRegistry.cs" />
     <Compile Include="Server\ServerDeployContext.cs" />
     <Compile Include="Agent\AgentBuildContext.cs" />
