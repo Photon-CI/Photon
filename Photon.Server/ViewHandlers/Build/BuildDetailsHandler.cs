@@ -13,7 +13,7 @@ namespace Photon.Server.ViewHandlers.Build
         {
             var vm = new BuildDetailsVM {
                 PageTitle = "Photon Server Build Details",
-                ProjectId = GetQuery<string>("project"),
+                ProjectId = GetQuery("project"),
                 BuildNumber = GetQuery<uint>("number"),
             };
 

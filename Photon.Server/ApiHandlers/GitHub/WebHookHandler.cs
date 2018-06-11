@@ -59,6 +59,9 @@ namespace Photon.Server.ApiHandlers.GitHub
             var source = (ProjectGithubSource)project.Description.Source;
             var build = await project.StartNewBuild();
             build.TaskName = source.HookTaskName;
+            build.TaskRoles = source.HookTaskRoles;
+            build.PreBuildCommand = project.Description.PreBuild;
+            build.AssemblyFilename = project.Description.AssemblyFile;
             build.GitRefspec = commit.Refspec;
             build.Commit = commit;
 

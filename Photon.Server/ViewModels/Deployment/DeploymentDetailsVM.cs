@@ -10,10 +10,13 @@ namespace Photon.Server.ViewModels.Deployment
     {
         public string ProjectId {get; set;}
         public uint DeploymentNumber {get; set;}
+        public string SessionId {get; private set;}
         public string ProjectName {get; private set;}
         public string DeploymentCreated {get; private set;}
         public string DeploymentDuration {get; private set;}
-        public string DeploymentEnvironment {get; private set;}
+        public string PackageId {get; private set;}
+        public string PackageVersion {get; private set;}
+        public string Environment {get; private set;}
         public PackageReference[] ApplicationPackages {get; private set;}
         public List<object> Artifacts {get; private set;}
         public string IconClass {get; private set;}
@@ -30,7 +33,11 @@ namespace Photon.Server.ViewModels.Deployment
                 if (project.Deployments.TryGet(DeploymentNumber, out var deploymentData)) {
                     DeploymentCreated = deploymentData.Created.ToLocalTime().ToString("F");
                     DeploymentDuration = deploymentData.Duration?.ToString("g");
-                    DeploymentEnvironment = deploymentData.EnvironmentName;
+
+                    SessionId = deploymentData.ServerSessionId;
+                    PackageId = deploymentData.PackageId;
+                    PackageVersion = deploymentData.PackageVersion;
+                    Environment = deploymentData.EnvironmentName;
                     ApplicationPackages = deploymentData.ApplicationPackages;
 
                     Artifacts = new List<object>();

@@ -5,6 +5,9 @@
 <script>
     var editor;
 
+    var agentJsonUrl = '{{#Url api/variable/json}}';
+    var agentDeleteUrl = '{{#Url api/variable/delete}}';
+
     $(function () {
         $('#layoutNavbarContent [data-link="variables"]').addClass('active');
 
@@ -26,9 +29,6 @@
 
         editor.focus();
     });
-
-    var agentJsonUrl = '{{#Url api/variable/json}}';
-    var agentDeleteUrl = '{{#Url api/variable/delete}}';
 
     function onLoad() {
         $.ajax({

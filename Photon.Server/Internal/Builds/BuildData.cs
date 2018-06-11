@@ -25,6 +25,9 @@ namespace Photon.Server.Internal.Builds
         public TimeSpan? Duration {get; set;}
         public string GitRefspec {get; set;}
         public string TaskName {get; set;}
+        public string[] TaskRoles {get; set;}
+        public string PreBuildCommand {get; set;}
+        public string AssemblyFilename {get; set;}
         public string ServerSessionId {get; set;}
         public PackageReference[] ProjectPackages {get; set;}
         public GithubCommit Commit {get; set;}

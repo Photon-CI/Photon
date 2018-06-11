@@ -47,6 +47,8 @@ namespace Photon.Server.ApiHandlers.Deploy
                     return Response.BadRequest().SetText($"Project '{projectId}' was not found!");
 
                 var deployment = await project.StartNewDeployment();
+                deployment.PackageId = projectPackageId;
+                deployment.PackageVersion = projectPackageVersion;
                 deployment.EnvironmentName = environmentName;
                 //deployment.ScriptName = ?;
 

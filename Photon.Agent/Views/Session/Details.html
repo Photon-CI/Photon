@@ -5,6 +5,8 @@
 <script src="{{#Url SharedContent/ansi_up.js}}"></script>
 <script>
     var reader;
+    var enableTracking = false;
+    var enableWrapping = false;
 
     $(function () {
         $('#layoutNavbarContent [data-link="sessions"]').addClass('active');
@@ -24,6 +26,8 @@
         //text_out = ansi_up.linkify(text_out);
 
         $('#SessionOutput').append(text_out);
+
+        if (enableTracking) scrollToBottom();
     }
 
     function onDone() {
@@ -32,6 +36,35 @@
 
     function onError() {
         //
+    }
+
+    function onTrackToggleClick() {
+        enableTracking = !$('#TrackToggle').hasClass('active');
+
+        if (enableTracking) scrollToBottom();
+    }
+
+    function onWrapToggleClick() {
+        enableWrapping = !$('#WrapToggle').hasClass('active');
+        var innerContent = $('.inner-content');
+
+        if (enableWrapping) {
+            innerContent.width('100%');
+            innerContent.find('pre').css('white-space', 'pre-wrap');
+        } else {
+            innerContent.width('auto');
+            innerContent.find('pre').css('white-space', 'pre');
+        }
+
+        if (enableTracking) scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        var outerContent = $('.outer-content');
+
+        outerContent.stop().animate({
+            scrollTop: outerContent[0].scrollHeight
+        }, 800);
     }
 </script>
 {{#EndScript}}
@@ -42,16 +75,60 @@
         background: #111;
         overflow-x: auto;
     }
+
     .session-output {
         color: #CCC;
+        word-break: break-all;
+    }
+    #WrapToggle.active,
+    #TrackToggle.active {
+        color: #00FF00;
+    }
+    #WrapToggle,
+    #TrackToggle {
+        padding: 3px 4px 0 4px;
+        width: 32px;
+        height: 32px;
+    }
+    #TrackToggle svg,
+    #WrapToggle svg {
+        width: auto;
+        height: 18px;
+        display: inline-block;
+        overflow: visible;
+        fill: currentColor;
+        color: inherit;
     }
 
     @media (min-width: 768px) {
         .layout-content {
             position: relative;
             height: 100vh;
-            overflow-x: auto;
-            overflow-y: auto;
+            overflow: hidden;
+        }
+        .toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 46px;
+        }
+        #SessionIcon {
+            font-size: 28px;
+            margin: 6px 0 0 6px;
+            margin-top: 6px;
+        }
+        .session-title {
+            margin-left: 46px;
+            line-height: 18px;
+        }
+        .outer-content {
+            position: absolute;
+            top: 46px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: auto;
         }
         .inner-content {
             position: absolute;
@@ -61,10 +138,26 @@
 </style>
 {{#EndStyle}}
 
-<div class="inner-content">
-    <div class="bg-secondary px-2 py-1">
-        <h2 class="text-light my-0">Session Output</h2>
+<div class="bg-dark px-2 py-1 toolbar">
+    <div class="float-right">
+        <button id="WrapToggle" class="btn btn-sm btn-secondary" data-toggle="button" onclick="onWrapToggleClick()">
+            <!--<img src="{{#Url SharedContent/Images/wrap.svg}}" />-->
+            <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="34" height="32" viewBox="0 0 34 32"> <path d="M 0,28 H 12 V 24 H 0 Z M 32,0 H 0 V 4 H 32 Z M 26,12 H 0 v 4 h 26.5 c 2.21,0 4,1.79 4,4 0,2.21 -1.79,4 -4,4 H 22 v -4 l -6,6 6,6 v -4 h 4 c 4.41,0 8,-3.59 8,-8 0,-4.41 -3.59,-8 -8,-8 z"id="path"inkscape:connector-curvature="0"style="display:inline;fill-opacity:1;stroke:none;stroke-opacity:1" /> </svg>
+        </button>
+        <button id="TrackToggle" class="btn btn-sm btn-secondary d-none d-md-inline" data-toggle="button" onclick="onTrackToggleClick()">
+            <!--<i class="fas fa-level-down-alt"></i>-->
+            <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" xml:space="preserve"> <g id="Icons" transform="translate(-8,-7)"> <rect height="2"width="16"x="8"y="23"id="rect3" /> <polygon points="17,7 15,7 15,17.672 9.414,12.086 8,13.5 16,21.5 24,13.5 22.586,12.086 17,17.672 "id="polygon5" /> </g> </svg>
+        </button>
     </div>
+    <i id="SessionIcon" class="{{SessionStatus}} float-left"></i>
+    <div class="session-title">
+        <span class="text-light">{{SessionTitle}}</span><br/>
+        <span class="text-muted">{{SessionId}}</span>
+    </div>
+</div>
 
-    <pre id="SessionOutput" class="session-output px-2 py-1"></pre>
+<div class="outer-content">
+    <div class="inner-content">
+        <pre id="SessionOutput" class="session-output px-2 py-1"></pre>
+    </div>
 </div>

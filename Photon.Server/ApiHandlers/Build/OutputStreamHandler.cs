@@ -6,11 +6,20 @@ using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Build
 {
-    [HttpHandler("api/build/output-stream")]
+    [HttpHandler("api/build/output")]
     internal class OutputStreamHandler : HttpHandlerAsync
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
+            var sessionId = GetQuery<string>("session");
+
+            if (!string.IsNullOrEmpty(sessionId)) {
+                if (PhotonServer.Instance.Sessions.TryGet(sessionId, out var session)) {
+                    if (!session.IsComplete)
+                        return Response.Redirect("api/session/output-stream", new {id = sessionId});
+                }
+            }
+
             var projectId = GetQuery<string>("project");
             var buildNumber = GetQuery<uint?>("number");
 

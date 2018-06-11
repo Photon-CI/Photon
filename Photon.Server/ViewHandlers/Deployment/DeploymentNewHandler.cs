@@ -37,13 +37,16 @@ namespace Photon.Server.ViewHandlers.Deployment
                 vm.Restore(Request.FormData());
                 await vm.StartDeployment();
 
-                return Response.Redirect("session/details", new {
-                    id = vm.ServerSessionId,
+                // TODO: Add support for url fragments to PiServerLite
+                // TODO: Then nav to #output
+                return Response.Redirect("deployment/details", new {
+                    project = vm.ProjectId,
+                    number = vm.DeploymentNumber,
                 });
             }
             catch (Exception error) {
                 vm.Errors.Add(error);
-                return Response.View("Build\\New.html", vm);
+                return Response.View("Deployment\\New.html", vm);
             }
         }
     }

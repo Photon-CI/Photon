@@ -42,6 +42,9 @@ namespace Photon.Server.ApiHandlers.Build
 
                 var build = await project.StartNewBuild();
                 build.TaskName = _taskName;
+                build.TaskRoles = startInfo.Roles;
+                build.PreBuildCommand = project.Description.PreBuild;
+                build.AssemblyFilename = project.Description.AssemblyFile;
                 build.GitRefspec = _gitRefspec;
 
                 var session = new ServerBuildSession {

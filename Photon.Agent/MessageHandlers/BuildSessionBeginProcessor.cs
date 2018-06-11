@@ -20,6 +20,7 @@ namespace Photon.Agent.MessageHandlers
                 Project = requestMessage.Project,
                 AssemblyFilename = requestMessage.AssemblyFile,
                 PreBuild = requestMessage.PreBuild,
+                TaskName = requestMessage.TaskName,
                 GitRefspec = requestMessage.GitRefspec,
                 BuildNumber = requestMessage.BuildNumber,
                 ServerVariables = requestMessage.Variables,

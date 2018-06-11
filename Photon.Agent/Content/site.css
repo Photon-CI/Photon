@@ -1,10 +1,10 @@
-﻿html {
+﻿html, body {
     height: 100%;
     overflow-x: hidden;
 }
-body {
+/*body {
     min-height: 100%;
-}
+}*/
 
 nav.sidebar {
     -webkit-transition: margin 200ms ease-out;
@@ -20,6 +20,10 @@ nav.sidebar {
     transition: margin 200ms ease-out, width 200ms ease-out;
 }
 
+.content-navbar {
+    padding: 2px 8px 1px 8px;
+    min-height: 47px;
+}
 .nav-item-iconholder {
     float: right;
     text-align: center;

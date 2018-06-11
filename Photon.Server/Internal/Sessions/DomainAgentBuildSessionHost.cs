@@ -24,6 +24,7 @@ namespace Photon.Server.Internal.Sessions
                 Agent = Agent,
                 AssemblyFile = session.AssemblyFilename,
                 PreBuild = session.PreBuild,
+                TaskName = session.TaskName,
                 GitRefspec = session.GitRefspec,
                 BuildNumber = session.Build.Number,
                 Variables = session.Variables,

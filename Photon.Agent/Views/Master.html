@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" lang="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{PageTitle}}</title>
     <link rel="SHORTCUT ICON" href="{{#Url SharedContent/photon_light.ico}}">
@@ -11,57 +12,55 @@
     {{$style-content}}
 </head>
 <body>
-    <div class="clearfix">
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark sidebar">
-            <div class="container-fluid">
-                <div class="navbar-brand photon-icon">
-                    <img src="{{#Url Content/Images/photon_dark.svg}}" class="d-inline-block" alt="" />
-                    Photon Agent
-                </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#layoutNavbarContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="layoutNavbarContent">
-                    <ul class="navbar-nav">
-                        <li class="nav-item" data-link="dashboard">
-                            <a href="{{#Url index}}" class="nav-link">
-                                <div class="nav-item-iconholder">
-                                    <i style="font-size: 16px" class="fas fa-home"></i>
-                                </div>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item" data-link="sessions">
-                            <a href="{{#Url sessions}}" class="nav-link">
-                                <div class="nav-item-iconholder">
-                                    <i style="font-size: 16px" class="fas fa-terminal"></i>
-                                </div>
-                                Sessions
-                            </a>
-                        </li>
-                        <li class="nav-item" data-link="variables">
-                            <a href="{{#Url variables}}" class="nav-link">
-                                <div class="nav-item-iconholder">
-                                    <i style="font-size: 16px" class="fas fa-hashtag"></i>
-                                </div>
-                                Variables
-                            </a>
-                        </li>
-                        <li class="nav-item" data-link="configuration">
-                            <a href="{{#Url configuration}}" class="nav-link">
-                                <div class="nav-item-iconholder">
-                                    <i style="font-size: 16px" class="fas fa-cog"></i>
-                                </div>
-                                Configuration
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark sidebar">
+        <div class="container-fluid">
+            <div class="navbar-brand photon-icon">
+                <img src="{{#Url Content/Images/photon_dark.svg}}" class="d-inline-block" alt="" />
+                Photon Agent
             </div>
-        </nav>
-        <div class="layout-content">
-            {{$master-content}}
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#layoutNavbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="layoutNavbarContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item" data-link="dashboard">
+                        <a href="{{#Url index}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-home"></i>
+                            </div>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item" data-link="sessions">
+                        <a href="{{#Url sessions}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-terminal"></i>
+                            </div>
+                            Sessions
+                        </a>
+                    </li>
+                    <li class="nav-item" data-link="variables">
+                        <a href="{{#Url variables}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-hashtag"></i>
+                            </div>
+                            Variables
+                        </a>
+                    </li>
+                    <li class="nav-item" data-link="configuration">
+                        <a href="{{#Url configuration}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-cog"></i>
+                            </div>
+                            Configuration
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
+    </nav>
+    <div class="layout-content">
+        {{$master-content}}
     </div>
     <script src="{{#Url SharedContent/jquery-3.3.1.min.js}}"></script>
     <script src="{{#Url SharedContent/popper.min.js}}"></script>

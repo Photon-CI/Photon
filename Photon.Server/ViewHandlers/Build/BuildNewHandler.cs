@@ -15,6 +15,11 @@ namespace Photon.Server.ViewHandlers.Build
         {
             var vm = new BuildNewVM {
                 ProjectId = GetQuery("project"),
+                GitRefspec = GetQuery("refspec"),
+                TaskName = GetQuery("task"),
+                TaskRoles = GetQuery("roles"),
+                PreBuildCommand = GetQuery("prebuild"),
+                AssemblyFilename = GetQuery("assembly"),
             };
 
             try {
@@ -35,8 +40,11 @@ namespace Photon.Server.ViewHandlers.Build
                 vm.Restore(Request.FormData());
                 await vm.StartBuild();
 
-                return Response.Redirect("session/details", new {
-                    id = vm.ServerSessionId,
+                // TODO: Add support for url fragments to PiServerLite
+                // TODO: Then nav to #output
+                return Response.Redirect("build/details", new {
+                    project = vm.ProjectId,
+                    number = vm.BuildNumber,
                 });
             }
             catch (Exception error) {

@@ -1,9 +1,11 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
+<script src="{{#Url SharedContent/SessionOutput.js}}"></script>
 <script src="{{#Url SharedContent/ansi_up.js}}"></script>
 <script>
-    var outputStreamUrl = '{{#Url api/build/output-stream}}?project={{&ProjectId}}&number={{&BuildNumber}}';
+    var outputUrl = '{{#Url api/build/output}}?session={{&SessionId}}&project={{&ProjectId}}&number={{&BuildNumber}}';
+    var reader;
 
     $(function () {
         $('#layoutNavbarContent [data-link="builds"]').addClass('active');
@@ -12,14 +14,11 @@
     });
 
     function loadOutput() {
-        $.ajax({
-            url: outputStreamUrl,
-            dataType: 'text'
-        }).done(function(data) {
-            onAppend(data);
-        }).fail(function() {
-            alert("Failed to load build output!");
-        });
+        reader = new SessionOutputReader();
+        reader.onAppend = onAppend;
+        reader.onDone = onDone;
+        reader.onError = onError;
+        reader.begin(outputUrl);
     }
 
     function onAppend(text) {
@@ -29,22 +28,56 @@
 
         $('#OutputText').append(text_out);
     }
+
+    function onDone() {
+        //
+    }
+
+    function onError() {
+        //
+    }
 </script>
 {{#EndScript}}
 
 {{#Style}}
 <style>
     .layout-content {
-        
     }
+
     #OutputText {
         overflow-x: auto;
         background: #111;
         color: #CCC;
     }
+
     td.c-icon {
         width: 1px;
         white-space: nowrap;
+    }
+
+    .output-toolbar {
+        height: auto;
+        padding: 2px 4px;
+    }
+
+    #WrapToggle.active,
+    #TrackToggle.active {
+        color: #00FF00;
+    }
+    #WrapToggle,
+    #TrackToggle {
+        padding: 3px 4px 0 4px;
+        width: 32px;
+        height: 32px;
+    }
+    #TrackToggle svg,
+    #WrapToggle svg {
+        width: auto;
+        height: 18px;
+        display: inline-block;
+        overflow: visible;
+        fill: currentColor;
+        color: inherit;
     }
 
     @media (min-width: 768px) {
@@ -54,18 +87,25 @@
             display: flex;
             overflow-y: hidden;
         }
+
         .tab-content {
             flex: 1;
         }
+
+        #output {
+            height: 100%;
+            flex-direction: column;
+            display: flex;
+        }
+
         .output-container {
+            flex: 1;
             position: relative;
             height: 100%;
             overflow-x: auto;
             overflow-y: auto;
         }
-        #output {
-            height: 100%;
-        }
+
         #OutputText {
             position: absolute;
             min-width: 100%;
@@ -80,6 +120,11 @@
         <h3 class="text-primary my-0">
             <i class="{{IconClass}}"></i> {{ProjectName}} #{{BuildNumber}}
         </h3>
+    </div>
+    <div class="form-inline">
+        <a href="{{#Url build/new}}?project={{&ProjectId}}&refspec={{&GitRefspec}}&task={{&TaskName}}&roles={{&TaskRoles}}" class="btn btn-sm btn-success">
+            <i class="fas fa-redo"></i>
+        </a>
     </div>
 </nav>
 
@@ -112,27 +157,35 @@
                 <div class="col-xl-7">
                     <table class="table table-sm my-2">
                         <thead class="thead-light">
-                        <tr>
-                            <th colspan="2">Details</th>
-                        </tr>
+                            <tr>
+                                <th colspan="2">Details</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>Project</td>
-                            <td>{{ProjectName}}</td>
-                        </tr>
-                        <tr>
-                            <td>Number</td>
-                            <td>{{BuildNumber}}</td>
-                        </tr>
-                        <tr>
-                            <td>Created</td>
-                            <td>{{BuildCreated}}</td>
-                        </tr>
-                        <tr>
-                            <td>Duration</td>
-                            <td>{{BuildDuration}}</td>
-                        </tr>
+                            <tr>
+                                <td>Project</td>
+                                <td>{{ProjectName}}</td>
+                            </tr>
+                            <tr>
+                                <td>Number</td>
+                                <td>{{BuildNumber}}</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>{{BuildCreated}}</td>
+                            </tr>
+                            <tr>
+                                <td>Duration</td>
+                                <td>{{BuildDuration}}</td>
+                            </tr>
+                            <tr>
+                                <td>Refspec</td>
+                                <td>{{GitRefspec}}</td>
+                            </tr>
+                            <tr>
+                                <td>Task</td>
+                                <td>{{TaskName}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -176,15 +229,21 @@
         </div>
     </div>
     <div id="output" class="tab-pane fade" role="tabpanel">
-        {{#If IsRunning}}
-        <div class="alert alert-info">
-            <h4><i class="fas fa-spinner fa-spin"></i> Build is running...</h4>
+        <div class="output-toolbar clearfix">
+            <div class="float-right">
+                <button id="WrapToggle" class="btn btn-sm btn-secondary" data-toggle="button" onclick="onWrapToggleClick()">
+                    <!--<img src="{{#Url SharedContent/Images/wrap.svg}}" />-->
+                    <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="34" height="32" viewBox="0 0 34 32"> <path d="M 0,28 H 12 V 24 H 0 Z M 32,0 H 0 V 4 H 32 Z M 26,12 H 0 v 4 h 26.5 c 2.21,0 4,1.79 4,4 0,2.21 -1.79,4 -4,4 H 22 v -4 l -6,6 6,6 v -4 h 4 c 4.41,0 8,-3.59 8,-8 0,-4.41 -3.59,-8 -8,-8 z"id="path"inkscape:connector-curvature="0"style="display:inline;fill-opacity:1;stroke:none;stroke-opacity:1" /> </svg>
+                </button>
+                <button id="TrackToggle" class="btn btn-sm btn-secondary d-none d-md-inline" data-toggle="button" onclick="onTrackToggleClick()">
+                    <!--<i class="fas fa-level-down-alt"></i>-->
+                    <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" xml:space="preserve"> <g id="Icons" transform="translate(-8,-7)"> <rect height="2"width="16"x="8"y="23"id="rect3" /> <polygon points="17,7 15,7 15,17.672 9.414,12.086 8,13.5 16,21.5 24,13.5 22.586,12.086 17,17.672 "id="polygon5" /> </g> </svg>
+                </button>
+            </div>
         </div>
-        {{#Else}}
         <div class="output-container">
             <pre id="OutputText" class="px-2 py-1"></pre>
         </div>
-        {{#EndIf}}
     </div>
     <div id="artifacts" class="tab-pane fade" role="tabpanel">
         <div class="container my-3">
@@ -195,24 +254,24 @@
             {{#Else}}
             <table class="table table-sm">
                 <thead class="thead-light">
-                <tr>
-                    <th>Filename</th>
-                </tr>
+                    <tr>
+                        <th>Filename</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {{#If Artifacts}}
+                    {{#If Artifacts}}
                     {{#Each Artifacts.artifact}}
                     <tr>
                         <td>{{artifact.Filename}}</td>
                     </tr>
                     {{#EndEach}}
-                {{#Else}}
-                <tr>
-                    <td class="text-center text-muted">
-                        None
-                    </td>
-                </tr>
-                {{#EndIf}}
+                    {{#Else}}
+                    <tr>
+                        <td class="text-center text-muted">
+                            None
+                        </td>
+                    </tr>
+                    {{#EndIf}}
                 </tbody>
             </table>
             {{#EndIf}}

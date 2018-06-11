@@ -58,6 +58,8 @@ namespace Photon.Server.ViewModels.Deployment
                 throw new ApplicationException($"Project '{ProjectId}' was not found!");
 
             var deployment = await project.StartNewDeployment();
+            deployment.PackageId = PackageId;
+            deployment.PackageVersion = PackageVersion;
             deployment.EnvironmentName = EnvironmentName;
             //deployment.ScriptName = ?;
 

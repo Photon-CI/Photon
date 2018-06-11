@@ -65,6 +65,20 @@
                         #{{deployment.Number}}: {{#If deployment.ProjectName}}{{deployment.ProjectName}}{{#Else}}{{deployment.ProjectId}}{{#EndIf}}
                     </a>
                 </td>
+                <td>
+                    {{#If deployment.PackageId}}
+                    {{deployment.PackageId}}<i class="text-muted">@</i>{{deployment.PackageVersion}}
+                    {{#Else}}
+                    <i class="text-muted">n/a</i>
+                    {{#EndIf}}
+                </td>
+                <td>
+                    {{#If deployment.Environment}}
+                    {{deployment.Environment}}
+                    {{#Else}}
+                    <i class="text-muted">--</i>
+                    {{#EndIf}}
+                </td>
                 <td class="c-time">
                     {{deployment.CreatedDisplay}}
                 </td>

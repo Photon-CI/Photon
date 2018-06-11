@@ -11,20 +11,21 @@ namespace Photon.Server.ViewModels.Build
     internal class BuildNewVM : ServerViewModel
     {
         public string ProjectId {get; set;}
-        public bool ProjectFound {get; private set;}
+        public string GitRefspec {get; set;}
+        public string TaskName {get; set;}
+        public string TaskRoles {get; set;}
+        public string PreBuildCommand {get; set;}
+        public string AssemblyFilename {get; set;}
         public string ProjectName {get; private set;}
-        public string GitRefspec {get; private set;}
-        public string PreBuildCommand {get; private set;}
-        public string AssemblyFilename {get; private set;}
-        public string TaskName {get; private set;}
-        public string TaskRoles {get; private set;}
         public uint BuildNumber {get; private set;}
         public string ServerSessionId {get; private set;}
+        public bool ProjectFound {get; private set;}
 
 
         public BuildNewVM()
         {
             PageTitle = "Photon Server New Build";
+            GitRefspec = "master";
         }
 
         public void Build()
@@ -37,9 +38,12 @@ namespace Photon.Server.ViewModels.Build
 
             ProjectFound = true;
             ProjectName = project.Description.Name;
-            PreBuildCommand = project.Description.PreBuild;
-            AssemblyFilename = project.Description.AssemblyFile;
-            GitRefspec = "master";
+
+            if (PreBuildCommand == null)
+                PreBuildCommand = project.Description.PreBuild;
+
+            if (AssemblyFilename == null)
+                AssemblyFilename = project.Description.AssemblyFile;
         }
 
         public void Restore(NameValueCollection form)
@@ -62,6 +66,9 @@ namespace Photon.Server.ViewModels.Build
 
             var build = await project.StartNewBuild();
             build.TaskName = TaskName;
+            build.TaskRoles = _roles;
+            build.PreBuildCommand = PreBuildCommand;
+            build.AssemblyFilename = AssemblyFilename;
             build.GitRefspec = GitRefspec;
 
             var session = new ServerBuildSession {

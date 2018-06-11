@@ -45,6 +45,9 @@ namespace Photon.Server.ViewModels.Deployment
                     allDeployments.Add(new DeploymentRow {
                         ProjectId = project.Description.Id,
                         ProjectName = projectName,
+                        PackageId = projectDeployment.PackageId,
+                        PackageVersion = projectDeployment.PackageVersion,
+                        Environment = projectDeployment.EnvironmentName,
                         Number = projectDeployment.Number,
                         Created = projectDeployment.Created,
                         CreatedDisplay = displayTime,
@@ -62,6 +65,9 @@ namespace Photon.Server.ViewModels.Deployment
     {
         public string ProjectId {get; set;}
         public string ProjectName {get; set;}
+        public string PackageId {get; set;}
+        public string PackageVersion {get; set;}
+        public string Environment {get; set;}
         public uint Number {get; set;}
         public DateTime Created {get; set;}
         public string Class {get; set;}

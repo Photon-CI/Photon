@@ -23,6 +23,8 @@ namespace Photon.Server.Internal.Deployments
         public DateTime Created {get; set;}
         public TimeSpan? Duration {get; set;}
         public string ScriptName {get; set;}
+        public string PackageId {get; set;}
+        public string PackageVersion {get; set;}
         public string EnvironmentName {get; set;}
         public string ServerSessionId {get; set;}
         public PackageReference[] ApplicationPackages {get; set;}
