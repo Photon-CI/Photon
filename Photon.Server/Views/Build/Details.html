@@ -5,15 +5,22 @@
 <script src="{{#Url SharedContent/ansi_up.js}}"></script>
 <script>
     var outputUrl = '{{#Url api/build/output}}?session={{&SessionId}}&project={{&ProjectId}}&number={{&BuildNumber}}';
+    var enableTracking = false;
+    var enableWrapping = false;
     var reader;
 
     $(function () {
         $('#layoutNavbarContent [data-link="builds"]').addClass('active');
 
         loadOutput();
+
+        onTrackToggleClick();
+        onWrapToggleClick();
     });
 
     function loadOutput() {
+        $('#OutputCursor').show();
+
         reader = new SessionOutputReader();
         reader.onAppend = onAppend;
         reader.onDone = onDone;
@@ -30,26 +37,65 @@
     }
 
     function onDone() {
-        //
+        $('#OutputCursor').hide();
+
+        //...
     }
 
     function onError() {
-        //
+        $('#OutputCursor').hide();
+
+        //...
+    }
+
+    function onTrackToggleClick() {
+        enableTracking = $('#TrackCheckBox').is(':checked');
+
+        if (enableTracking) scrollToBottom();
+    }
+
+    function onWrapToggleClick() {
+        enableWrapping = $('#WrapCheckBox').is(':checked');
+        var innerContent = $('.output-text-scroll');
+
+        if (enableWrapping) {
+            innerContent.width('100%');
+            innerContent.find('pre').css('white-space', 'pre-wrap');
+        } else {
+            innerContent.width('auto');
+            innerContent.find('pre').css('white-space', 'pre');
+        }
+
+        if (enableTracking) scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        var outerContent = $('.output-text-scroll');
+
+        outerContent.stop().animate({
+            scrollTop: outerContent[0].scrollHeight
+        }, 800);
     }
 </script>
 {{#EndScript}}
 
 {{#Style}}
+<link href="{{#Url Content/outputCursor.css}}" />
 <style>
     .layout-content {
     }
 
-    #OutputText {
-        overflow-x: auto;
+    .output-text-scroll {
         background: #111;
         color: #CCC;
     }
-
+    #OutputText {
+        overflow-x: auto;
+        /*color: #CCC;*/
+    }
+    #OutputCursor {
+        display: none;
+    }
     td.c-icon {
         width: 1px;
         white-space: nowrap;
@@ -57,9 +103,7 @@
 
     .output-toolbar {
         height: auto;
-        padding: 2px 4px;
     }
-
     #WrapToggle.active,
     #TrackToggle.active {
         color: #00FF00;
@@ -97,15 +141,15 @@
             flex-direction: column;
             display: flex;
         }
-
         .output-container {
             flex: 1;
+        }
+        .output-text-scroll {
             position: relative;
             height: 100%;
             overflow-x: auto;
             overflow-y: auto;
         }
-
         #OutputText {
             position: absolute;
             min-width: 100%;
@@ -229,20 +273,23 @@
         </div>
     </div>
     <div id="output" class="tab-pane fade" role="tabpanel">
-        <div class="output-toolbar clearfix">
+        <div class="output-toolbar px-2 py-1 clearfix">
             <div class="float-right">
-                <button id="WrapToggle" class="btn btn-sm btn-secondary" data-toggle="button" onclick="onWrapToggleClick()">
-                    <!--<img src="{{#Url SharedContent/Images/wrap.svg}}" />-->
-                    <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="34" height="32" viewBox="0 0 34 32"> <path d="M 0,28 H 12 V 24 H 0 Z M 32,0 H 0 V 4 H 32 Z M 26,12 H 0 v 4 h 26.5 c 2.21,0 4,1.79 4,4 0,2.21 -1.79,4 -4,4 H 22 v -4 l -6,6 6,6 v -4 h 4 c 4.41,0 8,-3.59 8,-8 0,-4.41 -3.59,-8 -8,-8 z"id="path"inkscape:connector-curvature="0"style="display:inline;fill-opacity:1;stroke:none;stroke-opacity:1" /> </svg>
-                </button>
-                <button id="TrackToggle" class="btn btn-sm btn-secondary d-none d-md-inline" data-toggle="button" onclick="onTrackToggleClick()">
-                    <!--<i class="fas fa-level-down-alt"></i>-->
-                    <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" xml:space="preserve"> <g id="Icons" transform="translate(-8,-7)"> <rect height="2"width="16"x="8"y="23"id="rect3" /> <polygon points="17,7 15,7 15,17.672 9.414,12.086 8,13.5 16,21.5 24,13.5 22.586,12.086 17,17.672 "id="polygon5" /> </g> </svg>
-                </button>
+                <div class="form-check form-check-inline">
+                    <input id="WrapCheckBox" type="checkbox" class="form-check-input" value="1" onchange="onWrapToggleClick()">
+                    <label for="WrapCheckBox" class="form-check-label">Wrap Lines</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input id="TrackCheckBox" type="checkbox" class="form-check-input" value="1" onchange="onTrackToggleClick()">
+                    <label for="TrackCheckBox" class="form-check-label">Track to Bottom</label>
+                </div>
             </div>
         </div>
         <div class="output-container">
-            <pre id="OutputText" class="px-2 py-1"></pre>
+            <div class="output-text-scroll">
+                <pre id="OutputText" class="px-2 py-1"></pre>
+                <span id="OutputCursor" class="blinking-cursor">|</span>
+            </div>
         </div>
     </div>
     <div id="artifacts" class="tab-pane fade" role="tabpanel">

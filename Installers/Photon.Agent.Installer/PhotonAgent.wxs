@@ -178,6 +178,9 @@
       <Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="f214c9de-3714-40c6-88e5-e42dab35e526">
         <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" Name="System.Runtime.InteropServices.RuntimeInformation.dll" Source="$(var.PhotonAgent_TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
       </Component>
+      <Component Id="photon_light.ico" Guid="cac82557-3cbe-42de-8548-5772872a4e1d">
+        <File Id="photon_light.ico" Name="photon_light.ico" Source="$(var.PhotonAgent_TargetDir)photon_light.ico" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="LibGit2SharpComponents">
       <ComponentRef Id="LibGit2Sharp_linux_x86x64" />
@@ -253,6 +256,9 @@
     <ComponentGroup Id="Content_Images_files" Directory="Content_Images">
       <Component Id="Content_Images_photon_dark.svg" Guid="a796222c-4757-44c4-b5f6-0f76c928f475">
         <File Id="Content_Images_photon_dark.svg" Name="photon_dark.svg" Source="$(var.PhotonAgent_TargetDir)Content\Images\photon_dark.svg" />
+      </Component>
+      <Component Id="Content_Images_wrap.svg" Guid="cb6e3c27-8a07-4f23-bd39-83f62086c529">
+        <File Id="Content_Images_wrap.svg" Name="wrap.svg" Source="$(var.PhotonAgent_TargetDir)Content\Images\wrap.svg" />
       </Component>
     </ComponentGroup>
   </Fragment>

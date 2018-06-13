@@ -317,6 +317,9 @@
     <None Include="server.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\outputCursor.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\site.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
