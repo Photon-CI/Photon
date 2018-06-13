@@ -5,8 +5,6 @@
 <script src="{{#Url SharedContent/ansi_up.js}}"></script>
 <script>
     var outputUrl = '{{#Url api/build/output}}?session={{&SessionId}}&project={{&ProjectId}}&number={{&BuildNumber}}';
-    var enableTracking = false;
-    var enableWrapping = false;
     var reader;
 
     $(function () {
@@ -49,13 +47,13 @@
     }
 
     function onTrackToggleClick() {
-        enableTracking = $('#TrackCheckBox').is(':checked');
+        var enableTracking = $('#TrackCheckBox').is(':checked');
 
         if (enableTracking) scrollToBottom();
     }
 
     function onWrapToggleClick() {
-        enableWrapping = $('#WrapCheckBox').is(':checked');
+        var enableWrapping = $('#WrapCheckBox').is(':checked');
         var innerContent = $('.output-text-scroll');
 
         if (enableWrapping) {
@@ -66,6 +64,7 @@
             innerContent.find('pre').css('white-space', 'pre');
         }
 
+        var enableTracking = $('#TrackCheckBox').is(':checked');
         if (enableTracking) scrollToBottom();
     }
 
@@ -80,22 +79,22 @@
 {{#EndScript}}
 
 {{#Style}}
-<link href="{{#Url Content/outputCursor.css}}" />
+<link href="{{#Url Content/outputCursor.css}}" rel="stylesheet" />
 <style>
     .layout-content {
     }
 
-    .output-text-scroll {
+    .output-container {
         background: #111;
         color: #CCC;
     }
-    #OutputText {
+    .inner-text {
         overflow-x: auto;
-        /*color: #CCC;*/
     }
     #OutputCursor {
         display: none;
     }
+
     td.c-icon {
         width: 1px;
         white-space: nowrap;
@@ -150,7 +149,7 @@
             overflow-x: auto;
             overflow-y: auto;
         }
-        #OutputText {
+        .text-inner {
             position: absolute;
             min-width: 100%;
             min-height: 100%;
@@ -287,8 +286,10 @@
         </div>
         <div class="output-container">
             <div class="output-text-scroll">
-                <pre id="OutputText" class="px-2 py-1"></pre>
-                <span id="OutputCursor" class="blinking-cursor">|</span>
+                <div class="text-inner px-2 py-1">
+                    <pre id="OutputText" class="m-0"></pre>
+                    <pre id="OutputCursor" class="blinking-cursor m-0">|</pre>
+                </div>
             </div>
         </div>
     </div>
