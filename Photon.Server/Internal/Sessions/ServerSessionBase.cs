@@ -140,11 +140,19 @@ namespace Photon.Server.Internal.Sessions
             if (Domain != null) {
                 try {
                     await Domain.Unload(true);
-                    Domain = null;
                 }
                 catch (Exception error) {
-                    Log.Error("Failed to unload domain!", error);
+                    Log.Error($"An error occurred while unloading the session domain [{SessionId}]!", error);
                 }
+
+                try {
+                    Domain.Dispose();
+                }
+                catch (Exception error) {
+                    Log.Error($"An error occurred while disposing the session domain [{SessionId}]!", error);
+                }
+
+                Domain = null;
             }
 
             var workDirectory = WorkDirectory;

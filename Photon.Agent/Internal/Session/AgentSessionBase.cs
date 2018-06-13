@@ -111,8 +111,23 @@ namespace Photon.Agent.Internal.Session
             TimeReleased = DateTime.UtcNow;
             OnReleased();
 
-            if (Domain != null)
-                await Domain.Unload(true);
+            if (Domain != null) {
+                try {
+                    await Domain.Unload(true);
+                }
+                catch (Exception error) {
+                    Log.Error($"An error occurred while unloading the session domain [{SessionId}]!", error);
+                }
+
+                try {
+                    Domain.Dispose();
+                }
+                catch (Exception error) {
+                    Log.Error($"An error occurred while disposing the session domain [{SessionId}]!", error);
+                }
+
+                Domain = null;
+            }
 
             try {
                 var _workDirectory = WorkDirectory;

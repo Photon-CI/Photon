@@ -96,6 +96,9 @@ namespace Photon.Server.Internal
             catch (Exception error) {
                 Log.Error($"Session '{session.SessionId}' Failed!", error);
             }
+            finally {
+                GC.Collect();
+            }
         }
 
         private async Task OnProcessItem(IServerSession session)

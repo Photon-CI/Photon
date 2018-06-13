@@ -112,6 +112,8 @@ namespace Photon.Communication.Packets
 
                 var remainingSize = buffer.Length - bufferPos;
                 var readSize = await stream.ReadAsync(buffer, bufferPos, remainingSize, token);
+                if (readSize == 0) throw new EndOfStreamException();
+
                 bufferPos += readSize;
             }
 

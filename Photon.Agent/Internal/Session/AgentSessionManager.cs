@@ -70,9 +70,18 @@ namespace Photon.Agent.Internal.Session
                 return false;
 
             Log.Debug($"Releasing Session '{sessionId}'...");
-            await session.ReleaseAsync();
-            Log.Info($"Session '{sessionId}' released.");
-            return true;
+            try {
+                await session.ReleaseAsync();
+                Log.Info($"Session '{sessionId}' released.");
+                return true;
+            }
+            catch (Exception error) {
+                Log.Error($"An error occurred while releasing the session [{sessionId}]!", error);
+                return false;
+            }
+            finally {
+                GC.Collect();
+            }
         }
 
         protected void OnSessionChanged(AgentSessionBase session)

@@ -19,10 +19,10 @@ namespace Photon.Library.Session
         {
             if (!isUnloaded) Unload(false).GetAwaiter().GetResult();
 
-            if (Agent != null) {
-                Agent.Dispose();
-                Agent = null;
-            }
+            //if (Agent != null) {
+            //    Agent.Dispose();
+            //    Agent = null;
+            //}
         }
 
         public void Initialize(string assemblyFilename)
@@ -61,6 +61,11 @@ namespace Photon.Library.Session
             // A ThreadAbortException will be called
             // if we immediately close the AppDomain.
             //Sponsor.Close();
+
+            if (Agent != null) {
+                Agent.Dispose();
+                Agent = null;
+            }
 
             try {
                 if (wait) await Task.Delay(200);
