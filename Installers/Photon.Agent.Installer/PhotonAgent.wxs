@@ -30,7 +30,7 @@
       <ComponentGroupRef Id="Content_fontawesome_5.0.13_css_files" />
       <ComponentGroupRef Id="Views_VariableSet_files" />
     </Feature>
-    <Property Id="CREATEFIREWALLEXCEPTION" Value="1">
+    <Property Id="CREATEFIREWALLEXCEPTION" Secure="yes" Value="1">
       <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="CreateFirewallException" />
     </Property>
     <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />

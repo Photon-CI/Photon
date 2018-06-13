@@ -136,12 +136,12 @@ namespace Photon.Server.Internal.Sessions
 
         private async Task<MessageClient> Reconnect(ServerAgent agent, TimeSpan timeout, CancellationToken token)
         {
-            var client = new MessageClient(PhotonServer.Instance.MessageRegistry);
-
             using (var timeoutTokenSource = new CancellationTokenSource(timeout))
             using (var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, token)) {
                 while (true) {
                     mergedTokenSource.Token.ThrowIfCancellationRequested();
+
+                    var client = new MessageClient(PhotonServer.Instance.MessageRegistry);
 
                     try {
                         using (var connectionTimeoutTokenSource = new CancellationTokenSource(20_000))
@@ -156,7 +156,7 @@ namespace Photon.Server.Internal.Sessions
                                 .GetResponseAsync<AgentGetVersionResponse>(connectTokenSource.Token);
 
                             if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
-                                break;
+                                return client;
                         }
                     }
                     catch (SocketException) {}
@@ -165,11 +165,11 @@ namespace Photon.Server.Internal.Sessions
                         Log.Warn("An unhandled exception occurred while attempting to reconnect to an updating agent.", error);
                     }
 
+                    client.Dispose();
+
                     await Task.Delay(3_000, mergedTokenSource.Token);
                 }
             }
-
-            return client;
         }
     }
 }

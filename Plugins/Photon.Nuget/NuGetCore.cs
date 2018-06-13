@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Photon.NuGetPlugin
 {
-    public class NuGetCore
+    public class NuGetCore : IDisposable
     {
         private static readonly Regex existsExp;
 
@@ -46,10 +46,12 @@ namespace Photon.NuGetPlugin
             PushTimeout = 60;
             Logger = new NullLogger();
 
-            Cache = new SourceCacheContext {
-                DirectDownload = true,
-                NoCache = true,
-            };
+            Cache = new SourceCacheContext();
+        }
+
+        public void Dispose()
+        {
+            Cache?.Dispose();
         }
 
         public void Initialize()
