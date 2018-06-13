@@ -46,6 +46,7 @@
     <Compile Include="Domain\DomainAgentBase.cs" />
     <Compile Include="Domain\DomainAgentSessionClient.cs" />
     <Compile Include="Domain\DomainAgentSessionHandle.cs" />
+    <Compile Include="Domain\DomainBlockWriter.cs" />
     <Compile Include="Domain\DomainConnectionFactory.cs" />
     <Compile Include="Domain\DomainContextBase.cs" />
     <Compile Include="Domain\DomainOutput.cs" />
