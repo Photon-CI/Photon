@@ -32,6 +32,9 @@
         //text_out = ansi_up.linkify(text_out);
 
         $('#OutputText').append(text_out);
+
+        var enableTracking = $('#TrackCheckBox').is(':checked');
+        if (enableTracking) scrollToBottom();
     }
 
     function onDone() {

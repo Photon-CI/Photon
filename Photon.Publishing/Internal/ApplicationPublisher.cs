@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Publishing.Internal
@@ -29,7 +30,7 @@ namespace Photon.Publishing.Internal
             this.context = context;
         }
 
-        public async Task PublishAsync(string packageName, string packageId)
+        public async Task PublishAsync(string packageName, string packageId, CancellationToken token = default(CancellationToken))
         {
             context.Output
                 .Write("Updating Application ", ConsoleColor.DarkCyan)
@@ -64,15 +65,20 @@ namespace Photon.Publishing.Internal
             await CreateZip(BinPath, zipFilename);
 
             // Create Version Directory
-            await CreateWebPath(assemblyVersion);
+            try {
+                await CreateWebPath(assemblyVersion, token);
+            }
+            catch (WebException) {
+                //...
+            }
 
             var webMsiName = $"{packageId}.{assemblyVersion}.msi";
             var webZipName = $"{packageId}.{assemblyVersion}.zip";
             var msiWebUrl = NetPath.Combine(UploadPath, assemblyVersion, webMsiName);
             var zipWebUrl = NetPath.Combine(UploadPath, assemblyVersion, webZipName);
 
-            await UploadFile(MsiFilename, msiWebUrl);
-            await UploadFile(zipFilename, zipWebUrl);
+            await UploadFile(MsiFilename, msiWebUrl, token);
+            await UploadFile(zipFilename, zipWebUrl, token);
 
             var index = new {
                 version = assemblyVersion,
@@ -81,9 +87,9 @@ namespace Photon.Publishing.Internal
                 notes = "...",
             };
 
-            await UploadIndex(index, assemblyVersion);
+            await UploadIndex(index, assemblyVersion, token);
 
-            await UpdateLatest(assemblyVersion);
+            await UpdateLatest(assemblyVersion, token);
 
             context.Output
                 .Write("Application ", ConsoleColor.DarkGreen)
@@ -93,7 +99,7 @@ namespace Photon.Publishing.Internal
                 .WriteLine(assemblyVersion, ConsoleColor.Cyan);
         }
 
-        private async Task CreateWebPath(string assemblyVersion)
+        private async Task CreateWebPath(string assemblyVersion, CancellationToken token)
         {
             var url = NetPath.Combine(UploadPath, assemblyVersion);
             var request = (FtpWebRequest)WebRequest.Create(url);
@@ -102,9 +108,8 @@ namespace Photon.Publishing.Internal
             if (!string.IsNullOrEmpty(FtpUsername) || !string.IsNullOrEmpty(FtpPassword))
                 request.Credentials = new NetworkCredential (FtpUsername, FtpPassword);
 
-            using (var _ = (FtpWebResponse)await request.GetResponseAsync()) {
-                //
-            }
+            using (token.Register(() => request.Abort()))
+            using (await request.GetResponseAsync()) {}
         }
 
         private async Task<string> GetWebVersion()
@@ -114,7 +119,7 @@ namespace Photon.Publishing.Internal
             }
         }
 
-        private async Task UploadFile(string filename, string url)
+        private async Task UploadFile(string filename, string url, CancellationToken token)
         {
             var request = (FtpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Ftp.UploadFile;
@@ -122,20 +127,20 @@ namespace Photon.Publishing.Internal
             if (!string.IsNullOrEmpty(FtpUsername) || !string.IsNullOrEmpty(FtpPassword))
                 request.Credentials = new NetworkCredential(FtpUsername, FtpPassword);
 
-            using (var fileStream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
-                request.ContentLength = fileStream.Length;
+            using (token.Register(() => request.Abort())) {
+                using (var fileStream = File.Open(filename, FileMode.Open, FileAccess.Read)) {
+                    request.ContentLength = fileStream.Length;
 
-                using (var requestStream = await request.GetRequestStreamAsync()) {
-                    await fileStream.CopyToAsync(requestStream);
+                    using (var requestStream = await request.GetRequestStreamAsync()) {
+                        await fileStream.CopyToAsync(requestStream);
+                    }
                 }
-            }
 
-            using (var _ = (FtpWebResponse) await request.GetResponseAsync()) {
-                //...
+                using (await request.GetResponseAsync()) {}
             }
         }
 
-        private async Task UploadIndex(object index, string version)
+        private async Task UploadIndex(object index, string version, CancellationToken token)
         {
             var url = NetPath.Combine(UploadPath, $"{version}/index.json");
             var request = (FtpWebRequest)WebRequest.Create(url);
@@ -144,18 +149,18 @@ namespace Photon.Publishing.Internal
             if (!string.IsNullOrEmpty(FtpUsername) || !string.IsNullOrEmpty(FtpPassword))
                 request.Credentials = new NetworkCredential (FtpUsername, FtpPassword);
 
-            using (var stream = await request.GetRequestStreamAsync())
-            using (var writer = new StreamWriter(stream))
-            using (var jsonWriter = new JsonTextWriter(writer)) {
-                JsonSettings.Serializer.Serialize(jsonWriter, index);
-            }
+            using (token.Register(() => request.Abort())) {
+                using (var stream = await request.GetRequestStreamAsync())
+                using (var writer = new StreamWriter(stream))
+                using (var jsonWriter = new JsonTextWriter(writer)) {
+                    JsonSettings.Serializer.Serialize(jsonWriter, index);
+                }
 
-            using (var _ = (FtpWebResponse)await request.GetResponseAsync()) {
-                //...
+                using (await request.GetResponseAsync()) {}
             }
         }
 
-        private async Task UpdateLatest(string version)
+        private async Task UpdateLatest(string version, CancellationToken token)
         {
             var url = NetPath.Combine(UploadPath, ".version");
             var request = (FtpWebRequest)WebRequest.Create(url);
@@ -164,25 +169,24 @@ namespace Photon.Publishing.Internal
             if (!string.IsNullOrEmpty(FtpUsername) || !string.IsNullOrEmpty(FtpPassword))
                 request.Credentials = new NetworkCredential (FtpUsername, FtpPassword);
 
-            using (var _ = (FtpWebResponse)await request.GetResponseAsync()) {
-                //...
-            }
+            using (token.Register(() => request.Abort()))
+            using (await request.GetResponseAsync()) {}
 
             //------------------
 
-            request = (FtpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Ftp.UploadFile;
+            var request2 = (FtpWebRequest)WebRequest.Create(url);
+            request2.Method = WebRequestMethods.Ftp.UploadFile;
 
             if (!string.IsNullOrEmpty(FtpUsername) || !string.IsNullOrEmpty(FtpPassword))
-                request.Credentials = new NetworkCredential (FtpUsername, FtpPassword);
+                request2.Credentials = new NetworkCredential (FtpUsername, FtpPassword);
 
-            using (var stream = await request.GetRequestStreamAsync())
-            using (var writer = new StreamWriter(stream)) {
-                writer.Write(version);
-            }
+            using (token.Register(() => request.Abort())) {
+                using (var stream = await request2.GetRequestStreamAsync())
+                using (var writer = new StreamWriter(stream)) {
+                    writer.Write(version);
+                }
 
-            using (var _ = (FtpWebResponse)await request.GetResponseAsync()) {
-                //...
+                using (await request2.GetResponseAsync()) {}
             }
         }
 

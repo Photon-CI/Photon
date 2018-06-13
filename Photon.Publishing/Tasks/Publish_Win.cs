@@ -41,9 +41,11 @@ namespace Photon.Publishing.Tasks
             ftpPass = photonVars["ftp.pass"];
 
             await BuildSolution();
-            await PublishServer();
-            await PublishAgent();
-            await PublishCLI();
+
+            await Task.WhenAll(
+                PublishServer(token),
+                PublishAgent(token),
+                PublishCLI(token));
 
             PathEx.CreatePath(nugetPackageDir);
 
@@ -68,7 +70,7 @@ namespace Photon.Publishing.Tasks
                 "/t:Rebuild");
         }
 
-        private async Task PublishServer()
+        private async Task PublishServer(CancellationToken token)
         {
             var binPath = Path.Combine(Context.ContentDirectory, "Photon.Server", "bin", "Release");
 
@@ -83,10 +85,10 @@ namespace Photon.Publishing.Tasks
                 FtpPassword = ftpPass,
             };
 
-            await publisher.PublishAsync("Photon Server", "Photon.Server");
+            await publisher.PublishAsync("Photon Server", "Photon.Server", token);
         }
 
-        private async Task PublishAgent()
+        private async Task PublishAgent(CancellationToken token)
         {
             var binPath = Path.Combine(Context.ContentDirectory, "Photon.Agent", "bin", "Release");
 
@@ -101,10 +103,10 @@ namespace Photon.Publishing.Tasks
                 FtpPassword = ftpPass,
             };
 
-            await publisher.PublishAsync("Photon Agent", "Photon.Agent");
+            await publisher.PublishAsync("Photon Agent", "Photon.Agent", token);
         }
 
-        private async Task PublishCLI()
+        private async Task PublishCLI(CancellationToken token)
         {
             var binPath = Path.Combine(Context.ContentDirectory, "Photon.CLI", "bin", "Release");
 
@@ -119,7 +121,7 @@ namespace Photon.Publishing.Tasks
                 FtpPassword = ftpPass,
             };
 
-            await publisher.PublishAsync("Photon CLI", "Photon.CLI");
+            await publisher.PublishAsync("Photon CLI", "Photon.CLI", token);
         }
 
         private async Task PublishFrameworkPackage(CancellationToken token)
