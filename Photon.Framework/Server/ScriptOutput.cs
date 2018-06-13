@@ -109,7 +109,7 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public ScriptOutput AppendRaw(string text)
+        public ScriptOutput WriteRaw(string text)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 

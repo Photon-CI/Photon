@@ -60,6 +60,12 @@ namespace Photon.Agent.Internal.Session
             return this;
         }
 
+        public SessionOutput WriteRaw(string text)
+        {
+            Writer.WriteRaw(text);
+            return this;
+        }
+
         private void Output_OnChanged(object sender, EventArgs e)
         {
             var length = Writer.Length;

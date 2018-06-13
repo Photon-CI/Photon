@@ -34,10 +34,11 @@ namespace Photon.NuGetPlugin
             var path = Path.GetDirectoryName(nuspecFilename);
             var nuspecName = Path.GetFileName(nuspecFilename);
 
-            Output?.WriteBlock(w => w
+            Output?.WriteBlock()
                 .Write("Creating Package from nuspec ", ConsoleColor.DarkCyan)
                 .Write(nuspecName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan));
+                .WriteLine("...", ConsoleColor.DarkCyan)
+                .Post();
 
             try {
                 var args = new List<string>(new[] {
@@ -59,9 +60,10 @@ namespace Photon.NuGetPlugin
                 Output?.WriteLine("Package created successfully.", ConsoleColor.DarkGreen);
             }
             catch (Exception error) {
-                Output?.WriteBlock(w => w
+                Output?.WriteBlock()
                     .WriteLine("Failed to create package!", ConsoleColor.DarkRed)
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow)
+                    .Post();
 
                 throw;
             }
@@ -71,10 +73,11 @@ namespace Photon.NuGetPlugin
         {
             var packageName = Path.GetFileName(packageFilename);
 
-            Output?.WriteBlock(w => w
+            Output?.WriteBlock()
                 .Write("Publishing Package ", ConsoleColor.DarkCyan)
                 .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan));
+                .WriteLine("...", ConsoleColor.DarkCyan)
+                .Post();
 
             try {
                 var name = Path.GetFileName(packageFilename);
@@ -89,10 +92,11 @@ namespace Photon.NuGetPlugin
 
                 if (result.ExitCode != 0) {
                     if (existsExp.IsMatch(result.Error)) {
-                        Output?.WriteBlock(w => w
+                        Output?.WriteBlock()
                             .Write("Package ", ConsoleColor.DarkGreen)
                             .Write(packageName, ConsoleColor.Green)
-                            .WriteLine(" already exists.", ConsoleColor.DarkYellow));
+                            .WriteLine(" already exists.", ConsoleColor.DarkYellow)
+                            .Post();
 
                         return;
                     }
@@ -100,17 +104,19 @@ namespace Photon.NuGetPlugin
                     throw new ApplicationException($"NuGet Push failed with exit code {result.ExitCode}!");
                 }
 
-                Output?.WriteBlock(w => w
+                Output?.WriteBlock()
                     .Write("Package ", ConsoleColor.DarkGreen)
                     .Write(packageName, ConsoleColor.Green)
-                    .WriteLine(" published successfully.", ConsoleColor.DarkGreen));
+                    .WriteLine(" published successfully.", ConsoleColor.DarkGreen)
+                    .Post();
             }
             catch (Exception error) {
-                Output?.WriteBlock(w => w
+                Output?.WriteBlock()
                     .Write("Failed to publish package ", ConsoleColor.DarkRed)
                     .Write(packageName, ConsoleColor.Red)
                     .WriteLine("!", ConsoleColor.DarkRed)
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow)
+                    .Post();
 
                 throw;
             }

@@ -89,6 +89,7 @@ namespace Photon.Agent.Internal.Session
             var domainOutput = new DomainOutput();
             domainOutput.OnWrite += (text, color) => Output.Write(text, color);
             domainOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+            domainOutput.OnWriteRaw += (text) => Output.WriteRaw(text);
 
             var context = new AgentDeployContext {
                 DeploymentNumber = DeploymentNumber,

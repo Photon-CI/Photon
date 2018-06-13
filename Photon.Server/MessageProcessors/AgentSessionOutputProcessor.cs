@@ -14,7 +14,7 @@ namespace Photon.Server.MessageProcessors
             if (!PhotonServer.Instance.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
                 throw new Exception($"Agent Session ID '{requestMessage.ServerSessionId}' not found!");
 
-            await Task.Run(() => session.Output.AppendRaw(requestMessage.Text));
+            await Task.Run(() => session.Output.WriteRaw(requestMessage.Text));
             return null;
         }
     }

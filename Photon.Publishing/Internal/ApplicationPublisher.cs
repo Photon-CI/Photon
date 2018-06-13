@@ -32,10 +32,11 @@ namespace Photon.Publishing.Internal
 
         public async Task PublishAsync(string packageName, string packageId, CancellationToken token = default(CancellationToken))
         {
-            context.Output
+            context.Output.WriteBlock()
                 .Write("Updating Application ", ConsoleColor.DarkCyan)
                 .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan);
+                .WriteLine("...", ConsoleColor.DarkCyan)
+                .Post();
 
             var photonVars = context.ServerVariables["photon"];
 
@@ -47,11 +48,12 @@ namespace Photon.Publishing.Internal
             var webVersion = await GetWebVersion();
 
             if (!VersionTools.HasUpdates(webVersion, assemblyVersion)) {
-                context.Output
+                context.Output.WriteBlock()
                     .Write("Application ", ConsoleColor.DarkBlue)
                     .Write(packageName, ConsoleColor.Blue)
                     .Write(" is up-to-date. Version ", ConsoleColor.DarkBlue)
-                    .WriteLine(assemblyVersion, ConsoleColor.Blue);
+                    .WriteLine(assemblyVersion, ConsoleColor.Blue)
+                    .Post();
 
                 return;
             }
@@ -91,12 +93,13 @@ namespace Photon.Publishing.Internal
 
             await UpdateLatest(assemblyVersion, token);
 
-            context.Output
+            context.Output.WriteBlock()
                 .Write("Application ", ConsoleColor.DarkGreen)
                 .Write(packageName, ConsoleColor.Green)
                 .Write(" updated successfully. ", ConsoleColor.DarkGreen)
                 .Write("Version ", ConsoleColor.DarkCyan)
-                .WriteLine(assemblyVersion, ConsoleColor.Cyan);
+                .WriteLine(assemblyVersion, ConsoleColor.Cyan)
+                .Post();
         }
 
         private async Task CreateWebPath(string assemblyVersion, CancellationToken token)

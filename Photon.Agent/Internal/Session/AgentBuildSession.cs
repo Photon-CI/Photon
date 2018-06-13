@@ -39,6 +39,7 @@ namespace Photon.Agent.Internal.Session
             using (var contextOutput = new DomainOutput()) {
                 contextOutput.OnWrite += (text, color) => Output.Write(text, color);
                 contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+                contextOutput.OnWriteRaw += (text) => Output.WriteRaw(text);
 
                 var context = new AgentBuildContext {
                     Project = Project,

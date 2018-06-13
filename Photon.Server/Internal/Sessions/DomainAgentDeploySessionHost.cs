@@ -47,7 +47,7 @@ namespace Photon.Server.Internal.Sessions
 
         protected override void OnSessionOutput(string text)
         {
-            session.Output.AppendRaw(text);
+            session.Output.WriteRaw(text);
         }
     }
 }

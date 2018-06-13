@@ -50,6 +50,7 @@ namespace Photon.Server.Internal.Sessions
             using (var contextOutput = new DomainOutput()) {
                 contextOutput.OnWrite += (text, color) => Output.Write(text, color);
                 contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+                contextOutput.OnWriteRaw += (text) => Output.WriteRaw(text);
 
                 var context = new ServerDeployContext {
                     DeploymentNumber = Deployment.Number,

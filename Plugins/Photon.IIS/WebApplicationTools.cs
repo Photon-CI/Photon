@@ -19,10 +19,11 @@ namespace Photon.Plugins.IIS
         public void Configure(string webSiteName, string webAppPath, Action<Application> configureAction)
         {
             if (!TryFindWebSite(webSiteName, out var webSite)) {
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("WebSite ", ConsoleColor.DarkRed)
                     .Write(webSiteName, ConsoleColor.Red)
-                    .WriteLine(" was not found!", ConsoleColor.DarkRed));
+                    .WriteLine(" was not found!", ConsoleColor.DarkRed)
+                    .Post();
 
                 throw new Exception($"WebSite '{webSiteName}' was not found!");
             }
@@ -32,30 +33,33 @@ namespace Photon.Plugins.IIS
                 handle.CommitChanges();
 
                 if (!TryFind(webSite, webAppPath, out webApp)) {
-                    handle.Context.Output.WriteBlock(w => w
+                    handle.Context.Output.WriteBlock()
                         .Write("Unable to create Web Application ", ConsoleColor.DarkRed)
                         .Write(webSiteName, ConsoleColor.Red)
-                        .WriteLine("!", ConsoleColor.DarkRed));
+                        .WriteLine("!", ConsoleColor.DarkRed)
+                        .Post();
 
                     throw new Exception($"Unable to create Web Application '{webSiteName}'!");
                 }
 
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("Created new Web Application ", ConsoleColor.DarkBlue)
                     .Write(webAppPath, ConsoleColor.Blue)
                     .Write(" under WebSite ", ConsoleColor.DarkBlue)
                     .Write(webSiteName, ConsoleColor.Blue)
-                    .WriteLine(".", ConsoleColor.DarkBlue));
+                    .WriteLine(".", ConsoleColor.DarkBlue)
+                    .Post();
             }
 
             configureAction(webApp);
 
             handle.CommitChanges();
 
-            handle.Context.Output.WriteBlock(w => w
+            handle.Context.Output.WriteBlock()
                 .Write("Web Application ", ConsoleColor.DarkGreen)
                 .Write(webSiteName, ConsoleColor.Green)
-                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen));
+                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen)
+                .Post();
         }
 
         private bool TryFindWebSite(string webSiteName, out Site webSite)

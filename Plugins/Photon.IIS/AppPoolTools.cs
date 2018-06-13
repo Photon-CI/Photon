@@ -18,19 +18,21 @@ namespace Photon.Plugins.IIS
         public async Task<bool> StartAsync(string appPoolName, TimeSpan timeout)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("Application Pool ", ConsoleColor.DarkYellow)
                     .Write(appPoolName, ConsoleColor.Yellow)
-                    .WriteLine(" not found.", ConsoleColor.DarkYellow));
+                    .WriteLine(" not found.", ConsoleColor.DarkYellow)
+                    .Post();
 
                 return false;
             }
 
             if (appPool.State == ObjectState.Started) {
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("Application Pool ", ConsoleColor.DarkBlue)
                     .Write(appPoolName, ConsoleColor.Blue)
-                    .WriteLine(" is already started.", ConsoleColor.DarkBlue));
+                    .WriteLine(" is already started.", ConsoleColor.DarkBlue)
+                    .Post();
 
                 return true;
             }
@@ -46,20 +48,22 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State != ObjectState.Started) {
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("A timeout was reached after ", ConsoleColor.DarkRed)
                     .Write(timeout, ConsoleColor.Red)
                     .Write(" waiting for Application Pool ", ConsoleColor.DarkRed)
                     .Write(appPoolName, ConsoleColor.Red)
-                    .WriteLine(" to start!", ConsoleColor.DarkRed));
+                    .WriteLine(" to start!", ConsoleColor.DarkRed)
+                    .Post();
 
                 return false;
             }
 
-            handle.Context.Output.WriteBlock(w => w
+            handle.Context.Output.WriteBlock()
                 .Write("Application Pool ", ConsoleColor.DarkGreen)
                 .Write(appPoolName, ConsoleColor.Green)
-                .WriteLine(" started successfully.", ConsoleColor.DarkGreen));
+                .WriteLine(" started successfully.", ConsoleColor.DarkGreen)
+                .Post();
 
             return true;
         }
@@ -67,19 +71,21 @@ namespace Photon.Plugins.IIS
         public async Task<bool> StopAsync(string appPoolName, TimeSpan timeout)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("Application Pool ", ConsoleColor.DarkYellow)
                     .Write(appPoolName, ConsoleColor.Yellow)
-                    .WriteLine(" not found.", ConsoleColor.DarkYellow));
+                    .WriteLine(" not found.", ConsoleColor.DarkYellow)
+                    .Post();
 
                 return false;
             }
 
             if (appPool.State == ObjectState.Stopped) {
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("Application Pool ", ConsoleColor.DarkBlue)
                     .Write(appPoolName, ConsoleColor.Blue)
-                    .WriteLine(" is already stopped.", ConsoleColor.DarkBlue));
+                    .WriteLine(" is already stopped.", ConsoleColor.DarkBlue)
+                    .Post();
 
                 return true;
             }
@@ -95,20 +101,22 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State != ObjectState.Stopped) {
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("A timeout was reached after ", ConsoleColor.DarkRed)
                     .Write(timeout, ConsoleColor.Red)
                     .Write(" waiting for Application Pool ", ConsoleColor.DarkRed)
                     .Write(appPoolName, ConsoleColor.Red)
-                    .WriteLine(" to stop!", ConsoleColor.DarkRed));
+                    .WriteLine(" to stop!", ConsoleColor.DarkRed)
+                    .Post();
 
                 return false;
             }
 
-            handle.Context.Output.WriteBlock(w => w
+            handle.Context.Output.WriteBlock()
                 .Write("Application Pool ", ConsoleColor.DarkGreen)
                 .Write(appPoolName, ConsoleColor.Green)
-                .WriteLine(" stopped successfully.", ConsoleColor.DarkGreen));
+                .WriteLine(" stopped successfully.", ConsoleColor.DarkGreen)
+                .Post();
 
             return true;
         }
@@ -120,28 +128,31 @@ namespace Photon.Plugins.IIS
                 handle.CommitChanges();
 
                 if (!TryFind(appPoolName, out appPool)) {
-                    handle.Context.Output.WriteBlock(w => w
+                    handle.Context.Output.WriteBlock()
                         .Write("Unable to create Application Pool ", ConsoleColor.DarkRed)
                         .Write(appPoolName, ConsoleColor.Red)
-                        .WriteLine("!", ConsoleColor.DarkRed));
+                        .WriteLine("!", ConsoleColor.DarkRed)
+                        .Post();
 
                     throw new Exception($"Unable to create Application Pool '{appPoolName}'!");
                 }
 
-                handle.Context.Output.WriteBlock(w => w
+                handle.Context.Output.WriteBlock()
                     .Write("Created new Application Pool ", ConsoleColor.DarkBlue)
                     .Write(appPoolName, ConsoleColor.Blue)
-                    .WriteLine(".", ConsoleColor.DarkBlue));
+                    .WriteLine(".", ConsoleColor.DarkBlue)
+                    .Post();
             }
 
             configureAction(appPool);
 
             handle.CommitChanges();
 
-            handle.Context.Output.WriteBlock(w => w
+            handle.Context.Output.WriteBlock()
                 .Write("Application Pool ", ConsoleColor.DarkGreen)
                 .Write(appPoolName, ConsoleColor.Green)
-                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen));
+                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen)
+                .Post();
         }
 
         private bool TryFind(string appPoolName, out ApplicationPool appPool)
