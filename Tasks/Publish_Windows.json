@@ -3,8 +3,8 @@
 	"assembly": "Photon.Publishing\\bin\\Debug\\Photon.Publishing.dll",
   "preBuild": "cmd.exe /c \".\\bin\\PreBuild.cmd\"",
 	"refspec": "master",
-	"task": "Publish_Win",
+	"task": "Publish_Windows",
 	"roles": [
-		"build"
+		"build.windows"
 	]
 }

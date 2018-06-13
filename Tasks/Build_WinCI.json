@@ -1,8 +1,0 @@
-{
-	"project": "photon",
-	"refspec": "master",
-	"task": "Build_WinCI",
-	"roles": [
-		"build"
-	]
-}

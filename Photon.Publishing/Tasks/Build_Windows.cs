@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Publishing.Tasks
 {
-    public class Build_LinuxCI : IBuildTask
+    public class Build_Windows : IBuildTask
     {
         public IAgentBuildContext Context {get; set;}
 
@@ -18,9 +18,9 @@ namespace Photon.Publishing.Tasks
         private async Task BuildSolution()
         {
             await Context.RunCommandLineAsync(
-                "msbuild", "/v:m",
+                ".\\bin\\msbuild.cmd", "/m", "/v:m",
                 "Photon.sln",
-                "/p:Configuration=\"Linux\"",
+                "/p:Configuration=Release",
                 "/p:Platform=\"Any CPU\"",
                 "/t:Rebuild");
         }

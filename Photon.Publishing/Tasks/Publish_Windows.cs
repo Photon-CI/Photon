@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Publishing.Tasks
 {
-    public class Publish_Win : IBuildTask
+    public class Publish_Windows : IBuildTask
     {
         private string frameworkVersion;
         private string nugetPackageDir;

@@ -39,10 +39,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Internal\ApplicationPublisher.cs" />
-    <Compile Include="Tasks\Build_LinuxCI.cs" />
+    <Compile Include="Tasks\Build_Linux.cs" />
     <Compile Include="Tasks\Publish_Linux.cs" />
-    <Compile Include="Tasks\Build_WinCI.cs" />
-    <Compile Include="Tasks\Publish_Win.cs" />
+    <Compile Include="Tasks\Build_Windows.cs" />
+    <Compile Include="Tasks\Publish_Windows.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

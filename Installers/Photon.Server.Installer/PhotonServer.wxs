@@ -140,9 +140,6 @@
 			<Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="e4e34802-30ef-4e84-a9d1-f0144093b078">
 			  <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" Name="System.Runtime.InteropServices.RuntimeInformation.dll" Source="$(var.PhotonServer_TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
 			</Component>
-			<Component Id="photon_light.ico" Guid="7cb5bfe3-4a27-4cad-b48f-39340beaf38c">
-			  <File Id="photon_light.ico" Name="photon_light.ico" Source="$(var.PhotonServer_TargetDir)photon_light.ico" />
-			</Component>
 		</ComponentGroup>
     <ComponentGroup Id="ServerTemplates" Directory="INSTALLDIR">
       <Component Id="ServerConfigTemplate" Guid="">
