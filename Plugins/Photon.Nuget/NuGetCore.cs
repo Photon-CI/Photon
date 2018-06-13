@@ -44,6 +44,7 @@ namespace Photon.NuGetPlugin
         {
             SourceUrl = "https://api.nuget.org/v3/index.json";
             PushTimeout = 60;
+            EnableV3 = true;
             Logger = new NullLogger();
 
             Cache = new SourceCacheContext();
@@ -86,9 +87,10 @@ namespace Photon.NuGetPlugin
             var nuspecName = Path.GetFileName(nuspecFilename);
             var packageName = Path.GetFileName(packageFilename);
 
-            Output?.Write("Parsing package definition ", ConsoleColor.DarkCyan)
+            Output?.WriteBlock(w => w
+                .Write("Parsing package definition ", ConsoleColor.DarkCyan)
                 .Write(nuspecName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan);
+                .WriteLine("...", ConsoleColor.DarkCyan));
 
             Manifest nuspec;
             try {
@@ -97,23 +99,27 @@ namespace Photon.NuGetPlugin
                 }
             }
             catch (FileNotFoundException) {
-                Output?.Write("Package definition ", ConsoleColor.DarkYellow)
+                Output?.WriteBlock(w => w
+                    .Write("Package definition ", ConsoleColor.DarkYellow)
                     .Write(packageName, ConsoleColor.Yellow)
-                    .WriteLine(" not found!", ConsoleColor.DarkYellow);
+                    .WriteLine(" not found!", ConsoleColor.DarkYellow));
 
                 throw;
             }
             catch (Exception error) {
-                Output?.Write("Failed to load package definition ", ConsoleColor.DarkRed)
+                Output?.WriteBlock(w => w
+                    .Write("Failed to load package definition ", ConsoleColor.DarkRed)
                     .Write(packageName, ConsoleColor.Red)
                     .WriteLine("!", ConsoleColor.DarkRed)
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
+
                 throw;
             }
 
-            Output?.Write("Creating Package ", ConsoleColor.DarkCyan)
+            Output?.WriteBlock(w => w
+                .Write("Creating Package ", ConsoleColor.DarkCyan)
                 .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan);
+                .WriteLine("...", ConsoleColor.DarkCyan));
 
             try {
                 var outputPath = Path.GetDirectoryName(packageFilename);
@@ -128,15 +134,17 @@ namespace Photon.NuGetPlugin
                     builder.Save(packageStream);
                 }
 
-                Output?.Write("Package ", ConsoleColor.DarkGreen)
+                Output?.WriteBlock(w => w
+                    .Write("Package ", ConsoleColor.DarkGreen)
                     .Write(packageName, ConsoleColor.Green)
-                    .WriteLine(" created successfully.", ConsoleColor.DarkGreen);
+                    .WriteLine(" created successfully.", ConsoleColor.DarkGreen));
             }
             catch (Exception error) {
-                Output?.Write("Failed to create package ", ConsoleColor.DarkRed)
+                Output?.WriteBlock(w => w
+                    .Write("Failed to create package ", ConsoleColor.DarkRed)
                     .Write(packageName, ConsoleColor.Red)
                     .WriteLine("!", ConsoleColor.DarkRed)
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
 
                 throw;
             }
@@ -146,28 +154,32 @@ namespace Photon.NuGetPlugin
         {
             var packageName = Path.GetFileName(packageFilename);
 
-            Output?.Write("Publishing Package ", ConsoleColor.DarkCyan)
+            Output?.WriteBlock(w => w
+                .Write("Publishing Package ", ConsoleColor.DarkCyan)
                 .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan);
+                .WriteLine("...", ConsoleColor.DarkCyan));
 
             try {
                 var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
                 await updateResource.Push(packageFilename, null, PushTimeout, false, x => ApiKey, null, Logger);
 
-                Output?.Write("Package ", ConsoleColor.DarkGreen)
+                Output?.WriteBlock(w => w
+                    .Write("Package ", ConsoleColor.DarkGreen)
                     .Write(packageName, ConsoleColor.Green)
-                    .WriteLine(" published successfully.", ConsoleColor.DarkGreen);
+                    .WriteLine(" published successfully.", ConsoleColor.DarkGreen));
             }
             catch (HttpRequestException error) when (existsExp.IsMatch(error.Message)) {
-                Output?.Write("Package ", ConsoleColor.DarkYellow)
+                Output?.WriteBlock(w => w
+                    .Write("Package ", ConsoleColor.DarkYellow)
                     .Write(packageName, ConsoleColor.Yellow)
-                    .WriteLine(" already exists.", ConsoleColor.DarkYellow);
+                    .WriteLine(" already exists.", ConsoleColor.DarkYellow));
             }
             catch (Exception error) {
-                Output?.Write("Failed to publish package ", ConsoleColor.DarkRed)
+                Output?.WriteBlock(w => w
+                    .Write("Failed to publish package ", ConsoleColor.DarkRed)
                     .Write(packageName, ConsoleColor.Red)
                     .WriteLine("!", ConsoleColor.DarkRed)
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
 
                 throw;
             }

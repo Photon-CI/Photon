@@ -23,18 +23,18 @@ namespace Photon.Plugins.IIS
                 handle.CommitChanges();
 
                 if (!TryFind(websiteName, out webSite)) {
-                    handle.Context.Output
+                    handle.Context.Output.WriteBlock(w => w
                         .Write("Unable to create WebSite ", ConsoleColor.DarkRed)
                         .Write(websiteName, ConsoleColor.Red)
-                        .WriteLine("!", ConsoleColor.DarkRed);
+                        .WriteLine("!", ConsoleColor.DarkRed));
 
                     throw new Exception($"Unable to create WebSite '{websiteName}'!");
                 }
 
-                handle.Context.Output
+                handle.Context.Output.WriteBlock(w => w
                     .Write("Created new WebSite ", ConsoleColor.DarkBlue)
                     .Write(websiteName, ConsoleColor.Blue)
-                    .WriteLine(".", ConsoleColor.DarkBlue);
+                    .WriteLine(".", ConsoleColor.DarkBlue));
             }
 
             // TODO: Set Port
@@ -44,10 +44,10 @@ namespace Photon.Plugins.IIS
 
             handle.CommitChanges();
 
-            handle.Context.Output
+            handle.Context.Output.WriteBlock(w => w
                 .Write("WebSite ", ConsoleColor.DarkGreen)
                 .Write(websiteName, ConsoleColor.Green)
-                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
+                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen));
         }
 
         private bool TryFind(string webSiteName, out Site webSite)

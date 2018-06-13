@@ -1,14 +1,17 @@
 ﻿using System;
+using Photon.Framework.Server;
 
 namespace Photon.Framework.Domain
 {
     public delegate void WriteFunc(object text, ConsoleColor color);
     public delegate void WriteLineFunc(object text, ConsoleColor color);
+    public delegate void WriteRawFunc(string text);
 
     public class DomainOutput : MarshalByRefInstance, IWriteAnsi
     {
         public event WriteFunc OnWrite;
         public event WriteLineFunc OnWriteLine;
+        public event WriteRawFunc OnWriteRaw;
 
 
         public IWriteAnsi Write(string text, ConsoleColor color)
@@ -32,6 +35,20 @@ namespace Photon.Framework.Domain
         public IWriteAnsi WriteLine(object value, ConsoleColor color)
         {
             OnWriteLine?.Invoke(value, color);
+            return this;
+        }
+
+        public IWriteAnsi WriteBlock(Action<IWriteAnsi> writerAction)
+        {
+            if (writerAction == null) throw new ArgumentNullException(nameof(writerAction));
+
+            using (var writer = new ScriptOutput()) {
+                writerAction.Invoke(writer);
+                writer.Flush();
+
+                OnWriteRaw?.Invoke(writer.GetString());
+            }
+
             return this;
         }
     }

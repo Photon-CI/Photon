@@ -70,17 +70,19 @@ namespace Photon.NuGetPlugin
 
         private async Task<bool> PreCheckUsingCore(CancellationToken token)
         {
-            context.Output.Write("Checking Package ", ConsoleColor.DarkCyan)
+            context.Output.WriteBlock(w => w
+                .Write("Checking Package ", ConsoleColor.DarkCyan)
                 .Write(PackageId, ConsoleColor.Cyan)
-                .WriteLine(" for updates...", ConsoleColor.DarkCyan);
+                .WriteLine(" for updates...", ConsoleColor.DarkCyan));
 
             var versionList = await Client.GetAllPackageVersions(PackageId, token);
             var packageVersion = versionList.Any() ? versionList.Max() : null;
 
             if (VersionTools.HasUpdates(packageVersion, Version)) return true;
 
-            context.Output.Write($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
-                .WriteLine(packageVersion, ConsoleColor.Blue);
+            context.Output.WriteBlock(w => w
+                .Write($"Package '{PackageId}' is up-to-date. Version ", ConsoleColor.DarkBlue)
+                .WriteLine(packageVersion, ConsoleColor.Blue));
 
             return false;
         }

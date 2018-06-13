@@ -8,5 +8,6 @@ namespace Photon.Framework
         IWriteAnsi Write(object value, ConsoleColor color);
         IWriteAnsi WriteLine(string text, ConsoleColor color);
         IWriteAnsi WriteLine(object value, ConsoleColor color);
+        IWriteAnsi WriteBlock(Action<IWriteAnsi> writerAction);
     }
 }

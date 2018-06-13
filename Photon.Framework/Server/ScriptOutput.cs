@@ -89,6 +89,26 @@ namespace Photon.Framework.Server
             return this;
         }
 
+        public IWriteAnsi WriteBlock(Action<IWriteAnsi> writerAction)
+        {
+            if (writerAction == null) throw new ArgumentNullException(nameof(writerAction));
+            if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
+
+            string text;
+            using (var _writer = new ScriptOutput()) {
+                writerAction.Invoke(_writer);
+                _writer.Flush();
+                text = _writer.GetString();
+            }
+
+            lock (lockHandle.Value) {
+                writer.Flush();
+                builder.Append(text);
+            }
+
+            return this;
+        }
+
         public ScriptOutput AppendRaw(string text)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
