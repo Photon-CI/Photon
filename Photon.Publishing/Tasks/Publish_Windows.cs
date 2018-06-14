@@ -156,8 +156,6 @@ namespace Photon.Publishing.Tasks
                     Output = Context.Output,
                 },
                 Client = new NuGetCore {
-                    //EnableV2 = true,
-                    EnableV3 = true,
                     Output = Context.Output,
                     ApiKey = nugetApiKey,
                 },

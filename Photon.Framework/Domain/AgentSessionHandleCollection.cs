@@ -69,18 +69,24 @@ namespace Photon.Framework.Domain
                 await Task.WhenAll(taskList.ToArray());
             }
             catch (AggregateException errors) {
-                context.Output.WriteLine("Failed to run tasks!", ConsoleColor.Red);
+                using (var block = context.Output.WriteBlock()) {
+                    block.WriteLine("Failed to run tasks!", ConsoleColor.Red);
 
-                errors.Flatten().Handle(e => {
-                    context.Output.WriteLine($"  {e.Message}", ConsoleColor.DarkYellow);
-                    return true;
-                });
+                    errors.Flatten().Handle(e => {
+                        block.WriteLine($"  {e.Message}", ConsoleColor.DarkYellow);
+                        return true;
+                    });
+
+                    block.Post();
+                }
 
                 throw;
             }
             catch (Exception error) {
-                context.Output.Write("Failed to run tasks! ", ConsoleColor.Red)
-                    .WriteLine(error.Message, ConsoleColor.DarkYellow);
+                context.Output.WriteBlock()
+                    .Write("Failed to run tasks! ", ConsoleColor.Red)
+                    .WriteLine(error.Message, ConsoleColor.DarkYellow)
+                    .Post();
 
                 throw;
             }

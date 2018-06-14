@@ -111,6 +111,10 @@ namespace Photon.Agent.Internal.Session
             TimeReleased = DateTime.UtcNow;
             OnReleased();
 
+            using (var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(8))) {
+                Transceiver.Stop(tokenSource.Token);
+            }
+
             if (Domain != null) {
                 try {
                     await Domain.Unload(true);

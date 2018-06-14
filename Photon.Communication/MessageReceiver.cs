@@ -2,6 +2,7 @@
 using Photon.Communication.Packets;
 using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace Photon.Communication
             stream?.Dispose();
         }
 
-        public void Start(Stream stream)
+        public void Start(NetworkStream stream)
         {
             this.stream = stream;
 

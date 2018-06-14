@@ -8,6 +8,7 @@ namespace Photon.Framework.Domain
     {
         private readonly DomainOutput domainOutput;
         private readonly ScriptOutput output;
+        private volatile bool isPosted;
 
 
         public DomainBlockWriter(DomainOutput output)
@@ -19,6 +20,8 @@ namespace Photon.Framework.Domain
 
         public void Dispose()
         {
+            Post();
+
             output?.Dispose();
         }
 
@@ -48,6 +51,9 @@ namespace Photon.Framework.Domain
 
         public void Post()
         {
+            if (isPosted) return;
+            isPosted = true;
+
             domainOutput.WriteRaw(output.GetString());
         }
     }

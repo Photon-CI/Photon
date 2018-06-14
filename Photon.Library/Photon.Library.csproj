@@ -92,8 +92,8 @@
     <Compile Include="TcpMessages\ApplicationPackagePushResponse.cs" />
     <Compile Include="TcpMessages\BuildSessionBeginRequest.cs" />
     <Compile Include="TcpMessages\BuildSessionBeginResponse.cs" />
-    <Compile Include="TcpMessages\BuildSessionReleaseRequest.cs" />
-    <Compile Include="TcpMessages\BuildSessionReleaseResponse.cs" />
+    <Compile Include="TcpMessages\SessionReleaseRequest.cs" />
+    <Compile Include="TcpMessages\SessionReleaseResponse.cs" />
     <Compile Include="TcpMessages\TaskCompleteMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\SessionDomainBase.cs" />
@@ -102,8 +102,6 @@
     <Compile Include="TcpMessages\TaskRunResponse.cs" />
     <Compile Include="TcpMessages\DeploySessionBeginRequest.cs" />
     <Compile Include="TcpMessages\DeploySessionBeginResponse.cs" />
-    <Compile Include="TcpMessages\DeploySessionReleaseRequest.cs" />
-    <Compile Include="TcpMessages\DeploySessionReleaseResponse.cs" />
     <Compile Include="TcpMessages\ProjectPackagePullRequest.cs" />
     <Compile Include="TcpMessages\ProjectPackagePullResponse.cs" />
     <Compile Include="TcpMessages\ProjectPackagePushRequest.cs" />

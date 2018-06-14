@@ -25,29 +25,37 @@ namespace Photon.Framework.Domain
 
         public void RunCommandLine(string command)
         {
-            Output.Write("Running Command: ", ConsoleColor.DarkCyan)
-                .WriteLine(command, ConsoleColor.Cyan);
+            Output.WriteBlock()
+                .Write("Running Command: ", ConsoleColor.DarkCyan)
+                .WriteLine(command, ConsoleColor.Cyan)
+                .Post();
 
             ProcessResult result;
             try {
                 result = ProcessRunner.Run(ContentDirectory, command, Output);
             }
             catch (Win32Exception error) when (error.ErrorCode == -2147467259) {
-                Output.Write("Command Failed!", ConsoleColor.DarkYellow)
-                    .WriteLine(" Application not found!", ConsoleColor.Yellow);
+                Output.WriteBlock()
+                    .Write("Command Failed!", ConsoleColor.DarkYellow)
+                    .WriteLine(" Application not found!", ConsoleColor.Yellow)
+                    .Post();
 
                 throw;
             }
             catch (Exception error) {
-                Output.Write("Command Failed!", ConsoleColor.DarkRed)
-                    .WriteLine($" {error.UnfoldMessages()}", ConsoleColor.Red);
+                Output.WriteBlock()
+                    .Write("Command Failed!", ConsoleColor.DarkRed)
+                    .WriteLine($" {error.UnfoldMessages()}", ConsoleColor.Red)
+                    .Post();
 
                 throw;
             }
 
             if (result.ExitCode != 0) {
-                Output.Write("Command Failed! Exit Code ", ConsoleColor.DarkYellow)
-                    .WriteLine(result.ExitCode.ToString(), ConsoleColor.Yellow);
+                Output.WriteBlock()
+                    .Write("Command Failed! Exit Code ", ConsoleColor.DarkYellow)
+                    .WriteLine(result.ExitCode.ToString(), ConsoleColor.Yellow)
+                    .Post();
 
                 throw new ApplicationException("Process terminated with a non-zero exit code!");
             }

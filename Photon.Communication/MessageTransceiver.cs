@@ -68,12 +68,12 @@ namespace Photon.Communication
             }
 
             try {
-                messageReceiver.Stop(token);
+                messageSender.Stop(token);
             }
             catch {}
 
             try {
-                messageSender.Stop(token);
+                messageReceiver.Stop(token);
             }
             catch {}
 

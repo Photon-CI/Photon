@@ -130,11 +130,10 @@
     <Compile Include="MessageHandlers\AgentUpdateProcessor.cs" />
     <Compile Include="MessageHandlers\SessionCancelProcessor.cs" />
     <Compile Include="MessageHandlers\DeploySessionBeginProcessor.cs" />
-    <Compile Include="MessageHandlers\DeploySessionReleaseProcessor.cs" />
     <Compile Include="MessageHandlers\AgentGetVersionProcessor.cs" />
     <Compile Include="MessageHandlers\HandshakeProcessor.cs" />
     <Compile Include="MessageHandlers\TaskRunProcessor.cs" />
-    <Compile Include="MessageHandlers\BuildSessionReleaseProcessor.cs" />
+    <Compile Include="MessageHandlers\SessionReleaseProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionBeginProcessor.cs" />
     <Compile Include="ViewHandlers\IndexHandler.cs" />
     <Compile Include="Program.cs" />
