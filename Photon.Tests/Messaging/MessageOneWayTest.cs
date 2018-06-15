@@ -21,7 +21,7 @@ namespace Photon.Tests.Messaging
         }
 
         [Test]
-        public async Task SendMessageOneWay_1000x()
+        public async Task SendMessageOneWay_ToHost_1000x()
         {
             TestMessageProcessor.Count = 0;
 
@@ -48,7 +48,6 @@ namespace Photon.Tests.Messaging
         {
             TestMessageProcessor.Count = 0;
 
-            using (var ev = new ManualResetEventSlim())
             using (var listener = new MessageListener(registry)) {
                 using (var client = new MessageClient(registry)) {
                     listener.ConnectionReceived += (sender, e) => {
@@ -56,16 +55,13 @@ namespace Photon.Tests.Messaging
                             e.Host.SendOneWay(new TestRequestOneWayMessage());
                         }
 
-                        Thread.Sleep(200);
                         e.Host.Stop();
-                        ev.Set();
                     };
 
                     listener.Listen(IPAddress.Loopback, 10934);
                     await client.ConnectAsync("localhost", 10934, CancellationToken.None);
 
-                    //await Task.Delay(200);
-                    ev.Wait();
+                    await Task.Delay(200);
                     client.Disconnect();
                 }
 
@@ -88,9 +84,7 @@ namespace Photon.Tests.Messaging
             {
                 Interlocked.Increment(ref Count);
 
-                return await Task.FromResult(new ResponseMessageBase {
-                    RequestMessageId = requestMessage.MessageId,
-                });
+                return await Task.FromResult<IResponseMessage>(null);
             }
         }
     }

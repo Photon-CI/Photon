@@ -27,7 +27,7 @@ namespace Photon.Communication.Packets
 
             reader = new BinaryReader(stream, Encoding.UTF8, true);
             packetBuilderList = new Dictionary<string, PacketBuilder>(StringComparer.Ordinal);
-            completeEvent = new ManualResetEventSlim(false);
+            completeEvent = new ManualResetEventSlim(true);
         }
 
         public void Dispose()

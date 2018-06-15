@@ -83,6 +83,7 @@ namespace Photon.Communication
             catch {}
 
             try {
+                stream.Flush();
                 stream.Close();
             }
             catch {}
