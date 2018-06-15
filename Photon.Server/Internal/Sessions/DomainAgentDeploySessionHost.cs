@@ -45,10 +45,7 @@ namespace Photon.Server.Internal.Sessions
             MessageClient.SendOneWay(message);
                 //.GetResponseAsync(token);
 
-            var timeout = TimeSpan.FromSeconds(30);
-            using (var timeoutTS = new CancellationTokenSource(timeout)) {
-                MessageClient.Disconnect();
-            }
+            MessageClient.Disconnect(TimeSpan.FromSeconds(30));
 
             // TODO:
             // 1) sender sends a release message

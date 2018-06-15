@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Server;
+﻿using System;
+using Photon.Framework.Server;
 using Photon.Library.TcpMessages;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,8 +44,9 @@ namespace Photon.Server.Internal.Sessions
                 AgentSessionId = AgentSessionId,
             };
 
-            await MessageClient.Send(message)
-                .GetResponseAsync(token);
+            MessageClient.SendOneWay(message);
+
+            MessageClient.Disconnect(TimeSpan.FromSeconds(30));
         }
 
         protected override void OnSessionOutput(string text)
