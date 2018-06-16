@@ -46,6 +46,7 @@ namespace Photon.Server.Internal.Sessions
 
             MessageClient.SendOneWay(message);
 
+            await Task.Delay(800, token);
             MessageClient.Disconnect(TimeSpan.FromSeconds(30));
         }
 

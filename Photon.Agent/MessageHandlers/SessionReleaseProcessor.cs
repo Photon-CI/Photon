@@ -10,7 +10,7 @@ namespace Photon.Agent.MessageHandlers
     {
         public override Task<IResponseMessage> Process(SessionReleaseRequest requestMessage)
         {
-            var _ = Task.Delay(100).ContinueWith(async t => {
+            var _ = Task.Delay(800).ContinueWith(async t => {
                 await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
             });
 
