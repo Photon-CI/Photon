@@ -129,10 +129,17 @@ namespace Photon.Server.Internal.Sessions
 
             foreach (var host in hostList.Values) {
                 try {
+                    host.Stop();
+                }
+                catch (Exception error) {
+                    Log.Error("Failed to stop host!", error);
+                }
+
+                try {
                     host.Dispose();
                 }
                 catch (Exception error) {
-                    Log.Error("Failed to close host!", error);
+                    Log.Error("Failed to dispose host!", error);
                 }
             }
             hostList.Clear();
