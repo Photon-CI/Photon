@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.10")]
-[assembly: AssemblyFileVersion("0.0.10")]
+[assembly: AssemblyVersion("0.0.12")]
+[assembly: AssemblyFileVersion("0.0.12")]
 
 [assembly: AssemblyTitle("Photon.Communication")]
 [assembly: AssemblyDescription("Communications library for Photon")]

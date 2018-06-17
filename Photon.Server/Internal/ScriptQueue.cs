@@ -1,9 +1,7 @@
 ﻿using log4net;
-using Photon.Framework.Extensions;
 using Photon.Framework.Tasks;
 using Photon.Server.Internal.Sessions;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -87,89 +85,96 @@ namespace Photon.Server.Internal
         private async Task OnProcess(IServerSession session)
         {
             Log.Debug($"Session '{session.SessionId}' processing...");
+            TaskResult result;
 
             try {
-                await OnProcessItem(session);
+                await PreProcessSession(session);
 
                 Log.Debug($"Session '{session.SessionId}' completed successfully.");
+                result = TaskResult.Ok();
+            }
+            catch (OperationCanceledException) {
+                Log.Warn($"Session '{session.SessionId}' cancelled.");
+                result = TaskResult.Cancel();
             }
             catch (Exception error) {
-                Log.Error($"Session '{session.SessionId}' Failed!", error);
+                Log.Error($"Session '{session.SessionId}' failed!", error);
+
+                session.Exception = error;
+                result = TaskResult.Error(error);
+            }
+
+            try {
+                await PostProcessSession(session, result);
+            }
+            catch (Exception error) {
+                Log.Error($"Session '{session.SessionId}' cleanup failed!", error);
             }
             finally {
                 GC.Collect();
             }
+
+            if (result.Successful)
+                Log.Debug($"Completed Script Session '{session.SessionId}' successfully.");
+            else if (result.Cancelled)
+                Log.Warn($"Script Session '{session.SessionId}' was cancelled.");
+            else
+                Log.Warn($"Completed Script Session '{session.SessionId}' with errors.", session.Exception);
         }
 
-        private async Task OnProcessItem(IServerSession session)
+        private async Task<TaskResult> PreProcessSession(IServerSession session)
         {
-            var abort = false;
-            var errorList = new List<Exception>();
-
             await session.InitializeAsync();
 
             try {
                 session.OnPreBuildEvent();
             }
+            catch (OperationCanceledException) {
+                throw;
+            }
             catch (Exception error) {
-                session.Output
-                    .Write("Pre-Build event failed! ", ConsoleColor.DarkRed)
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
-
-                Log.Error("Pre-Build Event Failed!", error);
-                return;
+                throw new ApplicationException("Pre-Build event Failed!", error);
             }
 
             try {
-                session.Output
-                    .WriteLine("Preparing working directory...", ConsoleColor.DarkCyan);
+                session.Output.WriteLine("Preparing working directory...", ConsoleColor.DarkCyan);
 
                 await session.PrepareWorkDirectoryAsync();
+            }
+            catch (OperationCanceledException) {
+                throw;
             }
             catch (Exception error) {
                 var _e = error;
                 if (error is AggregateException _ae)
                     _e = _ae.Flatten();
 
-                session.Output
-                    .Write("Failed to prepare working directory! ", ConsoleColor.DarkRed)
-                    .WriteLine(_e.UnfoldMessages(), ConsoleColor.DarkYellow);
-
-                abort = true;
-                errorList.Add(_e);
+                throw new ApplicationException("Pre-Build event Failed!", _e);
             }
 
-            TaskResult result = null;
-            if (!abort) {
-                try {
-                    session.Output
-                        .WriteLine("Running script...", ConsoleColor.DarkCyan);
+            try {
+                session.Output.WriteLine("Running script...", ConsoleColor.DarkCyan);
 
-                    await session.RunAsync();
-                    result = TaskResult.Ok();
-                }
-                catch (Exception error) {
-                    result = TaskResult.Error(error);
-                    errorList.Add(error);
-                    //abort = true;
-
-                    session.Output
-                        .Write("Script Failed! ", ConsoleColor.DarkRed)
-                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
-                }
+                await session.RunAsync();
+                return TaskResult.Ok();
             }
+            catch (OperationCanceledException) {
+                throw;
+            }
+            catch (Exception error) {
+                throw new ApplicationException("Script Failed!", error);
+            }
+        }
 
-            session.Output
-                .WriteLine("Destroying working directory...", ConsoleColor.DarkCyan);
+        private async Task PostProcessSession(IServerSession session, TaskResult result)
+        {
+            session.Output.WriteLine("Destroying working directory...", ConsoleColor.DarkCyan);
 
             try {
                 await session.ReleaseAsync();
             }
             catch (Exception error) {
-                session.Output
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
-
-                errorList.Add(error);
+                Log.Warn($"Failed to release session '{session.SessionId}'!", error);
             }
             finally {
                 session.Complete(result);
@@ -179,18 +184,8 @@ namespace Photon.Server.Internal
                 session.OnPostBuildEvent();
             }
             catch (Exception error) {
-                Log.Error("Post-Build Event Failed!", error);
+                Log.Error("Session post-build event failed!", error);
             }
-
-            if (errorList.Count > 1)
-                session.Exception = new AggregateException(errorList);
-            else if (errorList.Count == 1)
-                session.Exception = errorList[0];
-
-            if (session.Exception != null)
-                Log.Warn($"Completed Script Session '{session.SessionId}' with errors.", session.Exception);
-            else
-                Log.Debug($"Completed Script Session '{session.SessionId}' successfully.");
         }
     }
 }

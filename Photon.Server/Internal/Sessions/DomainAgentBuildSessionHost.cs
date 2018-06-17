@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Server;
+﻿using System;
+using Photon.Framework.Server;
 using Photon.Library.TcpMessages;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,12 +40,14 @@ namespace Photon.Server.Internal.Sessions
 
         protected override async Task OnReleaseSessionAsync(CancellationToken token)
         {
-            var message = new BuildSessionReleaseRequest {
+            var message = new SessionReleaseRequest {
                 AgentSessionId = AgentSessionId,
             };
 
-            await MessageClient.Send(message)
-                .GetResponseAsync(token);
+            MessageClient.SendOneWay(message);
+
+            await Task.Delay(800, token);
+            MessageClient.Disconnect(TimeSpan.FromSeconds(30));
         }
 
         protected override void OnSessionOutput(string text)

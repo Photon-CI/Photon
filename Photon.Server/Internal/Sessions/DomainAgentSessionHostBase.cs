@@ -49,6 +49,12 @@ namespace Photon.Server.Internal.Sessions
             MessageClient?.Dispose();
         }
 
+        public void Stop()
+        {
+            Tasks.Stop();
+            MessageClient.Disconnect();
+        }
+
         public void Abort()
         {
             if (MessageClient.IsConnected && !string.IsNullOrEmpty(AgentSessionId)) {

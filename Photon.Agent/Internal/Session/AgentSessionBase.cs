@@ -111,6 +111,10 @@ namespace Photon.Agent.Internal.Session
             TimeReleased = DateTime.UtcNow;
             OnReleased();
 
+            using (var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(8))) {
+                Transceiver.Stop(tokenSource.Token);
+            }
+
             if (Domain != null) {
                 try {
                     await Domain.Unload(true);
@@ -130,13 +134,12 @@ namespace Photon.Agent.Internal.Session
             }
 
             try {
-                var _workDirectory = WorkDirectory;
-                await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
+                FileUtils.DestoryDirectory(WorkDirectory);
             }
             catch (AggregateException errors) {
                 errors.Flatten().Handle(e => {
-                    if (e is IOException ioError) {
-                        Log.Warn(ioError.Message);
+                    if (e is IOException) {
+                        //Log.Warn(ioError.Message);
                         return true;
                     }
 

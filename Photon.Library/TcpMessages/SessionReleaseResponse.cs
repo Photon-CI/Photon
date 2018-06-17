@@ -2,7 +2,7 @@
 
 namespace Photon.Library.TcpMessages
 {
-    public class BuildSessionReleaseResponse : ResponseMessageBase
+    public class SessionReleaseResponse : ResponseMessageBase
     {
     }
 }

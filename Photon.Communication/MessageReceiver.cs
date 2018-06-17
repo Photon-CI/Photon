@@ -2,6 +2,7 @@
 using Photon.Communication.Packets;
 using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace Photon.Communication
             stream?.Dispose();
         }
 
-        public void Start(Stream stream)
+        public void Start(NetworkStream stream)
         {
             this.stream = stream;
 
@@ -41,7 +42,9 @@ namespace Photon.Communication
 
         private async Task OnProcess(CancellationToken token)
         {
-            while (!isDisposed && !token.IsCancellationRequested) {
+            while (true) {
+                token.ThrowIfCancellationRequested();
+
                 try {
                     await packetReceiver.ReadPacket(token);
                 }
@@ -65,7 +68,7 @@ namespace Photon.Communication
 
         public void Stop(CancellationToken token = default(CancellationToken))
         {
-            tokenSource.Cancel();
+            //tokenSource.Cancel();
 
             try {
                 packetReceiver.Stop(token);

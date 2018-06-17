@@ -96,7 +96,9 @@ namespace Photon.Communication
 
         private void Listener_OnConnectionReceived(IAsyncResult result)
         {
-            if (!isListening) return;
+            lock (startStopLock) {
+                if (!isListening) return;
+            }
 
             TcpClient client;
             try {

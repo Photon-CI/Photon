@@ -60,6 +60,7 @@ namespace Photon.Agent.Internal.Session
                 var githubSource = Project?.Source as ProjectGithubSource;
                 var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent && Commit != null;
                 CommitStatusUpdater su = null;
+                CommitStatus status;
 
                 if (notifyGithub) {
                     su = new CommitStatusUpdater {
@@ -69,7 +70,7 @@ namespace Photon.Agent.Internal.Session
                         Sha = Commit.Sha,
                     };
 
-                    var status = new CommitStatus {
+                    status = new CommitStatus {
                         State = CommitStates.Pending,
                         Context = "Photon",
                         Description = "Build in progress..."
@@ -78,34 +79,29 @@ namespace Photon.Agent.Internal.Session
                     await su.Post(status);
                 }
 
-                var success = false;
+                status = new CommitStatus {
+                    Context = "Photon",
+                };
 
                 try {
                     await Domain.RunBuildTask(context, TokenSource.Token);
 
-                    success = true;
+                    if (notifyGithub) {
+                        status.State = CommitStates.Success;
+                        status.Description = "Build Successful.";
+                        await su.Post(status);
+                    }
                 }
                 catch (Exception error) {
                     Exception = error;
-                    throw;
-                }
-                finally {
+
                     if (notifyGithub) {
-                        var status = new CommitStatus {
-                            Context = "Photon",
-                        };
-
-                        if (success) {
-                            status.State = CommitStates.Success;
-                            status.Description = "Build Successful.";
-                        }
-                        else {
-                            status.State = CommitStates.Failure;
-                            status.Description = "Build Failed!";
-                        }
-
+                        status.State = CommitStates.Failure;
+                        status.Description = "Build Failed!";
                         await su.Post(status);
                     }
+
+                    throw;
                 }
             }
         }

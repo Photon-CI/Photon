@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Photon.Communication.Packets
     {
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        private readonly Stream stream;
+        private readonly NetworkStream stream;
         private readonly ManualResetEventSlim completeEvent;
         private readonly BinaryReader reader;
         private readonly Dictionary<string, PacketBuilder> packetBuilderList;
@@ -20,13 +21,13 @@ namespace Photon.Communication.Packets
         public int Count => packetBuilderList.Count;
 
 
-        public PacketReceiver(Stream stream)
+        public PacketReceiver(NetworkStream stream)
         {
             this.stream = stream;
 
             reader = new BinaryReader(stream, Encoding.UTF8, true);
             packetBuilderList = new Dictionary<string, PacketBuilder>(StringComparer.Ordinal);
-            completeEvent = new ManualResetEventSlim(false);
+            completeEvent = new ManualResetEventSlim(true);
         }
 
         public void Dispose()
@@ -43,6 +44,7 @@ namespace Photon.Communication.Packets
             }
             catch (OperationCanceledException) {}
 
+            stream.Flush();
             stream.Close();
         }
 
@@ -69,7 +71,7 @@ namespace Photon.Communication.Packets
                 packetBuilder.Dispose();
 
                 // TODO: Lock Access
-                if (packetBuilderList.Count == 0)
+                if (packetBuilderList.Count == 0 && !stream.DataAvailable)
                     completeEvent.Set();
             }
         }

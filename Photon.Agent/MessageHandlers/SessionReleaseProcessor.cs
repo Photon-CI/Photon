@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Photon.Agent.MessageHandlers
 {
-    public class BuildSessionReleaseProcessor : MessageProcessorBase<BuildSessionReleaseRequest>
+    public class SessionReleaseProcessor : MessageProcessorBase<SessionReleaseRequest>
     {
-        public override Task<IResponseMessage> Process(BuildSessionReleaseRequest requestMessage)
+        public override Task<IResponseMessage> Process(SessionReleaseRequest requestMessage)
         {
-            var _ = Task.Delay(100).ContinueWith(async t => {
+            var _ = Task.Delay(800).ContinueWith(async t => {
                 await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
             });
 
-            return Task.FromResult<IResponseMessage>(new BuildSessionReleaseResponse());
+            return Task.FromResult<IResponseMessage>(null);
         }
     }
 }
