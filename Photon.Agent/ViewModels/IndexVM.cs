@@ -21,7 +21,7 @@ namespace Photon.Agent.ViewModels
         public string OsDescription {get; set;}
         public string OsArchitecture {get; set;}
         public string FrameworkDescription {get; set;}
-        public string ProcessArchitecture {get; set;}
+        //public string ProcessArchitecture {get; set;}
 
 
         public void Build()
@@ -30,7 +30,7 @@ namespace Photon.Agent.ViewModels
             AgentVersion = Configuration.Version;
             AgentHttpUrl = GetAgentHttpUrl();
             AgentTcpUrl = GetAgentTcpUrl();
-            ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
+            //ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
 
             MachineName = Environment.MachineName;
             MachineProcessorCount = Environment.ProcessorCount.ToString("N0");

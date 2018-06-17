@@ -17,9 +17,12 @@ namespace Photon.Publishing.Tasks
 
         private async Task BuildSolution()
         {
+            var msbuild_exe = Context.AgentVariables["global"]["msbuild_exe"];
+
             await Context.RunCommandLineAsync(
-                ".\\bin\\msbuild.cmd", "/m", "/v:m",
-                "Photon.sln",
+                //".\\bin\\msbuild.cmd", "/m", "/v:m",
+                $"\"{msbuild_exe}\"",
+                "Photon.sln", "/m", "/v:m",
                 "/p:Configuration=Release",
                 "/p:Platform=\"Any CPU\"",
                 "/t:Rebuild");
