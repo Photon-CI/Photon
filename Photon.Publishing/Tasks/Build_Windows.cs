@@ -22,7 +22,7 @@ namespace Photon.Publishing.Tasks
             await Context.RunCommandLineAsync(
                 //".\\bin\\msbuild.cmd", "/m", "/v:m",
                 $"\"{msbuild_exe}\"",
-                "Photon.sln", "/m",
+                "Photon.sln", "/m", "/v:m",
                 "/p:Configuration=Release",
                 "/p:Platform=\"Any CPU\"",
                 "/t:Rebuild");
