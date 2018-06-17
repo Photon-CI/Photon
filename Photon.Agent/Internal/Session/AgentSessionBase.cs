@@ -134,13 +134,12 @@ namespace Photon.Agent.Internal.Session
             }
 
             try {
-                var _workDirectory = WorkDirectory;
-                await Task.Run(() => FileUtils.DestoryDirectory(_workDirectory));
+                FileUtils.DestoryDirectory(WorkDirectory);
             }
             catch (AggregateException errors) {
                 errors.Flatten().Handle(e => {
-                    if (e is IOException ioError) {
-                        Log.Warn(ioError.Message);
+                    if (e is IOException) {
+                        //Log.Warn(ioError.Message);
                         return true;
                     }
 

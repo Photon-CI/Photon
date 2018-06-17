@@ -106,6 +106,7 @@ namespace Photon.Framework.Server
                 builder.Append(text);
             }
 
+            OnChanged();
             return this;
         }
 
@@ -118,16 +119,20 @@ namespace Photon.Framework.Server
                 builder.Append(text);
             }
 
+            OnChanged();
             return this;
         }
 
-        public void Flush()
+        public ScriptOutput Flush()
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
             lock (lockHandle.Value) {
                 writer.Flush();
             }
+
+            OnChanged();
+            return this;
         }
 
         protected virtual void OnChanged()
