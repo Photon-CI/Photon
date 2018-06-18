@@ -31,7 +31,7 @@
       <ComponentGroupRef Id="Views_VariableSet_files" />
     </Feature>
     <Property Id="CREATEFIREWALLEXCEPTION" Secure="yes" Value="1">
-      <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="CreateFirewallException" />
+      <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="FirewallException" />
     </Property>
     <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
     <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
@@ -139,7 +139,11 @@
         <File Id="PhotonAgent.exe" Name="PhotonAgent.exe" Source="$(var.PhotonAgent_TargetDir)PhotonAgent.exe" KeyPath="yes" />
         <ServiceInstall Id="ServiceInstaller" Name="Photon.Agent" Type="ownProcess" DisplayName="Photon Agent" Description="Agent instance for Photon." Start="auto" ErrorControl="normal" Account="[LocalSystem]" />
         <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Agent" Wait="yes" />
-        <RegistryValue Root="HKLM" Key="SOFTWARE\Photon\Agent" Name="CreateFirewallException" Value="[CREATEFIREWALLEXCEPTION]" Type="string" />
+      </Component>
+      <Component Id="RegistryComponents" Guid="0AE57731-F659-4473-B83C-614CE1FA4F7D">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\Photon\Agent" Action="createAndRemoveOnUninstall">
+          <RegistryValue Name="FirewallException" Value="[CREATEFIREWALLEXCEPTION]" Type="integer" />
+        </RegistryKey>
       </Component>
       <Component Id="FirewallException" Guid="C2CC1E1E-7DC8-451C-8708-F105F383EE11" KeyPath="yes">
         <Condition>CREATEFIREWALLEXCEPTION</Condition>

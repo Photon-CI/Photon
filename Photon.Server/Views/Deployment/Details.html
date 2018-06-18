@@ -11,9 +11,14 @@
         $('#layoutNavbarContent [data-link="deployments"]').addClass('active');
 
         loadOutput();
+
+        onTrackToggleClick();
+        onWrapToggleClick();
     });
 
     function loadOutput() {
+        $('#OutputCursor').show();
+
         reader = new SessionOutputReader();
         reader.onAppend = onAppend;
         reader.onDone = onDone;
@@ -27,27 +32,70 @@
         //text_out = ansi_up.linkify(text_out);
 
         $('#OutputText').append(text_out);
+
+        var enableTracking = $('#TrackCheckBox').is(':checked');
+        if (enableTracking) scrollToBottom();
     }
 
     function onDone() {
+        $('#OutputCursor').hide();
+
         //
     }
 
     function onError() {
+        $('#OutputCursor').hide();
+
         //
+    }
+
+    function onTrackToggleClick() {
+        var enableTracking = $('#TrackCheckBox').is(':checked');
+
+        if (enableTracking) scrollToBottom();
+    }
+
+    function onWrapToggleClick() {
+        var enableWrapping = $('#WrapCheckBox').is(':checked');
+        var innerContent = $('.output-text-scroll');
+
+        if (enableWrapping) {
+            innerContent.width('100%');
+            innerContent.find('pre').css('white-space', 'pre-wrap');
+        } else {
+            innerContent.width('auto');
+            innerContent.find('pre').css('white-space', 'pre');
+        }
+
+        var enableTracking = $('#TrackCheckBox').is(':checked');
+        if (enableTracking) scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        var outerContent = $('.output-text-scroll');
+
+        outerContent.stop().animate({
+            scrollTop: outerContent[0].scrollHeight
+        }, 800);
     }
 </script>
 {{#EndScript}}
 
 {{#Style}}
+<link href="{{#Url Content/outputCursor.css}}" rel="stylesheet" />
 <style>
-    .layout-content {
+    .output-toolbar {
+        height: auto;
     }
-
-    #OutputText {
-        overflow-x: auto;
+    .output-container {
         background: #111;
         color: #CCC;
+    }
+    .inner-text {
+        overflow-x: auto;
+    }
+    #OutputCursor {
+        display: none;
     }
 
     td.c-icon {
@@ -67,18 +115,21 @@
             flex: 1;
         }
 
+        #output {
+            height: 100%;
+            flex-direction: column;
+            display: flex;
+        }
         .output-container {
+            flex: 1;
+        }
+        .output-text-scroll {
             position: relative;
             height: 100%;
             overflow-x: auto;
             overflow-y: auto;
         }
-
-        #output {
-            height: 100%;
-        }
-
-        #OutputText {
+        .text-inner {
             position: absolute;
             min-width: 100%;
             min-height: 100%;
@@ -94,6 +145,13 @@
         </h3>
     </div>
     <div class="form-inline">
+        {{#If IsRunning}}
+        <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#CancelModal">Cancel</button>
+        {{#Else}}
+        <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#DeleteModal">
+            <i class="fas fa-trash"></i>
+        </button>
+        {{#EndIf}}
         <a href="{{#Url deployment/new}}?project={{&ProjectId}}&package={{&PackageId}}&version={{&PackageVersion}}" class="btn btn-sm btn-success">
             <i class="fas fa-redo"></i>
         </a>
@@ -202,8 +260,25 @@
         </div>
     </div>
     <div id="output" class="tab-pane fade" role="tabpanel">
+        <div class="output-toolbar px-2 py-1 clearfix">
+            <div class="float-right">
+                <div class="form-check form-check-inline">
+                    <input id="WrapCheckBox" type="checkbox" class="form-check-input" value="1" onchange="onWrapToggleClick()">
+                    <label for="WrapCheckBox" class="form-check-label">Wrap Lines</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input id="TrackCheckBox" type="checkbox" class="form-check-input" value="1" onchange="onTrackToggleClick()">
+                    <label for="TrackCheckBox" class="form-check-label">Track to Bottom</label>
+                </div>
+            </div>
+        </div>
         <div class="output-container">
-            <pre id="OutputText" class="px-2 py-1"></pre>
+            <div class="output-text-scroll">
+                <div class="text-inner px-2 py-1">
+                    <pre id="OutputText" class="m-0"></pre>
+                    <pre id="OutputCursor" class="blinking-cursor m-0">|</pre>
+                </div>
+            </div>
         </div>
     </div>
     <div id="artifacts" class="tab-pane fade" role="tabpanel">

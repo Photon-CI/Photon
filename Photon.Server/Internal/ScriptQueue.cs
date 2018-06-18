@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Photon.Framework.Extensions;
 
 namespace Photon.Server.Internal
 {
@@ -84,23 +85,29 @@ namespace Photon.Server.Internal
 
         private async Task OnProcess(IServerSession session)
         {
-            Log.Debug($"Session '{session.SessionId}' processing...");
+            Log.Debug($"Session '{session.SessionId}' started...");
             TaskResult result;
 
             try {
                 await PreProcessSession(session);
 
-                Log.Debug($"Session '{session.SessionId}' completed successfully.");
+                session.Output.WriteLine("Build Successful.", ConsoleColor.Green);
                 result = TaskResult.Ok();
             }
             catch (OperationCanceledException) {
                 Log.Warn($"Session '{session.SessionId}' cancelled.");
+
+                session.Output.WriteLine("Build Cancelled.", ConsoleColor.DarkYellow);
                 result = TaskResult.Cancel();
             }
             catch (Exception error) {
                 Log.Error($"Session '{session.SessionId}' failed!", error);
 
                 session.Exception = error;
+                session.Output.WriteBlock(w => w
+                    .Write("Build Failed! ", ConsoleColor.DarkRed)
+                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
+
                 result = TaskResult.Error(error);
             }
 
@@ -111,15 +118,10 @@ namespace Photon.Server.Internal
                 Log.Error($"Session '{session.SessionId}' cleanup failed!", error);
             }
             finally {
+                Log.Debug($"Session '{session.SessionId}' released.");
+
                 GC.Collect();
             }
-
-            if (result.Successful)
-                Log.Debug($"Completed Script Session '{session.SessionId}' successfully.");
-            else if (result.Cancelled)
-                Log.Warn($"Script Session '{session.SessionId}' was cancelled.");
-            else
-                Log.Warn($"Completed Script Session '{session.SessionId}' with errors.", session.Exception);
         }
 
         private async Task<TaskResult> PreProcessSession(IServerSession session)

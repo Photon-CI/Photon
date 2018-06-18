@@ -84,9 +84,9 @@
 {{#Style}}
 <link href="{{#Url Content/outputCursor.css}}" rel="stylesheet" />
 <style>
-    .layout-content {
+    .output-toolbar {
+        height: auto;
     }
-
     .output-container {
         background: #111;
         color: #CCC;
@@ -94,36 +94,13 @@
     .inner-text {
         overflow-x: auto;
     }
-    #OutputCursor {
-        display: none;
-    }
-
     td.c-icon {
         width: 1px;
         white-space: nowrap;
     }
 
-    .output-toolbar {
-        height: auto;
-    }
-    #WrapToggle.active,
-    #TrackToggle.active {
-        color: #00FF00;
-    }
-    #WrapToggle,
-    #TrackToggle {
-        padding: 3px 4px 0 4px;
-        width: 32px;
-        height: 32px;
-    }
-    #TrackToggle svg,
-    #WrapToggle svg {
-        width: auto;
-        height: 18px;
-        display: inline-block;
-        overflow: visible;
-        fill: currentColor;
-        color: inherit;
+    #OutputCursor {
+        display: none;
     }
 
     @media (min-width: 768px) {
