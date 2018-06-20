@@ -19,11 +19,11 @@ namespace Photon.Plugins.IIS
         public void Configure(string webSiteName, string webAppPath, Action<Application> configureAction)
         {
             if (!TryFindWebSite(webSiteName, out var webSite)) {
-                handle.Context.Output.WriteBlock()
-                    .Write("WebSite ", ConsoleColor.DarkRed)
-                    .Write(webSiteName, ConsoleColor.Red)
-                    .WriteLine(" was not found!", ConsoleColor.DarkRed)
-                    .Post();
+                using (var block = handle.Context.Output.WriteBlock()) {
+                    block.Write("WebSite ", ConsoleColor.DarkRed);
+                    block.Write(webSiteName, ConsoleColor.Red);
+                    block.WriteLine(" was not found!", ConsoleColor.DarkRed);
+                }
 
                 throw new Exception($"WebSite '{webSiteName}' was not found!");
             }
@@ -32,34 +32,44 @@ namespace Photon.Plugins.IIS
                 webSite.Applications.Add(webAppPath, DefaultPhysicalPath);
                 handle.CommitChanges();
 
+                if (!TryFindWebSite(webSiteName, out webSite)) {
+                    using (var block = handle.Context.Output.WriteBlock()) {
+                        block.Write("WebSite ", ConsoleColor.DarkRed);
+                        block.Write(webSiteName, ConsoleColor.Red);
+                        block.WriteLine(" was not found!", ConsoleColor.DarkRed);
+                    }
+
+                    throw new Exception($"WebSite '{webSiteName}' was not found!");
+                }
+
                 if (!TryFind(webSite, webAppPath, out webApp)) {
-                    handle.Context.Output.WriteBlock()
-                        .Write("Unable to create Web Application ", ConsoleColor.DarkRed)
-                        .Write(webSiteName, ConsoleColor.Red)
-                        .WriteLine("!", ConsoleColor.DarkRed)
-                        .Post();
+                    using (var block = handle.Context.Output.WriteBlock()) {
+                        block.Write("Unable to create Web Application ", ConsoleColor.DarkRed);
+                        block.Write(webSiteName, ConsoleColor.Red);
+                        block.WriteLine("!", ConsoleColor.DarkRed);
+                    }
 
                     throw new Exception($"Unable to create Web Application '{webSiteName}'!");
                 }
 
-                handle.Context.Output.WriteBlock()
-                    .Write("Created new Web Application ", ConsoleColor.DarkBlue)
-                    .Write(webAppPath, ConsoleColor.Blue)
-                    .Write(" under WebSite ", ConsoleColor.DarkBlue)
-                    .Write(webSiteName, ConsoleColor.Blue)
-                    .WriteLine(".", ConsoleColor.DarkBlue)
-                    .Post();
+                using (var block = handle.Context.Output.WriteBlock()) {
+                    block.Write("Created new Web Application ", ConsoleColor.DarkBlue);
+                    block.Write(webAppPath, ConsoleColor.Blue);
+                    block.Write(" under WebSite ", ConsoleColor.DarkBlue);
+                    block.Write(webSiteName, ConsoleColor.Blue);
+                    block.WriteLine(".", ConsoleColor.DarkBlue);
+                }
             }
 
             configureAction(webApp);
 
             handle.CommitChanges();
 
-            handle.Context.Output.WriteBlock()
-                .Write("Web Application ", ConsoleColor.DarkGreen)
-                .Write(webSiteName, ConsoleColor.Green)
-                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen)
-                .Post();
+            using (var block = handle.Context.Output.WriteBlock()) {
+                block.Write("Web Application ", ConsoleColor.DarkGreen);
+                block.Write(webSiteName, ConsoleColor.Green);
+                block.WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
+            }
         }
 
         private bool TryFindWebSite(string webSiteName, out Site webSite)
