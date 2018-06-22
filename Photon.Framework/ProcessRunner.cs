@@ -80,7 +80,7 @@ namespace Photon.Framework
             return builder.ToString();
         }
 
-        private static void SplitCommand(string command, out string exe, out string args)
+        public static void SplitCommand(string command, out string exe, out string args)
         {
             if (string.IsNullOrEmpty(command)) {
                 exe = command;
@@ -92,12 +92,12 @@ namespace Photon.Framework
 
             if (firstChar == '\"') {
                 var i = command.IndexOf('\"', 1);
-                exe = i >= 0 ? command.Substring(1, i) : command;
+                exe = i >= 0 ? command.Substring(1, i - 1) : command;
                 args = i >= 0 ? command.Substring(i + 1) : string.Empty;
             }
             else if (firstChar == '\'') {
                 var i = command.IndexOf('\'', 1);
-                exe = i >= 0 ? command.Substring(1, i) : command;
+                exe = i >= 0 ? command.Substring(1, i - 1) : command;
                 args = i >= 0 ? command.Substring(i + 1) : string.Empty;
             }
             else {
@@ -105,6 +105,9 @@ namespace Photon.Framework
                 exe = i >= 0 ? command.Substring(0, i) : command;
                 args = i >= 0 ? command.Substring(i + 1) : string.Empty;
             }
+
+            exe = exe?.Trim();
+            args = args?.Trim();
         }
     }
 }

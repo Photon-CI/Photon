@@ -58,13 +58,13 @@ namespace Photon.Framework.Domain
                 }
             }
 
-            context.Output.WriteBlock()
-                .Write("Running deployment task ", ConsoleColor.DarkCyan)
-                .Write(context.TaskName, ConsoleColor.Cyan)
-                .Write(" on agent ", ConsoleColor.DarkCyan)
-                .Write(context.Agent?.Name, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan)
-                .Post();
+            using (var block = context.Output.WriteBlock()) {
+                block.Write("Running deployment task ", ConsoleColor.DarkCyan);
+                block.Write(context.TaskName, ConsoleColor.Cyan);
+                block.Write(" on agent ", ConsoleColor.DarkCyan);
+                block.Write(context.Agent?.Name, ConsoleColor.Cyan);
+                block.WriteLine("...", ConsoleColor.DarkCyan);
+            }
 
             deployTaskRegistry.ExecuteTask(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);
