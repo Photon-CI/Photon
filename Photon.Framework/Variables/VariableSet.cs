@@ -14,7 +14,7 @@ namespace Photon.Framework.Variables
 
         public VariableSet(object variable)
         {
-            this.variable = variable;
+            this.variable = variable ?? throw new ArgumentNullException(nameof(variable));
         }
 
         public object GetValue(string name)
