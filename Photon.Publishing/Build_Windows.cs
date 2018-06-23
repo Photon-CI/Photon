@@ -36,7 +36,7 @@ namespace Photon.Publishing
             await Context.RunCommandLineAsync(
                 $"\"{nunit_exe}\"",
                 "\"Photon.Tests\\bin\\Release\\Photon.Tests.dll\"",
-                "--where:cat==unit");
+                "--where=\"cat == 'unit'\"");
         }
     }
 }
