@@ -5,7 +5,7 @@ using System;
 
 namespace Photon.Tests.Variables
 {
-    [UnitTestFixture]
+    [TestFixture, UnitTest]
     public class VariableWrapperTests
     {
         private readonly VariableSet wrapper;

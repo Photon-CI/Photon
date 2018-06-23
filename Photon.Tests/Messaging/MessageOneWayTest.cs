@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Tests.Messaging
 {
-    [IntegrationTestFixture]
+    [TestFixture, IntegrationTest]
     public class MessageOneWayTests
     {
         private readonly MessageProcessorRegistry registry;

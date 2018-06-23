@@ -48,9 +48,7 @@
     <Compile Include="Extensions\ArgSplitTests.cs" />
     <Compile Include="Extensions\NetPathTests.cs" />
     <Compile Include="Extensions\StringToTests.cs" />
-    <Compile Include="Internal\IntegrationTestFixtureAttribute.cs" />
     <Compile Include="Internal\IntegrationTestAttribute.cs" />
-    <Compile Include="Internal\UnitTestFixtureAttribute.cs" />
     <Compile Include="Internal\UnitTestAttribute.cs" />
     <Compile Include="Messaging\DisconnectTests.cs" />
     <Compile Include="Messaging\MessageOneWayTest.cs" />

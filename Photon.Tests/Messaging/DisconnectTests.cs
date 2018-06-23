@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Tests.Messaging
 {
-    [IntegrationTestFixture]
+    [TestFixture, IntegrationTest]
     public class DisconnectTests
     {
         private const string Host = "localhost";

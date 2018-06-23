@@ -4,7 +4,7 @@ using Photon.Tests.Internal;
 
 namespace Photon.Tests.Extensions
 {
-    [UnitTestFixture]
+    [TestFixture, UnitTest]
     public class ArgSplitTests
     {
         [Test]

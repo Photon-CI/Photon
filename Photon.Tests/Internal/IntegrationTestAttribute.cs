@@ -2,6 +2,8 @@
 
 namespace Photon.Tests.Internal
 {
-    [Category("integration")]
-    internal class IntegrationTestAttribute : TestAttribute {}
+    internal class IntegrationTestAttribute : CategoryAttribute
+    {
+        public IntegrationTestAttribute() : base("integration") {}
+    }
 }
