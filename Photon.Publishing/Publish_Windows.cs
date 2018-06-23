@@ -1,15 +1,15 @@
-﻿using Photon.Framework;
+﻿using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using Photon.Framework;
 using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
 using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Photon.Publishing.Tasks
+namespace Photon.Publishing
 {
     public class Publish_Windows : IBuildTask
     {

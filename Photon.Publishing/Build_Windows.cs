@@ -3,7 +3,7 @@ using Photon.Framework.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.Publishing.Tasks
+namespace Photon.Publishing
 {
     public class Build_Windows : IBuildTask
     {
@@ -13,6 +13,7 @@ namespace Photon.Publishing.Tasks
         public async Task RunAsync(CancellationToken token)
         {
             await BuildSolution();
+            await UnitTest();
         }
 
         private async Task BuildSolution()
@@ -26,6 +27,16 @@ namespace Photon.Publishing.Tasks
                 "/p:Configuration=Release",
                 "/p:Platform=\"Any CPU\"",
                 "/t:Rebuild");
+        }
+
+        private async Task UnitTest()
+        {
+            var nunit_exe = Context.AgentVariables["global"]["nunit_exe"];
+
+            await Context.RunCommandLineAsync(
+                $"\"{nunit_exe}\"",
+                "\"Photon.Tests\\bin\\Release\\Photon.Tests.dll\"",
+                "--where:cat==unit");
         }
     }
 }

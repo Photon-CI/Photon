@@ -1,9 +1,9 @@
-﻿using Photon.Framework.Agent;
-using Photon.Framework.Tasks;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework.Agent;
+using Photon.Framework.Tasks;
 
-namespace Photon.Publishing.Tasks
+namespace Photon.Publishing
 {
     public class Build_Linux : IBuildTask
     {
