@@ -15,12 +15,15 @@ namespace Photon.Server.ViewHandlers.Build
         {
             var vm = new BuildNewVM {
                 ProjectId = GetQuery("project"),
-                GitRefspec = GetQuery("refspec"),
                 TaskName = GetQuery("task"),
                 TaskRoles = GetQuery("roles"),
                 PreBuildCommand = GetQuery("prebuild"),
                 AssemblyFilename = GetQuery("assembly"),
             };
+
+            var qRefspec = GetQuery("refspec");
+            if (!string.IsNullOrEmpty(qRefspec))
+                vm.GitRefspec = qRefspec;
 
             try {
                 vm.Build();

@@ -2,11 +2,81 @@
 
 {{#Script}}
 <script>
+    var showAdvanced = false;
+
     $(function () {
         $('#layoutNavbarContent [data-link="builds"]').addClass('active');
+
+        updateTaskDetails();
     });
+
+    function toggleAdvanced() {
+        showAdvanced = !showAdvanced;
+
+        if (showAdvanced) {
+            updateTaskDetails();
+
+            $('.row.simple, .opt-simple').hide();
+            $('.row.advanced').css('display', 'flex');
+            $('.opt-advanced').show();
+            $('#AdvancedButton').text('Simple');
+        } else {
+            // TODO
+
+            $('.row.simple').css('display', 'flex');
+            $('.opt-simple').show();
+            $('.row.advanced, .opt-advanced').hide();
+            $('.row.advanced, .opt-advanced').hide();
+            $('#AdvancedButton').text('Advanced');
+        }
+    }
+
+    function onTaskSelect() {
+        updateTaskDetails();
+    }
+
+    function updateTaskDetails() {
+        var taskName = $('#TaskNameSelect').val();
+
+        var taskDetails = findTaskDetails(taskName);
+        if (taskDetails == null) {
+            $('#TaskDescription').hide();
+            return;
+        }
+
+        $('#TaskNameText').val(taskName);
+        $('#TaskRolesText').val(taskDetails.roles);
+
+        $('#TaskDescription').toggle(!!taskDetails.description);
+        $('#TaskDescriptionText').text(taskDetails.description);
+    }
+
+    function findTaskDetails(taskName) {
+        var taskListJson = $('#BuildTaskJson').val();
+        var taskList = JSON.parse(taskListJson);
+
+        return taskList.find(function(e) {
+            return e.name === taskName;
+        });
+    }
+
+    function onSubmit() {
+        if (!showAdvanced) {
+            updateTaskDetails();
+        }
+    }
 </script>
 {{#EndScript}}
+
+{{#Style}}
+<style>
+    #TaskDescription,
+    .row.advanced,
+    .opt-advanced {
+        display: none;
+    }
+</style>
+{{#EndStyle}}
 
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto">
@@ -16,8 +86,9 @@
     </div>
 </nav>
 
-<form method="post">
-    <input type="hidden" Name="ProjectId" value="{{ProjectId}}"/>
+<form method="post" onsubmit="onSubmit()">
+    <input type="hidden" name="ProjectId" value="{{ProjectId}}" />
+    <input type="hidden" id="BuildTaskJson" value="{{BuildTaskJson}}"/>
     <div class="container mt-3">
         {{#If Errors}}
         <div class="alert alert-danger">
@@ -30,33 +101,53 @@
         {{#EndIf}}
         <div class="row">
             <div class="col-12 col-lg-6 form-group">
-                <label for="RefspecText">Git Refspec</label>
-                <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" autocomplete="true" spellcheck="false" />
-                <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
+                <div class="opt-simple">
+                    <label for="TaskNameSelect">Task Name</label>
+                    <select id="TaskNameSelect" class="form-control" onchange="onTaskSelect()">
+                        {{#Each BuildTasks.task}}
+                        <option value="{{task.Name}}">{{task.Name}}</option>
+                        {{#EndEach}}
+                    </select>
+                </div>
+                <div class="opt-advanced">
+                    <label for="TaskNameText">Task Name</label>
+                    <input id="TaskNameText" name="TaskName" type="text" list="BuildTaskList" class="form-control" value="{{TaskName}}" />
+                    <datalist id="BuildTaskList">
+                        {{#Each BuildTasks.task}}
+                        <option value="{{task.Name}}">{{task.Name}}</option>
+                        {{#EndEach}}
+                    </datalist>
+                </div>
+                <small class="text-muted">A predefined build task to run.</small>
             </div>
             <div class="col-12 col-lg-6 form-group">
-                <label for="TaskNameText">Task Name</label>
-                <input id="TaskNameText" name="TaskName" type="text" class="form-control" value="{{TaskName}}" autocomplete="true" spellcheck="false" />
-                <small class="text-muted">The name of the <i>IBuildTask</i> method to run.</small>
+                <label for="RefspecText">Git Refspec</label>
+                <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" autocomplete="on" spellcheck="false" />
+                <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
             </div>
         </div>
-        <div class="row">
+        <div class="row simple">
+            <div class="col-12">
+                <span id="TaskDescription" class="text-info">
+                    <i class="fas fa-info-circle"></i>&nbsp;<i id="TaskDescriptionText"></i>
+                </span>
+            </div>
         </div>
-        <div class="row">
+        <div class="row advanced">
             <div class="col-12 form-group">
                 <label for="TaskRolesText">Task Roles</label>
                 <input id="TaskRolesText" name="TaskRoles" type="text" class="form-control" value="{{TaskRoles}}" autocomplete="true" spellcheck="false" />
                 <small class="text-muted">A list of Agent Roles that the task may be run on. Separate multiple entries using '<code>,</code>' or '<code>;</code>'.</small>
             </div>
         </div>
-        <div class="row">
+        <div class="row advanced">
             <div class="col-12 form-group">
                 <label for="PreBuildText">PreBuild Command</label>
                 <input id="PreBuildText" name="PreBuildCommand" type="text" class="form-control" value="{{PreBuildCommand}}" autocomplete="false" spellcheck="false" />
                 <small class="text-muted">A (optional) command that is run to build the publishing assembly.</small>
             </div>
         </div>
-        <div class="row">
+        <div class="row advanced">
             <div class="col-12 form-group">
                 <label for="AssemblyText">Assembly Filename</label>
                 <input id="AssemblyText" name="AssemblyFilename" type="text" class="form-control" value="{{AssemblyFilename}}" autocomplete="false" spellcheck="false" />
@@ -65,7 +156,10 @@
         </div>
         <hr />
         <div class="float-right">
-            <a href="{{#Url builds}}" class="btn btn-dark">Cancel</a>
+            <a href="{{#Url builds}}" class="btn btn-light">Back</a>
+            <button id="AdvancedButton" type="button" class="btn btn-light" onclick="toggleAdvanced()">
+                Advanced
+            </button>
             <button type="submit" class="btn btn-success">
                 Build <i class="fas fa-play"></i>
             </button>
