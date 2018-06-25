@@ -1,12 +1,12 @@
-﻿using Photon.Library.HttpMessages;
+﻿using Newtonsoft.Json;
+using Photon.Framework.Projects;
+using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Photon.Framework.Projects;
 
 namespace Photon.Server.ViewModels.Build
 {

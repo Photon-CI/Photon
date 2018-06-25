@@ -6,6 +6,8 @@
 
     $(function () {
         $('#layoutNavbarContent [data-link="builds"]').addClass('active');
+
+        updateTaskDetails();
     });
 
     function toggleAdvanced() {
@@ -13,9 +15,6 @@
 
         if (showAdvanced) {
             updateTaskDetails();
-
-            //var taskName = $('#TaskNameSelect').val();
-            //$('#TaskNameText').val(taskName);
 
             $('.row.simple, .opt-simple').hide();
             $('.row.advanced').css('display', 'flex');
@@ -40,11 +39,16 @@
         var taskName = $('#TaskNameSelect').val();
 
         var taskDetails = findTaskDetails(taskName);
-        if (taskDetails == null) return;
+        if (taskDetails == null) {
+            $('#TaskDescription').hide();
+            return;
+        }
 
         $('#TaskNameText').val(taskName);
-        //$('#RefspecText').val(task.refspec);
         $('#TaskRolesText').val(taskDetails.roles);
+
+        $('#TaskDescription').toggle(!!taskDetails.description);
+        $('#TaskDescriptionText').text(taskDetails.description);
     }
 
     function findTaskDetails(taskName) {
@@ -66,9 +70,8 @@
 
 {{#Style}}
 <style>
-    .row.advanced {
-        display: none;
-    }
+    #TaskDescription,
+    .row.advanced,
     .opt-advanced {
         display: none;
     }
@@ -119,8 +122,15 @@
             </div>
             <div class="col-12 col-lg-6 form-group">
                 <label for="RefspecText">Git Refspec</label>
-                <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" autocomplete="off" spellcheck="false" />
+                <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" autocomplete="on" spellcheck="false" />
                 <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
+            </div>
+        </div>
+        <div class="row simple">
+            <div class="col-12">
+                <span id="TaskDescription" class="text-info">
+                    <i class="fas fa-info-circle"></i>&nbsp;<i id="TaskDescriptionText"></i>
+                </span>
             </div>
         </div>
         <div class="row advanced">
