@@ -29,12 +29,16 @@ namespace Photon.Framework.Projects
         [JsonConverter(typeof(ProjectSourceSerializer))]
         public IProjectSource Source {get; set;}
 
-        [JsonProperty("environments", Order = 8)]
+        [JsonProperty("buildTasks", Order = 8)]
+        public List<ProjectBuildTask> BuildTasks {get; set;}
+
+        [JsonProperty("environments", Order = 9)]
         public List<ProjectEnvironment> Environments {get; set;}
 
 
         public Project()
         {
+            BuildTasks = new List<ProjectBuildTask>();
             Environments = new List<ProjectEnvironment>();
         }
     }
