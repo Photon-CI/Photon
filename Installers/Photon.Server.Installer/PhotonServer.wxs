@@ -109,11 +109,11 @@
 			  <ServiceInstall Id="ServiceInstaller" Name="Photon.Server" Type="ownProcess" DisplayName="Photon Server" Description="Primary Server instance for Photon." Start="auto" ErrorControl="normal" />
 			  <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="Photon.Server" Wait="yes" />
 			</Component>
-		  <Component Id="RegistryComponents" Guid="679F3BBF-5515-46E2-BEC0-C103166EF130">
+		  <!--<Component Id="RegistryComponents" Guid="679F3BBF-5515-46E2-BEC0-C103166EF130">
 		    <RegistryKey Root="HKLM" Key="SOFTWARE\Photon\Server" Action="createAndRemoveOnUninstall">
 		      <RegistryValue Name="FirewallException" Value="[CREATEFIREWALLEXCEPTION]" Type="integer" />
 		    </RegistryKey>
-		  </Component>
+		  </Component>-->
 		  <Component Id="FirewallException" Guid="3CBE654C-871B-423F-8357-D2B4E1E1DBA6" KeyPath="yes">
 		    <Condition>CREATEFIREWALLEXCEPTION</Condition>
 		    <firewall:FirewallException Id="PhotonServerFirewallException" File="PhotonServer.exe" Name="Photon Server" Protocol="tcp" Scope="any" IgnoreFailure="yes" />
