@@ -34,7 +34,7 @@ namespace Photon.Publishing
 
             nugetPackageDir = Path.Combine(Context.WorkDirectory, "Packages");
             nugetApiKey = Context.ServerVariables["global"]["nuget.apiKey"];
-            nugetExe = Context.AgentVariables["global"]["nuget.exe"];
+            nugetExe = Path.Combine(Context.ContentDirectory, "bin", "NuGet.exe"); //Context.AgentVariables["global"]["nuget.exe"];
             apiUrl = photonVars["apiUrl"];
             ftpUrl = photonVars["ftp.url"];
             ftpUser = photonVars["ftp.user"];
