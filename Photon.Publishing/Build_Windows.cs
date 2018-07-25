@@ -24,7 +24,7 @@ namespace Photon.Publishing
                 //".\\bin\\msbuild.cmd", "/m", "/v:m",
                 $"\"{msbuild_exe}\"",
                 "Photon.sln", "/m", "/v:m",
-                "/p:Configuration=Release",
+                "/p:Configuration=\"Release\"",
                 "/p:Platform=\"Any CPU\"",
                 "/t:Rebuild");
         }
