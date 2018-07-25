@@ -25,20 +25,22 @@ namespace Photon.Framework.Domain
 
         public void RunCommandLine(string command)
         {
-            Output.WriteBlock()
-                .Write("Running Command: ", ConsoleColor.DarkCyan)
-                .WriteLine(command, ConsoleColor.Cyan)
-                .Post();
+            using (var block = Output.WriteBlock()) {
+                block.Write("Running Command: ", ConsoleColor.DarkCyan);
+                block.WriteLine(command, ConsoleColor.Cyan);
+            }
 
             ProcessResult result;
             try {
-                result = ProcessRunner.Run(ContentDirectory, command, Output);
+                var runInfo = ProcessRunInfo.FromCommand(command);
+                runInfo.WorkingDirectory = ContentDirectory;
+                result = ProcessRunner.Run(runInfo, Output);
             }
             catch (Win32Exception error) when (error.ErrorCode == -2147467259) {
-                Output.WriteBlock()
-                    .Write("Command Failed!", ConsoleColor.DarkYellow)
-                    .WriteLine(" Application not found!", ConsoleColor.Yellow)
-                    .Post();
+                using (var block = Output.WriteBlock()) {
+                    block.Write("Command Failed!", ConsoleColor.DarkYellow);
+                    block.WriteLine(" Application not found!", ConsoleColor.Yellow);
+                }
 
                 throw;
             }

@@ -52,10 +52,21 @@ namespace Photon.Server.Internal.Sessions
                 contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
                 contextOutput.OnWriteRaw += (text) => Output.WriteRaw(text);
 
+                var agents = PhotonServer.Instance.Agents.All.ToArray();
+
+                if (!string.IsNullOrEmpty(EnvironmentName)) {
+                    var env = Project.Environments
+                        .FirstOrDefault(x => string.Equals(x.Name, EnvironmentName));
+
+                    if (env == null) throw new ApplicationException($"Environment '{EnvironmentName}' not found!");
+
+                    agents = agents.Where(x => env.AgentIdList.Contains(x.Id, StringComparer.OrdinalIgnoreCase)).ToArray();
+                }
+
                 var context = new ServerDeployContext {
                     DeploymentNumber = Deployment.Number,
                     Project = Project,
-                    Agents = PhotonServer.Instance.Agents.All.ToArray(),
+                    Agents = agents,
                     ProjectPackageId = ProjectPackageId,
                     ProjectPackageVersion = ProjectPackageVersion,
                     EnvironmentName = EnvironmentName,

@@ -21,8 +21,6 @@
             $('.opt-advanced').show();
             $('#AdvancedButton').text('Simple');
         } else {
-            // TODO
-
             $('.row.simple').css('display', 'flex');
             $('.opt-simple').show();
             $('.row.advanced, .opt-advanced').hide();
@@ -114,7 +112,7 @@
                     <input id="TaskNameText" name="TaskName" type="text" list="BuildTaskList" class="form-control" value="{{TaskName}}" />
                     <datalist id="BuildTaskList">
                         {{#Each BuildTasks.task}}
-                        <option value="{{task.Name}}">{{task.Name}}</option>
+                        <option value="{{task.Name}}" {{#If task.Selected}}selected{{#EndIf}}>{{task.Name}}</option>
                         {{#EndEach}}
                     </datalist>
                 </div>
@@ -122,7 +120,7 @@
             </div>
             <div class="col-12 col-lg-6 form-group">
                 <label for="RefspecText">Git Refspec</label>
-                <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" autocomplete="on" spellcheck="false" />
+                <input id="RefspecText" name="GitRefspec" type="text" class="form-control" value="{{GitRefspec}}" placeholder="master" autocomplete="on" spellcheck="false" />
                 <small class="text-muted">The branch name, tag name, or commit sha to pull.</small>
             </div>
         </div>

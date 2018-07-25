@@ -251,7 +251,9 @@ namespace Photon.Agent.Internal.Session
 
         protected void RunCommandScript(string command)
         {
-            var result = ProcessRunner.Run(ContentDirectory, command, Output.Writer);
+            var runInfo = ProcessRunInfo.FromCommand(command);
+            runInfo.WorkingDirectory = ContentDirectory;
+            var result = ProcessRunner.Run(runInfo, Output.Writer);
 
             if (result.ExitCode != 0)
                 throw new ApplicationException("Process terminated with a non-zero exit code!");

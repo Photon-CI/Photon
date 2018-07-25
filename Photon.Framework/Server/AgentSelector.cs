@@ -124,7 +124,7 @@ namespace Photon.Framework.Server
             }
 
             var environmentAgents = agents
-                .Where(a => environment.AgentIdList.Any(x => string.Equals(x, a.Id, StringComparison.OrdinalIgnoreCase)))
+                .Where(a => environment.AgentIdList.Contains(a.Id, StringComparer.OrdinalIgnoreCase))
                 .ToArray();
 
             if (environmentAgents.Any())

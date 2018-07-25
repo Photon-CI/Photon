@@ -49,6 +49,29 @@
         //...
     }
 
+    function onCancelClick(btn) {
+        $(btn).prop('disabled', true);
+
+        var url = '{{#Url api/session/cancel}}?id={{&SessionId}}';
+
+        $.ajax({
+            url: url,
+            method: 'POST'
+        }).done(function() {
+            $('#CancelModal').modal('hide');
+            document.location.reload();
+        }).fail(function(xhr) {
+            console.log('Failed to cancel session!', xhr);
+            alert('Failed to cancel build!');
+        }).always(function() {
+            $(btn).prop('disabled', false);
+        });
+    }
+
+    function onDeleteClick(btn) {
+        //...
+    }
+
     function onTrackToggleClick() {
         var enableTracking = $('#TrackCheckBox').is(':checked');
 
@@ -328,7 +351,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger">Abort</button>
+                <button type="button" class="btn btn-danger" onclick="onCancelClick(this)">Abort</button>
             </div>
         </div>
     </div>
@@ -348,7 +371,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-danger" onclick="onDeleteClick(this)">Delete</button>
             </div>
         </div>
     </div>

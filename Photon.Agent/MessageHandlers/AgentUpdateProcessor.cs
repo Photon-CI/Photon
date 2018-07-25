@@ -54,9 +54,13 @@ namespace Photon.Agent.MessageHandlers
             Log.Debug("Starting agent update...");
 
             try {
-                var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
+                var runInfo = new ProcessRunInfo {
+                    Filename = "msiexec.exe",
+                    Arguments = $"/i \"{msiFilename}\" /passive /l*vx \"log.txt\"",
+                    WorkingDirectory = updatePath,
+                };
 
-                using (var process = ProcessRunner.Start(updatePath, cmd)) {
+                using (var process = ProcessRunner.Start(runInfo)) {
                     if (process == null)
                         throw new ApplicationException("Failed to start process!");
                 }

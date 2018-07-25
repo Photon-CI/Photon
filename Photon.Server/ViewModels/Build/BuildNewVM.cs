@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Photon.Framework.Projects;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
@@ -14,7 +13,7 @@ namespace Photon.Server.ViewModels.Build
     {
         public string ProjectId {get; set;}
 
-        public ProjectBuildTask[] BuildTasks {get; private set;}
+        public BuildTaskRow[] BuildTasks {get; private set;}
 
         public string TaskName {get; set;}
         public string GitRefspec {get; set;}
@@ -31,7 +30,6 @@ namespace Photon.Server.ViewModels.Build
         public BuildNewVM()
         {
             PageTitle = "Photon Server New Build";
-            GitRefspec = "master";
         }
 
         public void Build()
@@ -44,7 +42,11 @@ namespace Photon.Server.ViewModels.Build
 
             ProjectFound = true;
             ProjectName = projectDesc.Name;
-            BuildTasks = projectDesc.BuildTasks?.ToArray();
+            BuildTasks = projectDesc.BuildTasks?
+                .Select(x => new BuildTaskRow {
+                    Name = x.Name,
+                    Selected = string.Equals(TaskName, x.Name, StringComparison.OrdinalIgnoreCase),
+                }).ToArray();
 
             if (PreBuildCommand == null)
                 PreBuildCommand = projectDesc.PreBuild;
@@ -70,14 +72,14 @@ namespace Photon.Server.ViewModels.Build
             if (string.IsNullOrWhiteSpace(TaskName))
                 throw new ApplicationException("'Task Name' is undefined!");
 
-            if (string.IsNullOrWhiteSpace(GitRefspec))
-                throw new ApplicationException("'Refspec' is undefined!");
-
             var _roles = TaskRoles.Split(new[] {',', ';'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim()).ToArray();
 
             if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out var project))
                 throw new ApplicationException($"Project '{ProjectId}' was not found!");
+
+            if (string.IsNullOrEmpty(GitRefspec))
+                GitRefspec = "master";
 
             var build = await project.StartNewBuild();
             build.TaskName = TaskName;
@@ -104,6 +106,12 @@ namespace Photon.Server.ViewModels.Build
 
             ServerSessionId = session.SessionId;
             BuildNumber = session.Build.Number;
+        }
+
+        public class BuildTaskRow
+        {
+            public string Name {get; set;}
+            public bool Selected {get; set;}
         }
     }
 }

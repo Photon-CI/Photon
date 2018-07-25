@@ -3,46 +3,96 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework
 {
+    public class ProcessRunInfo
+    {
+        public string Filename {get; set;}
+        public string Arguments {get; set;}
+        public string WorkingDirectory {get; set;}
+        public bool EchoCommand {get; set;}
+
+
+        public static ProcessRunInfo FromCommand(string command)
+        {
+            FromCommandInner(command, out var filename, out var arguments);
+
+            filename = filename?.Trim();
+            arguments = arguments?.Trim();
+
+            if (string.IsNullOrEmpty(arguments))
+                arguments = null;
+
+            return new ProcessRunInfo {
+                Filename = filename,
+                Arguments = arguments,
+            };
+        }
+
+        private static void FromCommandInner(string command, out string filename, out string arguments)
+        {
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException(nameof(command));
+
+            var firstChar = command[0];
+            var i = -1;
+
+            if (firstChar == '\"') {
+                i = command.IndexOf('\"', 1);
+            }
+            else if (firstChar == '\'') {
+                i = command.IndexOf('\'', 1);
+            }
+
+            if (i >= 0) {
+                filename = command.Substring(1, i - 1);
+                arguments = command.Substring(i + 1);
+                return;
+            }
+
+            i = command.IndexOf(' ');
+
+            filename = i >= 0 ? command.Substring(0, i) : command;
+            arguments = i >= 0 ? command.Substring(i + 1) : null;
+        }
+    }
+
     public static class ProcessRunner
     {
-        public static Process Start(string workDir, string filename, string arguments)
+        public static Process Start(ProcessRunInfo info)
         {
-            if (filename == null) throw new ArgumentNullException(nameof(filename));
+            if (info.Filename == null) throw new ArgumentNullException(nameof(info.Filename));
 
-            var parts = filename.Split(Path.DirectorySeparatorChar);
+            var parts = info.Filename.Split(Path.DirectorySeparatorChar);
             var firstPart = parts.FirstOrDefault();
 
             if (firstPart == "." || firstPart == "..") {
-                filename = Path.Combine(workDir, filename);
-                filename = Path.GetFullPath(filename);
+                info.Filename = Path.Combine(info.WorkingDirectory, info.Filename);
+                info.Filename = Path.GetFullPath(info.Filename);
             }
 
             var startInfo = new ProcessStartInfo {
-                FileName = filename,
-                Arguments = arguments,
-                WorkingDirectory = workDir,
+                FileName = info.Filename,
+                Arguments = info.Arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
             };
 
+            if (!string.IsNullOrEmpty(info.WorkingDirectory))
+                startInfo.WorkingDirectory = info.WorkingDirectory;
+
             return Process.Start(startInfo);
         }
 
-        public static Process Start(string workDir, string command)
+        public static ProcessResult Run(ProcessRunInfo info, IWriteAnsi output = null, CancellationToken token = default(CancellationToken))
         {
-            SplitCommand(command, out var _file, out var _args);
-            return Start(workDir, _file, _args);
-        }
-
-        public static ProcessResult Run(string workDir, string filename, string arguments, IWriteAnsi output = null)
-        {
-            using (var process = Start(workDir, filename, arguments)) {
+            using (var process = Start(info))
+            using (token.Register(() => process.Kill())) {
                 if (process == null)
                     throw new ApplicationException("Failed to start process!");
 
@@ -60,12 +110,6 @@ namespace Photon.Framework
             }
         }
 
-        public static ProcessResult Run(string workDir, string command, IWriteAnsi output = null)
-        {
-            SplitCommand(command, out var _file, out var _args);
-            return Run(workDir, _file, _args, output);
-        }
-
         private static async Task<string> ReadToOutput(StreamReader reader, IWriteAnsi output, ConsoleColor color)
         {
             var builder = new StringBuilder();
@@ -78,36 +122,6 @@ namespace Photon.Framework
             }
 
             return builder.ToString();
-        }
-
-        public static void SplitCommand(string command, out string exe, out string args)
-        {
-            if (string.IsNullOrEmpty(command)) {
-                exe = command;
-                args = string.Empty;
-                return;
-            }
-
-            var firstChar = command[0];
-
-            if (firstChar == '\"') {
-                var i = command.IndexOf('\"', 1);
-                exe = i >= 0 ? command.Substring(1, i - 1) : command;
-                args = i >= 0 ? command.Substring(i + 1) : string.Empty;
-            }
-            else if (firstChar == '\'') {
-                var i = command.IndexOf('\'', 1);
-                exe = i >= 0 ? command.Substring(1, i - 1) : command;
-                args = i >= 0 ? command.Substring(i + 1) : string.Empty;
-            }
-            else {
-                var i = command.IndexOf(' ');
-                exe = i >= 0 ? command.Substring(0, i) : command;
-                args = i >= 0 ? command.Substring(i + 1) : string.Empty;
-            }
-
-            exe = exe?.Trim();
-            args = args?.Trim();
         }
     }
 }

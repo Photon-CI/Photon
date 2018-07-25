@@ -58,9 +58,13 @@ namespace Photon.Server.ApiHandlers.Server
             Log.Debug("Starting server update...");
 
             try {
-                var cmd = $"msiexec.exe /i \"{msiFilename}\" /passive /l*vx \"log.txt\"";
+                var runInfo = new ProcessRunInfo {
+                    Filename = "msiexec.exe",
+                    Arguments = $"/i \"{msiFilename}\" /passive /l*vx \"log.txt\"",
+                    WorkingDirectory = updatePath,
+                };
 
-                ProcessRunner.Start(updatePath, cmd);
+                ProcessRunner.Start(runInfo);
 
                 Log.Info("Server update started.");
             }

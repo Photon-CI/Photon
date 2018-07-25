@@ -52,7 +52,14 @@ namespace Photon.NuGetPlugin
                     args.Add($"-Prop {prop.Key}=\"{prop.Value}\"");
 
                 var argStr = string.Join(" ", args);
-                var result = ProcessRunner.Run(path, ExeFilename, argStr, Output);
+
+                var runInfo = new ProcessRunInfo {
+                    Filename = ExeFilename,
+                    Arguments = argStr,
+                    WorkingDirectory = path,
+                };
+
+                var result = ProcessRunner.Run(runInfo, Output);
 
                 if (result.ExitCode != 0)
                     throw new ApplicationException($"NuGet Pack failed with exit code {result.ExitCode}!");
@@ -88,7 +95,13 @@ namespace Photon.NuGetPlugin
                     $"-Source \"{SourceUrl}\"",
                     $"-ApiKey \"{ApiKey}\"");
 
-                var result = ProcessRunner.Run(path, ExeFilename, args, Output);
+                var runInfo = new ProcessRunInfo {
+                    Filename = ExeFilename,
+                    Arguments = args,
+                    WorkingDirectory = path,
+                };
+
+                var result = ProcessRunner.Run(runInfo, Output);
 
                 if (result.ExitCode != 0) {
                     if (existsExp.IsMatch(result.Error)) {

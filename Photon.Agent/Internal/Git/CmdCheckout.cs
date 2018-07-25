@@ -64,7 +64,14 @@ namespace Photon.Agent.Internal.Git
         private ProcessResult GitCmd(string root, string arguments)
         {
             Output.WriteLine($" > git {arguments}", ConsoleColor.White);
-            return ProcessRunner.Run(root, Exe, arguments, Output);
+
+            var runInfo = new ProcessRunInfo {
+                Filename = Exe,
+                Arguments = arguments,
+                WorkingDirectory = root,
+            };
+
+            return ProcessRunner.Run(runInfo, Output);
         }
     }
 }

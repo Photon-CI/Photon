@@ -13,7 +13,6 @@ namespace Photon.Server.ViewModels.Deployment
         public string PackageId {get; set;}
         public string PackageVersion {get; set;}
         public string EnvironmentName {get; set;}
-        //public string ScriptName {get; set;}
         public uint DeploymentNumber {get; private set;}
         public string ServerSessionId {get; private set;}
 
@@ -42,7 +41,6 @@ namespace Photon.Server.ViewModels.Deployment
             ProjectId = form[nameof(ProjectId)];
             PackageId = form[nameof(PackageId)];
             PackageVersion = form[nameof(PackageVersion)];
-            //ScriptName = form[nameof(ScriptName)];
             EnvironmentName = form[nameof(EnvironmentName)];
         }
 
@@ -61,7 +59,6 @@ namespace Photon.Server.ViewModels.Deployment
             deployment.PackageId = PackageId;
             deployment.PackageVersion = PackageVersion;
             deployment.EnvironmentName = EnvironmentName;
-            //deployment.ScriptName = ?;
 
             var session = new ServerDeploySession {
                 Project = project.Description,
@@ -69,7 +66,6 @@ namespace Photon.Server.ViewModels.Deployment
                 ProjectPackageId = PackageId,
                 ProjectPackageVersion = PackageVersion,
                 ProjectPackageFilename = packageFilename,
-                //ScriptName = ScriptName,
                 EnvironmentName = EnvironmentName,
             };
 

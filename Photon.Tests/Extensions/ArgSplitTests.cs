@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using Photon.Framework;
 using Photon.Tests.Internal;
+using System;
 
 namespace Photon.Tests.Extensions
 {
@@ -8,67 +9,71 @@ namespace Photon.Tests.Extensions
     public class ArgSplitTests
     {
         [Test]
-        public void IsNull()
+        public void IsNull_ThrowsException()
         {
-            ProcessRunner.SplitCommand(null, out var exe, out var args);
-            Assert.That(exe, Is.Null);
-            Assert.That(args, Is.EqualTo(string.Empty));
+            Assert.Throws<ArgumentNullException>(() => ProcessRunInfo.FromCommand(null));
         }
 
         [Test]
-        public void IsEmpty()
+        public void IsEmpty_ThrowsException()
         {
-            ProcessRunner.SplitCommand(null, out var exe, out var args);
-            Assert.That(exe, Is.Null);
-            Assert.That(args, Is.EqualTo(string.Empty));
+            Assert.Throws<ArgumentNullException>(() => ProcessRunInfo.FromCommand(string.Empty));
+        }
+
+        [Test]
+        public void SplitNoQuotes_WhitespaceArgs()
+        {
+            var info = ProcessRunInfo.FromCommand("program ");
+            Assert.That(info.Filename, Is.EqualTo("program"));
+            Assert.That(info.Arguments, Is.Null);
         }
 
         [Test]
         public void SplitNoQuotes()
         {
-            ProcessRunner.SplitCommand("program arg1 arg2", out var exe, out var args);
-            Assert.That(exe, Is.EqualTo("program"));
-            Assert.That(args, Is.EqualTo("arg1 arg2"));
+            var info = ProcessRunInfo.FromCommand("program arg1 arg2");
+            Assert.That(info.Filename, Is.EqualTo("program"));
+            Assert.That(info.Arguments, Is.EqualTo("arg1 arg2"));
         }
 
         [Test]
         public void SplitWithQuotes()
         {
-            ProcessRunner.SplitCommand("\"program\" arg1 arg2", out var exe, out var args);
-            Assert.That(exe, Is.EqualTo("program"));
-            Assert.That(args, Is.EqualTo("arg1 arg2"));
+            var info = ProcessRunInfo.FromCommand("\"program\" arg1 arg2");
+            Assert.That(info.Filename, Is.EqualTo("program"));
+            Assert.That(info.Arguments, Is.EqualTo("arg1 arg2"));
         }
 
         [Test]
         public void SplitNoQuotes_NoArgs()
         {
-            ProcessRunner.SplitCommand("program", out var exe, out var args);
-            Assert.That(exe, Is.EqualTo("program"));
-            Assert.That(args, Is.EqualTo(string.Empty));
+            var info = ProcessRunInfo.FromCommand("program");
+            Assert.That(info.Filename, Is.EqualTo("program"));
+            Assert.That(info.Arguments, Is.Null);
         }
 
         [Test]
         public void SplitWithQuotes_NoArgs()
         {
-            ProcessRunner.SplitCommand("\"program\"", out var exe, out var args);
-            Assert.That(exe, Is.EqualTo("program"));
-            Assert.That(args, Is.EqualTo(string.Empty));
+            var info = ProcessRunInfo.FromCommand("\"program\"");
+            Assert.That(info.Filename, Is.EqualTo("program"));
+            Assert.That(info.Arguments, Is.Null);
         }
 
         [Test]
         public void TrimExeQuotes()
         {
-            ProcessRunner.SplitCommand("\" program \" arg1 arg2", out var exe, out var args);
-            Assert.That(exe, Is.EqualTo("program"));
-            Assert.That(args, Is.EqualTo("arg1 arg2"));
+            var info = ProcessRunInfo.FromCommand("\" program \" arg1 arg2");
+            Assert.That(info.Filename, Is.EqualTo("program"));
+            Assert.That(info.Arguments, Is.EqualTo("arg1 arg2"));
         }
 
         [Test]
         public void TrimArgs()
         {
-            ProcessRunner.SplitCommand("program   arg1   arg2", out var exe, out var args);
-            Assert.That(exe, Is.EqualTo("program"));
-            Assert.That(args, Is.EqualTo("arg1   arg2"));
+            var info = ProcessRunInfo.FromCommand("program   arg1   arg2");
+            Assert.That(info.Filename, Is.EqualTo("program"));
+            Assert.That(info.Arguments, Is.EqualTo("arg1   arg2"));
         }
     }
 }

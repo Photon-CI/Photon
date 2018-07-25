@@ -147,7 +147,7 @@
       </Component>
       <Component Id="FirewallException" Guid="C2CC1E1E-7DC8-451C-8708-F105F383EE11" KeyPath="yes">
         <Condition>CREATEFIREWALLEXCEPTION</Condition>
-        <firewall:FirewallException Id="PhotonAgentFirewallException" File="PhotonAgent.exe" Name="Photon Agent" Scope="any" />
+        <firewall:FirewallException Id="PhotonAgentFirewallException" File="PhotonAgent.exe" Name="Photon Agent" Scope="any" IgnoreFailure="yes" />
       </Component>
       <Component Id="PhotonAgent.exe.config" Guid="">
         <File Id="PhotonAgent.exe.config" Name="PhotonAgent.exe.config" Source="$(var.PhotonAgent_TargetDir)PhotonAgent.exe.config" />
