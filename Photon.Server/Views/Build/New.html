@@ -101,9 +101,9 @@
             <div class="col-12 col-lg-6 form-group">
                 <div class="opt-simple">
                     <label for="TaskNameSelect">Task Name</label>
-                    <select id="TaskNameSelect" class="form-control" onchange="onTaskSelect()">
+                    <select id="TaskNameSelect" name="TaskName" class="form-control" onchange="onTaskSelect()">
                         {{#Each BuildTasks.task}}
-                        <option value="{{task.Name}}">{{task.Name}}</option>
+                        <option value="{{task.Name}}" {{#If task.Selected}}selected{{#EndIf}}>{{task.Name}}</option>
                         {{#EndEach}}
                     </select>
                 </div>

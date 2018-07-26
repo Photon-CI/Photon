@@ -38,6 +38,8 @@
       <ComponentGroupRef Id="Views_Build_files" />
       <ComponentGroupRef Id="Views_Deployment_files" />
 		</Feature>
+    
+    <Property Id="CREATEFIREWALLEXCEPTION" Value="yes" Secure="yes" />
 
     <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
     <CustomAction Id="SetPhotonUrl" BinaryKey="ConfigTools" DllEntry="LoadServerUrl" Impersonate="yes" />

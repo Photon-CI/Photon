@@ -13,13 +13,13 @@
     function onSearchChanged() {
         var searchText = $('#SearchTextBox').val();
 
-        $('div[data-card-name]').each(function (i, e) {
+        $('#AgentTable tr').each(function (i, e) {
             var visible = false;
 
             if (searchText.length === 0) {
                 visible = true;
             } else {
-                var name = $(e).attr('data-card-name');
+                var name = $(e).attr('data-agent');
 
                 if (name.match(new RegExp(searchText, "i")))
                     visible = true;
@@ -28,49 +28,31 @@
             $(e).toggle(visible);
         });
     }
+
+    function onRowClick(row) {
+        var agentId = $(row).attr('data-id');
+
+        document.location = '{{#Url Agent/Edit}}?id='
+            + encodeURIComponent(agentId);
+    }
 </script>
 {{#EndScript}}
 
 {{#Style}}
 <style>
-    .layout-content > .container-fluid {
-        padding: 0;
+    #AgentTable tr {
+        cursor: pointer;
     }
-
-    .card-container {
-        margin: -4px 8px;
-        padding: 0;
+    .c-icon {
+        width: 0;
+        white-space: nowrap;
     }
-
-    .agent-card {
-        margin: 4px 4px;
-        min-height: 120px;
-    }
-
-        .agent-card .card-body {
-            padding: 8px;
-        }
-
     .agent-status-holder {
         width: 32px;
         display: inline-block;
         text-align: center;
         vertical-align: top;
         font-size: 24px;
-    }
-
-    .agent-name-holder {
-        display: inline-block;
-        line-height: 20px;
-    }
-
-    .agent-name {
-        margin: 0;
-        display: inline-block;
-    }
-
-    .agent-address {
-        display: inline-block;
     }
 </style>
 {{#EndStyle}}
@@ -94,7 +76,38 @@
     </div>
 </nav>
 
-<div class="container-fluid mt-3">
+<div class="container">
+    {{#If !Agents}}
+    <div class="container px-3 py-0">
+        <h3 class="py-0 text-muted">No Agents have been defined.</h3>
+        <p>
+            Agents are required for executing Build and Deployment scripts.
+            Create a <a href="{{#Url agent/edit}}">new Agent</a>.
+        </p>
+    </div>
+    {{#Else}}
+    <table id="AgentTable" class="table table-hover table-sm">
+        {{#Each Agents.agent}}
+        <tr data-agent="{{agent.Name}}" data-id="{{agent.Id}}" onclick="onRowClick(this)">
+            <td class="c-icon">
+                <i class="fas fa-check-circle text-success"></i>
+            </td>
+            <td>
+                <b>{{agent.Name}}</b>
+                <!--<a href="{{#Url Agent/Edit}}?id={{&agent.Id}}"></a>-->
+            </td>
+            <td>
+                {{#Each agent.Roles.role}}
+                <div class="badge badge-dark">{{role}}</div>
+                {{#EndEach}}
+            </td>
+        </tr>
+        {{#EndEach}}
+    </table>
+    {{#EndIf}}
+</div>
+
+<!--<div class="container-fluid mt-3">
     {{#If !Agents}}
     <div class="container px-3 py-0">
         <h3 class="py-0 text-muted">No Agents have been defined.</h3>
@@ -128,4 +141,4 @@
         </div>
         {{#EndEach}}
     </div>
-</div>
+</div>-->

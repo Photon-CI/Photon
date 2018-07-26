@@ -11,7 +11,8 @@ namespace Photon.Server.ViewModels.Agent
 
         public void Build()
         {
-            Agents = PhotonServer.Instance.Agents.All.ToArray();
+            Agents = PhotonServer.Instance.Agents.All
+                .OrderBy(x => x.Name).ToArray();
         }
     }
 }

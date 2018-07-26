@@ -33,6 +33,7 @@
     <!--<Property Id="CREATEFIREWALLEXCEPTION" Secure="yes" Value="1">
       <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="FirewallException" />
     </Property>-->
+    <Property Id="CREATEFIREWALLEXCEPTION" Value="yes" Secure="yes" />
     <Property Id="WixShellExecTarget" Value="[PHOTON_URL]" />
     <Binary Id="ConfigTools" SourceFile="$(var.PhotonInstallerCommon.TargetDir)Photon.Installer.Common.CA.dll" />
     <CustomAction Id="SetPhotonUrl" BinaryKey="ConfigTools" DllEntry="LoadAgentUrl" Impersonate="yes" />
