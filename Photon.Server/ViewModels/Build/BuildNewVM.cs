@@ -21,6 +21,7 @@ namespace Photon.Server.ViewModels.Build
         public string PreBuildCommand {get; set;}
         public string AssemblyFilename {get; set;}
         public string ProjectName {get; private set;}
+        public string ProjectDescription {get; private set;}
         public uint BuildNumber {get; private set;}
         public string ServerSessionId {get; private set;}
         public bool ProjectFound {get; private set;}
@@ -42,6 +43,8 @@ namespace Photon.Server.ViewModels.Build
 
             ProjectFound = true;
             ProjectName = projectDesc.Name;
+            ProjectDescription = projectDesc.Description;
+
             BuildTasks = projectDesc.BuildTasks?
                 .Select(x => new BuildTaskRow {
                     Name = x.Name,
@@ -54,7 +57,8 @@ namespace Photon.Server.ViewModels.Build
             if (AssemblyFilename == null)
                 AssemblyFilename = projectDesc.AssemblyFile;
 
-            BuildTaskJson = JsonConvert.SerializeObject(BuildTasks, Formatting.None);
+            BuildTaskJson = projectDesc.BuildTasks != null
+                ? JsonConvert.SerializeObject(projectDesc.BuildTasks, Formatting.None) : "{}";
         }
 
         public void Restore(NameValueCollection form)

@@ -13,6 +13,8 @@ namespace Photon.Server.ViewModels.Deployment
         public string PackageId {get; set;}
         public string PackageVersion {get; set;}
         public string EnvironmentName {get; set;}
+        public string ProjectName {get; set;}
+        public string ProjectDescription {get; set;}
         public uint DeploymentNumber {get; private set;}
         public string ServerSessionId {get; private set;}
 
@@ -28,6 +30,9 @@ namespace Photon.Server.ViewModels.Deployment
         {
             if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out var project))
                 throw new ApplicationException($"Project '{ProjectId}' not found!");
+
+            ProjectName = project.Description.Name;
+            ProjectDescription = project.Description.Description;
 
             Environments = project.Description.Environments
                 .Select(x => new DeploymentEnvironmentRow {

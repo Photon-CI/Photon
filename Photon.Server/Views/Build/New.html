@@ -35,18 +35,18 @@
 
     function updateTaskDetails() {
         var taskName = $('#TaskNameSelect').val();
+        $('#TaskNameText').val(taskName);
 
         var taskDetails = findTaskDetails(taskName);
-        if (taskDetails == null) {
+
+        if (!!taskDetails) {
+            $('#TaskRolesText').val(taskDetails.roles);
+
+            $('#TaskDescription').toggle(!!taskDetails.description);
+            $('#TaskDescriptionText').text(taskDetails.description);
+        } else {
             $('#TaskDescription').hide();
-            return;
         }
-
-        $('#TaskNameText').val(taskName);
-        $('#TaskRolesText').val(taskDetails.roles);
-
-        $('#TaskDescription').toggle(!!taskDetails.description);
-        $('#TaskDescriptionText').text(taskDetails.description);
     }
 
     function findTaskDetails(taskName) {
@@ -84,6 +84,11 @@
     </div>
 </nav>
 
+<div class="bg-info" style="padding: 8px 20px">
+    <h3 class="text-white m-0">{{ProjectName}}</h3>
+    <p class="text-light m-0">{{ProjectDescription}}</p>
+</div>
+
 <form method="post" onsubmit="onSubmit()">
     <input type="hidden" name="ProjectId" value="{{ProjectId}}" />
     <input type="hidden" id="BuildTaskJson" value="{{BuildTaskJson}}"/>
@@ -101,7 +106,7 @@
             <div class="col-12 col-lg-6 form-group">
                 <div class="opt-simple">
                     <label for="TaskNameSelect">Task Name</label>
-                    <select id="TaskNameSelect" name="TaskName" class="form-control" onchange="onTaskSelect()">
+                    <select id="TaskNameSelect" class="form-control" onchange="onTaskSelect()">
                         {{#Each BuildTasks.task}}
                         <option value="{{task.Name}}" {{#If task.Selected}}selected{{#EndIf}}>{{task.Name}}</option>
                         {{#EndEach}}
@@ -112,7 +117,7 @@
                     <input id="TaskNameText" name="TaskName" type="text" list="BuildTaskList" class="form-control" value="{{TaskName}}" />
                     <datalist id="BuildTaskList">
                         {{#Each BuildTasks.task}}
-                        <option value="{{task.Name}}" {{#If task.Selected}}selected{{#EndIf}}>{{task.Name}}</option>
+                        <option value="{{task.Name}}">{{task.Name}}</option>
                         {{#EndEach}}
                     </datalist>
                 </div>

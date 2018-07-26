@@ -11,32 +11,6 @@
 
     function onSubmit() {
         $('#ErrorContainer').empty();
-
-        //var projectId = $('#ProjectSelect').val();
-        //var gitRefspec = $('#RefspecText').val();
-        //var taskName = $('#TaskNameText').val();
-
-        //var request = {
-        //    project: projectId,
-        //    refspec: gitRefspec,
-        //    task: taskName
-        //};
-
-        //$.ajax({
-        //    url: buildStartUrl,
-        //    method: 'POST',
-        //    data: JSON.stringify(request)
-        //}).done(function (data) {
-        //    var buildNumber = data.buildNumber;
-
-        //    document.location = buildDetailsUrl
-        //        + '?project=' + encodeURIComponent(projectId)
-        //        + '&number=' + encodeURIComponent(buildNumber);
-        //}).fail(function() {
-        //    $('#ErrorContainer').append($('<div>')
-        //        .attr('class', 'alert alert-danger')
-        //        .append("Failed to start build!"));
-        //});
     }
 </script>
 {{#EndScript}}
@@ -48,6 +22,11 @@
         </h3>
     </div>
 </nav>
+
+<div class="bg-info" style="padding: 8px 20px">
+    <h3 class="text-white m-0">{{ProjectName}}</h3>
+    <p class="text-light m-0">{{ProjectDescription}}</p>
+</div>
 
 <form method="post">
     <input type="hidden" Name="ProjectId" value="{{ProjectId}}" />
@@ -75,20 +54,13 @@
                 <small class="text-muted">The version of the Project Package to deploy.</small>
             </div>
         </div>
-        <!--<div class="row">
-            <div class="col-12 form-group">
-                <label for="TaskNameText">Script Name</label>
-                <input id="TaskNameText" type="text" class="form-control" autocomplete="true" spellcheck="false" />
-                <small class="text-muted">The name of the <i>IDeployScript</i> class to run.</small>
-            </div>
-        </div>-->
         {{#If Environments}}
         <div class="row">
             <div class="col-12 form-group">
                 <label for="EnvironmentSelect">Environment</label>
                 <select id="EnvironmentSelect" name="EnvironmentName" class="form-control">
                     {{#Each Environments.env}}
-                    <option value="{{env.Name}}" {{#If env.Selected}}selected="selected"{{#EndIf}}>{{env.Name}}</option>
+                    <option value="{{env.Name}}" {{#If env.Selected}} selected="selected" {{#EndIf}}>{{env.Name}}</option>
                     {{#EndEach}}
                 </select>
                 <small class="text-muted">The environment where the deployment should be performed.</small>
