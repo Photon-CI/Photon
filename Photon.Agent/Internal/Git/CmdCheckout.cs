@@ -1,6 +1,7 @@
 ﻿using Photon.Framework;
 using Photon.Framework.Server;
 using System;
+using System.Web;
 
 namespace Photon.Agent.Internal.Git
 {
@@ -39,13 +40,21 @@ namespace Photon.Agent.Internal.Git
 
         private void GitClone()
         {
-            var r = GitCmd(Source.RepositoryPath, $"clone \"{Source.RepositoryUrl}\" \"{Source.RepositoryPath}\"");
-            if (r.ExitCode != 0) throw new Exception("Failed to clone repository!");
+            var result = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: $"clone \"{CredentialsUrl()}\" \"{Source.RepositoryPath}\"",
+                printArgs: $"clone \"{Source.RepositoryUrl}\"");
+
+            if (result.ExitCode != 0) throw new Exception("Failed to clone repository!");
         }
 
         private void Gitfetch()
         {
-            var r = GitCmd(Source.RepositoryPath, "fetch -p -t");
+            var r = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: $"fetch -p -t \"{CredentialsUrl()}\"",
+                printArgs: "fetch -p -t");
+
             if (r.ExitCode != 0) throw new Exception("Failed to fetch remotes!");
         }
 
@@ -57,13 +66,17 @@ namespace Photon.Agent.Internal.Git
 
         private void GitPull()
         {
-            var r = GitCmd(Source.RepositoryPath, "pull");
+            var r = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: $"pull \"{CredentialsUrl()}\"",
+                printArgs: "pull");
+
             if (r.ExitCode != 0) throw new Exception("Failed to pull updates from remote!");
         }
 
-        private ProcessResult GitCmd(string root, string arguments)
+        private ProcessResult GitCmd(string root, string arguments, string printArgs = null)
         {
-            Output.WriteLine($" > git {arguments}", ConsoleColor.White);
+            Output.WriteLine($" > git {printArgs ?? arguments}", ConsoleColor.White);
 
             var runInfo = new ProcessRunInfo {
                 Filename = Exe,
@@ -72,6 +85,20 @@ namespace Photon.Agent.Internal.Git
             };
 
             return ProcessRunner.Run(runInfo, Output);
+        }
+
+        private string CredentialsUrl()
+        {
+            var i = Source.RepositoryUrl.IndexOf("://", StringComparison.Ordinal);
+            if (i < 0) throw new ApplicationException($"Invalid URL '{Source.RepositoryUrl}'!");
+
+            var pre = Source.RepositoryUrl.Substring(0, i + 3);
+            var post = Source.RepositoryUrl.Substring(i + 3);
+
+            var eUser = HttpUtility.UrlEncode(Username);
+            var ePass = HttpUtility.UrlEncode(Password);
+
+            return string.Concat(pre, eUser, ":", ePass, "@", post);
         }
     }
 }

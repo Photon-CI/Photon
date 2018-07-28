@@ -14,6 +14,8 @@ namespace Photon.Server.ViewModels.Deployment
         public string ProjectName {get; private set;}
         public string DeploymentCreated {get; private set;}
         public string DeploymentDuration {get; private set;}
+        public string DeploymentException {get; private set;}
+        public string BuildException {get; private set;}
         public string PackageId {get; private set;}
         public string PackageVersion {get; private set;}
         public string Environment {get; private set;}
@@ -33,6 +35,7 @@ namespace Photon.Server.ViewModels.Deployment
                 if (project.Deployments.TryGet(DeploymentNumber, out var deploymentData)) {
                     DeploymentCreated = deploymentData.Created.ToLocalTime().ToString("F");
                     DeploymentDuration = deploymentData.Duration?.ToString("g");
+                    DeploymentException = deploymentData.Exception;
 
                     SessionId = deploymentData.ServerSessionId;
                     PackageId = deploymentData.PackageId;

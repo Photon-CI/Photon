@@ -14,6 +14,7 @@ namespace Photon.Server.ViewModels.Build
         public string ProjectName {get; private set;}
         public string BuildCreated {get; private set;}
         public string BuildDuration {get; private set;}
+        public string BuildException {get; private set;}
         public string GitRefspec {get; private set;}
         public string TaskName {get; private set;}
         public string TaskRoles {get; private set;}
@@ -39,6 +40,7 @@ namespace Photon.Server.ViewModels.Build
                     SessionId = buildData.ServerSessionId;
                     BuildCreated = buildData.Created.ToLocalTime().ToString("F");
                     BuildDuration = buildData.Duration?.ToString("g");
+                    BuildException = buildData.Exception;
                     GitRefspec = buildData.GitRefspec;
                     TaskName = buildData.TaskName;
                     TaskRoles = _roles;

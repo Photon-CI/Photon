@@ -206,6 +206,11 @@
 <div class="tab-content">
     <div id="summary" class="tab-pane fade show active" role="tabpanel">
         <div class="container-fluid">
+            {{#If BuildException}}
+            <div class="alert alert-danger mt-3 mb-1">
+                {{BuildException}}
+            </div>
+            {{#EndIf}}
             <div class="row">
                 <div class="col-xl-7">
                     <table class="table table-sm my-2">
