@@ -60,7 +60,10 @@ namespace Photon.Agent.Internal.Git
 
         private void GitCheckout(string refspec)
         {
-            var r = GitCmd(Source.RepositoryPath, $"checkout -f {refspec}");
+            var r = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: $"checkout -f {refspec} \"{CredentialsUrl()}\"",
+                printArgs: $"checkout -f {refspec}");
             if (r.ExitCode != 0) throw new Exception($"Failed to checkout refspec '{refspec}'!");
         }
 
