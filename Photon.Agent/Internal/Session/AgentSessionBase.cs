@@ -94,11 +94,9 @@ namespace Photon.Agent.Internal.Session
         {
             AgentVariables = await PhotonAgent.Instance.Variables.GetCollection();
 
-            await Task.Run(() => {
-                Directory.CreateDirectory(WorkDirectory);
-                Directory.CreateDirectory(ContentDirectory);
-                Directory.CreateDirectory(BinDirectory);
-            });
+            Directory.CreateDirectory(WorkDirectory);
+            Directory.CreateDirectory(ContentDirectory);
+            Directory.CreateDirectory(BinDirectory);
         }
 
         public abstract Task RunTaskAsync(string taskName, string taskSessionId);
@@ -133,23 +131,7 @@ namespace Photon.Agent.Internal.Session
                 Domain = null;
             }
 
-            try {
-                FileUtils.DestoryDirectory(WorkDirectory);
-            }
-            catch (AggregateException errors) {
-                errors.Flatten().Handle(e => {
-                    if (e is IOException) {
-                        //Log.Warn(ioError.Message);
-                        return true;
-                    }
-
-                    Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
-                    return true;
-                });
-            }
-            catch (Exception error) {
-                Log.Warn($"An error occurred while cleaning the work directory! {error.Message}");
-            }
+            await CleanupWorkDir();
         }
 
         public void Abort()
@@ -172,6 +154,45 @@ namespace Photon.Agent.Internal.Session
         protected void OnReleased()
         {
             ReleaseEvent?.Invoke(this, EventArgs.Empty);
+        }
+
+        private async Task CleanupWorkDir()
+        {
+            var retryDelay = 3000;
+            var retryCount = 3;
+
+            var attempt = 1;
+            var successful = false;
+            Exception lastError = null;
+            while (!successful && attempt < retryCount) {
+                try {
+                    FileUtils.DestoryDirectory(WorkDirectory);
+                    successful = true;
+                }
+                //catch (AggregateException errors) {
+                //    errors.Flatten().Handle(e => {
+                //        if (e is IOException) {
+                //            //Log.Warn(ioError.Message);
+                //            return true;
+                //        }
+
+                //        Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
+                //        return true;
+                //    });
+                //}
+                catch (Exception error) {
+                    lastError = error;
+                }
+
+                if (!successful) {
+                    await Task.Delay(retryDelay);
+                    attempt++;
+                }
+            }
+
+            if (!successful) {
+                Log.Warn($"Failed to clean the work directory after {retryCount} attempts! {lastError?.UnfoldMessages()}");
+            }
         }
 
         private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)

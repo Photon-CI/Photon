@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework.Tools;
 
 namespace Photon.Agent.Internal.Session
 {
@@ -226,27 +227,13 @@ namespace Photon.Agent.Internal.Session
 
         private void CopyDirectory(string sourcePath, string destPath)
         {
-            if (string.IsNullOrEmpty(sourcePath))
-                throw new ArgumentNullException(nameof(sourcePath));
-
-            if (string.IsNullOrEmpty(destPath))
-                throw new ArgumentNullException(nameof(destPath));
-
-            foreach (var path in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories)) {
-                var newPath = path.Replace(sourcePath, destPath);
-                Directory.CreateDirectory(newPath);
-            }
-
-            foreach (var file in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories)) {
-                var newPath = file.Replace(sourcePath, destPath);
-
-                try {
-                    File.Copy(file, newPath, true);
+            new DirectoryCopy {
+                SourceDirectory = sourcePath,
+                DestinationDirectory = destPath,
+                IgnoredDirectories = {
+                    ".git",
                 }
-                catch (Exception error) {
-                    Log.Warn($"Failed to copy file '{file}'! {error.Message}");
-                }
-            }
+            }.Copy();
         }
 
         protected void RunCommandScript(string command)

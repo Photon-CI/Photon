@@ -117,6 +117,7 @@
     <Compile Include="Tasks\TaskRegistryBase.cs" />
     <Compile Include="Tasks\TaskResult.cs" />
     <Compile Include="Tools\AssemblyTools.cs" />
+    <Compile Include="Tools\DirectoryCopy.cs" />
     <Compile Include="Tools\PathEx.cs" />
     <Compile Include="Tools\VersionTools.cs" />
     <Compile Include="Variables\VariableSet.cs" />
