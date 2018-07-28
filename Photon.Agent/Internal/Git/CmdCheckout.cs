@@ -42,8 +42,8 @@ namespace Photon.Agent.Internal.Git
         {
             var result = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"clone \"{CredentialsUrl()}\" \"{Source.RepositoryPath}\"",
-                printArgs: $"clone \"{Source.RepositoryUrl}\"");
+                arguments: $"clone --progress \"{CredentialsUrl()}\" \"{Source.RepositoryPath}\"",
+                printArgs: $"clone --progress \"{Source.RepositoryUrl}\"");
 
             if (result.ExitCode != 0) throw new Exception("Failed to clone repository!");
         }
@@ -52,8 +52,8 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"fetch -p -t \"{CredentialsUrl()}\"",
-                printArgs: "fetch -p -t");
+                arguments: $"fetch -p -P -t --progress \"{CredentialsUrl()}\"",
+                printArgs: "fetch -p -P -t --progress");
 
             if (r.ExitCode != 0) throw new Exception("Failed to fetch remotes!");
         }
@@ -62,8 +62,8 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"checkout -f {refspec} \"{CredentialsUrl()}\"",
-                printArgs: $"checkout -f {refspec}");
+                arguments: $"checkout -f --progress {refspec}");
+
             if (r.ExitCode != 0) throw new Exception($"Failed to checkout refspec '{refspec}'!");
         }
 
@@ -71,8 +71,8 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"pull \"{CredentialsUrl()}\"",
-                printArgs: "pull");
+                arguments: $"pull --progress \"{CredentialsUrl()}\"",
+                printArgs: "pull --progress");
 
             if (r.ExitCode != 0) throw new Exception("Failed to pull updates from remote!");
         }
@@ -85,6 +85,7 @@ namespace Photon.Agent.Internal.Git
                 Filename = Exe,
                 Arguments = arguments,
                 WorkingDirectory = root,
+                EchoCommand = false,
             };
 
             return ProcessRunner.Run(runInfo, Output);
