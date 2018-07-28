@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.150")]
-[assembly: AssemblyFileVersion("0.0.150")]
+[assembly: AssemblyVersion("0.0.151")]
+[assembly: AssemblyFileVersion("0.0.151")]
 
 [assembly: AssemblyTitle("Photon Server")]
 [assembly: AssemblyDescription("Primary service for Photon.")]
