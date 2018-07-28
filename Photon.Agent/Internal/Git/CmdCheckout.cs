@@ -52,8 +52,8 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"fetch -p -P -t --progress \"{CredentialsUrl()}\"",
-                printArgs: "fetch -p -P -t --progress");
+                arguments: "fetch -p -P -t --progress"); // \"{CredentialsUrl()}\"",
+                //printArgs: "fetch -p -P -t --progress");
 
             if (r.ExitCode != 0) throw new Exception("Failed to fetch remotes!");
         }
@@ -71,8 +71,8 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"pull --progress \"{CredentialsUrl()}\"",
-                printArgs: "pull --progress");
+                arguments: "pull --progress"); // \"{CredentialsUrl()}\"",
+                //printArgs: "pull --progress");
 
             if (r.ExitCode != 0) throw new Exception("Failed to pull updates from remote!");
         }

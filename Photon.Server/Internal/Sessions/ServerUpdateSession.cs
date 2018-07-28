@@ -22,7 +22,7 @@ namespace Photon.Server.Internal.Sessions
         public override async Task RunAsync()
         {
             var agents = PhotonServer.Instance.Agents.All
-                .Where(x => AgentIds.Any(id => string.Equals(id, x.Id, StringComparison.OrdinalIgnoreCase))).ToArray();
+                .Where(x => AgentIds.Contains(x.Id, StringComparer.OrdinalIgnoreCase)).ToArray();
 
             if (!agents.Any()) {
                 Output.WriteLine("No agents were found!", ConsoleColor.DarkYellow);
@@ -51,9 +51,10 @@ namespace Photon.Server.Internal.Sessions
         private async Task AgentAction(ServerAgent agent)
         {
             using (var messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry)) {
-                Output.Write("Connecting to agent ", ConsoleColor.DarkCyan)
+                Output.WriteBlock(block => block
+                    .Write("Connecting to agent ", ConsoleColor.DarkCyan)
                     .Write(agent.Name, ConsoleColor.Cyan)
-                    .WriteLine("...", ConsoleColor.DarkCyan);
+                    .WriteLine("...", ConsoleColor.DarkCyan));
 
                 try {
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
@@ -61,32 +62,36 @@ namespace Photon.Server.Internal.Sessions
                     await ClientHandshake.Verify(messageClient, TokenSource.Token);
                 }
                 catch (Exception error) {
-                    Output.Write("Failed to connect to agent ", ConsoleColor.DarkRed)
+                    Output.WriteBlock(block => block
+                        .Write("Failed to connect to agent ", ConsoleColor.DarkRed)
                         .Write(agent.Name, ConsoleColor.Red)
                         .WriteLine("!", ConsoleColor.DarkRed)
-                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
 
                     return;
                 }
 
                 Output.WriteLine("Agent connected.", ConsoleColor.DarkGreen);
 
-                Output.Write("Updating Agent ", ConsoleColor.DarkCyan)
+                Output.WriteBlock(block => block
+                    .Write("Updating Agent ", ConsoleColor.DarkCyan)
                     .Write(agent.Name, ConsoleColor.Cyan)
-                    .WriteLine("...", ConsoleColor.DarkCyan);
+                    .WriteLine("...", ConsoleColor.DarkCyan));
 
                 try {
                     await UpdateAgent(agent, messageClient, TokenSource.Token);
 
-                    Output.Write("Agent ", ConsoleColor.DarkGreen)
+                    Output.WriteBlock(block => block
+                        .Write("Agent ", ConsoleColor.DarkGreen)
                         .Write(agent.Name, ConsoleColor.Green)
-                        .WriteLine(" updated successfully.", ConsoleColor.DarkGreen);
+                        .WriteLine(" updated successfully.", ConsoleColor.DarkGreen));
                 }
                 catch (Exception error) {
-                    Output.Write("Failed to update agent ", ConsoleColor.DarkRed)
+                    Output.WriteBlock(block => block
+                        .Write("Failed to update agent ", ConsoleColor.DarkRed)
                         .Write(agent.Name, ConsoleColor.Red)
                         .WriteLine("!", ConsoleColor.DarkRed)
-                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow);
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
                 }
             }
         }
@@ -111,9 +116,10 @@ namespace Photon.Server.Internal.Sessions
                 messageClient = null;
             }
 
-            Output.Write("Agent update started on ", ConsoleColor.DarkCyan)
+            Output.WriteBlock(block => block
+                .Write("Agent update started on ", ConsoleColor.DarkCyan)
                 .Write(agent.Name, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan);
+                .WriteLine("...", ConsoleColor.DarkCyan));
 
             await Task.Delay(6_000, token);
 
