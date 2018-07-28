@@ -21,6 +21,7 @@ namespace Photon.Server.ViewModels.Build
         public string PreBuildCommand {get; private set;}
         public string AssemblyFilename {get; private set;}
         public PackageReference[] ProjectPackages {get; private set;}
+        public PackageReference[] ApplicationPackages {get; private set;}
         public List<object> Artifacts {get; private set;}
         public string IconClass {get; private set;}
         public bool IsRunning {get; private set;}
@@ -47,6 +48,7 @@ namespace Photon.Server.ViewModels.Build
                     PreBuildCommand = buildData.PreBuildCommand;
                     AssemblyFilename = buildData.AssemblyFilename;
                     ProjectPackages = buildData.ProjectPackages;
+                    ApplicationPackages = buildData.ApplicationPackages;
 
                     Artifacts = new List<object>();
                     // TODO

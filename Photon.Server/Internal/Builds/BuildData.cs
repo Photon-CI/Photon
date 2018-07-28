@@ -30,6 +30,7 @@ namespace Photon.Server.Internal.Builds
         public string AssemblyFilename {get; set;}
         public string ServerSessionId {get; set;}
         public PackageReference[] ProjectPackages {get; set;}
+        public PackageReference[] ApplicationPackages {get; set;}
         public GithubCommit Commit {get; set;}
         public bool IsComplete {get; set;}
         public bool IsSuccess {get; set;}

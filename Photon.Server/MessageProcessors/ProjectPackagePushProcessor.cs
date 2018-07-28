@@ -1,6 +1,7 @@
-﻿using Photon.Communication;
+﻿using log4net;
+using Photon.Communication;
 using Photon.Communication.Messages;
-using Photon.Framework.Packages;
+using Photon.Framework.Domain;
 using Photon.Library.TcpMessages;
 using Photon.Server.Internal;
 using System;
@@ -11,22 +12,26 @@ namespace Photon.Server.MessageProcessors
 {
     internal class ProjectPackagePushProcessor : MessageProcessorBase<ProjectPackagePushRequest>
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectPackagePushProcessor));
+
+
         public override async Task<IResponseMessage> Process(ProjectPackagePushRequest requestMessage)
         {
             try {
                 if (!PhotonServer.Instance.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
                     throw new Exception($"Agent Session ID '{requestMessage.ServerSessionId}' not found!");
 
-                var metadata = await ProjectPackageTools.GetMetadataAsync(requestMessage.Filename);
-                if (metadata == null) throw new ApplicationException("No metadata found!");
-
-                await PhotonServer.Instance.ProjectPackages.Add(requestMessage.Filename);
-
-                session.PushedProjectPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
+                await RemoteTaskCompletionSource.Run(taskHandle => {
+                    session.PackageClient.PushProjectPackage(requestMessage.Filename, taskHandle);
+                });
             }
             finally {
-                try {File.Delete(requestMessage.Filename);}
-                catch {}
+                try {
+                    File.Delete(requestMessage.Filename);
+                }
+                catch (Exception error) {
+                    Log.Warn("Failed to remove temporary project package!", error);
+                }
             }
 
             return new ProjectPackagePushResponse();

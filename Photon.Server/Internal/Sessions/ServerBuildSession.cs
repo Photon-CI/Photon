@@ -72,6 +72,7 @@ namespace Photon.Server.Internal.Sessions
                 Build.IsComplete = true;
                 Build.Duration = DateTime.UtcNow - Build.Created;
                 Build.ProjectPackages = PushedProjectPackages.ToArray();
+                Build.ApplicationPackages = PushedApplicationPackages.ToArray();
                 Build.Save();
 
                 await Build.SetOutput(Output.GetString());

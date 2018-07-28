@@ -9,7 +9,7 @@ namespace Photon.Library.Packages
     {
         public async Task Add(string filename)
         {
-            var metadata = await ApplicationPackageTools.GetMetadata(filename);
+            var metadata = await ApplicationPackageTools.GetMetadataAsync(filename);
             if (metadata == null) throw new Exception("No metadata file found in package!");
 
             await base.Add(filename, metadata);

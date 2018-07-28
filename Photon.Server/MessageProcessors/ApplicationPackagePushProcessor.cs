@@ -1,25 +1,37 @@
-﻿using Photon.Communication;
+﻿using log4net;
+using Photon.Communication;
 using Photon.Communication.Messages;
+using Photon.Framework.Domain;
+using Photon.Library.TcpMessages;
 using Photon.Server.Internal;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Library.TcpMessages;
 
 namespace Photon.Server.MessageProcessors
 {
     internal class ApplicationPackagePushProcessor : MessageProcessorBase<ApplicationPackagePushRequest>
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationPackagePushProcessor));
+
+
         public override async Task<IResponseMessage> Process(ApplicationPackagePushRequest requestMessage)
         {
-            //if (!(Transceiver.Context is IServerSession session))
-            //    throw new Exception("Session is undefined!");
-
             try {
-                await PhotonServer.Instance.ApplicationPackages.Add(requestMessage.Filename);
+                if (!PhotonServer.Instance.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
+                    throw new Exception($"Agent Session ID '{requestMessage.ServerSessionId}' not found!");
+
+                await RemoteTaskCompletionSource.Run(taskHandle => {
+                    session.PackageClient.PushApplicationPackage(requestMessage.Filename, taskHandle);
+                });
             }
             finally {
-                try {File.Delete(requestMessage.Filename);}
-                catch {}
+                try {
+                    File.Delete(requestMessage.Filename);
+                }
+                catch (Exception error) {
+                    Log.Warn("Failed to remove temporary project package!", error);
+                }
             }
 
             return new ApplicationPackagePushResponse();

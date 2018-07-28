@@ -13,5 +13,8 @@ namespace Photon.Library.HttpMessages
 
         [JsonProperty("projectPackages")]
         public HttpPackageReference[] ProjectPackages {get; set;}
+
+        [JsonProperty("applicationPackages")]
+        public HttpPackageReference[] ApplicationPackages {get; set;}
     }
 }

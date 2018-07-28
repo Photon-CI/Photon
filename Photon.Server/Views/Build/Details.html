@@ -251,7 +251,7 @@
                     <table class="table table-sm table-hover my-2">
                         <thead class="thead-light">
                             <tr>
-                                <th colspan="2">Packages</th>
+                                <th colspan="2">Project Packages</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -277,6 +277,35 @@
                                         <i class="fas fa-play"></i>
                                     </a>
                                 </td>
+                            </tr>
+                            {{#EndEach}}
+                            {{#EndIf}}
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-hover my-2">
+                        <thead class="thead-light">
+                            <tr>
+                                <th colspan="2">Application Packages</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#If IsRunning}}
+                            <tr>
+                                <td class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin"></i> Pending...
+                                </td>
+                            </tr>
+                            {{#Else}}
+                            {{#If !ApplicationPackages}}
+                            <tr>
+                                <td class="text-center text-muted">
+                                    None
+                                </td>
+                            </tr>
+                            {{#EndIf}}
+                            {{#Each ApplicationPackages.package}}
+                            <tr>
+                                <td>{{package.PackageId}} <span class="text-muted">@</span>{{package.PackageVersion}}</td>
                             </tr>
                             {{#EndEach}}
                             {{#EndIf}}

@@ -35,7 +35,7 @@ namespace Photon.Framework.Packages
             });
         }
 
-        public static async Task<ApplicationPackage> GetMetadata(string filename)
+        public static async Task<ApplicationPackage> GetMetadataAsync(string filename)
         {
             ApplicationPackage package = null;
 

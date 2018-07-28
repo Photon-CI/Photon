@@ -7,6 +7,8 @@ namespace Photon.Library.TcpMessages
     {
         public string MessageId {get; set;}
 
+        public string ServerSessionId {get; set;}
+
         [JsonIgnore]
         public string Filename {get; set;}
     }

@@ -19,7 +19,8 @@ namespace Photon.Server.Internal.Sessions
     internal abstract class ServerSessionBase : IServerSession
     {
         private readonly ConcurrentDictionary<string, DomainAgentSessionHostBase> hostList;
-        internal readonly List<PackageReference> PushedProjectPackageList;
+        private readonly List<PackageReference> PushedProjectPackageList;
+        private readonly List<PackageReference> PushedApplicationPackageList;
 
         public event EventHandler PreBuildEvent;
         public event EventHandler PostBuildEvent;
@@ -40,7 +41,7 @@ namespace Photon.Server.Internal.Sessions
         public Exception Exception {get; set;}
         public ScriptOutput Output {get;}
         protected DomainConnectionFactory ConnectionFactory {get;}
-        protected DomainPackageClient PackageClient {get;}
+        public DomainPackageClient PackageClient {get;}
         public TaskResult Result {get; private set;}
         public VariableSetCollection Variables {get; private set;}
         public bool IsReleased { get; private set; }
@@ -52,6 +53,7 @@ namespace Photon.Server.Internal.Sessions
         private readonly ApplicationPackageManager applicationPackages;
 
         public IEnumerable<PackageReference> PushedProjectPackages => PushedProjectPackageList;
+        public IEnumerable<PackageReference> PushedApplicationPackages => PushedApplicationPackageList;
 
 
         protected ServerSessionBase()
@@ -65,6 +67,7 @@ namespace Photon.Server.Internal.Sessions
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
             hostList = new ConcurrentDictionary<string, DomainAgentSessionHostBase>(StringComparer.Ordinal);
             PushedProjectPackageList = new List<PackageReference>();
+            PushedApplicationPackageList = new List<PackageReference>();
             WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
             BinDirectory = Path.Combine(WorkDirectory, "bin");
             ContentDirectory = Path.Combine(WorkDirectory, "content");
@@ -247,8 +250,13 @@ namespace Photon.Server.Internal.Sessions
 
         private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
-            applicationPackages.Add(filename)
-                .ContinueWith(taskHandle.FromTask);
+            Task.Run(async () => {
+                var metadata = await ApplicationPackageTools.GetMetadataAsync(filename);
+                if (metadata == null) throw new ApplicationException($"Invalid Project Package '{filename}'! No metadata found.");
+
+                await applicationPackages.Add(filename);
+                PushedApplicationPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
+            }).ContinueWith(taskHandle.FromTask);
         }
 
         private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)

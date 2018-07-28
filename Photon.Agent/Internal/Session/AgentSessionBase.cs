@@ -210,6 +210,7 @@ namespace Photon.Agent.Internal.Session
         private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
             var packageRequest = new ApplicationPackagePushRequest {
+                ServerSessionId = ServerSessionId,
                 Filename = filename,
             };
 

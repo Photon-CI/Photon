@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using Photon.Library.Extensions;
+﻿using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using System;
+using System.Linq;
 
 namespace Photon.Server.ApiHandlers.Build
 {
@@ -26,6 +26,8 @@ namespace Photon.Server.ApiHandlers.Build
                     BuildNumber = buildSession.Build.Number,
                     Result = buildSession.Result,
                     ProjectPackages = buildSession.PushedProjectPackages
+                        .Select(x => new HttpPackageReference(x)).ToArray(),
+                    ApplicationPackages = buildSession.PushedApplicationPackages
                         .Select(x => new HttpPackageReference(x)).ToArray(),
                 };
 
