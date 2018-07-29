@@ -29,6 +29,9 @@
       <ComponentGroupRef Id="Content_fontawesome_5.0.13_js_files" />
       <ComponentGroupRef Id="Content_fontawesome_5.0.13_css_files" />
       <ComponentGroupRef Id="Views_VariableSet_files" />
+      <ComponentGroupRef Id="Views_Applications_files" />
+      <ComponentGroupRef Id="Views_Security_files" />
+      <ComponentGroupRef Id="Views_Configuration_files" />
     </Feature>
     <!--<Property Id="CREATEFIREWALLEXCEPTION" Secure="yes" Value="1">
       <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="FirewallException" />
@@ -127,6 +130,9 @@
                 <Directory Id="Views_Variables" Name="Variables" />
                 <Directory Id="Views_Session" Name="Session" />
                 <Directory Id="Views_VariableSet" Name="VariableSet" />
+                <Directory Id="Views_Applications" Name="Applications" />
+                <Directory Id="Views_Configuration" Name="Configuration" />
+                <Directory Id="Views_Security" Name="Security" />
               </Directory>
             </Directory>
           </Directory>
@@ -204,14 +210,15 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_files" Directory="Views">
-      <Component Id="Views_Configuration.html" Guid="ea5a70a3-fb64-4b15-8558-bdff818163b7">
-        <File Id="Views_Configuration.html" Name="Configuration.html" Source="$(var.PhotonAgent_TargetDir)Views\Configuration.html" />
-      </Component>
+      
       <Component Id="Views_Index.html" Guid="1aa10e6f-6901-4129-bad4-57f99f9cf799">
         <File Id="Views_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Index.html" />
       </Component>
       <Component Id="Views_Master.html" Guid="a2aeca65-44b3-4e83-8ee3-4f3d2d80fb9b">
         <File Id="Views_Master.html" Name="Master.html" Source="$(var.PhotonAgent_TargetDir)Views\Master.html" />
+      </Component>
+      <Component Id="Views_Login.html" Guid="744d7128-ade0-44d7-8da5-e5419c728c3f">
+        <File Id="Views_Login.html" Name="Login.html" Source="$(var.PhotonAgent_TargetDir)Views\Login.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -352,6 +359,27 @@
       </Component>
       <Component Id="Views_VariableSet_Index.html" Guid="69abb2ba-ee6e-4df9-9d49-abe35979b7a5">
         <File Id="Views_VariableSet_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\VariableSet\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Applications_files" Directory="Views_Applications">
+      <Component Id="Views_Applications_Index.html" Guid="fefa2420-552e-4202-8999-baf3c21cd8bf">
+        <File Id="Views_Applications_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Applications\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Security_files" Directory="Views_Security">
+      <Component Id="Views_Security_Index.html" Guid="33d05a1b-902e-4fea-8084-ebaab13de32f">
+        <File Id="Views_Security_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Security\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Configuration_files" Directory="Views_Configuration">
+      <Component Id="Views_Configuration_Index.html" Guid="5d5b7ea3-53ac-4f1d-90f0-3a5b99a3d47f">
+        <File Id="Views_Configuration_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Configuration\Index.html" />
       </Component>
     </ComponentGroup>
   </Fragment>

@@ -37,6 +37,8 @@
       <ComponentGroupRef Id="Views_Package_files" />
       <ComponentGroupRef Id="Views_Build_files" />
       <ComponentGroupRef Id="Views_Deployment_files" />
+      <ComponentGroupRef Id="Views_Configuration_files" />
+      <ComponentGroupRef Id="Views_Security_files" />
 		</Feature>
     
     <Property Id="CREATEFIREWALLEXCEPTION" Value="yes" Secure="yes" />
@@ -96,6 +98,8 @@
 		            <Directory Id="Views_Agent" Name="Agent" />
 		            <Directory Id="Views_Project" Name="Project" />
 		            <Directory Id="Views_VariableSet" Name="VariableSet" />
+		            <Directory Id="Views_Security" Name="Security" />
+		            <Directory Id="Views_Configuration" Name="Configuration" />
 		          </Directory>
 		        </Directory>
 		      </Directory>
@@ -165,9 +169,7 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_files" Directory="Views">
-      <Component Id="Views_Configuration.html" Guid="8e668301-0b6a-4c15-8bee-1bf0a4139eca">
-        <File Id="Views_Configuration.html" Name="Configuration.html" Source="$(var.PhotonServer_TargetDir)Views\Configuration.html" />
-      </Component>
+      
       <Component Id="Views_Index.html" Guid="00b3c93f-90c5-48c8-b873-77b8dd3a62d9">
         <File Id="Views_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Index.html" />
       </Component>
@@ -405,6 +407,20 @@
       </Component>
       <Component Id="Views_Deployment_Details.html" Guid="2d8b0c12-6c14-44d2-a9e9-2f6a12469caf">
         <File Id="Views_Deployment_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Deployment\Details.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Configuration_files" Directory="Views_Configuration">
+      <Component Id="Views_Configuration_Index.html" Guid="e996e978-e985-4613-87eb-03e9b26a7dc3">
+        <File Id="Views_Configuration_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Configuration\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Views_Security_files" Directory="Views_Security">
+      <Component Id="Views_Security_Index.html" Guid="0c6e3b92-fec5-45d6-82a9-0e8131b3f379">
+        <File Id="Views_Security_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Security\Index.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
