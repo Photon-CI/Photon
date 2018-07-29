@@ -1,5 +1,4 @@
 ﻿using Photon.Agent.Internal;
-using Photon.Library;
 using System.Collections.Generic;
 
 namespace Photon.Agent.ViewModels.VariableSet
@@ -9,7 +8,7 @@ namespace Photon.Agent.ViewModels.VariableSet
         public string Id {get; set;}
     }
 
-    internal class VariableSetIndexVM : ViewModelBase
+    internal class VariableSetIndexVM : AgentViewModel
     {
         public List<VariableSetItem> Sets {get; set;}
 

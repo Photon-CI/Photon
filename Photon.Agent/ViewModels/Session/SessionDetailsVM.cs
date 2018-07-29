@@ -1,11 +1,10 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Agent.Internal.Session;
-using Photon.Library;
 using System;
 
 namespace Photon.Agent.ViewModels.Session
 {
-    internal class SessionDetailsVM : ViewModelBase
+    internal class SessionDetailsVM : AgentViewModel
     {
         public string SessionId {get; set;}
         public string SessionTitle {get; set;}

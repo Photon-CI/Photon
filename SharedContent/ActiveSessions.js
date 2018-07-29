@@ -137,6 +137,7 @@
                     .text(data.projectName + ' - Deployment #' + data.number);
 
                 e.find('[data-session-title]').text(data.name);
+                e.find('[data-session-package').text(data.name);
                 e.find('[data-session-version]').text('@' + data.projectVersion);
                 break;
             case 'update':

@@ -102,10 +102,17 @@
     <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
     <Compile Include="ApiHandlers\Variable\DeleteHandler.cs" />
     <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
-    <Compile Include="Internal\AgentDefinition.cs" />
-    <Compile Include="Internal\AgentHttpDefinition.cs" />
-    <Compile Include="Internal\AgentTcpDefinition.cs" />
-    <Compile Include="ViewHandlers\ConfigurationHandler.cs" />
+    <Compile Include="Internal\AgentConfiguration\AgentTcpConfiguration.cs" />
+    <Compile Include="Internal\AgentViewModel.cs" />
+    <Compile Include="Internal\AgentConfiguration\AgentConfiguration.cs" />
+    <Compile Include="Internal\AgentConfiguration\AgentConfigurationManager.cs" />
+    <Compile Include="Internal\AgentConfiguration\AgentHttpConfiguration.cs" />
+    <Compile Include="Internal\AgentConfiguration\AgentSecurityConfiguration.cs" />
+    <Compile Include="ViewHandlers\Applications\ApplicationIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Configuration\ConfigurationIndexHandler.cs" />
+    <Compile Include="ViewHandlers\LoginHandler.cs" />
+    <Compile Include="ViewHandlers\LogoutHandler.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityIndexHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
     <Compile Include="ViewHandlers\VariableSet\VariableSetEditJsonHandler.cs" />
@@ -142,6 +149,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
+    <Compile Include="ViewModels\LoginVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariableSetEditJsonVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariableSetIndexVM.cs" />
@@ -269,7 +277,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="photon_light.ico" />
-    <Content Include="Views\Configuration.html">
+    <Content Include="Views\Applications\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Configuration\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Login.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Security\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Session\Index.html">

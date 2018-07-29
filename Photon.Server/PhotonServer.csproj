@@ -98,11 +98,12 @@
     <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
     <Compile Include="ViewHandlers\Build\BuildDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Build\BuildNewHandler.cs" />
-    <Compile Include="ViewHandlers\ConfigurationHandler.cs" />
+    <Compile Include="ViewHandlers\Configuration\ConfigurationIndexHandler.cs" />
     <Compile Include="ViewHandlers\Deployment\DeploymentDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Deployment\DeploymentNewHandler.cs" />
     <Compile Include="ViewHandlers\LoginHandler.cs" />
     <Compile Include="ViewHandlers\LogoutHandler.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityIndexHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
     <Compile Include="ViewHandlers\Package\PackageIndexHandler.cs" />
     <Compile Include="ViewHandlers\Build\BuildIndexHandler.cs" />
@@ -129,7 +130,6 @@
     <Compile Include="Internal\Projects\ProjectManager.cs" />
     <Compile Include="Internal\ServerAgents\ServerAgentManager.cs" />
     <Compile Include="Internal\GitHub\HookEventHandler.cs" />
-    <Compile Include="Internal\JsonDynamicDocument.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfiguration.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerSecurityConfiguration.cs" />
@@ -347,13 +347,16 @@
     <Content Include="Views\Login.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Configuration.html">
+    <Content Include="Views\Configuration\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Deployment\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Build\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Security\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Session\Index.html">

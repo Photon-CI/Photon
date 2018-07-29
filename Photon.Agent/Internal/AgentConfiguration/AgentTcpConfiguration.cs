@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Agent.Internal
+namespace Photon.Agent.Internal.AgentConfiguration
 {
-    internal class AgentTcpDefinition
+    internal class AgentTcpConfiguration
     {
         [JsonProperty("host")]
         public string Host {get; set;}

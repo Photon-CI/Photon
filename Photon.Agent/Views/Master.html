@@ -47,6 +47,22 @@
                             Variables
                         </a>
                     </li>
+                    <li class="nav-item" data-link="applications">
+                        <a href="{{#Url applications}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-cube"></i>
+                            </div>
+                            Applications
+                        </a>
+                    </li>
+                    <li class="nav-item" data-link="security">
+                        <a href="{{#Url security}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-shield-alt"></i>
+                            </div>
+                            Security
+                        </a>
+                    </li>
                     <li class="nav-item" data-link="configuration">
                         <a href="{{#Url configuration}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -55,6 +71,16 @@
                             Configuration
                         </a>
                     </li>
+                    {{#If SecurityEnabled}}
+                    <li class="nav-item">
+                        <a href="{{#Url Logout}}" class="nav-link">
+                            <div class="nav-item-iconholder">
+                                <i style="font-size: 16px" class="fas fa-lock"></i>
+                            </div>
+                            Sign Out
+                        </a>
+                    </li>
+                    {{#EndIf}}
                 </ul>
             </div>
         </div>

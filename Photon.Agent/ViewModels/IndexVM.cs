@@ -1,12 +1,11 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Framework;
-using Photon.Library;
 using System;
 using System.Runtime.InteropServices;
 
 namespace Photon.Agent.ViewModels
 {
-    internal class IndexVM : ViewModelBase
+    internal class IndexVM : AgentViewModel
     {
         public string AgentName {get; set;}
         public string AgentVersion {get; set;}
@@ -21,7 +20,6 @@ namespace Photon.Agent.ViewModels
         public string OsDescription {get; set;}
         public string OsArchitecture {get; set;}
         public string FrameworkDescription {get; set;}
-        //public string ProcessArchitecture {get; set;}
 
 
         public void Build()
@@ -30,7 +28,6 @@ namespace Photon.Agent.ViewModels
             AgentVersion = Configuration.Version;
             AgentHttpUrl = GetAgentHttpUrl();
             AgentTcpUrl = GetAgentTcpUrl();
-            //ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
 
             MachineName = Environment.MachineName;
             MachineProcessorCount = Environment.ProcessorCount.ToString("N0");
@@ -45,7 +42,7 @@ namespace Photon.Agent.ViewModels
 
         private static string GetAgentName()
         {
-            var name = PhotonAgent.Instance.Definition.Name;
+            var name = PhotonAgent.Instance.AgentConfiguration.Value.Name;
 
             return !string.IsNullOrEmpty(name)
                 ? name : "Photon Agent";
@@ -53,7 +50,7 @@ namespace Photon.Agent.ViewModels
 
         private static string GetAgentHttpUrl()
         {
-            var http = PhotonAgent.Instance.Definition.Http;
+            var http = PhotonAgent.Instance.AgentConfiguration.Value.Http;
             var _port = http.Port != 80 ? $":{http.Port}" : string.Empty;
             var _hostIsWild = http.Host == "*" || http.Host == "+";
             var _host = _hostIsWild ? "localhost" : http.Host;
@@ -68,7 +65,7 @@ namespace Photon.Agent.ViewModels
 
         private static string GetAgentTcpUrl()
         {
-            var tcp = PhotonAgent.Instance.Definition.Tcp;
+            var tcp = PhotonAgent.Instance.AgentConfiguration.Value.Tcp;
             var _hostIsWild = tcp.Host == "0.0.0.0";
             var _host = _hostIsWild ? "localhost" : tcp.Host;
 

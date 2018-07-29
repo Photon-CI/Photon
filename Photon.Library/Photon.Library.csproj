@@ -73,6 +73,7 @@
     <Compile Include="HttpSecurity\IAuthorize.cs" />
     <Compile Include="HttpSecurity\LdapAuthorization.cs" />
     <Compile Include="ILibraryAssembly.cs" />
+    <Compile Include="JsonDynamicDocument.cs" />
     <Compile Include="LazyAsync.cs" />
     <Compile Include="Packages\ApplicationPackageManager.cs" />
     <Compile Include="Packages\PackageManagerBase.cs" />

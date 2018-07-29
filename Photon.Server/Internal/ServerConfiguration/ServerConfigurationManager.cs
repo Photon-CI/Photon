@@ -1,4 +1,6 @@
-﻿namespace Photon.Server.Internal.ServerConfiguration
+﻿using Photon.Library;
+
+namespace Photon.Server.Internal.ServerConfiguration
 {
     internal class ServerConfigurationManager
     {

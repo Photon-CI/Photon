@@ -1,15 +1,14 @@
 ﻿using log4net;
+using Photon.Agent.Internal.AgentConfiguration;
 using Photon.Agent.Internal.Git;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
-using Photon.Framework.Extensions;
 using Photon.Library;
 using Photon.Library.Variables;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
 using System;
-using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -27,12 +26,13 @@ namespace Photon.Agent.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
-        public AgentDefinition Definition {get; private set;}
         public string WorkDirectory {get;}
         public AgentSessionManager Sessions {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
         public VariableSetDocumentManager Variables {get;}
         public RepositorySourceManager RepositorySources {get;}
+
+        public AgentConfigurationManager AgentConfiguration {get;}
 
 
         public PhotonAgent()
@@ -44,6 +44,7 @@ namespace Photon.Agent.Internal
             Variables = new VariableSetDocumentManager();
             RepositorySources = new RepositorySourceManager();
             messageListener = new MessageListener(MessageRegistry);
+            AgentConfiguration = new AgentConfigurationManager();
 
             RepositorySources.RepositorySourceDirectory = Configuration.RepositoryDirectory;
             messageListener.ConnectionReceived += MessageListener_ConnectionReceived;
@@ -99,21 +100,15 @@ namespace Photon.Agent.Internal
             Log.Debug("Starting Agent...");
 
             // Load existing or default agent configuration
-            Definition = ParseAgentDefinition() ?? new AgentDefinition {
-                Http = {
-                    Host = "localhost",
-                    Port = 8082,
-                    Path = "/photon/agent",
-                },
-            };
+            AgentConfiguration.Load();
 
-            if (!IPAddress.TryParse(Definition.Tcp.Host, out var _address))
-                throw new Exception($"Invalid TCP Host '{Definition.Tcp.Host}'!");
+            if (!IPAddress.TryParse(AgentConfiguration.Value.Tcp.Host, out var _address))
+                throw new Exception($"Invalid TCP Host '{AgentConfiguration.Value.Tcp.Host}'!");
 
             MessageRegistry.Scan(Assembly.GetExecutingAssembly());
             MessageRegistry.Scan(typeof(ILibraryAssembly).Assembly);
             MessageRegistry.Scan(typeof(IFrameworkAssembly).Assembly);
-            messageListener.Listen(_address, Definition.Tcp.Port);
+            messageListener.Listen(_address, AgentConfiguration.Value.Tcp.Port);
 
             Sessions.Start();
 
@@ -182,26 +177,10 @@ namespace Photon.Agent.Internal
             }
         }
 
-        private AgentDefinition ParseAgentDefinition()
-        {
-            var file = Configuration.AgentFile ?? "agent.json";
-            var path = Path.Combine(Configuration.AssemblyPath, file);
-            path = Path.GetFullPath(path);
-
-            Log.Debug($"Loading Agent Definition: {path}");
-
-            if (!File.Exists(path)) {
-                Log.Warn($"Agent Definition not found! {path}");
-                return null;
-            }
-
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                return JsonSettings.Serializer.Deserialize<AgentDefinition>(stream);
-            }
-        }
-
         private void StartHttpServer()
         {
+            var httpConfig = AgentConfiguration.Value.Http;
+
             var contentDir = new ContentDirectory {
                 DirectoryPath = Configuration.HttpContentDirectory,
                 UrlPath = "/Content/",
@@ -214,7 +193,7 @@ namespace Photon.Agent.Internal
 
             var context = new HttpReceiverContext {
                 SecurityMgr = new AgentHttpSecurity(),
-                ListenerPath = Definition.Http.Path,
+                ListenerPath = httpConfig.Path,
                 ContentDirectories = {
                     contentDir,
                     sharedContentDir,
@@ -223,10 +202,10 @@ namespace Photon.Agent.Internal
 
             context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
-            var httpPrefix = $"http://{Definition.Http.Host}:{Definition.Http.Port}/";
+            var httpPrefix = $"http://{httpConfig.Host}:{httpConfig.Port}/";
 
-            if (!string.IsNullOrEmpty(Definition.Http.Path))
-                httpPrefix = NetPath.Combine(httpPrefix, Definition.Http.Path);
+            if (!string.IsNullOrEmpty(httpConfig.Path))
+                httpPrefix = NetPath.Combine(httpPrefix, httpConfig.Path);
 
             if (!httpPrefix.EndsWith("/"))
                 httpPrefix += "/";

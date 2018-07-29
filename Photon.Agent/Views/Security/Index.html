@@ -1,0 +1,29 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="security"]').addClass('active');
+    });
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+</style>
+{{#EndStyle}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <!--<h3 class="text-primary my-0">Security</h3>-->
+    </div>
+</nav>
+
+<form method="POST">
+    <div class="container mt-3">
+        <div class="form-check">
+            <input id="EnableSecurityCheckBox" name="EnableSecurity" type="checkbox" class="form-check-input" value="{{EnableSecurity}}">
+            <label for="EnableSecurityCheckBox" class="form-check-label">Enable Security</label>
+        </div>
+    </div>
+</form>

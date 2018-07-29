@@ -6,9 +6,9 @@ using Photon.Framework.Tools;
 using System;
 using System.IO;
 
-namespace Photon.Server.Internal
+namespace Photon.Library
 {
-    internal class JsonDynamicDocument
+    public class JsonDynamicDocument
     {
         public JsonSerializer Serializer {get; set;}
         public string Filename {get; set;}

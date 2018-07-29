@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Server.Internal.ServerConfiguration
+namespace Photon.Agent.Internal.AgentConfiguration
 {
-    public class ServerSecurityConfiguration
+    public class AgentSecurityConfiguration
     {
         [JsonProperty("enabled")]
         public bool Enabled {get; set;}
