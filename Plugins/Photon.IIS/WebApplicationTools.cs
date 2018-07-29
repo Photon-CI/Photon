@@ -45,11 +45,11 @@ namespace Photon.Plugins.IIS
                 if (!TryFind(webSite, webAppPath, out webApp)) {
                     using (var block = handle.Context.Output.WriteBlock()) {
                         block.Write("Unable to create Web Application ", ConsoleColor.DarkRed);
-                        block.Write(webSiteName, ConsoleColor.Red);
+                        block.Write(webAppPath, ConsoleColor.Red);
                         block.WriteLine("!", ConsoleColor.DarkRed);
                     }
 
-                    throw new Exception($"Unable to create Web Application '{webSiteName}'!");
+                    throw new Exception($"Unable to create Web Application '{webAppPath}'!");
                 }
 
                 using (var block = handle.Context.Output.WriteBlock()) {
@@ -67,7 +67,7 @@ namespace Photon.Plugins.IIS
 
             using (var block = handle.Context.Output.WriteBlock()) {
                 block.Write("Web Application ", ConsoleColor.DarkGreen);
-                block.Write(webSiteName, ConsoleColor.Green);
+                block.Write(webAppPath, ConsoleColor.Green);
                 block.WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
             }
         }

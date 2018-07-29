@@ -26,6 +26,8 @@ namespace Photon.Agent.Internal
 
         public async Task RunBuildTask(AgentBuildContext context, CancellationToken token = default(CancellationToken))
         {
+            if (!Agent.IsBuildTaskInRole(context)) return;
+
             Log.Debug($"Running build Task '{context.TaskName}'...");
 
             var completeEvent = new RemoteTaskCompletionSource();
@@ -45,6 +47,8 @@ namespace Photon.Agent.Internal
 
         public async Task RunDeployTask(AgentDeployContext context, CancellationToken token = default(CancellationToken))
         {
+            if (!Agent.IsDeployTaskInRole(context)) return;
+
             Log.Debug($"Running deployment Task '{context.TaskName}'...");
 
             var completeEvent = new RemoteTaskCompletionSource();

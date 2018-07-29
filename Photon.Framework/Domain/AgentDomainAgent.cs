@@ -38,26 +38,36 @@ namespace Photon.Framework.Domain
             return deployTaskRegistry.AllDescriptions.ToArray();
         }
 
+        public bool IsBuildTaskInRole(IAgentBuildContext context)
+        {
+            if (!buildTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc))
+                return true;
+
+            if (!(taskDesc.Roles?.Any() ?? false)) return true;
+
+            return context.Agent?.Roles?
+                .ContainsAny(taskDesc.Roles, StringComparer.OrdinalIgnoreCase) ?? false;
+        }
+
         public void RunBuildTask(IAgentBuildContext context, RemoteTaskCompletionSource completeEvent)
         {
             buildTaskRegistry.ExecuteTask(context, CancellationToken.None)
                 .ContinueWith(completeEvent.FromTask);
         }
 
+        public bool IsDeployTaskInRole(IAgentDeployContext context)
+        {
+            if (!deployTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc))
+                return true;
+
+            if (!(taskDesc.Roles?.Any() ?? false)) return true;
+
+            return context.Agent?.Roles?
+                .ContainsAny(taskDesc.Roles, StringComparer.OrdinalIgnoreCase) ?? false;
+        }
+
         public void RunDeployTask(IAgentDeployContext context, RemoteTaskCompletionSource completeEvent)
         {
-            if (deployTaskRegistry.TryGetDescription(context.TaskName, out var taskDesc)) {
-                if (taskDesc.Roles?.Any() ?? false) {
-                    var isInRole = context.Agent?.Roles?.ContainsAny(taskDesc.Roles, StringComparer.OrdinalIgnoreCase) ?? false;
-
-                    if (!isInRole) {
-                        // Task is not in agent roles
-                        completeEvent.SetResult();
-                        return;
-                    }
-                }
-            }
-
             using (var block = context.Output.WriteBlock()) {
                 block.Write("Running deployment task ", ConsoleColor.DarkCyan);
                 block.Write(context.TaskName, ConsoleColor.Cyan);
