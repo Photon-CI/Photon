@@ -45,6 +45,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Content\ContentFilterTests.cs" />
+    <Compile Include="Content\MockContentProvider.cs" />
     <Compile Include="Extensions\ArgSplitTests.cs" />
     <Compile Include="Extensions\NetPathTests.cs" />
     <Compile Include="Extensions\StringToTests.cs" />

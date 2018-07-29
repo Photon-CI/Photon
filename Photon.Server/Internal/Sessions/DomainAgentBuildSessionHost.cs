@@ -1,6 +1,6 @@
-﻿using System;
-using Photon.Framework.Server;
+﻿using Photon.Framework.Server;
 using Photon.Library.TcpMessages;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 

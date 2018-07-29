@@ -4,13 +4,13 @@ using Photon.Framework;
 using Photon.Framework.Agent;
 using Photon.Framework.Domain;
 using Photon.Framework.Projects;
+using Photon.Framework.Tools.Content;
 using Photon.Library.GitHub;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Framework.Tools;
 
 namespace Photon.Agent.Internal.Session
 {
@@ -227,13 +227,17 @@ namespace Photon.Agent.Internal.Session
 
         private void CopyDirectory(string sourcePath, string destPath)
         {
-            new DirectoryCopy {
+            var filter = new ContentFilter {
                 SourceDirectory = sourcePath,
                 DestinationDirectory = destPath,
+                DirectoryAction = (src, dest) => Directory.CreateDirectory(dest),
+                FileAction = File.Copy,
                 IgnoredDirectories = {
                     ".git",
-                }
-            }.Copy();
+                },
+            };
+
+            filter.Run();
         }
 
         protected void RunCommandScript(string command)

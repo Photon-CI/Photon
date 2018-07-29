@@ -161,6 +161,11 @@ namespace Photon.Server.Internal.Sessions
                             var versionResponse = await client.Send(versionRequest)
                                 .GetResponseAsync<AgentGetVersionResponse>(connectTokenSource.Token);
 
+                            if (string.IsNullOrEmpty(versionResponse.Version)) {
+                                Log.Warn("An empty version response was received!");
+                                continue;
+                            }
+
                             if (!VersionTools.HasUpdates(versionResponse.Version, UpdateVersion))
                                 return client;
                         }
