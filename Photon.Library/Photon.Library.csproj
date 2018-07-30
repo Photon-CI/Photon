@@ -79,10 +79,12 @@
     <Compile Include="Packages\PackageManagerBase.cs" />
     <Compile Include="Packages\ProjectPackageManager.cs" />
     <Compile Include="Session\SessionStatusArgs.cs" />
+    <Compile Include="TcpMessages\HealthCheckResponse.cs" />
     <Compile Include="TcpMessages\AgentGetVersionResponse.cs" />
     <Compile Include="TcpMessages\AgentGetVersionRequest.cs" />
     <Compile Include="TcpMessages\AgentUpdateResponse.cs" />
     <Compile Include="TcpMessages\AgentUpdateRequest.cs" />
+    <Compile Include="TcpMessages\HealthCheckRequest.cs" />
     <Compile Include="TcpMessages\SessionCancelRequest.cs" />
     <Compile Include="TcpMessages\HandshakeRequest.cs" />
     <Compile Include="TcpMessages\HandshakeResponse.cs" />

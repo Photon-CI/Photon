@@ -79,6 +79,9 @@
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
     <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
+    <Compile Include="Internal\HealthChecks\AgentStatusItem.cs" />
+    <Compile Include="Internal\HealthChecks\AgentStatus.cs" />
+    <Compile Include="Internal\HealthChecks\HealthCheckService.cs" />
     <Compile Include="Internal\Projects\ProjectLastDeployment.cs" />
     <Compile Include="Internal\Projects\ServerProject.cs" />
     <Compile Include="Internal\ServerViewModel.cs" />

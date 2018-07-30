@@ -108,6 +108,7 @@
     <Compile Include="Internal\AgentConfiguration\AgentConfigurationManager.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentHttpConfiguration.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentSecurityConfiguration.cs" />
+    <Compile Include="MessageHandlers\HealthCheckProcessor.cs" />
     <Compile Include="ViewHandlers\Applications\ApplicationIndexHandler.cs" />
     <Compile Include="ViewHandlers\Configuration\ConfigurationIndexHandler.cs" />
     <Compile Include="ViewHandlers\LoginHandler.cs" />

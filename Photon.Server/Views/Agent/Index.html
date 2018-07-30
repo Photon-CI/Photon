@@ -76,7 +76,7 @@
     </div>
 </nav>
 
-<div class="container">
+<div class="container mt-3">
     {{#If !Agents}}
     <div class="container px-3 py-0">
         <h3 class="py-0 text-muted">No Agents have been defined.</h3>
@@ -90,11 +90,10 @@
         {{#Each Agents.agent}}
         <tr data-agent="{{agent.Name}}" data-id="{{agent.Id}}" onclick="onRowClick(this)">
             <td class="c-icon">
-                <i class="fas fa-check-circle text-success"></i>
+                <i class="{{agent.Class}}"></i>
             </td>
             <td>
                 <b>{{agent.Name}}</b>
-                <!--<a href="{{#Url Agent/Edit}}?id={{&agent.Id}}"></a>-->
             </td>
             <td>
                 {{#Each agent.Roles.role}}

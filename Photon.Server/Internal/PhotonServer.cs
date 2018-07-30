@@ -15,6 +15,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Server.Internal.HealthChecks;
 
 namespace Photon.Server.Internal
 {
@@ -33,9 +34,9 @@ namespace Photon.Server.Internal
         public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
         public VariableSetDocumentManager Variables {get;}
-
         public ServerConfigurationManager ServerConfiguration {get;}
         public ServerAgentManager Agents {get;}
+        public HealthCheckService HealthChecks {get;}
 
 
         public PhotonServer()
@@ -44,6 +45,7 @@ namespace Photon.Server.Internal
             Sessions = new ServerSessionManager();
             MessageRegistry = new MessageProcessorRegistry();
             Variables = new VariableSetDocumentManager();
+            HealthChecks = new HealthCheckService();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
@@ -67,6 +69,7 @@ namespace Photon.Server.Internal
 
             Queue?.Dispose();
             Sessions?.Dispose();
+            HealthChecks.Dispose();
             receiver?.Dispose();
             receiver = null;
         }
@@ -90,6 +93,7 @@ namespace Photon.Server.Internal
 
             Sessions.Start();
             Queue.Start();
+            HealthChecks.Start();
 
             var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskHttp = Task.Run(() => StartHttpServer());
@@ -111,6 +115,7 @@ namespace Photon.Server.Internal
 
             Queue.Stop();
             Sessions.Stop();
+            HealthChecks.Stop();
 
             try {
                 receiver?.Dispose();
