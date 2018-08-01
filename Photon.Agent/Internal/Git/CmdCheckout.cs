@@ -47,8 +47,8 @@ namespace Photon.Agent.Internal.Git
         {
             var result = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"clone --progress \"{CredentialsUrl()}\" \"{Source.RepositoryPath}\"",
-                printArgs: $"clone --progress \"{Source.RepositoryUrl}\"",
+                arguments: $"clone --progress -v \"{CredentialsUrl()}\" \"{Source.RepositoryPath}\"",
+                printArgs: $"clone --progress -v \"{Source.RepositoryUrl}\"",
                 token: token);
 
             if (result.ExitCode != 0) throw new Exception("Failed to clone repository!");
