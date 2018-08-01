@@ -1,6 +1,7 @@
 ﻿using Microsoft.Web.Administration;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Plugins.IIS
@@ -147,6 +148,40 @@ namespace Photon.Plugins.IIS
             configureAction(appPool);
 
             handle.CommitChanges();
+
+            handle.Context.Output.WriteBlock()
+                .Write("Application Pool ", ConsoleColor.DarkGreen)
+                .Write(appPoolName, ConsoleColor.Green)
+                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen)
+                .Post();
+        }
+
+        public async Task ConfigureAsync(string appPoolName, Action<ApplicationPool> configureAction, CancellationToken token = default(CancellationToken))
+        {
+            if (!TryFind(appPoolName, out var appPool)) {
+                handle.Server.ApplicationPools.Add(appPoolName);
+                await handle.CommitChangesAsync(token);
+
+                if (!TryFind(appPoolName, out appPool)) {
+                    handle.Context.Output.WriteBlock()
+                        .Write("Unable to create Application Pool ", ConsoleColor.DarkRed)
+                        .Write(appPoolName, ConsoleColor.Red)
+                        .WriteLine("!", ConsoleColor.DarkRed)
+                        .Post();
+
+                    throw new Exception($"Unable to create Application Pool '{appPoolName}'!");
+                }
+
+                handle.Context.Output.WriteBlock()
+                    .Write("Created new Application Pool ", ConsoleColor.DarkBlue)
+                    .Write(appPoolName, ConsoleColor.Blue)
+                    .WriteLine(".", ConsoleColor.DarkBlue)
+                    .Post();
+            }
+
+            configureAction(appPool);
+
+            await handle.CommitChangesAsync(token);
 
             handle.Context.Output.WriteBlock()
                 .Write("Application Pool ", ConsoleColor.DarkGreen)

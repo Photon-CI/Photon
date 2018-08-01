@@ -1,6 +1,8 @@
 ﻿using Microsoft.Web.Administration;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Plugins.IIS
 {
@@ -23,20 +25,20 @@ namespace Photon.Plugins.IIS
                 handle.CommitChanges();
 
                 if (!TryFind(websiteName, out webSite)) {
-                    handle.Context.Output.WriteBlock()
-                        .Write("Unable to create WebSite ", ConsoleColor.DarkRed)
-                        .Write(websiteName, ConsoleColor.Red)
-                        .WriteLine("!", ConsoleColor.DarkRed)
-                        .Post();
+                    using (var block = handle.Context.Output.WriteBlock()) {
+                        block.Write("Unable to create WebSite ", ConsoleColor.DarkRed);
+                        block.Write(websiteName, ConsoleColor.Red);
+                        block.WriteLine("!", ConsoleColor.DarkRed);
+                    }
 
                     throw new Exception($"Unable to create WebSite '{websiteName}'!");
                 }
 
-                handle.Context.Output.WriteBlock()
-                    .Write("Created new WebSite ", ConsoleColor.DarkBlue)
-                    .Write(websiteName, ConsoleColor.Blue)
-                    .WriteLine(".", ConsoleColor.DarkBlue)
-                    .Post();
+                using (var block = handle.Context.Output.WriteBlock()) {
+                    block.Write("Created new WebSite ", ConsoleColor.DarkBlue);
+                    block.Write(websiteName, ConsoleColor.Blue);
+                    block.WriteLine(".", ConsoleColor.DarkBlue);
+                }
             }
 
             // TODO: Set Port
@@ -46,11 +48,48 @@ namespace Photon.Plugins.IIS
 
             handle.CommitChanges();
 
-            handle.Context.Output.WriteBlock()
-                .Write("WebSite ", ConsoleColor.DarkGreen)
-                .Write(websiteName, ConsoleColor.Green)
-                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen)
-                .Post();
+            using (var block = handle.Context.Output.WriteBlock()) {
+                block.Write("WebSite ", ConsoleColor.DarkGreen);
+                block.Write(websiteName, ConsoleColor.Green);
+                block.WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
+            }
+        }
+
+        public async Task ConfigureAsync(string websiteName, int port, Action<Site> configureAction, CancellationToken token = default(CancellationToken))
+        {
+            if (!TryFind(websiteName, out var webSite)) {
+                handle.Server.Sites.Add(websiteName, DefaultPhysicalPath, port);
+                await handle.CommitChangesAsync(token);
+
+                if (!TryFind(websiteName, out webSite)) {
+                    using (var block = handle.Context.Output.WriteBlock()) {
+                        block.Write("Unable to create WebSite ", ConsoleColor.DarkRed);
+                        block.Write(websiteName, ConsoleColor.Red);
+                        block.WriteLine("!", ConsoleColor.DarkRed);
+                    }
+
+                    throw new Exception($"Unable to create WebSite '{websiteName}'!");
+                }
+
+                using (var block = handle.Context.Output.WriteBlock()) {
+                    block.Write("Created new WebSite ", ConsoleColor.DarkBlue);
+                    block.Write(websiteName, ConsoleColor.Blue);
+                    block.WriteLine(".", ConsoleColor.DarkBlue);
+                }
+            }
+
+            // TODO: Set Port
+            //webSite.Bindings.FirstOrDefault()?.po
+
+            configureAction(webSite);
+
+            await handle.CommitChangesAsync(token);
+
+            using (var block = handle.Context.Output.WriteBlock()) {
+                block.Write("WebSite ", ConsoleColor.DarkGreen);
+                block.Write(websiteName, ConsoleColor.Green);
+                block.WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
+            }
         }
 
         private bool TryFind(string webSiteName, out Site webSite)
