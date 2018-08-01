@@ -1,6 +1,7 @@
 ﻿using LibGit2Sharp;
 using Photon.Framework.Server;
 using System;
+using System.Threading;
 
 namespace Photon.Agent.Internal.Git
 {
@@ -12,7 +13,7 @@ namespace Photon.Agent.Internal.Git
         public string Password {get; set;}
 
 
-        public void Checkout(string refspec = "master")
+        public void Checkout(string refspec = "master", CancellationToken token = default(CancellationToken))
         {
             var checkoutOptions = new CheckoutOptions {
                 CheckoutModifiers = CheckoutModifiers.Force,

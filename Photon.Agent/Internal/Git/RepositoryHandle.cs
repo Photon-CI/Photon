@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Photon.Agent.Internal.Session;
 using System;
+using System.Threading;
 
 namespace Photon.Agent.Internal.Git
 {
@@ -29,7 +30,7 @@ namespace Photon.Agent.Internal.Git
             disposeAction?.Invoke();
         }
 
-        public void Checkout(string refspec = "master")
+        public void Checkout(string refspec = "master", CancellationToken token = default(CancellationToken))
         {
             ICheckout checkout;
             if (UseCommandLine) {
@@ -55,7 +56,7 @@ namespace Photon.Agent.Internal.Git
                 };
             }
 
-            checkout.Checkout(refspec);
+            checkout.Checkout(refspec, token);
         }
     }
 }

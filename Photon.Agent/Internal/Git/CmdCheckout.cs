@@ -1,6 +1,7 @@
 ﻿using Photon.Framework;
 using Photon.Framework.Server;
 using System;
+using System.Threading;
 using System.Web;
 
 namespace Photon.Agent.Internal.Git
@@ -19,65 +20,71 @@ namespace Photon.Agent.Internal.Git
             Exe = "git";
         }
 
-        public void Checkout(string refspec = "master")
+        public void Checkout(string refspec = "master", CancellationToken token = default(CancellationToken))
         {
             if (!GitIsValidRepo()) {
-                GitClone();
+                GitClone(token);
             }
 
-            Gitfetch();
+            Gitfetch(token);
 
-            GitCheckout(refspec);
+            GitCheckout(refspec, token);
 
-            GitPull();
+            GitPull(token);
         }
 
-        private bool GitIsValidRepo()
+        private bool GitIsValidRepo(CancellationToken token = default(CancellationToken))
         {
-            var r = GitCmd(Source.RepositoryPath, "rev-parse --is-inside-work-tree");
+            var r = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: "rev-parse --is-inside-work-tree",
+                token: token);
+
             return r.ExitCode == 0 && string.Equals(r.Output.Trim(), "true");
         }
 
-        private void GitClone()
+        private void GitClone(CancellationToken token = default(CancellationToken))
         {
             var result = GitCmd(
                 root: Source.RepositoryPath,
                 arguments: $"clone --progress \"{CredentialsUrl()}\" \"{Source.RepositoryPath}\"",
-                printArgs: $"clone --progress \"{Source.RepositoryUrl}\"");
+                printArgs: $"clone --progress \"{Source.RepositoryUrl}\"",
+                token: token);
 
             if (result.ExitCode != 0) throw new Exception("Failed to clone repository!");
         }
 
-        private void Gitfetch()
+        private void Gitfetch(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: "fetch -p -P -t --progress"); // \"{CredentialsUrl()}\"",
-                //printArgs: "fetch -p -P -t --progress");
+                arguments: "fetch -p -P -t --progress",
+                token: token);
 
             if (r.ExitCode != 0) throw new Exception("Failed to fetch remotes!");
         }
 
-        private void GitCheckout(string refspec)
+        private void GitCheckout(string refspec, CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"checkout -f --progress {refspec}");
+                arguments: $"checkout -f --progress {refspec}",
+                token: token);
 
             if (r.ExitCode != 0) throw new Exception($"Failed to checkout refspec '{refspec}'!");
         }
 
-        private void GitPull()
+        private void GitPull(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: "pull --progress"); // \"{CredentialsUrl()}\"",
-                //printArgs: "pull --progress");
+                arguments: "pull --progress",
+                token: token);
 
             if (r.ExitCode != 0) throw new Exception("Failed to pull updates from remote!");
         }
 
-        private ProcessResult GitCmd(string root, string arguments, string printArgs = null)
+        private ProcessResult GitCmd(string root, string arguments, string printArgs = null, CancellationToken token = default(CancellationToken))
         {
             Output.WriteLine($" > git {printArgs ?? arguments}", ConsoleColor.White);
 
@@ -88,7 +95,7 @@ namespace Photon.Agent.Internal.Git
                 EchoCommand = false,
             };
 
-            return ProcessRunner.Run(runInfo, Output);
+            return ProcessRunner.Run(runInfo, Output, token);
         }
 
         private string CredentialsUrl()

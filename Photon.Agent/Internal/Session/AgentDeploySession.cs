@@ -118,5 +118,10 @@ namespace Photon.Agent.Internal.Session
                 throw;
             }
         }
+
+        public override async Task CompleteAsync()
+        {
+            //
+        }
     }
 }

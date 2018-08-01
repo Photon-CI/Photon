@@ -39,7 +39,10 @@ namespace Photon.Agent.MessageHandlers
             }
             catch (Exception error) {
                 Log.Error("Failed to initialize Build Session!", error);
+
+                await session.CompleteAsync();
                 await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(session.SessionId);
+
                 throw new ApplicationException("Failed to initialize Build Session!", error);
             }
         }

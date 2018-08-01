@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Photon.Framework;
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Photon.Framework;
 
 namespace Photon.Library.GitHub
 {
@@ -16,10 +17,10 @@ namespace Photon.Library.GitHub
         public string Sha {get; set;}
 
 
-        public async Task<CommitStatusResponse> Post(CommitStatus status)
+        public async Task<CommitStatusResponse> Post(CommitStatus status, CancellationToken token = default(CancellationToken))
         {
             try {
-                return await PostMessage(status);
+                return await PostMessage(status, token);
             }
             catch (WebException error) when (error.Response is HttpWebResponse response) {
                 if (response.StatusCode == HttpStatusCode.NotFound)
@@ -29,7 +30,7 @@ namespace Photon.Library.GitHub
             }
         }
 
-        private async Task<CommitStatusResponse> PostMessage(CommitStatus status)
+        private async Task<CommitStatusResponse> PostMessage(CommitStatus status, CancellationToken token = default(CancellationToken))
         {
             var data = status.ToJson();
             var buffer = Encoding.UTF8.GetBytes(data);
@@ -53,17 +54,19 @@ namespace Photon.Library.GitHub
                 request.Headers.Add("Authorization", $"Basic {authString}");
             }
 
-            using (var requestStream = request.GetRequestStream()) {
-                await requestStream.WriteAsync(buffer, 0, buffer.Length);
-            }
+            using (token.Register(() => request.Abort())) {
+                using (var requestStream = request.GetRequestStream()) {
+                    await requestStream.WriteAsync(buffer, 0, buffer.Length, token);
+                }
 
-            using (var response = (HttpWebResponse) await request.GetResponseAsync())
-            using (var responseStream = response.GetResponseStream()) {
-                if (responseStream == null) return null;
+                using (var response = (HttpWebResponse) await request.GetResponseAsync())
+                using (var responseStream = response.GetResponseStream()) {
+                    if (responseStream == null) return null;
 
-                using (var reader = new StreamReader(responseStream))
-                using (var jsonReader = new JsonTextReader(reader)) {
-                    return JsonSettings.Serializer.Deserialize<CommitStatusResponse>(jsonReader);
+                    using (var reader = new StreamReader(responseStream))
+                    using (var jsonReader = new JsonTextReader(reader)) {
+                        return JsonSettings.Serializer.Deserialize<CommitStatusResponse>(jsonReader);
+                    }
                 }
             }
         }

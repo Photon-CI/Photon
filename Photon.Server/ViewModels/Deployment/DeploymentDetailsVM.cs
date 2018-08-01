@@ -15,7 +15,6 @@ namespace Photon.Server.ViewModels.Deployment
         public string DeploymentCreated {get; private set;}
         public string DeploymentDuration {get; private set;}
         public string DeploymentException {get; private set;}
-        public string BuildException {get; private set;}
         public string PackageId {get; private set;}
         public string PackageVersion {get; private set;}
         public string Environment {get; private set;}

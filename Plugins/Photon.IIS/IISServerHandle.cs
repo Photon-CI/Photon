@@ -1,6 +1,8 @@
 ﻿using Microsoft.Web.Administration;
 using Photon.Framework.Domain;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Plugins.IIS
 {
@@ -24,11 +26,27 @@ namespace Photon.Plugins.IIS
             _server?.Dispose();
         }
 
-        public void CommitChanges()
+        public bool CommitChanges()
         {
             _server.CommitChanges();
-            _server.Dispose();
-            _server = null;
+
+            return DisposeServer();
+        }
+
+        public bool CommitChanges(TimeSpan timeout)
+        {
+            using (var tokenSource = new CancellationTokenSource(timeout)) {
+                Task.Run(() => _server.CommitChanges(), tokenSource.Token);
+            }
+
+            return DisposeServer();
+        }
+
+        public async Task<bool> CommitChangesAsync(CancellationToken token)
+        {
+            await Task.Run(() => _server.CommitChanges(), token);
+
+            return DisposeServer();
         }
 
         private ServerManager GetServer()
@@ -37,6 +55,20 @@ namespace Photon.Plugins.IIS
 
             _server = ServerManager.OpenRemote(serverName);
             return _server;
+        }
+
+        private bool DisposeServer()
+        {
+            try {
+                _server.Dispose();
+                return true;
+            }
+            catch {
+                return false;
+            }
+            finally {
+                _server = null;
+            }
         }
     }
 }

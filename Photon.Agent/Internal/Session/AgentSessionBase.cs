@@ -101,6 +101,8 @@ namespace Photon.Agent.Internal.Session
 
         public abstract Task RunTaskAsync(string taskName, string taskSessionId);
 
+        public abstract Task CompleteAsync();
+
         public async Task ReleaseAsync()
         {
             if (IsReleased) return;

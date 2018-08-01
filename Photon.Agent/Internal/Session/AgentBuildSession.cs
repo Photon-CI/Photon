@@ -7,7 +7,6 @@ using Photon.Framework.Projects;
 using Photon.Framework.Tools.Content;
 using Photon.Library.GitHub;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +29,7 @@ namespace Photon.Agent.Internal.Session
         {
             await base.InitializeAsync();
 
-            LoadProjectSource();
+            await LoadProjectSource();
 
             LoadProjectAssembly();
         }
@@ -59,55 +58,30 @@ namespace Photon.Agent.Internal.Session
                 };
 
                 var githubSource = Project?.Source as ProjectGithubSource;
-                var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent && Commit != null;
-                CommitStatusUpdater su = null;
-                CommitStatus status;
+                var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-                if (notifyGithub) {
-                    su = new CommitStatusUpdater {
-                        Username = githubSource.Username,
-                        Password = githubSource.Password,
-                        StatusUrl = Commit.StatusesUrl,
-                        Sha = Commit.Sha,
-                    };
-
-                    status = new CommitStatus {
-                        State = CommitStates.Pending,
-                        Context = "Photon",
-                        Description = "Build in progress..."
-                    };
-
-                    await su.Post(status);
-                }
-
-                status = new CommitStatus {
-                    Context = "Photon",
-                };
+                if (notifyGithub)
+                    await NotifyGithubStarted(githubSource);
 
                 try {
                     await Domain.RunBuildTask(context, TokenSource.Token);
-
-                    if (notifyGithub) {
-                        status.State = CommitStates.Success;
-                        status.Description = "Build Successful.";
-                        await su.Post(status);
-                    }
                 }
                 catch (Exception error) {
                     Exception = error;
-
-                    if (notifyGithub) {
-                        status.State = CommitStates.Failure;
-                        status.Description = "Build Failed!";
-                        await su.Post(status);
-                    }
-
                     throw;
                 }
             }
         }
 
-        private void LoadProjectSource()
+        public override async Task CompleteAsync()
+        {
+            var githubSource = Project?.Source as ProjectGithubSource;
+            var notifyGithub =  githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
+
+            if (notifyGithub) await NotifyGithubComplete(githubSource);
+        }
+
+        private async Task LoadProjectSource()
         {
             if (Project.Source is ProjectFileSystemSource fsSource) {
                 Output.WriteLine($"Copying File-System directory '{fsSource.Path}' to work content directory.", ConsoleColor.DarkCyan);
@@ -121,8 +95,7 @@ namespace Photon.Agent.Internal.Session
 
                 RepositoryHandle handle = null;
                 try {
-                    handle = GetRepositoryHandle(githubSource.CloneUrl, TimeSpan.FromMinutes(1), TokenSource.Token)
-                        .GetAwaiter().GetResult();
+                    handle = await GetRepositoryHandle(githubSource.CloneUrl, TimeSpan.FromMinutes(1), TokenSource.Token);
 
                     handle.Username = githubSource.Username;
                     handle.Password = githubSource.Password;
@@ -130,7 +103,7 @@ namespace Photon.Agent.Internal.Session
                     handle.CommandLineExe = githubSource.CommandLineExe;
                     handle.Output = Output;
 
-                    handle.Checkout(GitRefspec);
+                    handle.Checkout(GitRefspec, TokenSource.Token);
 
                     Output.WriteLine("Copying repository to work content directory.", ConsoleColor.DarkCyan);
                     CopyDirectory(handle.Source.RepositoryPath, ContentDirectory);
@@ -170,9 +143,6 @@ namespace Photon.Agent.Internal.Session
                 throw new ApplicationException("Assembly filename is undefined!");
             }
 
-            var errorList = new Lazy<List<Exception>>();
-            var abort = false;
-
             if (!string.IsNullOrWhiteSpace(PreBuild)) {
                 Output.WriteLine("Running Pre-Build Script...", ConsoleColor.DarkCyan);
 
@@ -180,23 +150,20 @@ namespace Photon.Agent.Internal.Session
                     RunCommandScript(PreBuild);
                 }
                 catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Script Pre-Build failed! [{SessionId}]", error));
-                    //Log.Error($"Script Pre-Build command failed! [{Id}]", error);
                     Output.WriteLine($"An error occurred while executing the Pre-Build script! {error.Message} [{SessionId}]", ConsoleColor.DarkYellow);
-                    abort = true;
+                    throw new ApplicationException($"Script Pre-Build failed! [{SessionId}]", error);
                 }
             }
 
             var assemblyFilename = Path.Combine(ContentDirectory, AssemblyFilename);
 
             if (!File.Exists(assemblyFilename)) {
-                errorList.Value.Add(new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!"));
                 Output.WriteLine($"The assembly file '{assemblyFilename}' could not be found!", ConsoleColor.DarkYellow);
-                abort = true;
+                throw new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!");
             }
 
             // Shadow-Copy assembly folder
-            string assemblyCopyFilename = null;
+            string assemblyCopyFilename;
             try {
                 var sourcePath = Path.GetDirectoryName(assemblyFilename);
                 var assemblyName = Path.GetFileName(assemblyFilename);
@@ -204,25 +171,18 @@ namespace Photon.Agent.Internal.Session
                 CopyDirectory(sourcePath, BinDirectory);
             }
             catch (Exception error) {
-                errorList.Value.Add(new ApplicationException($"Failed to shadow-copy assembly '{assemblyFilename}'!", error));
                 Output.WriteLine($"Failed to shadow-copy assembly '{assemblyFilename}'!", ConsoleColor.DarkYellow);
-                abort = true;
+                throw new ApplicationException($"Failed to shadow-copy assembly '{assemblyFilename}'!", error);
             }
 
-            if (!abort) {
-                try {
-                    Domain = new AgentSessionDomain();
-                    Domain.Initialize(assemblyCopyFilename);
-                }
-                catch (Exception error) {
-                    errorList.Value.Add(new ApplicationException($"Failed to initialize Assembly! [{SessionId}]", error));
-                    Output.WriteLine($"An error occurred while initializing the assembly! {error.Message} [{SessionId}]", ConsoleColor.DarkRed);
-                    //abort = true;
-                }
+            try {
+                Domain = new AgentSessionDomain();
+                Domain.Initialize(assemblyCopyFilename);
             }
-
-            if (errorList.IsValueCreated)
-                throw new AggregateException(errorList.Value);
+            catch (Exception error) {
+                Output.WriteLine($"An error occurred while initializing the assembly! {error.Message} [{SessionId}]", ConsoleColor.DarkRed);
+                throw new ApplicationException($"Failed to initialize Assembly! [{SessionId}]", error);
+            }
         }
 
         private void CopyDirectory(string sourcePath, string destPath)
@@ -238,6 +198,50 @@ namespace Photon.Agent.Internal.Session
             };
 
             filter.Run();
+        }
+
+        private CommitStatusUpdater GetStatusUpdater(ProjectGithubSource githubSource)
+        {
+            return new CommitStatusUpdater {
+                Username = githubSource.Username,
+                Password = githubSource.Password,
+                StatusUrl = Commit.StatusesUrl,
+                Sha = Commit.Sha,
+            };
+        }
+
+        private async Task NotifyGithubStarted(ProjectGithubSource githubSource)
+        {
+            var status = new CommitStatus {
+                State = CommitStates.Pending,
+                Context = "Photon",
+                Description = "Build in progress..."
+            };
+
+            await GetStatusUpdater(githubSource).Post(status);
+        }
+
+        private async Task NotifyGithubComplete(ProjectGithubSource githubSource)
+        {
+            if (Commit == null) {
+                Log.Error("Unable to send GitHub notification! Commit is undefined!");
+                return;
+            }
+
+            var status = new CommitStatus {
+                Context = "Photon",
+            };
+
+            if (Exception != null) {
+                status.State = CommitStates.Failure;
+                status.Description = "Build Failed!";
+            }
+            else {
+                status.State = CommitStates.Success;
+                status.Description = "Build Successful.";
+            }
+
+            await GetStatusUpdater(githubSource).Post(status);
         }
 
         protected void RunCommandScript(string command)

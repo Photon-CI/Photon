@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.10")]
-[assembly: AssemblyFileVersion("0.0.10")]
+[assembly: AssemblyVersion("0.0.11")]
+[assembly: AssemblyFileVersion("0.0.11")]
 
 [assembly: AssemblyTitle("Photon.IIS")]
 [assembly: AssemblyDescription("IIS plugin for Photon.")]

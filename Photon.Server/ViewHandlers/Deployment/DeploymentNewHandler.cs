@@ -17,6 +17,7 @@ namespace Photon.Server.ViewHandlers.Deployment
                 ProjectId = GetQuery("project"),
                 PackageId = GetQuery("package"),
                 PackageVersion = GetQuery("version"),
+                EnvironmentName = GetQuery("env"),
             };
 
             try {
