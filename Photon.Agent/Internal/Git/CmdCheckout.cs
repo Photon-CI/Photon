@@ -47,8 +47,8 @@ namespace Photon.Agent.Internal.Git
         {
             var result = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"clone --progress -v {CredentialsUrl()} \"{Source.RepositoryPath}\"",
-                printArgs: $"clone --progress -v {Source.RepositoryUrl}",
+                arguments: $"clone -v {CredentialsUrl()} \"{Source.RepositoryPath}\"",
+                printArgs: $"clone -v {Source.RepositoryUrl}",
                 token: token);
 
             if (result.ExitCode != 0) throw new Exception("Failed to clone repository!");
@@ -68,7 +68,7 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: $"checkout -f --progress {refspec}",
+                arguments: $"checkout -f {refspec}",
                 token: token);
 
             if (r.ExitCode != 0) throw new Exception($"Failed to checkout refspec '{refspec}'!");
@@ -78,7 +78,7 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: "pull --progress",
+                arguments: "pull",
                 token: token);
 
             if (r.ExitCode != 0) throw new Exception("Failed to pull updates from remote!");
