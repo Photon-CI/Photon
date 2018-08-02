@@ -19,7 +19,6 @@ namespace Photon.Server.Internal.HealthChecks
 
         private readonly ConcurrentDictionary<string, AgentStatusItem> items;
         private CancellationTokenSource tokenSource;
-        private Task runTask;
 
         public TimeSpan Interval {get; set;}
         public int Parallelism {get; set;}
@@ -27,7 +26,7 @@ namespace Photon.Server.Internal.HealthChecks
 
         public HealthCheckService()
         {
-            Interval = TimeSpan.FromMinutes(15);
+            Interval = TimeSpan.FromMinutes(10);
             Parallelism = 8;
 
             items = new ConcurrentDictionary<string, AgentStatusItem>(StringComparer.Ordinal);
@@ -41,7 +40,7 @@ namespace Photon.Server.Internal.HealthChecks
         public void Start()
         {
             tokenSource = new CancellationTokenSource();
-            runTask = Run(tokenSource.Token);
+            _ = Run(tokenSource.Token);
         }
 
         public void Stop()
@@ -101,6 +100,7 @@ namespace Photon.Server.Internal.HealthChecks
             var item = new AgentStatusItem {
                 AgentId = agent.Id,
                 AgentName = agent.Name,
+                AgentVersion = result.Version,
                 Status = result.Status,
                 Warnings = result.Warnings?.ToArray(),
                 Errors = result.Errors?.ToArray(),
@@ -141,6 +141,7 @@ namespace Photon.Server.Internal.HealthChecks
 
                     return new HealthCheckResult {
                         Status = status,
+                        Version = response.AgentVersion,
                         Warnings = response.Warnings,
                         Errors = response.Errors,
                     };
@@ -166,6 +167,7 @@ namespace Photon.Server.Internal.HealthChecks
     internal class HealthCheckResult
     {
         public AgentStatus Status {get; set;}
+        public string Version {get; set;}
         public List<string> Warnings {get; set;}
         public List<string> Errors {get; set;}
 

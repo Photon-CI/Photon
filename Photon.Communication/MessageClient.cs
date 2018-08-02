@@ -46,8 +46,9 @@ namespace Photon.Communication
 
         public async Task ConnectAsync(string hostname, int port, CancellationToken token)
         {
-            token.Register(() => Tcp.Close());
-            await Tcp.ConnectAsync(hostname, port);
+            using (token.Register(() => Tcp.Close())) {
+                await Tcp.ConnectAsync(hostname, port);
+            }
 
             Transceiver.Start(Tcp);
         }

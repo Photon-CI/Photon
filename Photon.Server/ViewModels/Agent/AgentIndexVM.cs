@@ -19,6 +19,7 @@ namespace Photon.Server.ViewModels.Agent
                     return new AgentRow {
                         Id = x.Id,
                         Name = x.Name,
+                        Version = status?.AgentVersion,
                         Roles = x.Roles.OrderBy(y => y).ToArray(),
                         Class = statusClass,
                     };
@@ -42,6 +43,7 @@ namespace Photon.Server.ViewModels.Agent
         {
             public string Id {get; set;}
             public string Name {get; set;}
+            public string Version {get; set;}
             public string[] Roles {get; set;}
             public string Class {get; set;}
         }

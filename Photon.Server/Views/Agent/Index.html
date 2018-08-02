@@ -44,7 +44,7 @@
         cursor: pointer;
     }
     .c-icon {
-        width: 0;
+        width: 1px;
         white-space: nowrap;
     }
     .agent-status-holder {
@@ -58,9 +58,7 @@
 {{#EndStyle}}
 
 <nav class="navbar navbar-dark bg-dark content-navbar">
-    <div class="navbar-brand mr-auto">
-        <!--<h3 class="text-primary my-0">Agents</h3>-->
-    </div>
+    <div class="navbar-brand mr-auto"></div>
     <div class="form-inline">
         <a href="{{#Url agent/edit}}" class="btn btn-sm btn-success mr-2">
             New <i class="fas fa-plus"></i>
@@ -93,7 +91,7 @@
                 <i class="{{agent.Class}}"></i>
             </td>
             <td>
-                <b>{{agent.Name}}</b>
+                <b>{{agent.Name}}</b> {{#If agent.Version}}<small class="text-muted">{{agent.Version}}</small>{{#EndIf}}
             </td>
             <td>
                 {{#Each agent.Roles.role}}
@@ -105,39 +103,3 @@
     </table>
     {{#EndIf}}
 </div>
-
-<!--<div class="container-fluid mt-3">
-    {{#If !Agents}}
-    <div class="container px-3 py-0">
-        <h3 class="py-0 text-muted">No Agents have been defined.</h3>
-        <p>
-            Agents are required for executing Build and Deployment scripts.
-            Create a <a href="{{#Url agent/edit}}">new Agent</a>.
-        </p>
-    </div>
-    {{#EndIf}}
-    <div class="row no-gutters card-container">
-        {{#Each Agents.agent}}
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3" data-card-name="{{agent.Name}}">
-            <div class="card agent-card">
-                <div class="card-header">
-                    <div class="agent-status-holder">
-                        <i class="fas fa-check-circle text-success"></i>
-                    </div>
-                    <div class="agent-name-holder">
-                        <h5 class="card-title agent-name">
-                            <a href="{{#Url Agent/Edit}}?id={{&agent.Id}}">{{agent.Name}}</a>
-                        </h5><br />
-                        <h6 class="card-subtitle agent-address text-muted">{{agent.TcpHost}} :{{agent.TcpPort}}</h6>
-                    </div>
-                </div>
-                <div class="card-body">
-                    {{#Each agent.Roles.role}}
-                    <div class="badge badge-dark">{{role}}</div>
-                    {{#EndEach}}
-                </div>
-            </div>
-        </div>
-        {{#EndEach}}
-    </div>
-</div>-->

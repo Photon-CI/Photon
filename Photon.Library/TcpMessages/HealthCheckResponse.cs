@@ -5,6 +5,7 @@ namespace Photon.Library.TcpMessages
 {
     public class HealthCheckResponse : ResponseMessageBase
     {
+        public string AgentVersion {get; set;}
         public List<string> Warnings {get; set;}
         public List<string> Errors {get; set;}
 

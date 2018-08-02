@@ -93,7 +93,6 @@ namespace Photon.Server.Internal
 
             Sessions.Start();
             Queue.Start();
-            HealthChecks.Start();
 
             var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskHttp = Task.Run(() => StartHttpServer());
@@ -105,6 +104,8 @@ namespace Photon.Server.Internal
                 taskAgents,
                 taskProjects,
                 taskHttp);
+
+            HealthChecks.Start();
 
             Log.Info("Server started.");
         }
