@@ -22,6 +22,9 @@ namespace Photon.Framework.Projects
         [JsonProperty("commandLine", Order = 5)]
         public bool UseCommandLine {get; set;}
 
+        [JsonProperty("enableTracing", Order = 5)]
+        public bool EnableTracing {get; set;}
+
         [JsonProperty("exe", Order = 6)]
         public string CommandLineExe {get; set;}
 

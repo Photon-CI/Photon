@@ -101,6 +101,7 @@ namespace Photon.Agent.Internal.Session
                     handle.Password = githubSource.Password;
                     handle.UseCommandLine = githubSource.UseCommandLine;
                     handle.CommandLineExe = githubSource.CommandLineExe;
+                    handle.EnableTracing = githubSource.EnableTracing;
                     handle.Output = Output;
 
                     handle.Checkout(GitRefspec, TokenSource.Token);

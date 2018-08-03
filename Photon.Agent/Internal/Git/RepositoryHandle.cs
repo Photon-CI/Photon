@@ -16,6 +16,7 @@ namespace Photon.Agent.Internal.Git
         public string Username {get; set;}
         public string Password {get; set;}
         public bool UseCommandLine {get; set;}
+        public bool EnableTracing {get; set;}
         public string CommandLineExe {get; set;}
 
 
@@ -42,6 +43,7 @@ namespace Photon.Agent.Internal.Git
                     Source = Source,
                     Username = Username,
                     Password = Password,
+                    EnableTracing = EnableTracing,
                 };
             }
             else {
@@ -53,6 +55,7 @@ namespace Photon.Agent.Internal.Git
                     Source = Source,
                     Username = Username,
                     Password = Password,
+                    // TODO: Tracing
                 };
             }
 

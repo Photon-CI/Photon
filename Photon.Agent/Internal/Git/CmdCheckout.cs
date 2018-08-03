@@ -13,11 +13,13 @@ namespace Photon.Agent.Internal.Git
         public RepositorySource Source {get; set;}
         public string Username {get; set;}
         public string Password {get; set;}
+        public bool EnableTracing {get; set;}
 
 
         public CmdCheckout()
         {
             Exe = "git";
+            EnableTracing = false;
         }
 
         public void Checkout(string refspec = "master", CancellationToken token = default(CancellationToken))
@@ -58,7 +60,7 @@ namespace Photon.Agent.Internal.Git
         {
             var r = GitCmd(
                 root: Source.RepositoryPath,
-                arguments: "fetch -p -P -t --progress",
+                arguments: "fetch -p -P -t",
                 token: token);
 
             if (r.ExitCode != 0) throw new Exception("Failed to fetch remotes!");
@@ -95,11 +97,17 @@ namespace Photon.Agent.Internal.Git
                 EchoCommand = false,
             };
 
+            if (EnableTracing)
+                runInfo.EnvironmentVariables["GIT_TRACE"] = "1";
+
             return ProcessRunner.Run(runInfo, Output, token);
         }
 
         private string CredentialsUrl()
         {
+            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password))
+                return Source.RepositoryUrl;
+
             var i = Source.RepositoryUrl.IndexOf("://", StringComparison.Ordinal);
             if (i < 0) throw new ApplicationException($"Invalid URL '{Source.RepositoryUrl}'!");
 

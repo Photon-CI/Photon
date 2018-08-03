@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,8 +14,14 @@ namespace Photon.Framework
         public string Filename {get; set;}
         public string Arguments {get; set;}
         public string WorkingDirectory {get; set;}
+        public Dictionary<string, string> EnvironmentVariables {get; set;}
         public bool EchoCommand {get; set;}
 
+
+        public ProcessRunInfo()
+        {
+            EnvironmentVariables = new Dictionary<string, string>();
+        }
 
         public static ProcessRunInfo FromCommand(string command)
         {
@@ -85,6 +92,9 @@ namespace Photon.Framework
 
             if (!string.IsNullOrEmpty(info.WorkingDirectory))
                 startInfo.WorkingDirectory = info.WorkingDirectory;
+
+            foreach (var key in info.EnvironmentVariables.Keys)
+                startInfo.EnvironmentVariables[key] = info.EnvironmentVariables[key];
 
             return Process.Start(startInfo);
         }
