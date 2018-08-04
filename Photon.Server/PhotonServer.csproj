@@ -206,42 +206,54 @@
     <Compile Include="ViewModels\VariableSet\VariablesIndexVM.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.eot">
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.eot">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-brands-400.eot</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.ttf">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-brands-400.ttf</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.woff">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-brands-400.woff</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.woff2">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-brands-400.woff2</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.eot">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-regular-400.eot</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.ttf">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-regular-400.ttf</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.woff">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-regular-400.woff</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.woff2">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-regular-400.woff2</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.eot">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-solid-900.eot</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.ttf">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-solid-900.ttf</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.woff">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-solid-900.woff</Link>
-    </None>
-    <None Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.woff2">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-solid-900.woff2</Link>
-    </None>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
@@ -284,18 +296,23 @@
     </Content>
     <Content Include="..\SharedContent\fontawesome-5.2.0\css\all.css">
       <Link>Content\fontawesome-5.2.0\css\all.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SharedContent\fontawesome-5.2.0\css\all.min.css">
       <Link>Content\fontawesome-5.2.0\css\all.min.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-brands-400.svg">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-brands-400.svg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-regular-400.svg">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-regular-400.svg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.svg">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-solid-900.svg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SharedContent\jquery-3.3.1.min.js">
       <Link>Content\jquery-3.3.1.min.js</Link>
