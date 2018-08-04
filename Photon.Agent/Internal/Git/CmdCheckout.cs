@@ -32,6 +32,12 @@ namespace Photon.Agent.Internal.Git
 
             GitCheckout(refspec, token);
 
+            var headCommit = GitGetHeadCommit(token);
+            var commonCommit = GitGetCommonCommit(refspec, token);
+
+            if (!string.Equals(headCommit, commonCommit))
+                GitResetHard(commonCommit, token);
+
             GitPull(token);
         }
 
@@ -43,6 +49,30 @@ namespace Photon.Agent.Internal.Git
                 token: token);
 
             return r.ExitCode == 0 && string.Equals(r.Output.Trim(), "true");
+        }
+
+        private string GitGetHeadCommit(CancellationToken token = default(CancellationToken))
+        {
+            var r = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: "rev-parse HEAD",
+                token: token);
+
+            if (r.ExitCode != 0) throw new Exception("Failed to get HEAD commit!");
+
+            return r.Output.Trim();
+        }
+
+        private string GitGetCommonCommit(string refspec, CancellationToken token = default(CancellationToken))
+        {
+            var r = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: $"merge-base HEAD origin/{refspec}",
+                token: token);
+
+            if (r.ExitCode != 0) throw new Exception("Failed to get common commit between HEAD and remote!");
+
+            return r.Output.Trim();
         }
 
         private void GitClone(CancellationToken token = default(CancellationToken))
@@ -64,6 +94,16 @@ namespace Photon.Agent.Internal.Git
                 token: token);
 
             if (r.ExitCode != 0) throw new Exception("Failed to fetch remotes!");
+        }
+
+        private void GitResetHard(string commit, CancellationToken token = default(CancellationToken))
+        {
+            var r = GitCmd(
+                root: Source.RepositoryPath,
+                arguments: $"reset --hard {commit}",
+                token: token);
+
+            if (r.ExitCode != 0) throw new Exception($"Failed to reset branch to commit '{commit}'!");
         }
 
         private void GitCheckout(string refspec, CancellationToken token = default(CancellationToken))

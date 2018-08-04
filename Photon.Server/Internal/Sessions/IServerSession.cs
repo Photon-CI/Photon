@@ -15,6 +15,7 @@ namespace Photon.Server.Internal.Sessions
         ScriptOutput Output {get;}
         TaskResult Result {get;}
         bool IsComplete {get;}
+        bool IsUserAborted {get;}
 
         Task InitializeAsync();
         Task PrepareWorkDirectoryAsync();

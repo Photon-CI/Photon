@@ -29,6 +29,7 @@ namespace Photon.Server.Internal.Sessions
         private readonly Lazy<ILog> _log;
         public DateTime TimeCreated {get;}
         public DateTime? TimeReleased {get; private set;}
+        public bool IsUserAborted {get; private set;}
 
         public string SessionId {get;}
         public string WorkDirectory {get;}
@@ -183,6 +184,7 @@ namespace Photon.Server.Internal.Sessions
 
         public void Abort()
         {
+            IsUserAborted = true;
             TokenSource.Cancel();
 
             foreach (var host in hostList.Values)

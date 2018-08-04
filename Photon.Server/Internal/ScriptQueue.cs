@@ -1,11 +1,11 @@
 ﻿using log4net;
+using Photon.Framework.Extensions;
 using Photon.Framework.Tasks;
 using Photon.Server.Internal.Sessions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Photon.Framework.Extensions;
 
 namespace Photon.Server.Internal
 {
@@ -91,24 +91,30 @@ namespace Photon.Server.Internal
             try {
                 await PreProcessSession(session);
 
-                session.Output.WriteLine("Build Successful.", ConsoleColor.Green);
-                result = TaskResult.Ok();
-            }
-            catch (OperationCanceledException) {
-                Log.Warn($"Session '{session.SessionId}' cancelled.");
-
-                session.Output.WriteLine("Build Cancelled.", ConsoleColor.DarkYellow);
-                result = TaskResult.Cancel();
+                if (!session.IsUserAborted) {
+                    session.Output.WriteLine("SUCCESS.", ConsoleColor.Green);
+                    result = TaskResult.Ok();
+                }
+                else {
+                    session.Output.WriteLine("CANCELLED", ConsoleColor.DarkYellow);
+                    result = TaskResult.Cancel();
+                }
             }
             catch (Exception error) {
-                Log.Error($"Session '{session.SessionId}' failed!", error);
+                if (!session.IsUserAborted) {
+                    Log.Error($"Session '{session.SessionId}' failed!", error);
 
-                session.Exception = error;
-                session.Output.WriteBlock(w => w
-                    .Write("Build Failed! ", ConsoleColor.DarkRed)
-                    .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
+                    session.Exception = error;
+                    session.Output.WriteBlock(w => w
+                        .Write("FAILED! ", ConsoleColor.DarkRed)
+                        .WriteLine(error.UnfoldMessages(), ConsoleColor.DarkYellow));
 
-                result = TaskResult.Error(error);
+                    result = TaskResult.Error(error);
+                }
+                else {
+                    session.Output.WriteLine("CANCELLED", ConsoleColor.DarkYellow);
+                    result = TaskResult.Cancel();
+                }
             }
 
             try {
@@ -170,8 +176,6 @@ namespace Photon.Server.Internal
 
         private async Task PostProcessSession(IServerSession session, TaskResult result)
         {
-            session.Output.WriteLine("Destroying working directory...", ConsoleColor.DarkCyan);
-
             try {
                 await session.ReleaseAsync();
             }
