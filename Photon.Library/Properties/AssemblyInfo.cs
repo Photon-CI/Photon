@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("1.0.19")]
-[assembly: AssemblyFileVersion("1.0.19")]
+[assembly: AssemblyVersion("1.0.20")]
+[assembly: AssemblyFileVersion("1.0.20")]
 
 [assembly: AssemblyTitle("Photon Library")]
 [assembly: AssemblyDescription("Base library for Photon applications.")]

@@ -1,0 +1,46 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="packages"]').addClass('active');
+    });
+</script>
+{{#EndScript}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto"></div>
+</nav>
+
+<div class="container mt-3">
+    {{#If !AnyVersions}}
+    <div class="px-3 py-0">
+        <h3 class="py-0 text-muted">No versions of this package were found.</h3>
+    </div>
+    {{#Else}}
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <table class="table table-sm table-striped bg-light mt-3">
+                <thead class="thead-light">
+                <tr>
+                    <th>Version</th>
+                    <th>Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#Each PackageVersions.version}}
+                <tr>
+                    <td>
+                        <a href="{{#Url api/applicationPackage/get}}?id={{&version.Id}}&version={{&version.Version}}">{{version.Version}}</a>
+                    </td>
+                    <td>
+                        {{version.Created}}
+                    </td>
+                </tr>
+                {{#EndEach}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{#EndIf}}
+</div>

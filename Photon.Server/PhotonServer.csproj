@@ -76,6 +76,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiHandlers\Deploy\OutputStreamHandler.cs" />
+    <Compile Include="ApiHandlers\Package\ApplicationPackageGetHandler.cs" />
+    <Compile Include="ApiHandlers\Package\ProjectPackageGetHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
     <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
@@ -106,6 +108,8 @@
     <Compile Include="ViewHandlers\Deployment\DeploymentNewHandler.cs" />
     <Compile Include="ViewHandlers\LoginHandler.cs" />
     <Compile Include="ViewHandlers\LogoutHandler.cs" />
+    <Compile Include="ViewHandlers\Package\ApplicationPackageDetailsHandler.cs" />
+    <Compile Include="ViewHandlers\Package\ProjectPackageDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Security\SecurityIndexHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
     <Compile Include="ViewHandlers\Package\PackageIndexHandler.cs" />
@@ -191,6 +195,9 @@
     <Compile Include="ViewModels\Deployment\DeploymentNewVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\LoginVM.cs" />
+    <Compile Include="ViewModels\Package\ApplicationPackageDetailsVM.cs" />
+    <Compile Include="ViewModels\Package\ProjectPackageDetailsVM.cs" />
+    <Compile Include="ViewModels\Package\PackageIndexVM.cs" />
     <Compile Include="ViewModels\Project\ProjectJsonVM.cs" />
     <Compile Include="ViewModels\Project\ProjectEditVM.cs" />
     <Compile Include="ViewModels\Project\ProjectIndexVM.cs" />
@@ -380,6 +387,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Build\Index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Package\ApplicationDetails.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Package\ProjectDetails.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Security\Index.html">

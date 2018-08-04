@@ -6,13 +6,14 @@ using System;
 namespace Photon.Server.ViewHandlers.Package
 {
     [Secure]
-    [HttpHandler("/packages")]
-    [HttpHandler("/package/index")]
-    internal class PackageIndexHandler : HttpHandler
+    [HttpHandler("/application-package/details")]
+    internal class ApplicationPackageDetailsHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new PackageIndexVM();
+            var vm = new ApplicationPackageDetailsVM {
+                PackageId = GetQuery("id"),
+            };
 
             try {
                 vm.Build();
@@ -21,7 +22,7 @@ namespace Photon.Server.ViewHandlers.Package
                 vm.Errors.Add(error);
             }
 
-            return Response.View("Package\\Index.html", vm);
+            return Response.View("Package\\ApplicationDetails.html", vm);
         }
     }
 }
