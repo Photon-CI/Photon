@@ -39,6 +39,8 @@
       <ComponentGroupRef Id="Views_Deployment_files" />
       <ComponentGroupRef Id="Views_Configuration_files" />
       <ComponentGroupRef Id="Views_Security_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.2.0_webfonts_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.2.0_css_files" />
 		</Feature>
     
     <Property Id="CREATEFIREWALLEXCEPTION" Value="yes" Secure="yes" />
@@ -84,6 +86,10 @@
 		            <Directory Id="Content_fontawesome_5.0.13" Name="fontawesome-5.0.13">
 		              <Directory Id="Content_fontawesome_5.0.13_css" Name="css" />
 		              <Directory Id="Content_fontawesome_5.0.13_js" Name="js" />
+		            </Directory>
+		            <Directory Id="Content_fontawesome_5.2.0" Name="fontawesome-5.2.0">
+		              <Directory Id="Content_fontawesome_5.2.0_css" Name="css" />
+		              <Directory Id="Content_fontawesome_5.2.0_webfonts" Name="webfonts" />
 		            </Directory>
 		          </Directory>
 		          <Directory Id="Views" Name="Views">
@@ -314,31 +320,17 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.13_js_files" Directory="Content_fontawesome_5.0.13_js">
-      <Component Id="Content_fontawesome_5.0.13_js_fontawesome.min.js" Guid="fa3f969d-6960-4c9c-99e6-a05938e88c0c">
-        <File Id="Content_fontawesome_5.0.13_js_fontawesome.min.js" Name="fontawesome.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fontawesome.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fontawesome_all.min.js" Guid="8656b6d7-5d5b-413f-8656-e10cefbb6bc3">
-        <File Id="Content_fontawesome_5.0.13_js_fontawesome_all.min.js" Name="fontawesome-all.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fontawesome-all.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_v4_shims.min.js" Guid="4336951c-5e80-4cf7-ba30-f7087bd213f5">
-        <File Id="Content_fontawesome_5.0.13_js_fa_v4_shims.min.js" Name="fa-v4-shims.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-v4-shims.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_solid.min.js" Guid="3a7557ed-0501-40a1-be4e-7c4e489ddd30">
-        <File Id="Content_fontawesome_5.0.13_js_fa_solid.min.js" Name="fa-solid.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-solid.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_regular.min.js" Guid="c21772f4-8a89-404c-9d5f-bfe0083121a5">
-        <File Id="Content_fontawesome_5.0.13_js_fa_regular.min.js" Name="fa-regular.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-regular.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_brands.min.js" Guid="e3598269-fa6f-4532-bbc3-3827269779bc">
-        <File Id="Content_fontawesome_5.0.13_js_fa_brands.min.js" Name="fa-brands.min.js" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\js\fa-brands.min.js" />
-      </Component>
+      
+      
+      
+      
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.13_css_files" Directory="Content_fontawesome_5.0.13_css">
-      <Component Id="Content_fontawesome_5.0.13_css_fa_svg_with_js.css" Guid="7efe9282-6821-405c-9dee-9360353e4080">
-        <File Id="Content_fontawesome_5.0.13_css_fa_svg_with_js.css" Name="fa-svg-with-js.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.0.13\css\fa-svg-with-js.css" />
-      </Component>
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -382,6 +374,12 @@
       <Component Id="Views_Package_Index.html" Guid="18eb0848-02bf-4e0b-b2bc-b873d4e1cb96">
         <File Id="Views_Package_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Package\Index.html" />
       </Component>
+      <Component Id="Views_Package_ApplicationDetails.html" Guid="4769f3ee-a04b-488c-8263-fd0d13bd52c0">
+        <File Id="Views_Package_ApplicationDetails.html" Name="ApplicationDetails.html" Source="$(var.PhotonServer_TargetDir)Views\Package\ApplicationDetails.html" />
+      </Component>
+      <Component Id="Views_Package_ProjectDetails.html" Guid="77ca619a-bb75-4377-b017-65fc0d3d6bae">
+        <File Id="Views_Package_ProjectDetails.html" Name="ProjectDetails.html" Source="$(var.PhotonServer_TargetDir)Views\Package\ProjectDetails.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -421,6 +419,29 @@
     <ComponentGroup Id="Views_Security_files" Directory="Views_Security">
       <Component Id="Views_Security_Index.html" Guid="0c6e3b92-fec5-45d6-82a9-0e8131b3f379">
         <File Id="Views_Security_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Security\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.2.0_webfonts_files" Directory="Content_fontawesome_5.2.0_webfonts">
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.svg" Guid="01d9fe03-d5d2-490e-b86e-5c8e4e50a2ec">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.svg" Name="fa-solid-900.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.svg" Guid="54306c7e-6d39-4ca9-97c1-b4bd77ea31b7">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.svg" Name="fa-regular-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.svg" Guid="5c24f725-fa25-45f2-8d14-635dc6507ccd">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.svg" Name="fa-brands-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.svg" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.2.0_css_files" Directory="Content_fontawesome_5.2.0_css">
+      <Component Id="Content_fontawesome_5.2.0_css_all.css" Guid="c215cd63-9432-4db3-b2c9-cecf9f58711c">
+        <File Id="Content_fontawesome_5.2.0_css_all.css" Name="all.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\css\all.css" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_css_all.min.css" Guid="a3530fe2-fc38-4a54-95fa-54bce895c995">
+        <File Id="Content_fontawesome_5.2.0_css_all.min.css" Name="all.min.css" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\css\all.min.css" />
       </Component>
     </ComponentGroup>
   </Fragment>

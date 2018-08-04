@@ -32,6 +32,8 @@
       <ComponentGroupRef Id="Views_Applications_files" />
       <ComponentGroupRef Id="Views_Security_files" />
       <ComponentGroupRef Id="Views_Configuration_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.2.0_webfonts_files" />
+      <ComponentGroupRef Id="Content_fontawesome_5.2.0_css_files" />
     </Feature>
     <!--<Property Id="CREATEFIREWALLEXCEPTION" Secure="yes" Value="1">
       <RegistrySearch Id="FirewallExceptionRegKey" Root="HKLM" Key="SOFTWARE\Photon\Agent" Type="raw" Name="FirewallException" />
@@ -122,6 +124,10 @@
                 <Directory Id="Content_fontawesome_5.0.13" Name="fontawesome-5.0.13">
                   <Directory Id="Content_fontawesome_5.0.13_css" Name="css" />
                   <Directory Id="Content_fontawesome_5.0.13_js" Name="js" />
+                </Directory>
+                <Directory Id="Content_fontawesome_5.2.0" Name="fontawesome-5.2.0">
+                  <Directory Id="Content_fontawesome_5.2.0_css" Name="css" />
+                  <Directory Id="Content_fontawesome_5.2.0_webfonts" Name="webfonts" />
                 </Directory>
               </Directory>
               <Directory Id="Views" Name="Views">
@@ -325,31 +331,17 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.13_js_files" Directory="Content_fontawesome_5.0.13_js">
-      <Component Id="Content_fontawesome_5.0.13_js_fontawesome.min.js" Guid="92596db0-3797-44ee-8c55-c8867d7e30e6">
-        <File Id="Content_fontawesome_5.0.13_js_fontawesome.min.js" Name="fontawesome.min.js" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.0.13\js\fontawesome.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fontawesome_all.min.js" Guid="de4038a6-7239-45ea-922a-c3cf3304d8de">
-        <File Id="Content_fontawesome_5.0.13_js_fontawesome_all.min.js" Name="fontawesome-all.min.js" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.0.13\js\fontawesome-all.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_v4_shims.min.js" Guid="593d98c7-5cfa-436d-af91-146120220c45">
-        <File Id="Content_fontawesome_5.0.13_js_fa_v4_shims.min.js" Name="fa-v4-shims.min.js" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.0.13\js\fa-v4-shims.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_solid.min.js" Guid="b33b911a-5357-4279-8683-7d2e6c5df683">
-        <File Id="Content_fontawesome_5.0.13_js_fa_solid.min.js" Name="fa-solid.min.js" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.0.13\js\fa-solid.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_brands.min.js" Guid="95ae044b-e2ae-47db-9fd0-2ba89e35b5b7">
-        <File Id="Content_fontawesome_5.0.13_js_fa_brands.min.js" Name="fa-brands.min.js" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.0.13\js\fa-brands.min.js" />
-      </Component>
-      <Component Id="Content_fontawesome_5.0.13_js_fa_regular.min.js" Guid="0b3bbd5e-f74b-4813-a618-23b59a8ad0e3">
-        <File Id="Content_fontawesome_5.0.13_js_fa_regular.min.js" Name="fa-regular.min.js" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.0.13\js\fa-regular.min.js" />
-      </Component>
+      
+      
+      
+      
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.13_css_files" Directory="Content_fontawesome_5.0.13_css">
-      <Component Id="Content_fontawesome_5.0.13_css_fa_svg_with_js.css" Guid="87714398-94fa-4c22-9c89-4fc6f14150ae">
-        <File Id="Content_fontawesome_5.0.13_css_fa_svg_with_js.css" Name="fa-svg-with-js.css" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.0.13\css\fa-svg-with-js.css" />
-      </Component>
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -380,6 +372,29 @@
     <ComponentGroup Id="Views_Configuration_files" Directory="Views_Configuration">
       <Component Id="Views_Configuration_Index.html" Guid="5d5b7ea3-53ac-4f1d-90f0-3a5b99a3d47f">
         <File Id="Views_Configuration_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Configuration\Index.html" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.2.0_webfonts_files" Directory="Content_fontawesome_5.2.0_webfonts">
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.svg" Guid="a540a1dc-c91b-40bf-a275-0267d9d2f12c">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.svg" Name="fa-brands-400.svg" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.svg" Guid="97f37aef-432f-47e1-b990-e5e136447cbb">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.svg" Name="fa-regular-400.svg" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.svg" Guid="de298945-7e4f-47a9-97eb-5a5ef5956fae">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.svg" Name="fa-solid-900.svg" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.svg" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Content_fontawesome_5.2.0_css_files" Directory="Content_fontawesome_5.2.0_css">
+      <Component Id="Content_fontawesome_5.2.0_css_all.css" Guid="5b52b4d8-e243-4e31-a51a-2c1c1032253c">
+        <File Id="Content_fontawesome_5.2.0_css_all.css" Name="all.css" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\css\all.css" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_css_all.min.css" Guid="7028c84d-d91e-4b3a-b7c9-49bdd07e9f4a">
+        <File Id="Content_fontawesome_5.2.0_css_all.min.css" Name="all.min.css" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\css\all.min.css" />
       </Component>
     </ComponentGroup>
   </Fragment>
