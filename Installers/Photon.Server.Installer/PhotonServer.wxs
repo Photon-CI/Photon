@@ -230,30 +230,10 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.11_css_files" Directory="Content_fontawesome_5.0.11_css">
-      
-      
-      
-      
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.11_webfonts_files" Directory="Content_fontawesome_5.0.11_webfonts">
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -320,17 +300,10 @@
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.13_js_files" Directory="Content_fontawesome_5.0.13_js">
-      
-      
-      
-      
-      
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Content_fontawesome_5.0.13_css_files" Directory="Content_fontawesome_5.0.13_css">
-      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -427,11 +400,38 @@
       <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.svg" Guid="01d9fe03-d5d2-490e-b86e-5c8e4e50a2ec">
         <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.svg" Name="fa-solid-900.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.svg" />
       </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.ttf" Guid="3D4F6C4E-E220-4FE1-A451-D3018C4E0007">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.ttf" Name="fa-solid-900.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.ttf" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.woff" Guid="FC137283-9775-4AFA-A74D-633EC13FE633">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.woff" Name="fa-solid-900.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.woff" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.woff2" Guid="2C8EC6E7-9399-47D2-AD2A-660E9C61AC77">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.woff2" Name="fa-solid-900.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.woff2" />
+      </Component>
       <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.svg" Guid="54306c7e-6d39-4ca9-97c1-b4bd77ea31b7">
         <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.svg" Name="fa-regular-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.svg" />
       </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.ttf" Guid="F2B9FF3C-2E50-4B63-A495-734BBC266A2A">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.ttf" Name="fa-regular-400.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.ttf" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.woff" Guid="97B73486-C340-46AD-BAF1-D4B066249AA5">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.woff" Name="fa-regular-400.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.woff" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.woff2" Guid="C38AF851-3E40-4CF9-8921-7D820FFFC6B8">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.woff2" Name="fa-regular-400.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.woff2" />
+      </Component>
       <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.svg" Guid="5c24f725-fa25-45f2-8d14-635dc6507ccd">
         <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.svg" Name="fa-brands-400.svg" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.svg" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.ttf" Guid="25E35492-76FD-4308-B152-605154E587FC">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.ttf" Name="fa-brands-400.ttf" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.ttf" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff" Guid="D17491C4-6FE4-4A01-BC0B-07CDC9A1F50A">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff" Name="fa-brands-400.woff" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.woff" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff2" Guid="015CDF42-888C-4A48-8DB5-3A58657019AD">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff2" Name="fa-brands-400.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.woff2" />
       </Component>
     </ComponentGroup>
   </Fragment>
