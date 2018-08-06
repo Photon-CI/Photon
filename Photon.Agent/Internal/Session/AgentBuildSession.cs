@@ -60,7 +60,7 @@ namespace Photon.Agent.Internal.Session
                 var githubSource = Project?.Source as ProjectGithubSource;
                 var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-                if (notifyGithub)
+                if (notifyGithub && Commit != null)
                     await NotifyGithubStarted(githubSource);
 
                 try {
@@ -78,7 +78,8 @@ namespace Photon.Agent.Internal.Session
             var githubSource = Project?.Source as ProjectGithubSource;
             var notifyGithub =  githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-            if (notifyGithub) await NotifyGithubComplete(githubSource);
+            if (notifyGithub && Commit != null)
+                await NotifyGithubComplete(githubSource);
         }
 
         private async Task LoadProjectSource()
@@ -213,6 +214,11 @@ namespace Photon.Agent.Internal.Session
 
         private async Task NotifyGithubStarted(ProjectGithubSource githubSource)
         {
+            if (Commit == null) {
+                Log.Error("Unable to send GitHub notification! Commit is undefined!");
+                return;
+            }
+
             var status = new CommitStatus {
                 State = CommitStates.Pending,
                 Context = "Photon",

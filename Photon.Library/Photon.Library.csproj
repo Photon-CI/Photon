@@ -78,6 +78,10 @@
     <Compile Include="Packages\ApplicationPackageManager.cs" />
     <Compile Include="Packages\PackageManagerBase.cs" />
     <Compile Include="Packages\ProjectPackageManager.cs" />
+    <Compile Include="Security\GroupRoles.cs" />
+    <Compile Include="Security\User.cs" />
+    <Compile Include="Security\UserGroup.cs" />
+    <Compile Include="Security\UserGroupManager.cs" />
     <Compile Include="Session\SessionStatusArgs.cs" />
     <Compile Include="TcpMessages\HealthCheckResponse.cs" />
     <Compile Include="TcpMessages\AgentGetVersionResponse.cs" />

@@ -22,49 +22,54 @@
     </div>
 </nav>
 
+{{#If !AnyPackages}}
 <div class="container mt-3">
-    {{#If !AnyPackages}}
     <div class="px-3 py-0">
         <h3 class="py-0 text-muted">No Packages have been created.</h3>
         <p>
             Packages are created by running <code>IBuildTask</code> methods on one or more Agents.
         </p>
     </div>
-    {{#EndIf}}
-    {{#If AnyProjectPackages}}
-    <table class="table table-sm table-striped bg-light mt-3">
-        <thead class="thead-light">
-            <tr>
-                <th>Project Packages</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#Each ProjectPackages.package}}
-            <tr>
-                <td>
-                    <a href="{{#Url project-package/details}}?id={{&package}}">{{package}}</a>
-                </td>
-            </tr>
-            {{#EndEach}}
-        </tbody>
-    </table>
-    {{#EndIf}}
-    {{#If AnyApplicationPackages}}
-    <table class="table table-sm table-striped bg-light mt-3">
-        <thead class="thead-light">
-            <tr>
-                <th>Application Packages</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#Each ApplicationPackages.package}}
-            <tr>
-                <td>
-                    <a href="{{#Url application-package/details}}?id={{&package}}">{{package}}</a>
-                </td>
-            </tr>
-            {{#EndEach}}
-        </tbody>
-    </table>
-    {{#EndIf}}
 </div>
+{{#Else}}
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <table class="table table-sm table-striped bg-light">
+                <thead class="thead-light">
+                <tr>
+                    <th>Project Packages</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#Each ProjectPackages.package}}
+                <tr>
+                    <td>
+                        <a href="{{#Url project-package/details}}?id={{&package}}">{{package}}</a>
+                    </td>
+                </tr>
+                {{#EndEach}}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-12 col-md-6">
+            <table class="table table-sm table-striped bg-light">
+                <thead class="thead-light">
+                <tr>
+                    <th>Application Packages</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#Each ApplicationPackages.package}}
+                <tr>
+                    <td>
+                        <a href="{{#Url application-package/details}}?id={{&package}}">{{package}}</a>
+                    </td>
+                </tr>
+                {{#EndEach}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{#EndIf}}
