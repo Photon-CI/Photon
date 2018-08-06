@@ -1,12 +1,11 @@
 ﻿using log4net;
-using Photon.Framework;
-using Photon.Framework.Extensions;
 using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,47 +23,47 @@ namespace Photon.Server.ApiHandlers.Build
             var qGitRefspec = GetQuery("refspec");
             var qTaskName = GetQuery("task");
 
-            HttpBuildStartRequest startInfo = null;
-            if (HttpContext.Request.ContentLength64 > 0) {
-                startInfo = JsonSettings.Serializer.Deserialize<HttpBuildStartRequest>(HttpContext.Request.InputStream);
-            }
+            //HttpBuildStartRequest startInfo = null;
+            //if (HttpContext.Request.ContentLength64 > 0) {
+            //    startInfo = JsonSettings.Serializer.Deserialize<HttpBuildStartRequest>(HttpContext.Request.InputStream);
+            //}
 
-            if (startInfo == null)
-                return Response.BadRequest().SetText("No json request was found!");
+            //if (startInfo == null)
+            //    return Response.BadRequest().SetText("No json request was found!");
 
-            var _projectId = qProject ?? startInfo.ProjectId;
-            var _gitRefspec = qGitRefspec ?? startInfo.GitRefspec;
-            var _taskName = qTaskName ?? startInfo.TaskName;
+            //var _projectId = qProject ?? startInfo.ProjectId;
+            //var _gitRefspec = qGitRefspec ?? startInfo.GitRefspec;
+            //var _taskName = qTaskName ?? startInfo.TaskName;
 
             try {
-                if (!PhotonServer.Instance.Projects.TryGet(_projectId, out var project))
-                    return Response.BadRequest().SetText($"Project '{_projectId}' was not found!");
+                if (!PhotonServer.Instance.Projects.TryGet(qProject, out var project))
+                    return Response.BadRequest().SetText($"Project '{qProject}' was not found!");
+
+                var buildTask = project.Description.BuildTasks
+                    .FirstOrDefault(x => string.Equals(x.Name, qTaskName, StringComparison.OrdinalIgnoreCase));
+
+                if (buildTask == null)
+                    return Response.BadRequest().SetText($"Build-Task '{qTaskName}' was not found!");
 
                 var build = await project.StartNewBuild();
-                build.TaskName = _taskName;
-                build.TaskRoles = startInfo.Roles;
-                build.PreBuildCommand = project.Description.PreBuild;
+                build.TaskName = buildTask.Name;
+                build.TaskRoles = buildTask.Roles.ToArray();
+                build.PreBuildCommand =  project.Description.PreBuild;
                 build.AssemblyFilename = project.Description.AssemblyFile;
-                build.GitRefspec = _gitRefspec;
+                build.GitRefspec = qGitRefspec ?? buildTask.GitRefspec;
 
                 var session = new ServerBuildSession {
                     Project = project.Description,
                     AssemblyFilename = project.Description.AssemblyFile,
                     PreBuild = project.Description.PreBuild,
-                    TaskName = _taskName,
-                    GitRefspec = _gitRefspec,
+                    TaskName = buildTask.Name,
+                    GitRefspec = qGitRefspec ?? buildTask.GitRefspec,
                     Build = build,
-                    Roles = startInfo.Roles,
-                    Mode = startInfo.Mode,
+                    Roles = buildTask.Roles.ToArray(),
+                    Mode = AgentStartModes.Any, // TODO: AgentStartMode.Parse(buildTask.AgentMode),
                 };
 
                 build.ServerSessionId = session.SessionId;
-
-                if (!string.IsNullOrEmpty(startInfo.AssemblyFilename))
-                    session.AssemblyFilename = startInfo.AssemblyFilename;
-
-                if (!string.IsNullOrEmpty(startInfo.PreBuildCommand))
-                    session.PreBuild = startInfo.PreBuildCommand;
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
@@ -77,7 +76,7 @@ namespace Photon.Server.ApiHandlers.Build
                 return Response.Json(response);
             }
             catch (Exception error) {
-                Log.Error($"Failed to run Build-Task '{startInfo.TaskName}' from Project '{startInfo.ProjectId}' @ '{_gitRefspec}'!", error);
+                Log.Error($"Failed to run Build-Task '{qTaskName}' from Project '{qProject}' @ '{qGitRefspec}'!", error);
                 return Response.Exception(error);
             }
         }
