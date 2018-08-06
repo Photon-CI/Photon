@@ -1,7 +1,6 @@
 ﻿using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
-using Photon.Framework.Extensions;
 using Photon.Library.HttpMessages;
 using System;
 using System.IO;
@@ -14,10 +13,10 @@ namespace Photon.CLI.Actions
     {
         private const int PollIntervalMs = 400;
 
-        public HttpBuildStartRequest Request {get; private set;}
         public string ServerName {get; set;}
+        public string ProjectId {get; set;}
+        public string TaskName {get; set;}
         public string GitRefspec {get; set;}
-        public string StartFile {get; set;}
         public HttpBuildResultResponse Result {get; set;}
 
 
@@ -25,11 +24,7 @@ namespace Photon.CLI.Actions
         {
             var server = context.Servers.Get(ServerName);
 
-            using (var fileStream = File.Open(StartFile, FileMode.Open, FileAccess.Read)) {
-                Request = JsonSettings.Serializer.Deserialize<HttpBuildStartRequest>(fileStream);
-            }
-
-            var startResult = await StartSession(server, Request);
+            var startResult = await StartSession(server);
             var sessionId = startResult?.SessionId;
 
             if (string.IsNullOrEmpty(sessionId))
@@ -69,23 +64,18 @@ namespace Photon.CLI.Actions
             }
         }
 
-        private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server, HttpBuildStartRequest request)
+        private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server)
         {
             HttpClientEx client = null;
-            MemoryStream requestStream = null;
 
             try {
-                requestStream = new MemoryStream();
-                JsonSettings.Serializer.Serialize(requestStream, request, true);
-
                 var url = NetPath.Combine(server.Url, "api/build/start");
 
                 client = HttpClientEx.Post(url, new {
+                    project = ProjectId,
+                    task = TaskName,
                     refspec = GitRefspec,
                 });
-
-                requestStream.Seek(0, SeekOrigin.Begin);
-                client.Body = requestStream;
 
                 await client.Send();
 
@@ -103,7 +93,6 @@ namespace Photon.CLI.Actions
                 throw;
             }
             finally {
-                requestStream?.Dispose();
                 client?.Dispose();
             }
         }
