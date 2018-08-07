@@ -22,10 +22,10 @@ namespace Photon.Agent.ViewModels
         public string FrameworkDescription {get; set;}
 
 
-        public void Build()
+        protected override void OnBuild()
         {
             AgentName = GetAgentName();
-            AgentVersion = Configuration.Version;
+            AgentVersion = Internal.Configuration.Version;
             AgentHttpUrl = GetAgentHttpUrl();
             AgentTcpUrl = GetAgentTcpUrl();
 

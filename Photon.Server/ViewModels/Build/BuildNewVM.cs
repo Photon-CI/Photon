@@ -2,6 +2,7 @@
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -28,13 +29,15 @@ namespace Photon.Server.ViewModels.Build
         public string BuildTaskJson {get; private set;}
 
 
-        public BuildNewVM()
+        public BuildNewVM(IHttpHandler handler) : base(handler)
         {
             PageTitle = "Photon Server New Build";
         }
 
-        public void Build()
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             if (string.IsNullOrEmpty(ProjectId))
                 throw new ApplicationException("Project ID is undefined!");
 

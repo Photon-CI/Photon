@@ -3,17 +3,12 @@ using System.Collections.Generic;
 
 namespace Photon.Agent.ViewModels.VariableSet
 {
-    internal class VariableSetItem
-    {
-        public string Id {get; set;}
-    }
-
     internal class VariableSetIndexVM : AgentViewModel
     {
         public List<VariableSetItem> Sets {get; set;}
 
 
-        public void Build()
+        protected override void OnBuild()
         {
             Sets = new List<VariableSetItem>();
 
@@ -22,6 +17,11 @@ namespace Photon.Agent.ViewModels.VariableSet
                     Id = key,
                 });
             }
+        }
+
+        internal class VariableSetItem
+        {
+            public string Id {get; set;}
         }
     }
 }

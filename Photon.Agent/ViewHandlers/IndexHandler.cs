@@ -1,5 +1,4 @@
-﻿using System;
-using Photon.Agent.ViewModels;
+﻿using Photon.Agent.ViewModels;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewHandlers
@@ -12,12 +11,7 @@ namespace Photon.Agent.ViewHandlers
         {
             var vm = new IndexVM();
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            vm.Build();
 
             return Response.View("Index.html", vm);
         }

@@ -1,5 +1,6 @@
 ﻿using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -21,13 +22,15 @@ namespace Photon.Server.ViewModels.Deployment
         public DeploymentEnvironmentRow[] Environments {get; set;}
 
 
-        public DeploymentNewVM()
+        public DeploymentNewVM(IHttpHandler handler) : base(handler)
         {
             PageTitle = "Photon Server New Deployment";
         }
 
-        public void Build()
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out var project))
                 throw new ApplicationException($"Project '{ProjectId}' not found!");
 

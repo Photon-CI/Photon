@@ -1,28 +1,24 @@
-﻿using Photon.Server.ViewModels.Deployment;
+﻿using Photon.Server.Internal.Security;
+using Photon.Server.ViewModels.Deployment;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
-using System;
 
 namespace Photon.Server.ViewHandlers.Deployment
 {
     [Secure]
+    [RequiresRoles(GroupRole.DeployView)]
     [HttpHandler("/deployment/details")]
     internal class DeploymentDetailsHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new DeploymentDetailsVM {
+            var vm = new DeploymentDetailsVM(this) {
                 PageTitle = "Photon Server Deployment Details",
                 ProjectId = GetQuery<string>("project"),
                 DeploymentNumber = GetQuery<uint>("number"),
             };
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            vm.Build();
 
             return Response.View("Deployment\\Details.html", vm);
         }

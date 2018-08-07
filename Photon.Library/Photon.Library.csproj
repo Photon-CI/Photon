@@ -71,14 +71,13 @@
     <Compile Include="HttpSecurity\HttpUserContext.cs" />
     <Compile Include="HttpSecurity\HttpUserCredentials.cs" />
     <Compile Include="HttpSecurity\IAuthorize.cs" />
-    <Compile Include="HttpSecurity\LdapAuthorization.cs" />
+    <Compile Include="HttpSecurity\HybridAuthorization.cs" />
     <Compile Include="ILibraryAssembly.cs" />
     <Compile Include="JsonDynamicDocument.cs" />
     <Compile Include="LazyAsync.cs" />
     <Compile Include="Packages\ApplicationPackageManager.cs" />
     <Compile Include="Packages\PackageManagerBase.cs" />
     <Compile Include="Packages\ProjectPackageManager.cs" />
-    <Compile Include="Security\GroupRoles.cs" />
     <Compile Include="Security\User.cs" />
     <Compile Include="Security\UserGroup.cs" />
     <Compile Include="Security\UserGroupManager.cs" />

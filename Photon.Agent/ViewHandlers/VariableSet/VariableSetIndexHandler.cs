@@ -1,5 +1,4 @@
-﻿using System;
-using Photon.Agent.ViewModels.VariableSet;
+﻿using Photon.Agent.ViewModels.VariableSet;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewHandlers.VariableSet
@@ -14,12 +13,7 @@ namespace Photon.Agent.ViewHandlers.VariableSet
                 PageTitle = "Photon Agent Variables",
             };
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            vm.Build();
 
             return Response.View("VariableSet\\Index.html", vm);
         }

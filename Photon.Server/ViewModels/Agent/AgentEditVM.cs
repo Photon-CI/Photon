@@ -1,6 +1,7 @@
 ﻿using Photon.Framework.Extensions;
 using Photon.Framework.Server;
 using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Specialized;
 
@@ -17,6 +18,8 @@ namespace Photon.Server.ViewModels.Agent
         public bool IsNew {get; set;}
 
 
+        public AgentEditVM(IHttpHandler handler) : base(handler) {}
+
         public void Restore(NameValueCollection form)
         {
             AgentId_Source = form.Get("AgentId_Source");
@@ -29,8 +32,10 @@ namespace Photon.Server.ViewModels.Agent
                 .Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public void Build()
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             IsNew = string.IsNullOrEmpty(AgentId);
 
             if (IsNew) {

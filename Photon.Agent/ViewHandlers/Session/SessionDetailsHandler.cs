@@ -1,6 +1,5 @@
 ﻿using Photon.Agent.ViewModels.Session;
 using PiServerLite.Http.Handlers;
-using System;
 
 namespace Photon.Agent.ViewHandlers.Session
 {
@@ -16,12 +15,7 @@ namespace Photon.Agent.ViewHandlers.Session
                 SessionId = sessionId,
             };
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            vm.Build();
 
             return Response.View("Session\\Details.html", vm);
         }

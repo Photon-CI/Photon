@@ -1,27 +1,23 @@
-﻿using Photon.Server.ViewModels.Deployment;
+﻿using Photon.Server.Internal.Security;
+using Photon.Server.ViewModels.Deployment;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
-using System;
 
 namespace Photon.Server.ViewHandlers.Deployment
 {
     [Secure]
+    [RequiresRoles(GroupRole.DeployView)]
     [HttpHandler("/deployments")]
     [HttpHandler("/deployment/index")]
     internal class DeploymentIndexHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new DeploymentIndexVM {
+            var vm = new DeploymentIndexVM(this) {
                 PageTitle = "Photon Server Deployments",
             };
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            vm.Build();
 
             return Response.View("Deployment\\Index.html", vm);
         }

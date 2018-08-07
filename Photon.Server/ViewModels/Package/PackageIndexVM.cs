@@ -1,4 +1,5 @@
 ﻿using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
 using System.Linq;
 
 namespace Photon.Server.ViewModels.Package
@@ -13,13 +14,15 @@ namespace Photon.Server.ViewModels.Package
         public bool AnyPackages => AnyProjectPackages || AnyApplicationPackages;
 
 
-        public PackageIndexVM()
+        public PackageIndexVM(IHttpHandler handler) : base(handler)
         {
             PageTitle = "Photon Server Packages";
         }
 
-        public void Build()
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             ProjectPackages = PhotonServer.Instance
                 .ProjectPackages.GetAllPackages().ToArray();
             

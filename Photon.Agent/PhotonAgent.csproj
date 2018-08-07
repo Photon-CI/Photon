@@ -108,6 +108,8 @@
     <Compile Include="Internal\AgentConfiguration\AgentConfigurationManager.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentHttpConfiguration.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentSecurityConfiguration.cs" />
+    <Compile Include="Internal\Security\GroupRoles.cs" />
+    <Compile Include="Internal\Security\SecurityTest.cs" />
     <Compile Include="MessageHandlers\HealthCheckProcessor.cs" />
     <Compile Include="ViewHandlers\Applications\ApplicationIndexHandler.cs" />
     <Compile Include="ViewHandlers\Configuration\ConfigurationIndexHandler.cs" />
@@ -149,8 +151,12 @@
     <Compile Include="ViewHandlers\IndexHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\Applications\ApplicationIndexVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\LoginVM.cs" />
+    <Compile Include="ViewModels\Configuration\ConfigurationIndexVM.cs" />
+    <Compile Include="ViewModels\MasterVM.cs" />
+    <Compile Include="ViewModels\Security\SecurityIndexVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariableSetEditJsonVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariableSetIndexVM.cs" />

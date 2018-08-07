@@ -11,7 +11,7 @@ namespace Photon.Agent.ViewModels.Session
         public string SessionStatus {get; set;}
 
 
-        public void Build()
+        protected override void OnBuild()
         {
             if (!PhotonAgent.Instance.Sessions.TryGet(SessionId, out var session))
                 throw new ApplicationException($"Session '{SessionId}' not found!");

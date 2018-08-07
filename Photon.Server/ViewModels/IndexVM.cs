@@ -1,5 +1,6 @@
 ﻿using Photon.Framework;
 using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Runtime.InteropServices;
 
@@ -22,10 +23,14 @@ namespace Photon.Server.ViewModels
         public string ProcessArchitecture {get; set;}
 
 
-        public void Build()
+        public IndexVM(IHttpHandler handler) : base(handler) {}
+
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             ServerName = GetServerName();
-            ServerVersion = Configuration.Version;
+            ServerVersion = Internal.Configuration.Version;
             ServerHttpUrl = GetServerHttpUrl();
             ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
 

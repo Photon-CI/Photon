@@ -1,4 +1,5 @@
 ﻿using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,12 @@ namespace Photon.Server.ViewModels.Build
         public Framework.Projects.Project[] Projects {get; private set;}
 
 
-        public void Build()
+        public BuildIndexVM(IHttpHandler handler) : base(handler) {}
+
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             IsLoading = PhotonServer.Instance.Projects.IsLoading;
             if (IsLoading) return;
 

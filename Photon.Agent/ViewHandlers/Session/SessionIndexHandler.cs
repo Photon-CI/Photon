@@ -1,4 +1,4 @@
-﻿using Photon.Library;
+﻿using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewHandlers.Session
@@ -9,7 +9,9 @@ namespace Photon.Agent.ViewHandlers.Session
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new ViewModelBase();
+            var vm = new AgentViewModel {
+                PageTitle = "Photon Agent Sessions",
+            };
 
             return Response.View("Session\\Index.html", vm);
         }

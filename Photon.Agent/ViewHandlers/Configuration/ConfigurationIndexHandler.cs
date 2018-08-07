@@ -1,23 +1,15 @@
-﻿using Photon.Library;
+﻿using Photon.Agent.ViewModels.Configuration;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewHandlers.Configuration
 {
     [HttpHandler("/configuration")]
+    [HttpHandler("/configuration/index")]
     internal class ConfigurationIndexHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new ViewModelBase {
-                PageTitle = "Photon Agent Configuration"
-            };
-
-            //try {
-            //    vm.Build();
-            //}
-            //catch (Exception error) {
-            //    vm.Errors.Add(error);
-            //}
+            var vm = new ConfigurationIndexVM();
 
             return Response.View("Configuration\\Index.html", vm);
         }

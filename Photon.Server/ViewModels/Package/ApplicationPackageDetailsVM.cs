@@ -1,4 +1,5 @@
 ﻿using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
 using System;
 using System.IO;
 using System.Linq;
@@ -13,13 +14,15 @@ namespace Photon.Server.ViewModels.Package
         public bool AnyVersions => PackageVersions?.Any() ?? false;
 
 
-        public ApplicationPackageDetailsVM()
+        public ApplicationPackageDetailsVM(IHttpHandler handler) : base(handler)
         {
             PageTitle = "Photon Server Application-Package Details";
         }
 
-        public void Build()
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             var packagePath = PhotonServer.Instance
                 .ApplicationPackages.GetPackagePath(PackageId);
 

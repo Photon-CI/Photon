@@ -1,17 +1,19 @@
-﻿using System;
+﻿using Photon.Server.Internal.Security;
 using Photon.Server.ViewModels.Agent;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
+using System;
 
 namespace Photon.Server.ViewHandlers.Agent
 {
     [Secure]
+    [RequiresRoles(GroupRole.AgentEdit)]
     [HttpHandler("/agent/edit")]
     internal class AgentEditHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new AgentEditVM {
+            var vm = new AgentEditVM(this) {
                 AgentId = GetQuery("id"),
             };
 
@@ -24,7 +26,7 @@ namespace Photon.Server.ViewHandlers.Agent
 
         public override HttpHandlerResult Post()
         {
-            var vm = new AgentEditVM();
+            var vm = new AgentEditVM(this);
 
             try {
                 vm.Restore(Request.FormData());
@@ -34,6 +36,9 @@ namespace Photon.Server.ViewHandlers.Agent
             }
             catch (Exception error) {
                 vm.Errors.Add(error);
+
+                vm.Build();
+
                 return Response.View("Agent\\Edit.html", vm);
             }
         }

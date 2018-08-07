@@ -1,10 +1,12 @@
-﻿using Photon.Server.ViewModels.Session;
+﻿using Photon.Server.Internal.Security;
+using Photon.Server.ViewModels.Session;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 
 namespace Photon.Server.ViewHandlers.Session
 {
     [Secure]
+    [RequiresRoles(GroupRole.BuildView, GroupRole.DeployView)]
     [HttpHandler("session/details")]
     internal class SessionDetailsHandler : HttpHandler
     {
@@ -12,14 +14,12 @@ namespace Photon.Server.ViewHandlers.Session
         {
             var sessionId = GetQuery("id");
 
-            var vm = new SessionDetailsVM {
+            var vm = new SessionDetailsVM(this) {
                 PageTitle = "Photon Server Session Details",
                 SessionId = sessionId,
             };
 
-            //try {
-            //    vm.
-            //}
+            vm.Build();
 
             return Response.View("Session\\Details.html", vm);
         }

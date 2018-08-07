@@ -1,5 +1,6 @@
 ﻿using Photon.Server.Internal;
 using Photon.Server.Internal.HealthChecks;
+using PiServerLite.Http.Handlers;
 using System.Linq;
 
 namespace Photon.Server.ViewModels.Agent
@@ -9,8 +10,12 @@ namespace Photon.Server.ViewModels.Agent
         public AgentRow[] Agents {get; set;}
 
 
-        public void Build()
+        public AgentIndexVM(IHttpHandler handler) : base(handler) {}
+
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             Agents = PhotonServer.Instance.Agents.All
                 .Select(x => {
                     var status = PhotonServer.Instance.HealthChecks.GetStatus(x.Id);
