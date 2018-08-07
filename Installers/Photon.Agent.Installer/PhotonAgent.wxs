@@ -413,6 +413,15 @@
       <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff2" Guid="E9B7ECB9-B1DD-439F-9E38-CBA448ECC8B1">
         <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff2" Name="fa-brands-400.woff2" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.woff2" />
       </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.eot" Guid="8f14f927-922e-40c0-9509-3f042539b45d">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.eot" Name="fa-brands-400.eot" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.eot" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.eot" Guid="8b513fe1-5563-4435-bffe-b47c62bb7106">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.eot" Name="fa-regular-400.eot" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.eot" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.eot" Guid="28c62ab8-e8af-4818-a0c1-2fd72f3539f0">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.eot" Name="fa-solid-900.eot" Source="$(var.PhotonAgent_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.eot" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>

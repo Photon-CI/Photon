@@ -185,6 +185,9 @@
       <Component Id="Views_Login.html" Guid="6b570aa8-bbcb-4485-960e-e7b61e169fc0">
         <File Id="Views_Login.html" Name="Login.html" Source="$(var.PhotonServer_TargetDir)Views\Login.html" />
       </Component>
+      <Component Id="Views_AccessDenied.html" Guid="aaa1a43c-84fe-4b3e-b2e1-44426dadcce9">
+        <File Id="Views_AccessDenied.html" Name="AccessDenied.html" Source="$(var.PhotonServer_TargetDir)Views\AccessDenied.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -432,6 +435,15 @@
       </Component>
       <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff2" Guid="015CDF42-888C-4A48-8DB5-3A58657019AD">
         <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.woff2" Name="fa-brands-400.woff2" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.woff2" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.eot" Guid="f3260004-1905-4a52-aa64-444a51c83d94">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_brands_400.eot" Name="fa-brands-400.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-brands-400.eot" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.eot" Guid="bb2546c3-0704-4b28-9a41-ffd5270ab91c">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_regular_400.eot" Name="fa-regular-400.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-regular-400.eot" />
+      </Component>
+      <Component Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.eot" Guid="e1797d97-f78d-479a-997b-f39b514e5fcd">
+        <File Id="Content_fontawesome_5.2.0_webfonts_fa_solid_900.eot" Name="fa-solid-900.eot" Source="$(var.PhotonServer_TargetDir)Content\fontawesome-5.2.0\webfonts\fa-solid-900.eot" />
       </Component>
     </ComponentGroup>
   </Fragment>
