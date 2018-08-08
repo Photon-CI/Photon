@@ -1,10 +1,10 @@
 ﻿using log4net;
+using Photon.Library.HttpSecurity;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System;
-using Photon.Library.HttpSecurity;
 
 namespace Photon.Server.ApiHandlers.Security
 {

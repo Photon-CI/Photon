@@ -1,10 +1,19 @@
-﻿namespace Photon.Agent.Internal.AgentConfiguration
+﻿using Newtonsoft.Json;
+
+namespace Photon.Agent.Internal.AgentConfiguration
 {
     internal class AgentConfiguration
     {
+        [JsonProperty("name")]
         public string Name {get; set;}
+
+        [JsonProperty("http")]
         public AgentHttpConfiguration Http {get; set;}
+
+        [JsonProperty("tcp")]
         public AgentTcpConfiguration Tcp {get; set;}
+
+        [JsonProperty("security")]
         public AgentSecurityConfiguration Security {get; set;}
 
 

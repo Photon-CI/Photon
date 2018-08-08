@@ -1,4 +1,5 @@
-﻿using Photon.Library;
+﻿using Newtonsoft.Json.Linq;
+using Photon.Library;
 
 namespace Photon.Agent.Internal.AgentConfiguration
 {
@@ -35,7 +36,8 @@ namespace Photon.Agent.Internal.AgentConfiguration
 
         private void Document_OnUpdate(dynamic document)
         {
-            document.Merge(Value);
+            var mergeValue = JObject.FromObject(Value, agentDocument.Serializer);
+            ((JObject)document).Merge(mergeValue);
         }
     }
 }

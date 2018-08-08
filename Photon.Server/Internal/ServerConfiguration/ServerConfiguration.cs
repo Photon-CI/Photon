@@ -1,9 +1,16 @@
-﻿namespace Photon.Server.Internal.ServerConfiguration
+﻿using Newtonsoft.Json;
+
+namespace Photon.Server.Internal.ServerConfiguration
 {
     internal class ServerConfiguration
     {
+        [JsonProperty("name")]
         public string Name {get; set;}
+
+        [JsonProperty("http")]
         public ServerHttpConfiguration Http {get; set;}
+
+        [JsonProperty("security")]
         public ServerSecurityConfiguration Security {get; set;}
 
 
