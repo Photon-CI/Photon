@@ -1,4 +1,4 @@
-﻿using Photon.Agent.Internal;
+﻿using Photon.Agent.Internal.Security;
 using Photon.Agent.ViewModels;
 using Photon.Library.HttpSecurity;
 using PiServerLite.Http.Handlers;
@@ -12,17 +12,19 @@ namespace Photon.Agent.ViewHandlers
         {
             var _user = HttpContext.Request.Cookies["photon.agent.username"]?.Value;
 
-            var vm = new LoginVM {
+            var vm = new LoginVM(this) {
                 Username = _user,
                 RememberMe = _user != null,
             };
+
+            vm.Build();
 
             return Response.View("Login.html", vm);
         }
 
         public override HttpHandlerResult Post()
         {
-            var vm = new LoginVM();
+            var vm = new LoginVM(this);
             vm.Restore(Request.FormData());
 
             var user = new HttpUserCredentials {
@@ -33,6 +35,8 @@ namespace Photon.Agent.ViewHandlers
             var serverSecurity = (AgentHttpSecurity) Context.SecurityMgr;
             if (!serverSecurity.Authorize(HttpContext.Response, user)) {
                 vm.AuthMessage = "Invalid Credentials";
+                vm.Build();
+
                 return Response.View("Login.html", vm);
             }
 

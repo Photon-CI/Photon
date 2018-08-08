@@ -77,8 +77,8 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.3.1\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.3.2\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -111,10 +111,12 @@
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\Security\SecurityTest.cs" />
     <Compile Include="MessageHandlers\HealthCheckProcessor.cs" />
+    <Compile Include="ViewHandlers\AccessDeniedHandler.cs" />
     <Compile Include="ViewHandlers\Applications\ApplicationIndexHandler.cs" />
     <Compile Include="ViewHandlers\Configuration\ConfigurationIndexHandler.cs" />
     <Compile Include="ViewHandlers\LoginHandler.cs" />
     <Compile Include="ViewHandlers\LogoutHandler.cs" />
+    <Compile Include="Internal\Security\RequiresRolesAttribute.cs" />
     <Compile Include="ViewHandlers\Security\SecurityIndexHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
@@ -128,7 +130,7 @@
     <Compile Include="Internal\Git\RepositoryIndexEntry.cs" />
     <Compile Include="Internal\Git\RepositorySourceManager.cs" />
     <Compile Include="Internal\Git\RepositorySource.cs" />
-    <Compile Include="Internal\AgentHttpSecurity.cs" />
+    <Compile Include="Internal\Security\AgentHttpSecurity.cs" />
     <Compile Include="Internal\Session\AgentBuildSession.cs" />
     <Compile Include="Internal\Session\AgentDeploySession.cs" />
     <Compile Include="Internal\Session\AgentSessionBase.cs" />
@@ -324,6 +326,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="photon_light.ico" />
+    <Content Include="Views\AccessDenied.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Applications\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

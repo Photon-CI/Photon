@@ -31,6 +31,7 @@
                             Dashboard
                         </a>
                     </li>
+                    {{#If Master.ShowSessions}}
                     <li class="nav-item" data-link="sessions">
                         <a href="{{#Url sessions}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -39,6 +40,8 @@
                             Sessions
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowVariables}}
                     <li class="nav-item" data-link="variables">
                         <a href="{{#Url variables}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -47,6 +50,8 @@
                             Variables
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowApplications}}
                     <li class="nav-item" data-link="applications">
                         <a href="{{#Url applications}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -55,6 +60,8 @@
                             Applications
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowSecurity}}
                     <li class="nav-item" data-link="security">
                         <a href="{{#Url security}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -63,6 +70,8 @@
                             Security
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowConfiguration}}
                     <li class="nav-item" data-link="configuration">
                         <a href="{{#Url configuration}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -71,6 +80,7 @@
                             Configuration
                         </a>
                     </li>
+                    {{#EndIf}}
                     {{#If SecurityEnabled}}
                     <li class="nav-item">
                         <a href="{{#Url Logout}}" class="nav-link">

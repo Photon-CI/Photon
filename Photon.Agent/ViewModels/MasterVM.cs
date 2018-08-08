@@ -1,5 +1,6 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Agent.Internal.Security;
+using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewModels
 {
@@ -12,9 +13,14 @@ namespace Photon.Agent.ViewModels
         public bool ShowConfiguration {get; set;}
 
 
-        public void Build()
+        public void Build(IHttpHandler handler)
         {
-            var userId = "_admin_";
+            var httpSecurity = (AgentHttpSecurity)PhotonAgent.Instance.HttpContext.SecurityMgr;
+
+            if (!httpSecurity.GetUserContext(handler.HttpContext.Request, out var user))
+                return;
+
+            var userId = user.UserId;
             var userMgr = PhotonAgent.Instance.UserMgr;
 
             ShowSessions = userMgr.UserHasRole(userId, GroupRole.SessionView);

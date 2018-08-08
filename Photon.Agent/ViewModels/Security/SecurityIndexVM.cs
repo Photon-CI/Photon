@@ -1,14 +1,13 @@
 ﻿using Photon.Agent.Internal;
+using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewModels.Security
 {
     internal class SecurityIndexVM : AgentViewModel
     {
-        public SecurityIndexVM()
+        public SecurityIndexVM(IHttpHandler handler) : base(handler)
         {
             PageTitle = "Photon Agent Security";
         }
-
-        protected override void OnBuild() {}
     }
 }

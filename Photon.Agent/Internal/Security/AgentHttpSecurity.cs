@@ -7,7 +7,7 @@ using System;
 using System.Net;
 using System.Text;
 
-namespace Photon.Agent.Internal
+namespace Photon.Agent.Internal.Security
 {
     internal class AgentHttpSecurity : ISecurityManager
     {
@@ -24,16 +24,25 @@ namespace Photon.Agent.Internal
             //userTokens.PruneInterval = ?;
         }
 
-        public bool Authorize(HttpListenerRequest request)
+        public bool GetUserContext(HttpListenerRequest request, out HttpUserContext userContext)
         {
-            // Authorization Cookie
             var authCookie = request.Cookies[CookieName];
             var token = authCookie?.Value;
 
-            if (!string.IsNullOrEmpty(token) && userTokens.TryGet(token, out var userContext)) {
+            if (!string.IsNullOrEmpty(token) && userTokens.TryGet(token, out userContext)) {
                 userContext.Restart();
                 return true;
             }
+
+            userContext = null;
+            return false;
+        }
+
+        public bool Authorize(HttpListenerRequest request)
+        {
+            // Authorization Cookie
+            if (GetUserContext(request, out var userContext))
+                return true;
 
             // Authorization Header
             var authHeader = request.Headers.Get("Authorization");

@@ -1,4 +1,4 @@
-﻿using Photon.Agent.Internal;
+﻿using Photon.Agent.Internal.Security;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewHandlers
