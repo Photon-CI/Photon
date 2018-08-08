@@ -1,10 +1,13 @@
 ﻿using log4net;
 using Photon.Agent.Internal.AgentConfiguration;
 using Photon.Agent.Internal.Git;
+using Photon.Agent.Internal.Security;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Library;
+using Photon.Library.HttpSecurity;
+using Photon.Library.Security;
 using Photon.Library.Variables;
 using PiServerLite.Http;
 using PiServerLite.Http.Content;
@@ -13,9 +16,6 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Agent.Internal.Security;
-using Photon.Library.HttpSecurity;
-using Photon.Library.Security;
 
 namespace Photon.Agent.Internal
 {
@@ -187,23 +187,19 @@ namespace Photon.Agent.Internal
             };
 
             HttpContext = new HttpReceiverContext {
-                //SecurityMgr = new AgentHttpSecurity(),
                 ListenerPath = httpConfig.Path,
+                SecurityMgr = new HttpSecurityManager {
+                    Authorization = new HybridAuthorization {
+                        UserMgr = UserMgr,
+                    },
+                    Restricted = enableSecurity,
+                    CookieName = "PHOTON.AGENT.AUTH",
+                },
                 ContentDirectories = {
                     contentDir,
                     sharedContentDir,
                 },
             };
-
-            if (enableSecurity) {
-                var auth = new HybridAuthorization {
-                    UserMgr = UserMgr,
-                };
-
-                HttpContext.SecurityMgr = new AgentHttpSecurity {
-                    Authorization = auth,
-                };
-            }
 
             HttpContext.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 

@@ -1,4 +1,7 @@
-﻿using Photon.Library;
+﻿using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+using Photon.Library;
 
 namespace Photon.Server.Internal.ServerConfiguration
 {
@@ -35,7 +38,22 @@ namespace Photon.Server.Internal.ServerConfiguration
 
         private void Document_OnUpdate(dynamic document)
         {
-            document.Merge(Value);
+            // Since Json Merge function does not accept a contract resolver,
+            // we must first serialize and deserialize the data.
+
+            dynamic _valueX;
+            var buffer = new StringBuilder();
+
+            using (var writer = new StringWriter(buffer)) {
+                serverDocument.Serializer.Serialize(writer, Value);
+            }
+
+            using (var reader = new StringReader(buffer.ToString()))
+            using (var jsonReader = new JsonTextReader(reader)) {
+                _valueX = serverDocument.Serializer.Deserialize(jsonReader);
+            }
+
+            document.Merge(_valueX);
         }
     }
 }

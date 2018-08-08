@@ -1,4 +1,5 @@
-﻿using PiServerLite.Http.Handlers;
+﻿using Photon.Library.HttpSecurity;
+using PiServerLite.Http.Handlers;
 using System.Linq;
 
 namespace Photon.Server.Internal.Security
@@ -20,7 +21,7 @@ namespace Photon.Server.Internal.Security
             var isSecurityEnabled = PhotonServer.Instance.ServerConfiguration.Value.Security?.Enabled ?? false;
             if (!isSecurityEnabled) return null;
 
-            var httpSecurity = (ServerHttpSecurity)PhotonServer.Instance.HttpContext.SecurityMgr;
+            var httpSecurity = (HttpSecurityManager)PhotonServer.Instance.HttpContext.SecurityMgr;
             if (!httpSecurity.GetUserContext(httpHandler.HttpContext.Request, out var userContext))
                 return httpHandler.Response.Redirect("AccessDenied");
 

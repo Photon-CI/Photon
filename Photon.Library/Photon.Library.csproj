@@ -72,6 +72,7 @@
     <Compile Include="HttpSecurity\HttpUserCredentials.cs" />
     <Compile Include="HttpSecurity\IAuthorize.cs" />
     <Compile Include="HttpSecurity\HybridAuthorization.cs" />
+    <Compile Include="HttpSecurity\HttpSecurityManager.cs" />
     <Compile Include="ILibraryAssembly.cs" />
     <Compile Include="JsonDynamicDocument.cs" />
     <Compile Include="LazyAsync.cs" />

@@ -5,6 +5,22 @@
     $(function () {
         $('#layoutNavbarContent [data-link="security"]').addClass('active');
     });
+
+    function onEnabledChanged() {
+        var enableSecurityCheckBox = $('#EnableSecurityCheckBox');
+        var checked = enableSecurityCheckBox.is(':checked') ? 'true' : 'false';
+        enableSecurityCheckBox.attr('disabled', true);
+
+        $.ajax({
+            url: '{{#Url api/security/enabled}}?value='+checked,
+            method: 'POST'
+        }).fail(function() {
+            alert('Failed to change security enabled value!');
+            enableSecurityCheckBox.attr('checked', !checked);
+        }).always(function() {
+            enableSecurityCheckBox.attr('disabled', false);
+        });
+    }
 </script>
 {{#EndScript}}
 
@@ -14,15 +30,13 @@
 {{#EndStyle}}
 
 <nav class="navbar navbar-dark bg-dark content-navbar">
-    <div class="navbar-brand mr-auto">
-        <!--<h3 class="text-primary my-0">Security</h3>-->
-    </div>
+    <div class="navbar-brand mr-auto"></div>
 </nav>
 
 <form method="POST">
     <div class="container mt-3">
         <div class="form-check">
-            <input id="EnableSecurityCheckBox" name="EnableSecurity" type="checkbox" class="form-check-input" value="{{EnableSecurity}}">
+            <input id="EnableSecurityCheckBox" name="EnableSecurity" type="checkbox" class="form-check-input" onchange="onEnabledChanged()" {{#If Master.IsSecured}} checked{{#EndIf}}>
             <label for="EnableSecurityCheckBox" class="form-check-label">Enable Security</label>
         </div>
     </div>

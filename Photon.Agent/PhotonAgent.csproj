@@ -95,6 +95,7 @@
     <Compile Include="AgentService.Designer.cs">
       <DependentUpon>AgentService.cs</DependentUpon>
     </Compile>
+    <Compile Include="ApiHandlers\Security\SecurityEnabledHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="ApiHandlers\LogHandler.cs" />
     <Compile Include="ApiHandlers\Session\ActiveHandler.cs" />
@@ -130,7 +131,6 @@
     <Compile Include="Internal\Git\RepositoryIndexEntry.cs" />
     <Compile Include="Internal\Git\RepositorySourceManager.cs" />
     <Compile Include="Internal\Git\RepositorySource.cs" />
-    <Compile Include="Internal\Security\AgentHttpSecurity.cs" />
     <Compile Include="Internal\Session\AgentBuildSession.cs" />
     <Compile Include="Internal\Session\AgentDeploySession.cs" />
     <Compile Include="Internal\Session\AgentSessionBase.cs" />

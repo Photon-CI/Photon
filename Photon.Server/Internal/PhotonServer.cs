@@ -189,21 +189,18 @@ namespace Photon.Server.Internal
 
             HttpContext = new HttpReceiverContext {
                 ListenerPath = http.Path,
+                SecurityMgr = new HttpSecurityManager {
+                    Authorization = new HybridAuthorization {
+                        UserMgr = UserMgr,
+                    },
+                    Restricted = enableSecurity,
+                    CookieName = "PHOTON.SERVER.AUTH",
+                },
                 ContentDirectories = {
                     contentDir,
                     sharedContentDir,
                 },
             };
-
-            if (enableSecurity) {
-                var auth = new HybridAuthorization {
-                    UserMgr = UserMgr,
-                };
-
-                HttpContext.SecurityMgr = new ServerHttpSecurity {
-                    Authorization = auth,
-                };
-            }
 
             HttpContext.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 

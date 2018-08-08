@@ -78,6 +78,7 @@
     <Compile Include="ApiHandlers\Deploy\OutputStreamHandler.cs" />
     <Compile Include="ApiHandlers\Package\ApplicationPackageGetHandler.cs" />
     <Compile Include="ApiHandlers\Package\ProjectPackageGetHandler.cs" />
+    <Compile Include="ApiHandlers\Security\SecurityEnabledHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
     <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
@@ -145,7 +146,6 @@
     <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerSecurityConfiguration.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerHttpConfiguration.cs" />
-    <Compile Include="Internal\Security\ServerHttpSecurity.cs" />
     <Compile Include="Internal\Sessions\ServerSessionWatch.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
     <Compile Include="Internal\Sessions\SessionStateEventArgs.cs" />

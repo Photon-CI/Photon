@@ -1,4 +1,4 @@
-﻿using Photon.Agent.Internal.Security;
+﻿using Photon.Library.HttpSecurity;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewHandlers
@@ -11,7 +11,7 @@ namespace Photon.Agent.ViewHandlers
 
         private HttpHandlerResult Run()
         {
-            var serverSecurity = (AgentHttpSecurity) Context.SecurityMgr;
+            var serverSecurity = (HttpSecurityManager) Context.SecurityMgr;
             serverSecurity.SignOut(HttpContext);
 
             return Response.Redirect("/login");

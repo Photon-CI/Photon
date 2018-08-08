@@ -1,5 +1,4 @@
 ﻿using Photon.Library.HttpSecurity;
-using Photon.Server.Internal.Security;
 using Photon.Server.ViewModels;
 using PiServerLite.Http.Handlers;
 
@@ -32,7 +31,7 @@ namespace Photon.Server.ViewHandlers
                 Password = vm.Password,
             };
 
-            var serverSecurity = (ServerHttpSecurity) Context.SecurityMgr;
+            var serverSecurity = (HttpSecurityManager) Context.SecurityMgr;
             if (!serverSecurity.Authorize(HttpContext.Response, user)) {
                 vm.AuthMessage = "Invalid Credentials";
                 vm.Build();
