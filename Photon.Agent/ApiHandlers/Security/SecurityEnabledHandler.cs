@@ -1,5 +1,6 @@
 ﻿using log4net;
 using Photon.Agent.Internal;
+using Photon.Agent.Internal.AgentConfiguration;
 using Photon.Agent.Internal.Security;
 using Photon.Library.HttpSecurity;
 using PiServerLite.Http.Handlers;
@@ -33,6 +34,10 @@ namespace Photon.Agent.ApiHandlers.Security
                 httpSecurity.Restricted = value;
 
                 var config = PhotonAgent.Instance.AgentConfiguration;
+
+                if (config.Value.Security == null)
+                    config.Value.Security = new AgentSecurityConfiguration();
+
                 config.Value.Security.Enabled = value;
                 config.Save();
 

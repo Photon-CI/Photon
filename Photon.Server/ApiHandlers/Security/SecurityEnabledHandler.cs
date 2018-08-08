@@ -2,6 +2,7 @@
 using Photon.Library.HttpSecurity;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
+using Photon.Server.Internal.ServerConfiguration;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System;
@@ -33,6 +34,10 @@ namespace Photon.Server.ApiHandlers.Security
                 httpSecurity.Restricted = value;
 
                 var config = PhotonServer.Instance.ServerConfiguration;
+
+                if (config.Value.Security == null)
+                    config.Value.Security = new ServerSecurityConfiguration();
+
                 config.Value.Security.Enabled = value;
                 config.Save();
 
