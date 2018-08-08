@@ -13,6 +13,9 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Agent.Internal.Security;
+using Photon.Library.HttpSecurity;
+using Photon.Library.Security;
 
 namespace Photon.Agent.Internal
 {
@@ -26,13 +29,15 @@ namespace Photon.Agent.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
+        public HttpReceiverContext HttpContext {get; private set;}
+
         public string WorkDirectory {get;}
         public AgentSessionManager Sessions {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
         public VariableSetDocumentManager Variables {get;}
         public RepositorySourceManager RepositorySources {get;}
-
         public AgentConfigurationManager AgentConfiguration {get;}
+        public UserGroupManager UserMgr {get;}
 
 
         public PhotonAgent()
@@ -45,24 +50,11 @@ namespace Photon.Agent.Internal
             RepositorySources = new RepositorySourceManager();
             messageListener = new MessageListener(MessageRegistry);
             AgentConfiguration = new AgentConfigurationManager();
+            UserMgr = new UserGroupManager();
 
             RepositorySources.RepositorySourceDirectory = Configuration.RepositoryDirectory;
             messageListener.ConnectionReceived += MessageListener_ConnectionReceived;
             messageListener.ThreadException += MessageListener_ThreadException;
-        }
-
-        private void MessageListener_ConnectionReceived(object sender, TcpConnectionReceivedEventArgs e)
-        {
-            var remote = (IPEndPoint)e.Host.Tcp.Client.RemoteEndPoint;
-            Log.Info($"TCP Connection received from '{remote.Address}:{remote.Port}'.");
-
-            e.Accept = false;
-            using (var tokenSource = new CancellationTokenSource()) {
-                tokenSource.CancelAfter(TimeSpan.FromSeconds(30));
-
-                if (e.Host.GetHandshakeResult(tokenSource.Token).GetAwaiter().GetResult())
-                    e.Accept = true;
-            }
         }
 
         public void Dispose()
@@ -101,6 +93,8 @@ namespace Photon.Agent.Internal
 
             // Load existing or default agent configuration
             AgentConfiguration.Load();
+
+            SecurityTest.Initialize(UserMgr);
 
             if (!IPAddress.TryParse(AgentConfiguration.Value.Tcp.Host, out var _address))
                 throw new Exception($"Invalid TCP Host '{AgentConfiguration.Value.Tcp.Host}'!");
@@ -179,6 +173,7 @@ namespace Photon.Agent.Internal
 
         private void StartHttpServer()
         {
+            var enableSecurity = AgentConfiguration.Value.Security?.Enabled ?? false;
             var httpConfig = AgentConfiguration.Value.Http;
 
             var contentDir = new ContentDirectory {
@@ -191,8 +186,8 @@ namespace Photon.Agent.Internal
                 UrlPath = "/SharedContent/",
             };
 
-            var context = new HttpReceiverContext {
-                SecurityMgr = new AgentHttpSecurity(),
+            HttpContext = new HttpReceiverContext {
+                //SecurityMgr = new AgentHttpSecurity(),
                 ListenerPath = httpConfig.Path,
                 ContentDirectories = {
                     contentDir,
@@ -200,7 +195,17 @@ namespace Photon.Agent.Internal
                 },
             };
 
-            context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
+            if (enableSecurity) {
+                var auth = new HybridAuthorization {
+                    UserMgr = UserMgr,
+                };
+
+                HttpContext.SecurityMgr = new AgentHttpSecurity {
+                    Authorization = auth,
+                };
+            }
+
+            HttpContext.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
             var httpPrefix = $"http://{httpConfig.Host}:{httpConfig.Port}/";
 
@@ -210,7 +215,7 @@ namespace Photon.Agent.Internal
             if (!httpPrefix.EndsWith("/"))
                 httpPrefix += "/";
 
-            receiver = new HttpReceiver(context);
+            receiver = new HttpReceiver(HttpContext);
             receiver.Routes.Scan(Assembly.GetExecutingAssembly());
             receiver.AddPrefix(httpPrefix);
 
@@ -221,6 +226,20 @@ namespace Photon.Agent.Internal
             }
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);
+            }
+        }
+
+        private void MessageListener_ConnectionReceived(object sender, TcpConnectionReceivedEventArgs e)
+        {
+            var remote = (IPEndPoint)e.Host.Tcp.Client.RemoteEndPoint;
+            Log.Info($"TCP Connection received from '{remote.Address}:{remote.Port}'.");
+
+            e.Accept = false;
+            using (var tokenSource = new CancellationTokenSource()) {
+                tokenSource.CancelAfter(TimeSpan.FromSeconds(30));
+
+                if (e.Host.GetHandshakeResult(tokenSource.Token).GetAwaiter().GetResult())
+                    e.Accept = true;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Photon.Server.ViewModels.Build;
+﻿using Photon.Server.Internal.Security;
+using Photon.Server.ViewModels.Build;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System;
@@ -9,11 +10,12 @@ namespace Photon.Server.ViewHandlers.Build
 {
     [Secure]
     [HttpHandler("/build/new")]
+    [RequiresRoles(GroupRole.BuildStart)]
     internal class BuildNewHandler : HttpHandlerAsync
     {
         public override Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
-            var vm = new BuildNewVM {
+            var vm = new BuildNewVM(this) {
                 ProjectId = GetQuery("project"),
                 TaskName = GetQuery("task"),
                 TaskRoles = GetQuery("roles"),
@@ -25,19 +27,14 @@ namespace Photon.Server.ViewHandlers.Build
             if (!string.IsNullOrEmpty(qRefspec))
                 vm.GitRefspec = qRefspec;
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            vm.Build();
 
             return Response.View("Build\\New.html", vm).AsAsync();
         }
 
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
-            var vm = new BuildNewVM();
+            var vm = new BuildNewVM(this);
 
             try {
                 vm.Restore(Request.FormData());
@@ -52,6 +49,9 @@ namespace Photon.Server.ViewHandlers.Build
             }
             catch (Exception error) {
                 vm.Errors.Add(error);
+
+                vm.Build();
+
                 return Response.View("Build\\New.html", vm);
             }
         }

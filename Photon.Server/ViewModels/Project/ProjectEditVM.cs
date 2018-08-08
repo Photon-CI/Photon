@@ -1,5 +1,6 @@
 ﻿using Photon.Server.Internal;
 using Photon.Server.Internal.Projects;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Specialized;
 
@@ -15,6 +16,8 @@ namespace Photon.Server.ViewModels.Project
         public bool IsNew => string.IsNullOrEmpty(ProjectId_Source);
 
 
+        public ProjectEditVM(IHttpHandler handler) : base(handler) {}
+
         public void Restore(NameValueCollection form)
         {
             ProjectId_Source = form.Get(nameof(ProjectId_Source));
@@ -23,8 +26,10 @@ namespace Photon.Server.ViewModels.Project
             ProjectDescription = form.Get(nameof(ProjectDescription));
         }
 
-        public void Build()
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             if (string.IsNullOrEmpty(ProjectId)) {
                 ProjectId_Source = null;
                 ProjectId = Guid.NewGuid().ToString("D");

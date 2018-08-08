@@ -1,5 +1,6 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Agent.Internal.Session;
+using PiServerLite.Http.Handlers;
 using System;
 
 namespace Photon.Agent.ViewModels.Session
@@ -11,8 +12,12 @@ namespace Photon.Agent.ViewModels.Session
         public string SessionStatus {get; set;}
 
 
-        public void Build()
+        public SessionDetailsVM(IHttpHandler handler) : base(handler) {}
+
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             if (!PhotonAgent.Instance.Sessions.TryGet(SessionId, out var session))
                 throw new ApplicationException($"Session '{SessionId}' not found!");
 

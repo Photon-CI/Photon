@@ -1,25 +1,20 @@
-﻿using Photon.Library;
+﻿using Photon.Server.Internal.Security;
+using Photon.Server.ViewModels.Configuration;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 
 namespace Photon.Server.ViewHandlers.Configuration
 {
     [Secure]
+    [RequiresRoles(GroupRole.ConfigurationView)]
     [HttpHandler("/configuration")]
     internal class ConfigurationHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new ViewModelBase {
-                PageTitle = "Photon Server Configuration",
-            };
+            var vm = new ConfigurationIndexVM(this);
 
-            //try {
-            //    vm.Build();
-            //}
-            //catch (Exception error) {
-            //    vm.Errors.Add(error);
-            //}
+            vm.Build();
 
             return Response.View("Configuration\\Index.html", vm);
         }

@@ -1,23 +1,21 @@
-﻿using Photon.Library;
+﻿using Photon.Agent.Internal.Security;
+using Photon.Agent.ViewModels.Security;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 
 namespace Photon.Agent.ViewHandlers.Security
 {
+    [Secure]
+    [RequiresRoles(GroupRole.SecurityView)]
     [HttpHandler("/security")]
+    [HttpHandler("/security/index")]
     internal class SecurityIndexHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new ViewModelBase {
-                PageTitle = "Photon Agent Security"
-            };
+            var vm = new SecurityIndexVM(this);
 
-            //try {
-            //    vm.Build();
-            //}
-            //catch (Exception error) {
-            //    vm.Errors.Add(error);
-            //}
+            vm.Build();
 
             return Response.View("Security\\Index.html", vm);
         }

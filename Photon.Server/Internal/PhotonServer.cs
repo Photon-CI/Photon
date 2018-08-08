@@ -4,8 +4,11 @@ using Photon.Framework;
 using Photon.Library;
 using Photon.Library.HttpSecurity;
 using Photon.Library.Packages;
+using Photon.Library.Security;
 using Photon.Library.Variables;
+using Photon.Server.Internal.HealthChecks;
 using Photon.Server.Internal.Projects;
+using Photon.Server.Internal.Security;
 using Photon.Server.Internal.ServerAgents;
 using Photon.Server.Internal.ServerConfiguration;
 using Photon.Server.Internal.Sessions;
@@ -15,7 +18,6 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Server.Internal.HealthChecks;
 
 namespace Photon.Server.Internal
 {
@@ -27,6 +29,8 @@ namespace Photon.Server.Internal
         private HttpReceiver receiver;
         private bool isStarted;
 
+        public HttpReceiverContext HttpContext {get; private set;}
+
         public ProjectManager Projects {get;}
         public ServerSessionManager Sessions {get;}
         public ScriptQueue Queue {get;}
@@ -37,6 +41,7 @@ namespace Photon.Server.Internal
         public ServerConfigurationManager ServerConfiguration {get;}
         public ServerAgentManager Agents {get;}
         public HealthCheckService HealthChecks {get;}
+        public UserGroupManager UserMgr {get;}
 
 
         public PhotonServer()
@@ -46,6 +51,7 @@ namespace Photon.Server.Internal
             MessageRegistry = new MessageProcessorRegistry();
             Variables = new VariableSetDocumentManager();
             HealthChecks = new HealthCheckService();
+            UserMgr = new UserGroupManager();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
@@ -83,6 +89,8 @@ namespace Photon.Server.Internal
 
             // Load existing or default server configuration
             ServerConfiguration.Load();
+
+            SecurityTest.Initialize(UserMgr);
 
             MessageRegistry.Scan(Assembly.GetExecutingAssembly());
             MessageRegistry.Scan(typeof(ILibraryAssembly).Assembly);
@@ -179,7 +187,7 @@ namespace Photon.Server.Internal
                 UrlPath = "/SharedContent/",
             };
 
-            var context = new HttpReceiverContext {
+            HttpContext = new HttpReceiverContext {
                 ListenerPath = http.Path,
                 ContentDirectories = {
                     contentDir,
@@ -188,14 +196,16 @@ namespace Photon.Server.Internal
             };
 
             if (enableSecurity) {
-                var ldapAuth = new LdapAuthorization();
+                var auth = new HybridAuthorization {
+                    UserMgr = UserMgr,
+                };
 
-                context.SecurityMgr = new ServerHttpSecurity {
-                    Authorization = ldapAuth,
+                HttpContext.SecurityMgr = new ServerHttpSecurity {
+                    Authorization = auth,
                 };
             }
 
-            context.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
+            HttpContext.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
 
             var httpPrefix = $"http://{http.Host}:{http.Port}/";
 
@@ -205,7 +215,7 @@ namespace Photon.Server.Internal
             if (!httpPrefix.EndsWith("/"))
                 httpPrefix += "/";
 
-            receiver = new HttpReceiver(context);
+            receiver = new HttpReceiver(HttpContext);
             receiver.Routes.Scan(Assembly.GetExecutingAssembly());
             receiver.AddPrefix(httpPrefix);
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Photon.Server.ViewModels;
+﻿using Photon.Server.ViewModels;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 
@@ -12,14 +11,9 @@ namespace Photon.Server.ViewHandlers
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new IndexVM();
+            var vm = new IndexVM(this);
 
-            try {
-                vm.Build();
-            }
-            catch (Exception error) {
-                vm.Errors.Add(error);
-            }
+            vm.Build();
 
             return Response.View("Index.html", vm);
         }

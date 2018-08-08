@@ -58,8 +58,8 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.3.1\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.3.2\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
@@ -81,11 +81,14 @@
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
     <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
+    <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\HealthChecks\AgentStatusItem.cs" />
     <Compile Include="Internal\HealthChecks\AgentStatus.cs" />
     <Compile Include="Internal\HealthChecks\HealthCheckService.cs" />
     <Compile Include="Internal\Projects\ProjectLastDeployment.cs" />
     <Compile Include="Internal\Projects\ServerProject.cs" />
+    <Compile Include="Internal\Security\RequiresRolesAttribute.cs" />
+    <Compile Include="Internal\Security\SecurityTest.cs" />
     <Compile Include="Internal\ServerViewModel.cs" />
     <Compile Include="ViewHandlers\Agent\AgentEditHandler.cs" />
     <Compile Include="ViewHandlers\Agent\AgentEditJsonHandler.cs" />
@@ -106,6 +109,7 @@
     <Compile Include="ViewHandlers\Configuration\ConfigurationIndexHandler.cs" />
     <Compile Include="ViewHandlers\Deployment\DeploymentDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Deployment\DeploymentNewHandler.cs" />
+    <Compile Include="ViewHandlers\AccessDeniedHandler.cs" />
     <Compile Include="ViewHandlers\LoginHandler.cs" />
     <Compile Include="ViewHandlers\LogoutHandler.cs" />
     <Compile Include="ViewHandlers\Package\ApplicationPackageDetailsHandler.cs" />
@@ -141,7 +145,7 @@
     <Compile Include="Internal\ServerConfiguration\ServerConfigurationManager.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerSecurityConfiguration.cs" />
     <Compile Include="Internal\ServerConfiguration\ServerHttpConfiguration.cs" />
-    <Compile Include="Internal\ServerHttpSecurity.cs" />
+    <Compile Include="Internal\Security\ServerHttpSecurity.cs" />
     <Compile Include="Internal\Sessions\ServerSessionWatch.cs" />
     <Compile Include="Internal\Sessions\ServerUpdateSession.cs" />
     <Compile Include="Internal\Sessions\SessionStateEventArgs.cs" />
@@ -190,17 +194,20 @@
     <Compile Include="ViewModels\Build\BuildDetailsVM.cs" />
     <Compile Include="ViewModels\Build\BuildNewVM.cs" />
     <Compile Include="ViewModels\Build\BuildIndexVM.cs" />
+    <Compile Include="ViewModels\Configuration\ConfigurationIndexVM.cs" />
     <Compile Include="ViewModels\Deployment\DeploymentDetailsVM.cs" />
     <Compile Include="ViewModels\Deployment\DeploymentIndexVM.cs" />
     <Compile Include="ViewModels\Deployment\DeploymentNewVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\LoginVM.cs" />
+    <Compile Include="ViewModels\MasterVM.cs" />
     <Compile Include="ViewModels\Package\ApplicationPackageDetailsVM.cs" />
     <Compile Include="ViewModels\Package\ProjectPackageDetailsVM.cs" />
     <Compile Include="ViewModels\Package\PackageIndexVM.cs" />
     <Compile Include="ViewModels\Project\ProjectJsonVM.cs" />
     <Compile Include="ViewModels\Project\ProjectEditVM.cs" />
     <Compile Include="ViewModels\Project\ProjectIndexVM.cs" />
+    <Compile Include="ViewModels\Security\SecurityIndexVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariablesEditJsonVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariablesIndexVM.cs" />
@@ -392,6 +399,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Deployment\New.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\AccessDenied.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Login.html">

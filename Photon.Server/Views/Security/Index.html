@@ -22,7 +22,7 @@
 <form method="POST">
     <div class="container mt-3">
         <div class="form-check">
-            <input id="EnableSecurityCheckBox" name="EnableSecurity" type="checkbox" class="form-check-input" value="{{EnableSecurity}}">
+            <input id="EnableSecurityCheckBox" name="EnableSecurity" type="checkbox" class="form-check-input" {{#If IsSecurityEnabled}}checked{{#EndIf}}>
             <label for="EnableSecurityCheckBox" class="form-check-label">Enable Security</label>
         </div>
     </div>

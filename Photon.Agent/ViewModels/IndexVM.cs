@@ -1,5 +1,6 @@
 ﻿using Photon.Agent.Internal;
 using Photon.Framework;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Runtime.InteropServices;
 
@@ -22,10 +23,14 @@ namespace Photon.Agent.ViewModels
         public string FrameworkDescription {get; set;}
 
 
-        public void Build()
+        public IndexVM(IHttpHandler handler) : base(handler) {}
+
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             AgentName = GetAgentName();
-            AgentVersion = Configuration.Version;
+            AgentVersion = Internal.Configuration.Version;
             AgentHttpUrl = GetAgentHttpUrl();
             AgentTcpUrl = GetAgentTcpUrl();
 

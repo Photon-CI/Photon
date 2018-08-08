@@ -1,6 +1,7 @@
 ﻿using Photon.Framework.Packages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Builds;
+using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Generic;
 
@@ -27,8 +28,12 @@ namespace Photon.Server.ViewModels.Build
         public bool IsRunning {get; private set;}
 
 
-        public void Build()
+        public BuildDetailsVM(IHttpHandler handler) : base(handler) {}
+
+        protected override void OnBuild()
         {
+            base.OnBuild();
+
             IconClass = "fas fa-ellipses-h text-muted";
 
             if (!string.IsNullOrEmpty(ProjectId) && PhotonServer.Instance.Projects.TryGet(ProjectId, out var project)) {

@@ -31,6 +31,7 @@
                             Dashboard
                         </a>
                     </li>
+                    {{#If Master.ShowAgents}}
                     <li class="nav-item" data-link="agents">
                         <a href="{{#Url agents}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -39,6 +40,8 @@
                             Agents
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowProjects}}
                     <li class="nav-item" data-link="projects">
                         <a href="{{#Url projects}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -47,6 +50,8 @@
                             Projects
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowVariables}}
                     <li class="nav-item" data-link="variables">
                         <a href="{{#Url variables}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -55,6 +60,8 @@
                             Variables
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowPackages}}
                     <li class="nav-item" data-link="packages">
                         <a href="{{#Url Packages}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -63,6 +70,8 @@
                             Packages
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowBuilds}}
                     <li class="nav-item" data-link="builds">
                         <a href="{{#Url Builds}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -71,6 +80,8 @@
                             Builds
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowDeployments}}
                     <li class="nav-item" data-link="deployments">
                         <a href="{{#Url Deployments}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -79,6 +90,8 @@
                             Deployments
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowSecurity}}
                     <li class="nav-item" data-link="security">
                         <a href="{{#Url security}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -87,6 +100,8 @@
                             Security
                         </a>
                     </li>
+                    {{#EndIf}}
+                    {{#If Master.ShowConfiguration}}
                     <li class="nav-item" data-link="configuration">
                         <a href="{{#Url Configuration}}" class="nav-link">
                             <div class="nav-item-iconholder">
@@ -95,6 +110,7 @@
                             Configuration
                         </a>
                     </li>
+                    {{#EndIf}}
                     {{#If SecurityEnabled}}
                     <li class="nav-item">
                         <a href="{{#Url Logout}}" class="nav-link">

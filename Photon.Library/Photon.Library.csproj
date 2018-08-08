@@ -34,8 +34,8 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.3.1\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.3.2\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -71,14 +71,13 @@
     <Compile Include="HttpSecurity\HttpUserContext.cs" />
     <Compile Include="HttpSecurity\HttpUserCredentials.cs" />
     <Compile Include="HttpSecurity\IAuthorize.cs" />
-    <Compile Include="HttpSecurity\LdapAuthorization.cs" />
+    <Compile Include="HttpSecurity\HybridAuthorization.cs" />
     <Compile Include="ILibraryAssembly.cs" />
     <Compile Include="JsonDynamicDocument.cs" />
     <Compile Include="LazyAsync.cs" />
     <Compile Include="Packages\ApplicationPackageManager.cs" />
     <Compile Include="Packages\PackageManagerBase.cs" />
     <Compile Include="Packages\ProjectPackageManager.cs" />
-    <Compile Include="Security\GroupRoles.cs" />
     <Compile Include="Security\User.cs" />
     <Compile Include="Security\UserGroup.cs" />
     <Compile Include="Security\UserGroupManager.cs" />

@@ -1,5 +1,6 @@
 ﻿using Photon.Framework.Extensions;
 using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
 using System.Collections.Specialized;
 
 namespace Photon.Server.ViewModels
@@ -12,7 +13,7 @@ namespace Photon.Server.ViewModels
         public string AuthMessage {get; set;}
 
 
-        public LoginVM()
+        public LoginVM(IHttpHandler handler) : base(handler)
         {
             PageTitle = "Photon Server Login";
         }
