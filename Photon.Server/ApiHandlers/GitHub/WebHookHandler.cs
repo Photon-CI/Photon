@@ -5,7 +5,6 @@ using Photon.Server.Internal;
 using Photon.Server.Internal.GitHub;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
-using PiServerLite.Http.Security;
 using System;
 using System.Linq;
 using System.Threading;
@@ -13,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.GitHub
 {
-    [Secure]
     [HttpHandler("api/github/webhook")]
     internal class WebHookHandler : HttpHandlerAsync
     {
