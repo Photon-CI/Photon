@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Photon.CLI.Internal.Http
@@ -34,6 +35,8 @@ namespace Photon.CLI.Internal.Http
         public string ContentType {get; set;}
         public Stream Body {get; set;}
         public Func<Stream> BodyFunc {get; set;}
+        public string Username {get; set;}
+        public string Password {get; set;}
         
         public HttpWebRequest RequestBase {get; private set;}
         public HttpWebResponse ResponseBase {get; private set;}
@@ -82,6 +85,12 @@ namespace Photon.CLI.Internal.Http
             request.Method = Method;
             request.KeepAlive = true;
             request.ContentType = ContentType;
+
+            if (!string.IsNullOrEmpty(Username)) {
+                var creds = Encoding.ASCII.GetBytes($"{Username}:{Password}");
+                var creds64 = Convert.ToBase64String(creds);
+                request.Headers[HttpRequestHeader.Authorization] = $"Basic {creds64}";
+            }
 
             var requestBody = Body ?? BodyFunc?.Invoke();
 

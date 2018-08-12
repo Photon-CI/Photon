@@ -86,6 +86,9 @@ namespace Photon.CLI.Actions
                 PathEx.CreatePath(updateDirectory);
 
                 using (var client = HttpClientEx.Get(url)) {
+                    client.Username = Username;
+                    client.Password = Password;
+
                     await client.Send();
 
                     using (var responseStream = client.ResponseBase.GetResponseStream()) {
@@ -110,6 +113,8 @@ namespace Photon.CLI.Actions
                 var url = NetPath.Combine(server.Url, "api/server/update");
 
                 using (var client = HttpClientEx.Post(url)) {
+                    client.Username = Username;
+                    client.Password = Password;
                     client.ContentType = "application/octet-stream";
                     client.BodyFunc = () => File.Open(updateFilename, FileMode.Open, FileAccess.Read);
 
@@ -135,6 +140,12 @@ namespace Photon.CLI.Actions
         {
             using (var tokenSource = new CancellationTokenSource(timeout)) 
             using (var client = new WebClient()) {
+                if (!string.IsNullOrEmpty(Username)) {
+                    var creds = Encoding.ASCII.GetBytes($"{Username}:{Password}");
+                    var creds64 = Convert.ToBase64String(creds);
+                    client.Headers[HttpRequestHeader.Authorization] = $"Basic {creds64}";
+                }
+
                 var token = tokenSource.Token;
                 while (true) {
                     token.ThrowIfCancellationRequested();
