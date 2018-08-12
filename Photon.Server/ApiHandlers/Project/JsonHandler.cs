@@ -1,12 +1,16 @@
 ﻿using Photon.Framework.Tools;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Project
 {
+    [Secure]
+    [RequiresRoles(GroupRole.ProjectView)]
     [HttpHandler("/api/project/json")]
     internal class JsonHandler : HttpHandlerAsync
     {
@@ -28,6 +32,7 @@ namespace Photon.Server.ApiHandlers.Project
                 .AsAsync();
         }
 
+        // TODO: Require ProjectEdit attribute
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var projectId = GetQuery("id");

@@ -8,7 +8,6 @@ using Photon.Library.Security;
 using Photon.Library.Variables;
 using Photon.Server.Internal.HealthChecks;
 using Photon.Server.Internal.Projects;
-using Photon.Server.Internal.Security;
 using Photon.Server.Internal.ServerAgents;
 using Photon.Server.Internal.ServerConfiguration;
 using Photon.Server.Internal.Sessions;
@@ -18,6 +17,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Server.Internal.Security;
 
 namespace Photon.Server.Internal
 {
@@ -90,7 +90,10 @@ namespace Photon.Server.Internal
             // Load existing or default server configuration
             ServerConfiguration.Load();
 
-            SecurityTest.Initialize(UserMgr);
+            UserMgr.Directory = Configuration.Directory;
+            
+            if (!UserMgr.Initialize())
+                DefaultSecurityGroups.Initialize(UserMgr);
 
             MessageRegistry.Scan(Assembly.GetExecutingAssembly());
             MessageRegistry.Scan(typeof(ILibraryAssembly).Assembly);
@@ -174,7 +177,7 @@ namespace Photon.Server.Internal
 
         private void StartHttpServer()
         {
-            var enableSecurity = ServerConfiguration.Value.Security?.Enabled ?? false;
+            var config = ServerConfiguration.Value;
             var http = ServerConfiguration.Value.Http;
 
             var contentDir = new ContentDirectory {
@@ -192,8 +195,9 @@ namespace Photon.Server.Internal
                 SecurityMgr = new HttpSecurityManager {
                     Authorization = new HybridAuthorization {
                         UserMgr = UserMgr,
+                        DomainEnabled = config.Security?.DomainEnabled ?? false,
                     },
-                    Restricted = enableSecurity,
+                    Restricted = config.Security?.Enabled ?? false,
                     CookieName = "PHOTON.SERVER.AUTH",
                 },
                 ContentDirectories = {

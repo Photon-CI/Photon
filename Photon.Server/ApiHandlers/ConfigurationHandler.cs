@@ -1,11 +1,15 @@
-﻿using System.IO;
+﻿using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
+using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Server.Internal;
-using PiServerLite.Http.Handlers;
 
 namespace Photon.Server.ApiHandlers
 {
+    [Secure]
+    [RequiresRoles(GroupRole.ConfigurationView)]
     [HttpHandler("/api/configuration")]
     internal class ConfigurationHandler : HttpHandlerAsync
     {
@@ -14,6 +18,7 @@ namespace Photon.Server.ApiHandlers
             return await Task.FromResult(Response.File(Configuration.ServerFile));
         }
 
+        // TODO: Require ConfigurationEdit
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             using (var fileStream = File.Open(Configuration.ServerFile, FileMode.Create, FileAccess.Write)) {

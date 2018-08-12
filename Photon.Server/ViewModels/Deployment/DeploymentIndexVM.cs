@@ -1,4 +1,5 @@
 ﻿using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ namespace Photon.Server.ViewModels.Deployment
     internal class DeploymentIndexVM : ServerViewModel
     {
         public bool IsLoading {get; private set;}
+        public bool CanStartBuild {get; private set;}
         public DeploymentRow[] Deployments {get; private set;}
         public Framework.Projects.Project[] Projects {get; private set;}
 
@@ -18,6 +20,8 @@ namespace Photon.Server.ViewModels.Deployment
         protected override void OnBuild()
         {
             base.OnBuild();
+
+            CanStartBuild = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.DeployStart);
 
             IsLoading = PhotonServer.Instance.Projects.IsLoading;
             if (IsLoading) return;

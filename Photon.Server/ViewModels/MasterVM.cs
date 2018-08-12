@@ -8,6 +8,7 @@ namespace Photon.Server.ViewModels
     internal class MasterVM
     {
         public bool IsSecured {get; set;}
+        public HttpUserContext UserContext {get; set;}
         public bool ShowAgents {get; set;}
         public bool ShowProjects {get; set;}
         public bool ShowVariables {get; set;}
@@ -25,20 +26,19 @@ namespace Photon.Server.ViewModels
             if (IsSecured) {
                 var httpSecurity = (HttpSecurityManager)PhotonServer.Instance.HttpContext.SecurityMgr;
 
-                if (!httpSecurity.GetUserContext(handler.HttpContext.Request, out var user))
-                    return;
+                UserContext = httpSecurity.GetUserContext(handler.HttpContext.Request);
+                if (UserContext == null) return;
 
-                var userId = user.UserId;
                 var userMgr = PhotonServer.Instance.UserMgr;
 
-                ShowAgents = userMgr.UserHasRole(userId, GroupRole.AgentView);
-                ShowProjects = userMgr.UserHasRole(userId, GroupRole.ProjectView);
-                ShowVariables = userMgr.UserHasRole(userId, GroupRole.VariablesView);
-                ShowPackages = userMgr.UserHasRole(userId, GroupRole.PackagesView);
-                ShowBuilds = userMgr.UserHasRole(userId, GroupRole.BuildView);
-                ShowDeployments = userMgr.UserHasRole(userId, GroupRole.DeployView);
-                ShowSecurity = userMgr.UserHasRole(userId, GroupRole.SecurityView);
-                ShowConfiguration = userMgr.UserHasRole(userId, GroupRole.ConfigurationView);
+                ShowAgents = userMgr.UserHasRole(UserContext.UserId, GroupRole.AgentView);
+                ShowProjects = userMgr.UserHasRole(UserContext.UserId, GroupRole.ProjectView);
+                ShowVariables = userMgr.UserHasRole(UserContext.UserId, GroupRole.VariablesView);
+                ShowPackages = userMgr.UserHasRole(UserContext.UserId, GroupRole.PackagesView);
+                ShowBuilds = userMgr.UserHasRole(UserContext.UserId, GroupRole.BuildView);
+                ShowDeployments = userMgr.UserHasRole(UserContext.UserId, GroupRole.DeployView);
+                ShowSecurity = userMgr.UserHasRole(UserContext.UserId, GroupRole.SecurityView);
+                ShowConfiguration = userMgr.UserHasRole(UserContext.UserId, GroupRole.ConfigurationView);
             }
             else {
                 ShowAgents = true;

@@ -1,12 +1,16 @@
-﻿using System;
-using Photon.Library.Extensions;
+﻿using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System;
 
 namespace Photon.Server.ApiHandlers.Agent
 {
+    [Secure]
+    [RequiresRoles(GroupRole.AgentEdit)]
     [HttpHandler("api/agent/update/result")]
     internal class UpdateResultHandler : HttpHandler
     {

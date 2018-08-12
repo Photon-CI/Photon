@@ -35,9 +35,11 @@
         <!--<h3 class="text-primary my-0">Projects</h3>-->
     </div>
     <div class="form-inline">
+        {{#If UserCanEdit}}
         <a href="{{#Url project/edit}}" class="btn btn-sm btn-success mr-2">
             New <i class="fas fa-plus"></i>
         </a>
+        {{#EndIf}}
         <div class="input-group input-group-sm">
             <input id="SearchTextBox" type="text" class="form-control" />
             <div class="input-group-append">

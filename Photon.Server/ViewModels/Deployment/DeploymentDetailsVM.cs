@@ -4,6 +4,7 @@ using Photon.Server.Internal.Deployments;
 using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Generic;
+using Photon.Server.Internal.Security;
 
 namespace Photon.Server.ViewModels.Deployment
 {
@@ -23,6 +24,8 @@ namespace Photon.Server.ViewModels.Deployment
         public List<object> Artifacts {get; private set;}
         public string IconClass {get; private set;}
         public bool IsRunning {get; private set;}
+        public bool CanStartDeployment {get; private set;}
+        public bool CanDeleteDeployment {get; private set;}
 
 
         public DeploymentDetailsVM(IHttpHandler handler) : base(handler) {}
@@ -30,6 +33,9 @@ namespace Photon.Server.ViewModels.Deployment
         protected override void OnBuild()
         {
             base.OnBuild();
+
+            CanStartDeployment = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.DeployStart);
+            CanDeleteDeployment = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.DeployDelete);
 
             IconClass = "fas fa-ellipses-h text-muted";
 

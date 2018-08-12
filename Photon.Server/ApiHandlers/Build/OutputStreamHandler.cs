@@ -1,11 +1,13 @@
 ﻿using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Build
 {
+    [Secure]
     [HttpHandler("api/build/output")]
     internal class OutputStreamHandler : HttpHandlerAsync
     {

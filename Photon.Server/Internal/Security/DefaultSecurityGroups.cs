@@ -2,7 +2,7 @@
 
 namespace Photon.Server.Internal.Security
 {
-    internal static class SecurityTest
+    internal static class DefaultSecurityGroups
     {
         public static User AdminUser {get;}
         public static User GuestUser {get;}
@@ -10,7 +10,7 @@ namespace Photon.Server.Internal.Security
         public static UserGroup GuestGroup {get;}
 
 
-        static SecurityTest()
+        static DefaultSecurityGroups()
         {
             AdminUser = new User {
                 Id = "_admin_",
@@ -29,6 +29,8 @@ namespace Photon.Server.Internal.Security
             };
 
             AdminGroup = new UserGroup {
+                Id = "_administrators_",
+                Name = "Administrators",
                 UserIdList = {
                     AdminUser.Id,
                 },
@@ -55,6 +57,8 @@ namespace Photon.Server.Internal.Security
             };
 
             GuestGroup = new UserGroup {
+                Id = "_guests_",
+                Name = "Guests",
                 UserIdList = {
                     GuestUser.Id,
                 },
@@ -71,10 +75,10 @@ namespace Photon.Server.Internal.Security
 
         public static void Initialize(UserGroupManager userMgr)
         {
-            userMgr.Users.Add(AdminUser);
-            userMgr.Users.Add(GuestUser);
-            userMgr.Groups.Add(AdminGroup);
-            userMgr.Groups.Add(GuestGroup);
+            userMgr.AddUser(AdminUser);
+            userMgr.AddUser(GuestUser);
+            userMgr.AddGroup(AdminGroup);
+            userMgr.AddGroup(GuestGroup);
         }
     }
 }

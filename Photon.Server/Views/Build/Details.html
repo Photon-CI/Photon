@@ -169,15 +169,21 @@
     </div>
     <div class="form-inline">
         {{#If IsRunning}}
-        <button type="button" class="btn btn-sm btn-warning mr-2" data-toggle="modal" data-target="#CancelModal">Cancel</button>
+            {{#If CanStartBuild}}
+            <button type="button" class="btn btn-sm btn-warning mr-2" data-toggle="modal" data-target="#CancelModal">Cancel</button>
+            {{#EndIf}}
         {{#Else}}
-        <button type="button" class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#DeleteModal">
-            <i class="fas fa-trash"></i>
-        </button>
+            {{#If CanDeleteBuild}}
+            <button type="button" class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#DeleteModal">
+                <i class="fas fa-trash"></i>
+            </button>
+            {{#EndIf}}
         {{#EndIf}}
+        {{#If CanStartBuild}}
         <a href="{{#Url build/new}}?project={{&ProjectId}}&refspec={{&GitRefspec}}&task={{&TaskName}}&roles={{&TaskRoles}}" class="btn btn-sm btn-success">
             <i class="fas fa-redo"></i>
         </a>
+        {{#EndIf}}
     </div>
 </nav>
 

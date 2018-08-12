@@ -6,19 +6,37 @@
         $('#layoutNavbarContent [data-link="security"]').addClass('active');
     });
 
-    function onEnabledChanged() {
-        var enableSecurityCheckBox = $('#EnableSecurityCheckBox');
-        var checked = enableSecurityCheckBox.is(':checked') ? 'true' : 'false';
-        enableSecurityCheckBox.attr('disabled', true);
+    function enableSecurity() {
+        $(this).attr('disabled', true);
 
-        $.ajax({
-            url: '{{#Url api/security/enabled}}?value='+checked,
-            method: 'POST'
-        }).fail(function() {
-            alert('Failed to change security enabled value!');
-            enableSecurityCheckBox.attr('checked', !checked);
-        }).always(function() {
-            enableSecurityCheckBox.attr('disabled', false);
+        requestSecurityEnabled('true')
+            .done(function() {
+                document.location.reload();
+            }).fail(function() {
+                $(this).attr('disabled', false);
+                alert('Failed to enable security!');
+            });
+    }
+
+    function disableSecurity() {
+        $(this).attr('disabled', true);
+
+        requestSecurityEnabled('false')
+            .done(function () {
+                document.location.reload();
+            }).fail(function () {
+                $(this).attr('disabled', false);
+                alert('Failed to enable security!');
+            });
+    }
+
+    function requestSecurityEnabled(value) {
+        var _value = encodeURIComponent(value);
+
+        return $.ajax({
+            url: '{{#Url api/security/enabled}}?value='+_value,
+            method: 'POST',
+            dataType: 'text'
         });
     }
 </script>
@@ -33,11 +51,34 @@
     <div class="navbar-brand mr-auto"></div>
 </nav>
 
-<form method="POST">
-    <div class="container mt-3">
-        <div class="form-check">
-            <input id="EnableSecurityCheckBox" name="EnableSecurity" type="checkbox" class="form-check-input" onchange="onEnabledChanged()" {{#If Master.IsSecured}} checked{{#EndIf}}>
-            <label for="EnableSecurityCheckBox" class="form-check-label">Enable Security</label>
+<div class="bg-light p-1">
+    <div class="container">
+        <div class="row h-100">
+            <div class="col-12 col-md-4 col-lg-3 p-1 my-auto">
+                {{#If Master.IsSecured}}
+                <button class="btn btn-warning w-100" onclick="disableSecurity()">
+                    <i class="fas fa-lock-open"></i>&nbsp;Disable Security
+                </button>
+                {{#Else}}
+                <button class="btn btn-primary w-100" onclick="enableSecurity()">
+                    <i class="fas fa-lock"></i>&nbsp;Enable Security
+                </button>
+                {{#EndIf}}
+            </div>
+            <div class="col-12 col-md-8 col-lg-9 py-1 my-auto">
+                <p class="align-middle m-0" style="line-height: 1.1">Enable security to require users to authenticate before accessing any resources.</p>
+            </div>
         </div>
     </div>
-</form>
+</div>
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-3" style="height: 300px; background: #FAA;">
+
+        </div>
+        <div class="col-9" style="height: 300px; background: #AFA;">
+
+        </div>
+    </div>
+</div>

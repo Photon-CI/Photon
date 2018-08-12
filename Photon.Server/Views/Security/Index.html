@@ -6,19 +6,78 @@
         $('#layoutNavbarContent [data-link="security"]').addClass('active');
     });
 
-    function onEnabledChanged() {
-        var enableSecurityCheckBox = $('#EnableSecurityCheckBox');
-        var checked = enableSecurityCheckBox.is(':checked') ? 'true' : 'false';
-        enableSecurityCheckBox.attr('disabled', true);
+    function editGroup(row) {
+        var id = $(row).attr('data-id');
+        var url = '{{#Url security/group/edit}}';
 
-        $.ajax({
-            url: '{{#Url api/security/enabled}}?value='+checked,
-            method: 'POST'
-        }).fail(function() {
-            alert('Failed to change security enabled value!');
-            enableSecurityCheckBox.attr('checked', !checked);
-        }).always(function() {
-            enableSecurityCheckBox.attr('disabled', false);
+        var _id = encodeURIComponent(id);
+        document.location = url+'?id='+_id;
+    }
+
+    function editUser(row) {
+        var id = $(row).attr('data-id');
+        var url = '{{#Url security/user/edit}}';
+
+        var _id = encodeURIComponent(id);
+        document.location = url+'?id='+_id;
+    }
+
+    function enableSecurity(ctrl) {
+        $(ctrl).prop('disabled', true);
+
+        requestSecurityEnabled('true')
+            .done(function () {
+                document.location.reload();
+            }).fail(function () {
+                alert('Failed to enable security!');
+                $(ctrl).prop('disabled', false);
+            });
+    }
+
+    function disableSecurity(ctrl) {
+        $(ctrl).prop('disabled', true);
+
+        requestSecurityEnabled('false')
+            .done(function () {
+                document.location.reload();
+            }).fail(function () {
+                alert('Failed to enable security!');
+                $(ctrl).prop('disabled', false);
+            });
+    }
+
+    function onDomainEnabledChanged(ctrl) {
+        $(ctrl).prop('disabled', true);
+
+        var isChecked = $(ctrl).is(':checked');
+        var value = isChecked ? 'true' : 'false';
+
+        requestDomainEnabled(value)
+            .fail(function () {
+                alert('Failed to toggle domain security!');
+                $(ctrl).prop('checked', !isChecked);
+            }).always(function() {
+                $(ctrl).prop('disabled', false);
+            });
+    }
+
+    function requestSecurityEnabled(value) {
+        var _value = encodeURIComponent(value);
+
+        return $.ajax({
+            url: '{{#Url api/security/enabled}}?value=' + _value,
+            method: 'POST',
+            dataType: 'text'
+        });
+    }
+
+    function requestDomainEnabled(value) {
+        var _value = encodeURIComponent(value);
+
+        return $.ajax({
+            url: '{{#Url api/security/domain/enabled}}?value=' + _value,
+            method: 'POST',
+            dataType: 'text'
         });
     }
 </script>
@@ -26,6 +85,9 @@
 
 {{#Style}}
 <style>
+    .user-group-row {
+        cursor: pointer;
+    }
 </style>
 {{#EndStyle}}
 
@@ -33,11 +95,113 @@
     <div class="navbar-brand mr-auto"></div>
 </nav>
 
-<form method="POST">
-    <div class="container mt-3">
-        <div class="form-check">
-            <input id="EnableSecurityCheckBox" name="EnableSecurity" type="checkbox" class="form-check-input" onchange="onEnabledChanged()" {{#If Master.IsSecured}}checked{{#EndIf}}>
-            <label for="EnableSecurityCheckBox" class="form-check-label">Enable Security</label>
+{{#If Master.IsSecured}}
+<div class="bg-info p-1">
+    <div class="container">
+        <div class="row h-100">
+            {{#If UserCanEdit}}
+            <div class="col-12 col-md-4 col-lg-3 p-1 my-auto">
+                <button class="btn btn-warning w-100" onclick="disableSecurity(this)">
+                    <i class="fas fa-lock-open"></i>&nbsp;Disable Security
+                </button>
+            </div>
+            {{#EndIf}}
+            <div class="col-12 col-md-8 col-lg-9 py-1 my-auto">
+                <b class="align-middle m-0 text-light">Security is enabled.</b>
+            </div>
         </div>
     </div>
-</form>
+</div>
+
+<div class="container">
+    <div class="card text-center mt-3 mb-2">
+        <div class="card-header">
+            <ul id="SecurityTabs" class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <a id="GroupsTab" href="#groups" class="nav-link active" role="tab" data-toggle="tab">Groups</a>
+                </li>
+                <li class="nav-item">
+                    <a id="UsersTab" href="#users" class="nav-link" role="tab" data-toggle="tab">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a id="DomainTab" href="#domain" class="nav-link" role="tab" data-toggle="tab">Domain</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body text-left">
+            <div class="tab-content" id="myTabContent">
+                <div id="groups" class="tab-pane fade show active" role="tabpanel">
+                    <table class="table table-sm table-hover bg-light table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>
+                                    {{#If UserCanEdit}}
+                                    <a href="{{#Url security/group/edit}}" class="text-success px-1 float-right">New Group</a>
+                                    {{#EndIf}}
+                                    User Groups
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#Each UserGroups.group}}
+                            <tr class="user-group-row" data-id="{{group.Id}}" onclick="editGroup(this)">
+                                <td>{{group.Name}}</td>
+                            </tr>
+                            {{#EndEach}}
+                        </tbody>
+                    </table>
+                </div>
+                <div id="users" class="tab-pane fade" role="tabpanel">
+                    <table class="table table-sm table-hover bg-light table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>
+                                    {{#If UserCanEdit}}
+                                    <a href="{{#Url security/user/edit}}" class="text-success px-1 float-right">New User</a>
+                                    {{#EndIf}}
+                                    Users
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#Each Users.user}}
+                            <tr class="user-group-row" data-id="{{user.Id}}" onclick="editUser(this)">
+                                <td>{{user.DisplayName}}</td>
+                            </tr>
+                            {{#EndEach}}
+                        </tbody>
+                    </table>
+                </div>
+                <div id="domain" class="tab-pane fade" role="tabpanel">
+                    <div class="form-group mt-3">
+                        <div class="form-check">
+                            <input id="DomainEnabledCheckbox" class="form-check-input" type="checkbox" onchange="onDomainEnabledChanged(this)" {{#If IsDomainEnabled}} checked{{#EndIf}} {{#If !UserCanEdit}} disabled{{#EndIf}}>
+                            <label for="DomainEnabledCheckbox" class="form-check-label">Enabled</label>
+                        </div>
+                        <small class="text-muted">Allows user credentials to be verified through an Active Directory controller.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{#Else}}
+<div class="bg-warning p-1">
+    <div class="container">
+        <div class="row h-100">
+            <div class="col-12 col-md-4 col-lg-3 p-1 my-auto">
+                <button class="btn btn-primary w-100" onclick="enableSecurity(this)">
+                    <i class="fas fa-lock"></i>&nbsp;Enable Security
+                </button>
+            </div>
+            <div class="col-12 col-md-8 col-lg-9 py-1 my-auto">
+                <b class="align-middle m-0 text-dark">Security is disabled!</b>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+    <p>You must enable security before configuring security features.</p>
+</div>
+{{#EndIf}}

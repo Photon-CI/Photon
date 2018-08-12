@@ -10,8 +10,6 @@ namespace Photon.Library.HttpSecurity
 {
     public class HttpSecurityManager : ISecurityManager
     {
-        //private const string CookieName = "PHOTON.SERVER.AUTH";
-
         private readonly ReferencePool<HttpUserContext> userTokens;
         
         public string CookieName {get; set;}
@@ -25,7 +23,7 @@ namespace Photon.Library.HttpSecurity
             userTokens = new ReferencePool<HttpUserContext>();
         }
 
-        public bool GetUserContext(HttpListenerRequest request, out HttpUserContext userContext)
+        public bool TryGetUserContext(HttpListenerRequest request, out HttpUserContext userContext)
         {
             if (GetCookieUserContext(request, out userContext)) {
                 userContext.Restart();
@@ -41,11 +39,16 @@ namespace Photon.Library.HttpSecurity
             return false;
         }
 
+        public HttpUserContext GetUserContext(HttpListenerRequest request)
+        {
+            return TryGetUserContext(request, out var userContext) ? userContext : null;
+        }
+
         public bool Authorize(HttpListenerRequest request)
         {
             if (!Restricted) return true;
 
-            return GetUserContext(request, out _);
+            return TryGetUserContext(request, out _);
         }
 
         public bool Authorize(HttpListenerResponse response, HttpUserCredentials user)

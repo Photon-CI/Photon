@@ -1,0 +1,279 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    var templateUserRow;
+
+    $(function () {
+        $('#layoutNavbarContent [data-link="security"]').addClass('active');
+
+        templateUserRow = $('#GroupUsersTable tr[data-template="user-row"]')
+            .detach().removeAttr('data-template');
+    });
+
+    function appendUserRow(id, name) {
+        var row = templateUserRow.clone(true)
+            .attr('data-id', id)
+            .attr('data-name', name);
+
+        row.find('[data-name]').text(name);
+
+        $('#GroupUsersTable tbody').append(row);
+        $('#GroupUsersTable tbody').find('[data-none]').hide();
+    }
+
+    function onSubmit() {
+        var x = $('#GroupUsersTable tbody tr:not([data-none])')
+            .map(function () {
+                var id = $(this).attr('data-id');
+                return encodeURIComponent(id);
+            }).get().join('&');
+
+        $('#UserIdListVar').val(x);
+    }
+
+    function onAddUserRowClick(row) {
+        var rowId = $(row).attr('data-id');
+        var rowName = $(row).attr('data-name');
+
+        $('#AddUserIdVar').val(rowId);
+        $('#AddUserNameVar').val(rowName);
+
+        $('#AddUserTable tbody tr.active').removeClass('active');
+        $(row).addClass('active');
+    }
+
+    function onAddUserClick() {
+        var userId = $('#AddUserIdVar').val();
+        var userName = $('#AddUserNameVar').val();
+
+        $('#AddUserModal').modal('hide');
+        appendUserRow(userId, userName);
+    }
+
+    function onRemoveUserClick(btn) {
+        $(btn).closest('tr').remove();
+
+        var x = $('#GroupUsersTable tbody');
+        if (!x.find('tr:not([data-none])').length)
+            x.find('[data-none]').show();
+    }
+</script>
+{{#EndScript}}
+
+{{#Style}}
+<style>
+    .user-list-scroll {
+        max-height: 80%;
+    }
+    .user-list-text {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom: 0;
+    }
+    #AddUserTable tbody tr {
+        cursor: pointer;
+    }
+    #AddUserTable tbody tr.active {
+        background-color: #56adcf;
+    }
+    [data-template] {
+        display: none;
+    }
+</style>
+{{#EndStyle}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto"></div>
+</nav>
+
+<form method="post" onsubmit="onSubmit()">
+    <input type="hidden" name="GroupId" value="{{GroupId}}"/>
+    <input type="hidden" id="UserIdListVar" name="GroupUserIdList"/>
+    <div class="container mt-3 mb-2">
+        <div class="row">
+            <div class="col-md-8 col-lg-9">
+                <div class="form-group">
+                    <label for="GroupNameTextBox">Group Name</label>
+                    <input id="GroupNameTextBox" name="GroupName" class="form-control" value="{{GroupName}}" />
+                    <small class="text-muted">The displayed name of the Group.</small>
+                </div>
+                <div class="form-group">
+                    <table id="GroupUsersTable" class="table table-sm table-hover bg-light">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>
+                                <button type="button" class="btn btn-sm btn-success float-right" data-toggle="modal" data-target="#AddUserModal">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                Users
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr data-template="user-row">
+                            <td>
+                                <button data-type="delete" type="button" class="btn btn-sm btn-outline-danger float-right" onclick="onRemoveUserClick(this)">
+                                    <i class="fas fa-minus-circle"></i>
+                                </button>
+                                <span data-name></span>
+                            </td>
+                        </tr>
+                        {{#If !GroupUsers}}
+                        <tr data-none>
+                            <td>None...</td>
+                        </tr>
+                        {{#EndIf}}
+                        {{#Each GroupUsers.user}}
+                        <tr data-id="{{user.Id}}">
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-danger float-right" onclick="onRemoveUserClick(this)">
+                                    <i class="fas fa-minus-circle"></i>
+                                </button>
+                                <span>{{user.DisplayName}}</span>
+                            </td>
+                        </tr>
+                        {{#EndEach}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label>Group Roles</label>
+                <hr class="my-0" />
+                <i class="text-secondary">Agent</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleAgentViewCheckBox" name="RoleAgentView" class="form-check-input" {{#If RoleAgentView}} checked{{#EndIf}} />
+                    <label for="RoleAgentViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleAgentEditCheckBox" name="RoleAgentEdit" class="form-check-input" {{#If RoleAgentEdit}} checked{{#EndIf}} />
+                    <label for="RoleAgentEditCheckBox" class="form-check-label">Edit</label>
+                </div>
+                <hr class="my-0 mt-2" />
+                <i class="text-secondary">Project</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleProjectViewCheckBox" name="RoleProjectView" class="form-check-input" {{#If RoleProjectView}} checked{{#EndIf}} />
+                    <label for="RoleProjectViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleProjectEditCheckBox" name="RoleProjectEdit" class="form-check-input" {{#If RoleProjectEdit}} checked{{#EndIf}} />
+                    <label for="RoleProjectEditCheckBox" class="form-check-label">Edit</label>
+                </div>
+                <hr class="my-0 mt-2" />
+                <i class="text-secondary">Build</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleBuildViewCheckBox" name="RoleBuildView" class="form-check-input" {{#If RoleBuildView}} checked{{#EndIf}} />
+                    <label for="RoleBuildViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleBuildStartCheckBox" name="RoleBuildStart" class="form-check-input" {{#If RoleBuildStart}} checked{{#EndIf}} />
+                    <label for="RoleBuildStartCheckBox" class="form-check-label">Start</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleBuildDeleteCheckBox" name="RoleBuildDelete" class="form-check-input" {{#If RoleBuildDelete}} checked{{#EndIf}} />
+                    <label for="RoleBuildDeleteCheckBox" class="form-check-label">Delete</label>
+                </div>
+                <hr class="my-0 mt-2" />
+                <i class="text-secondary">Deployments</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleDeploymentViewCheckBox" name="RoleDeploymentView" class="form-check-input" {{#If RoleDeploymentView}} checked{{#EndIf}} />
+                    <label for="RoleDeploymentViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleDeploymentStartCheckBox" name="RoleDeploymentStart" class="form-check-input" {{#If RoleDeploymentStart}} checked{{#EndIf}} />
+                    <label for="RoleDeploymentStartCheckBox" class="form-check-label">Start</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleDeploymentDeleteCheckBox" name="RoleDeploymentDelete" class="form-check-input" {{#If RoleDeploymentDelete}} checked{{#EndIf}} />
+                    <label for="RoleDeploymentDeleteCheckBox" class="form-check-label">Delete</label>
+                </div>
+                <hr class="my-0 mt-2" />
+                <i class="text-secondary">Variables</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleVariablesViewCheckBox" name="RoleVariablesView" class="form-check-input" {{#If RoleVariablesView}} checked{{#EndIf}} />
+                    <label for="RoleVariablesViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleVariablesEditCheckBox" name="RoleVariablesEdit" class="form-check-input" {{#If RoleVariablesEdit}} checked{{#EndIf}} />
+                    <label for="RoleVariablesEditCheckBox" class="form-check-label">Edit</label>
+                </div>
+                <hr class="my-0 mt-2" />
+                <i class="text-secondary">Packages</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RolePackagesViewCheckBox" name="RolePackagesView" class="form-check-input" {{#If RolePackagesView}} checked{{#EndIf}} />
+                    <label for="RolePackagesViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RolePackagesDeleteCheckBox" name="RolePackagesDelete" class="form-check-input" {{#If RolePackagesDelete}} checked{{#EndIf}} />
+                    <label for="RolePackagesDeleteCheckBox" class="form-check-label">Delete</label>
+                </div>
+                <hr class="my-0 mt-2" />
+                <i class="text-secondary">Security</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleSecurityViewCheckBox" name="RoleSecurityView" class="form-check-input" {{#If RoleSecurityView}} checked{{#EndIf}} />
+                    <label for="RoleSecurityViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleSecurityEditCheckBox" name="RoleSecurityEdit" class="form-check-input" {{#If RoleSecurityEdit}} checked{{#EndIf}} />
+                    <label for="RoleSecurityEditCheckBox" class="form-check-label">Edit</label>
+                </div>
+                <hr class="my-0 mt-2" />
+                <i class="text-secondary">Configuration</i>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleConfigurationViewCheckBox" name="RoleConfigurationView" class="form-check-input" {{#If RoleConfigurationView}} checked{{#EndIf}} />
+                    <label for="RoleConfigurationViewCheckBox" class="form-check-label">View</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="RoleConfigurationEditCheckBox" name="RoleConfigurationEdit" class="form-check-input" {{#If RoleConfigurationEdit}} checked{{#EndIf}} />
+                    <label for="RoleConfigurationEditCheckBox" class="form-check-label">Edit</label>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="text-right">
+            {{#If GroupId}}
+            <button type="button" class="btn btn-danger">
+                <i class="fas fa-trash"></i>&nbsp;Delete
+            </button>
+            {{#EndIf}}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>&nbsp;Save
+            </button>
+        </div>
+    </div>
+</form>
+
+<div id="AddUserModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input id="AddUserIdVar" type="hidden" />
+                <input id="AddUserNameVar" type="hidden" />
+                <input id="AddUserNameTextBox" type="text" class="form-control user-list-text" />
+
+                <div class="user-list-scroll">
+                    <table id="AddUserTable" class="table table-sm table-hover table-bordered bg-light">
+                        <tbody>
+                            {{#Each UserList.user}}
+                            <tr data-id="{{user.Id}}" data-name="{{user.DisplayName}}" onclick="onAddUserRowClick(this)">
+                                <td>{{user.DisplayName}}</td>
+                            </tr>
+                            {{#EndEach}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="onAddUserClick()">Add User</button>
+            </div>
+        </div>
+    </div>
+</div>

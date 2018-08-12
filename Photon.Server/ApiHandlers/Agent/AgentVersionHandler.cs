@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-using log4net;
+﻿using log4net;
 using Photon.Communication;
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
@@ -14,7 +6,17 @@ using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Library.TcpMessages;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Photon.Server.ApiHandlers.Agent
 {
@@ -25,6 +27,8 @@ namespace Photon.Server.ApiHandlers.Agent
         public string Exception {get; set;}
     }
 
+    [Secure]
+    [RequiresRoles(GroupRole.AgentView)]
     [HttpHandler("api/agent/versions")]
     internal class AgentVersionHandler : HttpHandlerAsync
     {

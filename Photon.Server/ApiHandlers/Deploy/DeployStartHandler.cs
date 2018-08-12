@@ -3,14 +3,18 @@ using Photon.Framework.Packages;
 using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Deploy
 {
+    [Secure]
+    [RequiresRoles(GroupRole.DeployStart)]
     [HttpHandler("api/deploy/start")]
     internal class DeployHandler : HttpHandlerAsync
     {

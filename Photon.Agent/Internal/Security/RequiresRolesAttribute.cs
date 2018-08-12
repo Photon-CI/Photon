@@ -22,7 +22,7 @@ namespace Photon.Agent.Internal.Security
             if (!isSecurityEnabled) return null;
 
             var httpSecurity = (HttpSecurityManager)PhotonAgent.Instance.HttpContext.SecurityMgr;
-            if (!httpSecurity.GetUserContext(httpHandler.HttpContext.Request, out var userContext))
+            if (!httpSecurity.TryGetUserContext(httpHandler.HttpContext.Request, out var userContext))
                 return httpHandler.Response.Redirect("AccessDenied");
 
             var rolesRequired = httpHandler.GetType()

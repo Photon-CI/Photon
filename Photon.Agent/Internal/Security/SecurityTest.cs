@@ -29,6 +29,8 @@ namespace Photon.Agent.Internal.Security
             };
 
             AdminGroup = new UserGroup {
+                Id = "_adminGroup_",
+                Name = "Administrators",
                 UserIdList = {
                     AdminUser.Id,
                 },
@@ -47,6 +49,8 @@ namespace Photon.Agent.Internal.Security
             };
 
             GuestGroup = new UserGroup {
+                Id = "_guestGroup_",
+                Name = "Guests",
                 UserIdList = {
                     GuestUser.Id,
                 },
@@ -60,10 +64,10 @@ namespace Photon.Agent.Internal.Security
 
         public static void Initialize(UserGroupManager userMgr)
         {
-            userMgr.Users.Add(AdminUser);
-            userMgr.Users.Add(GuestUser);
-            userMgr.Groups.Add(AdminGroup);
-            userMgr.Groups.Add(GuestGroup);
+            userMgr.AddUser(AdminUser);
+            userMgr.AddUser(GuestUser);
+            userMgr.AddGroup(AdminGroup);
+            userMgr.AddGroup(GuestGroup);
         }
     }
 }

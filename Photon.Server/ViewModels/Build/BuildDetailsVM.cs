@@ -4,6 +4,7 @@ using Photon.Server.Internal.Builds;
 using PiServerLite.Http.Handlers;
 using System;
 using System.Collections.Generic;
+using Photon.Server.Internal.Security;
 
 namespace Photon.Server.ViewModels.Build
 {
@@ -26,6 +27,8 @@ namespace Photon.Server.ViewModels.Build
         public List<object> Artifacts {get; private set;}
         public string IconClass {get; private set;}
         public bool IsRunning {get; private set;}
+        public bool CanStartBuild {get; private set;}
+        public bool CanDeleteBuild {get; private set;}
 
 
         public BuildDetailsVM(IHttpHandler handler) : base(handler) {}
@@ -33,6 +36,9 @@ namespace Photon.Server.ViewModels.Build
         protected override void OnBuild()
         {
             base.OnBuild();
+
+            CanStartBuild = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.BuildStart);
+            CanDeleteBuild = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.BuildDelete);
 
             IconClass = "fas fa-ellipses-h text-muted";
 

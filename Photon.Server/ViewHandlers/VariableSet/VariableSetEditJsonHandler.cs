@@ -6,7 +6,7 @@ using PiServerLite.Http.Security;
 namespace Photon.Server.ViewHandlers.VariableSet
 {
     [Secure]
-    [RequiresRoles(GroupRole.VariablesEdit)]
+    [RequiresRoles(GroupRole.VariablesView)]
     [HttpHandler("/variable/edit/json")]
     internal class VariableSetEditJsonHandler : HttpHandler
     {

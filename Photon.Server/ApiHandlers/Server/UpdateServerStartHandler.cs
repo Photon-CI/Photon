@@ -3,6 +3,7 @@ using Photon.Framework;
 using Photon.Framework.Tools;
 using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 using System;
 using System.IO;
 using System.Threading;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Server
 {
+    [Secure]
     [HttpHandler("api/server/update")]
     internal class UpdateServerStartHandler : HttpHandlerAsync
     {

@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using log4net;
+﻿using log4net;
 using Photon.Framework.Tools;
 using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Agent
 {
+    [Secure]
     [HttpHandler("api/agent/update/start")]
     internal class UpdateAgentStartHandler : HttpHandlerAsync
     {

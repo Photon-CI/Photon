@@ -64,6 +64,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
@@ -73,11 +74,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiHandlers\Deploy\OutputStreamHandler.cs" />
     <Compile Include="ApiHandlers\Package\ApplicationPackageGetHandler.cs" />
     <Compile Include="ApiHandlers\Package\ProjectPackageGetHandler.cs" />
+    <Compile Include="ApiHandlers\Security\SecurityDomainEnabledHandler.cs" />
     <Compile Include="ApiHandlers\Security\SecurityEnabledHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
@@ -89,7 +92,7 @@
     <Compile Include="Internal\Projects\ProjectLastDeployment.cs" />
     <Compile Include="Internal\Projects\ServerProject.cs" />
     <Compile Include="Internal\Security\RequiresRolesAttribute.cs" />
-    <Compile Include="Internal\Security\SecurityTest.cs" />
+    <Compile Include="Internal\Security\DefaultSecurityGroups.cs" />
     <Compile Include="Internal\ServerViewModel.cs" />
     <Compile Include="ViewHandlers\Agent\AgentEditHandler.cs" />
     <Compile Include="ViewHandlers\Agent\AgentEditJsonHandler.cs" />
@@ -100,9 +103,6 @@
     <Compile Include="ApiHandlers\Project\DeleteHandler.cs" />
     <Compile Include="ApiHandlers\Project\JsonHandler.cs" />
     <Compile Include="ApiHandlers\ConfigurationHandler.cs" />
-    <Compile Include="ApiHandlers\Session\ListHandler.cs" />
-    <Compile Include="ApiHandlers\Session\CancelHandler.cs" />
-    <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
     <Compile Include="ApiHandlers\Variable\DeleteHandler.cs" />
     <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
     <Compile Include="ViewHandlers\Build\BuildDetailsHandler.cs" />
@@ -115,7 +115,10 @@
     <Compile Include="ViewHandlers\LogoutHandler.cs" />
     <Compile Include="ViewHandlers\Package\ApplicationPackageDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Package\ProjectPackageDetailsHandler.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityEditGroupHandler.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityDeleteUserHandler.cs" />
     <Compile Include="ViewHandlers\Security\SecurityIndexHandler.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityEditUserHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
     <Compile Include="ViewHandlers\Package\PackageIndexHandler.cs" />
     <Compile Include="ViewHandlers\Build\BuildIndexHandler.cs" />
@@ -127,7 +130,6 @@
     <Compile Include="ApiHandlers\Agent\UpdateAgentStartHandler.cs" />
     <Compile Include="ApiHandlers\Build\BuildResultHandler.cs" />
     <Compile Include="ApiHandlers\Deploy\DeployResultHandler.cs" />
-    <Compile Include="ApiHandlers\Session\OutputHandler.cs" />
     <Compile Include="ApiHandlers\VersionHandler.cs" />
     <Compile Include="ViewHandlers\Agent\AgentIndexHandler.cs" />
     <Compile Include="ViewHandlers\Project\ProjectJsonHandler.cs" />
@@ -207,7 +209,9 @@
     <Compile Include="ViewModels\Project\ProjectJsonVM.cs" />
     <Compile Include="ViewModels\Project\ProjectEditVM.cs" />
     <Compile Include="ViewModels\Project\ProjectIndexVM.cs" />
+    <Compile Include="ViewModels\Security\SecurityEditGroupVM.cs" />
     <Compile Include="ViewModels\Security\SecurityIndexVM.cs" />
+    <Compile Include="ViewModels\Security\SecurityEditUserVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariablesEditJsonVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariablesIndexVM.cs" />
@@ -325,6 +329,10 @@
       <Link>Content\jquery-3.3.1.min.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\SharedContent\js.cookie-2.2.0.min.js">
+      <Link>Content\js.cookie-2.2.0.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\SharedContent\jsoneditor-5.15.0\img\jsoneditor-icons.svg">
       <Link>Content\jsoneditor-5.15.0\img\jsoneditor-icons.svg</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -422,10 +430,13 @@
     <Content Include="Views\Package\ProjectDetails.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Security\Index.html">
+    <Content Include="Views\Security\EditUser.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Session\Index.html">
+    <Content Include="Views\Security\EditGroup.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Security\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Package\Index.html">
@@ -444,9 +455,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Project\Index.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Session\Details.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\VariableSet\EditJson.html">

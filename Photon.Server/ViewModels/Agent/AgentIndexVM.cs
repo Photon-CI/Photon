@@ -1,5 +1,6 @@
 ﻿using Photon.Server.Internal;
 using Photon.Server.Internal.HealthChecks;
+using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
 using System.Linq;
 
@@ -8,6 +9,7 @@ namespace Photon.Server.ViewModels.Agent
     internal class AgentIndexVM : ServerViewModel
     {
         public AgentRow[] Agents {get; set;}
+        public bool UserCanEdit {get; set;}
 
 
         public AgentIndexVM(IHttpHandler handler) : base(handler) {}
@@ -15,6 +17,8 @@ namespace Photon.Server.ViewModels.Agent
         protected override void OnBuild()
         {
             base.OnBuild();
+
+            UserCanEdit = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.AgentEdit);
 
             Agents = PhotonServer.Instance.Agents.All
                 .Select(x => {

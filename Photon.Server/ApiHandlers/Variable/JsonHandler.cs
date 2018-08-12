@@ -1,13 +1,17 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Photon.Library.Variables;
+﻿using Photon.Library.Variables;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Variable
 {
+    [Secure]
+    [RequiresRoles(GroupRole.VariablesView)]
     [HttpHandler("/api/variable/json")]
-    internal class JsonHandler : HttpHandlerAsync
+    internal class JsonGetHandler : HttpHandlerAsync
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
@@ -26,7 +30,13 @@ namespace Photon.Server.ApiHandlers.Variable
                 .SetContentType("application/json")
                 .SetText(json);
         }
+    }
 
+    [Secure]
+    [RequiresRoles(GroupRole.VariablesEdit)]
+    [HttpHandler("/api/variable/json-set")]
+    internal class JsonPostHandler : HttpHandlerAsync
+    {
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var id = GetQuery("id");

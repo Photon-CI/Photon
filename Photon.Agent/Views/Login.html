@@ -59,7 +59,7 @@
     <script src="{{#Url SharedContent/jquery-3.3.1.min.js}}"></script>
     <script src="{{#Url SharedContent/popper.min.js}}"></script>
     <script src="{{#Url SharedContent/bootstrap-4.1.0/js/bootstrap.min.js}}"></script>
-    <script src="{{#Url SharedContent/js.cookie.js}}" type="text/javascript"></script>
+    <script src="{{#Url SharedContent/js.cookie.js}}"></script>
     <script>
         function onSubmit() {
             var remember = $('#chkRememberMe').is(':checked');
@@ -68,7 +68,7 @@
             if (remember)
                 username = $('#txtUsername').val();
 
-            Cookies.set('photon.server.username', username, { expires: 365 });
+            Cookies.set('photon.agent.username', username, { expires: 365 });
         }
     </script>
 </body>

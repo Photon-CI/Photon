@@ -1,8 +1,12 @@
 ﻿using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 
 namespace Photon.Server.ApiHandlers.Project
 {
+    [Secure]
+    [RequiresRoles(GroupRole.ProjectEdit)]
     [HttpHandler("/api/project/delete")]
     internal class DeleteHandler : HttpHandler
     {

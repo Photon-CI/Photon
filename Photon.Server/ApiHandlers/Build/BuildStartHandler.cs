@@ -2,8 +2,10 @@
 using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 using System;
 using System.Linq;
 using System.Threading;
@@ -11,6 +13,8 @@ using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Build
 {
+    [Secure]
+    [RequiresRoles(GroupRole.BuildStart)]
     [HttpHandler("/api/build/start")]
     internal class BuildStartHandler : HttpHandlerAsync
     {
@@ -22,18 +26,6 @@ namespace Photon.Server.ApiHandlers.Build
             var qProject = GetQuery("project");
             var qGitRefspec = GetQuery("refspec");
             var qTaskName = GetQuery("task");
-
-            //HttpBuildStartRequest startInfo = null;
-            //if (HttpContext.Request.ContentLength64 > 0) {
-            //    startInfo = JsonSettings.Serializer.Deserialize<HttpBuildStartRequest>(HttpContext.Request.InputStream);
-            //}
-
-            //if (startInfo == null)
-            //    return Response.BadRequest().SetText("No json request was found!");
-
-            //var _projectId = qProject ?? startInfo.ProjectId;
-            //var _gitRefspec = qGitRefspec ?? startInfo.GitRefspec;
-            //var _taskName = qTaskName ?? startInfo.TaskName;
 
             try {
                 if (!PhotonServer.Instance.Projects.TryGet(qProject, out var project))

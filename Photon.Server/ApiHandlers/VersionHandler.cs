@@ -1,8 +1,10 @@
-﻿using System.Reflection;
-using PiServerLite.Http.Handlers;
+﻿using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System.Reflection;
 
 namespace Photon.Server.ApiHandlers
 {
+    [Secure]
     [HttpHandler("api/version")]
     internal class VersionHandler : HttpHandler
     {

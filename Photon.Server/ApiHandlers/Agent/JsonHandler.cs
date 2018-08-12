@@ -1,13 +1,17 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Photon.Framework.Server;
 using Photon.Library.Extensions;
 using Photon.Server.Internal;
+using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.ApiHandlers.Agent
 {
+    [Secure]
+    [RequiresRoles(GroupRole.AgentEdit)]
     [HttpHandler("/api/agent/json")]
     internal class JsonHandler : HttpHandlerAsync
     {

@@ -1,12 +1,14 @@
-﻿using System;
-using Photon.Library.Extensions;
+﻿using Photon.Library.Extensions;
 using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System;
 
 namespace Photon.Server.ApiHandlers.Deploy
 {
+    [Secure]
     [HttpHandler("api/deploy/result")]
     internal class DeployResultHandler : HttpHandler
     {

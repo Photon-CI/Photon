@@ -22,7 +22,7 @@ namespace Photon.Agent.ViewModels
             if (IsSecured) {
                 var httpSecurity = (HttpSecurityManager)PhotonAgent.Instance.HttpContext.SecurityMgr;
 
-                if (!httpSecurity.GetUserContext(handler.HttpContext.Request, out var user))
+                if (!httpSecurity.TryGetUserContext(handler.HttpContext.Request, out var user))
                     return;
 
                 var userId = user.UserId;

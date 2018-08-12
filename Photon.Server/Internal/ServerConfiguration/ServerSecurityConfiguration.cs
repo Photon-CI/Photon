@@ -7,7 +7,7 @@ namespace Photon.Server.Internal.ServerConfiguration
         [JsonProperty("enabled")]
         public bool Enabled {get; set;}
 
-        [JsonProperty("type")]
-        public string Type {get; set;}
+        [JsonProperty("domainEnabled")]
+        public bool DomainEnabled {get; set;}
     }
 }

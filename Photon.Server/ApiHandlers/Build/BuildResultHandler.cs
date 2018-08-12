@@ -3,11 +3,13 @@ using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
 using System;
 using System.Linq;
 
 namespace Photon.Server.ApiHandlers.Build
 {
+    [Secure]
     [HttpHandler("api/build/result")]
     internal class BuildResultHandler : HttpHandler
     {
