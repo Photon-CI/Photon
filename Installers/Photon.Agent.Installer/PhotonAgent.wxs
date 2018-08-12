@@ -226,6 +226,9 @@
       <Component Id="Views_Login.html" Guid="744d7128-ade0-44d7-8da5-e5419c728c3f">
         <File Id="Views_Login.html" Name="Login.html" Source="$(var.PhotonAgent_TargetDir)Views\Login.html" />
       </Component>
+      <Component Id="Views_AccessDenied.html" Guid="3c957929-e106-4cb9-b76c-45de294afbfa">
+        <File Id="Views_AccessDenied.html" Name="AccessDenied.html" Source="$(var.PhotonAgent_TargetDir)Views\AccessDenied.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -299,6 +302,9 @@
       </Component>
       <Component Id="Content_SessionOutput.js" Guid="b3765657-69ed-4bf3-a0ca-500d75d07455">
         <File Id="Content_SessionOutput.js" Name="SessionOutput.js" Source="$(var.PhotonAgent_TargetDir)Content\SessionOutput.js" />
+      </Component>
+      <Component Id="Content_js.cookie_2.2.0.min.js" Guid="d534b2ee-66c9-45cf-9097-e9671a55e2c2">
+        <File Id="Content_js.cookie_2.2.0.min.js" Name="js.cookie-2.2.0.min.js" Source="$(var.PhotonAgent_TargetDir)Content\js.cookie-2.2.0.min.js" />
       </Component>
     </ComponentGroup>
   </Fragment>

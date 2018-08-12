@@ -272,16 +272,15 @@
       <Component Id="Content_outputCursor.css" Guid="da98f198-126e-44a5-a100-5174b117f2a1">
         <File Id="Content_outputCursor.css" Name="outputCursor.css" Source="$(var.PhotonServer_TargetDir)Content\outputCursor.css" />
       </Component>
+      <Component Id="Content_js.cookie_2.2.0.min.js" Guid="b371fbbb-7404-47c4-a8dc-7d1aa9419c89">
+        <File Id="Content_js.cookie_2.2.0.min.js" Name="js.cookie-2.2.0.min.js" Source="$(var.PhotonServer_TargetDir)Content\js.cookie-2.2.0.min.js" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
     <ComponentGroup Id="Views_Session_files" Directory="Views_Session">
-      <Component Id="Views_Session_Details.html" Guid="ea34fdc3-1aa3-41c9-9049-aa4b3991ff1d">
-        <File Id="Views_Session_Details.html" Name="Details.html" Source="$(var.PhotonServer_TargetDir)Views\Session\Details.html" />
-      </Component>
-      <Component Id="Views_Session_Index.html" Guid="7ac6c20b-2725-446d-81bd-007ed60926e4">
-        <File Id="Views_Session_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Session\Index.html" />
-      </Component>
+      
+      
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -395,6 +394,12 @@
     <ComponentGroup Id="Views_Security_files" Directory="Views_Security">
       <Component Id="Views_Security_Index.html" Guid="0c6e3b92-fec5-45d6-82a9-0e8131b3f379">
         <File Id="Views_Security_Index.html" Name="Index.html" Source="$(var.PhotonServer_TargetDir)Views\Security\Index.html" />
+      </Component>
+      <Component Id="Views_Security_EditUser.html" Guid="86c85803-0f18-4136-add7-796cf515f7c0">
+        <File Id="Views_Security_EditUser.html" Name="EditUser.html" Source="$(var.PhotonServer_TargetDir)Views\Security\EditUser.html" />
+      </Component>
+      <Component Id="Views_Security_EditGroup.html" Guid="264dc736-caa4-4446-ae9e-509198fd79a5">
+        <File Id="Views_Security_EditGroup.html" Name="EditGroup.html" Source="$(var.PhotonServer_TargetDir)Views\Security\EditGroup.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
