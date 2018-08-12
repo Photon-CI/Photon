@@ -11,6 +11,8 @@ namespace Photon.CLI.Commands
     {
         public string Server {get; set;}
         public string AgentNames {get; set;}
+        public string Username {get; set;}
+        public string Password {get; set;}
 
 
         public UpdateCommands(CommandContext context) : base(context)
@@ -22,6 +24,8 @@ namespace Photon.CLI.Commands
 
             Map("-s", "-server").ToProperty(v => Server = v);
             Map("-n", "-names").ToProperty(v => AgentNames = v);
+            Map("-u", "-user").ToProperty(v => Username = v);
+            Map("-p", "-pass").ToProperty(v => Password = v);
         }
 
         private async Task OnHelp(string[] args)
@@ -39,6 +43,8 @@ namespace Photon.CLI.Commands
             if (args.ContainsAny("help", "?")) {
                 await new HelpPrinter(typeof(UpdateCommands), nameof(UpdateServerCommand))
                     .Add("-server  | -s", "The name of the target Photon Server.")
+                    .Add("-user    | -u", "The optional username.")
+                    .Add("-pass    | -p", "The optional password.")
                     .PrintAsync();
 
                 return;
@@ -46,6 +52,8 @@ namespace Photon.CLI.Commands
 
             var updateAction = new UpdateServerAction {
                 ServerName = Server,
+                Username = Username,
+                Password = Password,
             };
 
             await updateAction.Run(Context);

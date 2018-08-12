@@ -16,7 +16,10 @@ namespace Photon.Server.ViewHandlers
 
             vm.Build();
 
-            return Response.View("AccessDenied.html", vm);
+            var response = Response.View("AccessDenied.html", vm);
+            response.StatusCode = 401;
+            response.StatusDescription = "Unauthorized";
+            return response;
         }
     }
 }

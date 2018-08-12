@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +17,8 @@ namespace Photon.CLI.Actions
     internal class UpdateServerAction
     {
         public string ServerName {get; set;}
+        public string Username {get; set;}
+        public string Password {get; set;}
 
 
         public async Task Run(CommandContext context)
@@ -26,6 +29,12 @@ namespace Photon.CLI.Actions
 
             string currentVersion;
             using (var webClient = new WebClient()) {
+                if (!string.IsNullOrEmpty(Username)) {
+                    var creds = Encoding.ASCII.GetBytes($"{Username}:{Password}");
+                    var creds64 = Convert.ToBase64String(creds);
+                    webClient.Headers[HttpRequestHeader.Authorization] = $"Basic {creds64}";
+                }
+
                 var currentVersionUrl = NetPath.Combine(server.Url, "api/version");
                 currentVersion = (await webClient.DownloadStringTaskAsync(currentVersionUrl)).Trim();
             }
