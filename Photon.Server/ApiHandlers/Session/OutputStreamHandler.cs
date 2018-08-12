@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Photon.Server.Internal;
+using PiServerLite.Http.Handlers;
+using PiServerLite.Http.Security;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Server.Internal;
-using PiServerLite.Http.Handlers;
 
 namespace Photon.Server.ApiHandlers.Session
 {
+    [Secure]
     [HttpHandler("api/session/output-stream")]
     internal class OutputStreamHandler : HttpHandler
     {

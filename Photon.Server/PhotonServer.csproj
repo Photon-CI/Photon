@@ -82,6 +82,7 @@
     <Compile Include="ApiHandlers\Package\ProjectPackageGetHandler.cs" />
     <Compile Include="ApiHandlers\Security\SecurityDomainEnabledHandler.cs" />
     <Compile Include="ApiHandlers\Security\SecurityEnabledHandler.cs" />
+    <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
     <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
