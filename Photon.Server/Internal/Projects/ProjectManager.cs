@@ -1,6 +1,6 @@
 ﻿using log4net;
 using Photon.Framework.Projects;
-using Photon.Library;
+using Photon.Framework.Tools;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -119,9 +119,7 @@ namespace Photon.Server.Internal.Projects
             if (!isLoaded) Task.WaitAll(loadTask.Task);
 
             if (projectsCollection.TryRemove(id, out var project)) {
-                if (Directory.Exists(project.ContentPath))
-                    FileUtils.DestoryDirectory(project.ContentPath);
-
+                PathEx.DestoryDirectory(project.ContentPath);
                 return true;
             }
 

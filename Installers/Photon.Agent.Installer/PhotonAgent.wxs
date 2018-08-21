@@ -208,6 +208,9 @@
           <util:PermissionEx User="Users" GenericAll="yes" />
         </File>
       </Component>
+      <Component Id="AgentUninstaller" Guid="56891F1E-85EE-4184-B108-D91F1CC70442">
+        <Shortcut Id="UninstallProduct" Name="Uninstall Photon.Agent" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" Description="Uninstalls Photon Agent." />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>

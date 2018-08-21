@@ -4,8 +4,8 @@ using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Server;
 using Photon.Framework.Tasks;
+using Photon.Framework.Tools;
 using Photon.Framework.Variables;
-using Photon.Library;
 using Photon.Library.Packages;
 using System;
 using System.Collections.Concurrent;
@@ -168,7 +168,7 @@ namespace Photon.Server.Internal.Sessions
 
             var workDirectory = WorkDirectory;
             try {
-                await Task.Run(() => FileUtils.DestoryDirectory(workDirectory));
+                await Task.Run(() => PathEx.DestoryDirectory(workDirectory));
             }
             catch (AggregateException errors) {
                 errors.Flatten().Handle(e => {

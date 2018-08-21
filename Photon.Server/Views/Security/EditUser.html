@@ -19,12 +19,24 @@
 </script>
 {{#EndScript}}
 
-<nav class="navbar navbar-dark bg-dark content-navbar">
-    <div class="navbar-brand mr-auto"></div>
-</nav>
-
 <form id="EditUserForm" method="post">
-    <input type="hidden" name="UserId" value="{{UserId}}"/>
+    <nav class="navbar navbar-dark bg-dark content-navbar">
+        <div class="navbar-brand mr-auto">
+            <h3 class="text-info my-0">Edit User</h3>
+        </div>
+        <div>
+            {{#If UserId}}
+            <button type="button" class="btn btn-danger" onclick="onDeleteClick()">
+                <i class="fas fa-trash"></i>&nbsp;Delete
+            </button>
+            {{#EndIf}}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>&nbsp;Save
+            </button>
+        </div>
+    </nav>
+
+    <input type="hidden" name="UserId" value="{{UserId}}" />
     <div class="container mt-3 mb-2">
         {{#If Errors}}
         <div class="mb-3">
@@ -75,17 +87,6 @@
                 </div>
                 <small class="text-muted">Allow the user to authenticate using this account.</small>
             </div>
-        </div>
-        <hr />
-        <div class="text-right">
-            {{#If UserId}}
-            <button type="button" class="btn btn-danger" onclick="onDeleteClick()">
-                <i class="fas fa-trash"></i>&nbsp;Delete
-            </button>
-            {{#EndIf}}
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i>&nbsp;Save
-            </button>
         </div>
     </div>
 </form>

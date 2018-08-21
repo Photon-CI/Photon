@@ -43,9 +43,15 @@
     <Compile Include="Agent\AgentContextBase.cs" />
     <Compile Include="Agent\IAgentContext.cs" />
     <Compile Include="AnsiWriter.cs" />
+    <Compile Include="Applications\Application.cs" />
+    <Compile Include="Applications\ApplicationRevision.cs" />
+    <Compile Include="Applications\DomainApplicationRevision.cs" />
+    <Compile Include="Applications\IApplicationManager.cs" />
     <Compile Include="Domain\DomainAgentBase.cs" />
     <Compile Include="Domain\DomainAgentSessionClient.cs" />
     <Compile Include="Domain\DomainAgentSessionHandle.cs" />
+    <Compile Include="Applications\DomainApplication.cs" />
+    <Compile Include="Applications\DomainApplicationManager.cs" />
     <Compile Include="Domain\DomainBlockWriter.cs" />
     <Compile Include="Domain\DomainConnectionFactory.cs" />
     <Compile Include="Domain\DomainContextBase.cs" />

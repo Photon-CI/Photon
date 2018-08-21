@@ -4,6 +4,12 @@
 <script>
     $(function () {
         $('#layoutNavbarContent [data-link="security"]').addClass('active');
+
+        $('#GroupListSearch').on('input', onGroupSearchChanged);
+        onGroupSearchChanged();
+
+        $('#UserListSearch').on('input', onUserSearchChanged);
+        onUserSearchChanged();
     });
 
     function editGroup(row) {
@@ -80,6 +86,44 @@
             dataType: 'text'
         });
     }
+
+    function onGroupSearchChanged() {
+        var searchText = $('#GroupListSearch').val();
+
+        $('#GroupListTable tbody tr').each(function (i, e) {
+            var visible = false;
+
+            if (searchText.length === 0) {
+                visible = true;
+            } else {
+                var val = $(e).find('td')[0].innerText;
+
+                if (val.match(new RegExp(searchText, "i")))
+                    visible = true;
+            }
+
+            $(e).toggle(visible);
+        });
+    }
+
+    function onUserSearchChanged() {
+        var searchText = $('#UserListSearch').val();
+
+        $('#UserListTable tbody tr').each(function (i, e) {
+            var visible = false;
+
+            if (searchText.length === 0) {
+                visible = true;
+            } else {
+                var val = $(e).find('td')[0].innerText;
+
+                if (val.match(new RegExp(searchText, "i")))
+                    visible = true;
+            }
+
+            $(e).toggle(visible);
+        });
+    }
 </script>
 {{#EndScript}}
 
@@ -87,6 +131,14 @@
 <style>
     .user-group-row {
         cursor: pointer;
+    }
+    .table-header {
+        color: #495057;
+        background-color: #e9ecef;
+        /*border: solid 1px #dee2e6;*/
+        font-weight: 700;
+        line-height: 32px;
+        padding: 2px;
     }
 </style>
 {{#EndStyle}}
@@ -131,46 +183,70 @@
         <div class="card-body text-left">
             <div class="tab-content" id="myTabContent">
                 <div id="groups" class="tab-pane fade show active" role="tabpanel">
-                    <table class="table table-sm table-hover bg-light table-bordered">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>
-                                    {{#If UserCanEdit}}
-                                    <a href="{{#Url security/group/edit}}" class="text-success px-1 float-right">New Group</a>
-                                    {{#EndIf}}
-                                    User Groups
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{#Each UserGroups.group}}
-                            <tr class="user-group-row" data-id="{{group.Id}}" onclick="editGroup(this)">
-                                <td>{{group.Name}}</td>
-                            </tr>
-                            {{#EndEach}}
-                        </tbody>
-                    </table>
+                    <div class="border">
+                        <div class="table-header border-bottom clearfix">
+                            <div class="float-right">
+                                {{#If UserCanEdit}}
+                                <a href="{{#Url security/group/edit}}" class="text-success mr-2">New Group</a>
+                                {{#EndIf}}
+                                <form class="d-inline-block" style="width: 200px;">
+                                    <div class="input-group input-group-sm">
+                                        <input id="GroupListSearch" type="text" class="form-control"/>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <span class="px-1">Groups</span>
+                        </div>
+                        <div style="max-height: 600px; overflow-y: auto">
+                            <table id="GroupListTable" class="table table-sm table-hover bg-light m-0">
+                                <tbody>
+                                {{#Each UserGroups.group}}
+                                <tr class="user-group-row" data-id="{{group.Id}}" onclick="editGroup(this)">
+                                    <td>{{group.Name}}</td>
+                                </tr>
+                                {{#EndEach}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div id="users" class="tab-pane fade" role="tabpanel">
-                    <table class="table table-sm table-hover bg-light table-bordered">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>
-                                    {{#If UserCanEdit}}
-                                    <a href="{{#Url security/user/edit}}" class="text-success px-1 float-right">New User</a>
-                                    {{#EndIf}}
-                                    Users
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{#Each Users.user}}
-                            <tr class="user-group-row" data-id="{{user.Id}}" onclick="editUser(this)">
-                                <td>{{user.DisplayName}}</td>
-                            </tr>
-                            {{#EndEach}}
-                        </tbody>
-                    </table>
+                    <div class="border">
+                        <div class="table-header border-bottom clearfix">
+                            <div class="float-right">
+                                {{#If UserCanEdit}}
+                                <a href="{{#Url security/user/edit}}" class="text-success mr-2">New User</a>
+                                {{#EndIf}}
+                                <form class="d-inline-block" style="width: 200px;">
+                                    <div class="input-group input-group-sm">
+                                        <input id="UserListSearch" type="text" class="form-control" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <span class="px-1">Users</span>
+                        </div>
+                        <div style="max-height: 600px; overflow-y: auto">
+                            <table id="UserListTable" class="table table-sm table-hover bg-light m-0">
+                                <tbody>
+                                    {{#Each Users.user}}
+                                    <tr class="user-group-row" data-id="{{user.Id}}" onclick="editUser(this)">
+                                        <td>{{user.DisplayName}}</td>
+                                    </tr>
+                                    {{#EndEach}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div id="domain" class="tab-pane fade" role="tabpanel">
                     <div class="form-group mt-3">

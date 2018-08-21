@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Extensions;
+﻿using Photon.Framework.Applications;
+using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Variables;
@@ -21,6 +22,7 @@ namespace Photon.Framework.Domain
         public DomainPackageClient Packages {get; set;}
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
+        public DomainApplicationManager Applications {get; set;}
 
 
         public void RunCommandLine(string command)

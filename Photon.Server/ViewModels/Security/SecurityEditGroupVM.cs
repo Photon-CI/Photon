@@ -36,6 +36,7 @@ namespace Photon.Server.ViewModels.Security
         public bool RoleConfigurationEdit {get; set;}
         public User[] UserList {get; set;}
         public string GroupUserIdList {get; set;}
+        public string SearchText {get; set;}
 
 
         public SecurityEditGroupVM(IHttpHandler handler) : base(handler)
@@ -48,7 +49,7 @@ namespace Photon.Server.ViewModels.Security
             base.OnBuild();
 
             var userMgr = PhotonServer.Instance.UserMgr;
-            UserList = userMgr.AllUsers.ToArray();
+            UserList = userMgr.AllUsers.OrderBy(x => x.DisplayName).ToArray();
 
             if (string.IsNullOrEmpty(GroupId)) return;
 
@@ -77,14 +78,13 @@ namespace Photon.Server.ViewModels.Security
             RoleConfigurationView = HasRole(GroupRole.ConfigurationView);
             RoleConfigurationEdit = HasRole(GroupRole.ConfigurationEdit);
 
-            GroupUsers = group.UserIdList.Select(userId => {
-                return userMgr.TryGetUserById(userId, out var user)
-                    ? user
-                    : new User {
+            GroupUsers = group.UserIdList
+                .Select(userId => userMgr.TryGetUserById(userId, out var user)
+                    ? user : new User {
                         Id = userId,
                         DisplayName = userId,
-                    };
-            }).ToArray();
+                    })
+                .OrderBy(x => x.DisplayName).ToArray();
         }
 
         public void Restore(NameValueCollection form)
@@ -110,6 +110,7 @@ namespace Photon.Server.ViewModels.Security
             RoleConfigurationView = form.Get(nameof(RoleConfigurationView)).To<bool>();
             RoleConfigurationEdit = form.Get(nameof(RoleConfigurationEdit)).To<bool>();
             GroupUserIdList = form.Get(nameof(GroupUserIdList));
+            SearchText = form.Get(nameof(SearchText));
         }
 
         public void Save()

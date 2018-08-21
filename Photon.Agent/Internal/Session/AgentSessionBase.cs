@@ -5,8 +5,8 @@ using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
+using Photon.Framework.Tools;
 using Photon.Framework.Variables;
-using Photon.Library;
 using Photon.Library.TcpMessages;
 using System;
 using System.IO;
@@ -134,6 +134,9 @@ namespace Photon.Agent.Internal.Session
             }
 
             await CleanupWorkDir();
+
+            var maxAppCount = PhotonAgent.Instance.AgentConfiguration.Value.Applications.MaxCount;
+            PhotonAgent.Instance.ApplicationMgr.ApplyRetentionPolicy(maxAppCount);
         }
 
         public void Abort()
@@ -160,28 +163,17 @@ namespace Photon.Agent.Internal.Session
 
         private async Task CleanupWorkDir()
         {
-            var retryDelay = 3000;
-            var retryCount = 3;
+            const int retryDelay = 3000;
+            const int retryCount = 3;
 
             var attempt = 1;
             var successful = false;
             Exception lastError = null;
             while (!successful && attempt < retryCount) {
                 try {
-                    FileUtils.DestoryDirectory(WorkDirectory);
+                    PathEx.DestoryDirectory(WorkDirectory);
                     successful = true;
                 }
-                //catch (AggregateException errors) {
-                //    errors.Flatten().Handle(e => {
-                //        if (e is IOException) {
-                //            //Log.Warn(ioError.Message);
-                //            return true;
-                //        }
-
-                //        Log.Warn($"An error occurred while cleaning the work directory! {e.Message}");
-                //        return true;
-                //    });
-                //}
                 catch (Exception error) {
                     lastError = error;
                 }

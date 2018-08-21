@@ -2,7 +2,6 @@
 using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Framework.Tools;
-using Photon.Library;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -94,7 +93,7 @@ namespace Photon.Server.Internal.Builds
                 data.Remove(number);
 
                 try {
-                    FileUtils.DestoryDirectory(build.ContentPath);
+                    PathEx.DestoryDirectory(build.ContentPath);
                 }
                 catch (Exception error) {
                     Log.Error($"Failed to cleanup build #{number}!", error);

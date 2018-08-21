@@ -103,12 +103,14 @@
     <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
     <Compile Include="ApiHandlers\Variable\DeleteHandler.cs" />
     <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
+    <Compile Include="Internal\AgentConfiguration\AgentApplicationConfiguration.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentTcpConfiguration.cs" />
     <Compile Include="Internal\AgentViewModel.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentConfiguration.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentConfigurationManager.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentHttpConfiguration.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentSecurityConfiguration.cs" />
+    <Compile Include="Internal\Applications\ApplicationManager.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\Security\SecurityTest.cs" />
     <Compile Include="MessageHandlers\HealthCheckProcessor.cs" />

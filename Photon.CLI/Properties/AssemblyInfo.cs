@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.44")]
-[assembly: AssemblyFileVersion("0.0.44")]
+[assembly: AssemblyVersion("0.0.45")]
+[assembly: AssemblyFileVersion("0.0.45")]
 
 [assembly: AssemblyTitle("Photon CLI")]
 [assembly: AssemblyDescription("Command-Line Interface for Photon.")]

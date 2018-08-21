@@ -83,11 +83,23 @@
 </style>
 {{#EndStyle}}
 
-<nav class="navbar navbar-dark bg-dark content-navbar">
-    <div class="navbar-brand mr-auto"></div>
-</nav>
-
 <form method="post" onsubmit="onSubmit()">
+    <nav class="navbar navbar-dark bg-dark content-navbar">
+        <div class="navbar-brand mr-auto">
+            <h3 class="text-info my-0">Edit Group</h3>
+        </div>
+        <div>
+            {{#If GroupId}}
+            <button type="button" class="btn btn-danger">
+                <i class="fas fa-trash"></i>&nbsp;Delete
+            </button>
+            {{#EndIf}}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>&nbsp;Save
+            </button>
+        </div>
+    </nav>
+
     <input type="hidden" name="GroupId" value="{{GroupId}}"/>
     <input type="hidden" id="UserIdListVar" name="GroupUserIdList"/>
     <div class="container mt-3 mb-2">
@@ -229,17 +241,6 @@
                     <label for="RoleConfigurationEditCheckBox" class="form-check-label">Edit</label>
                 </div>
             </div>
-        </div>
-        <hr />
-        <div class="text-right">
-            {{#If GroupId}}
-            <button type="button" class="btn btn-danger">
-                <i class="fas fa-trash"></i>&nbsp;Delete
-            </button>
-            {{#EndIf}}
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i>&nbsp;Save
-            </button>
         </div>
     </div>
 </form>

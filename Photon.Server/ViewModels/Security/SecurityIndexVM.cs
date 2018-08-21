@@ -25,8 +25,8 @@ namespace Photon.Server.ViewModels.Security
 
             UserCanEdit = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.SecurityEdit);
 
-            UserGroups = PhotonServer.Instance.UserMgr.AllGroups.ToArray();
-            Users = PhotonServer.Instance.UserMgr.AllUsers.ToArray();
+            UserGroups = PhotonServer.Instance.UserMgr.AllGroups.OrderBy(x => x.Name).ToArray();
+            Users = PhotonServer.Instance.UserMgr.AllUsers.OrderBy(x => x.DisplayName).ToArray();
 
             IsDomainEnabled = PhotonServer.Instance.ServerConfiguration.Value.Security.DomainEnabled;
         }

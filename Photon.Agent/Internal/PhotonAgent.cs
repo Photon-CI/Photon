@@ -16,6 +16,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Agent.Internal.Applications;
 
 namespace Photon.Agent.Internal
 {
@@ -38,6 +39,7 @@ namespace Photon.Agent.Internal
         public RepositorySourceManager RepositorySources {get;}
         public AgentConfigurationManager AgentConfiguration {get;}
         public UserGroupManager UserMgr {get;}
+        public ApplicationManager ApplicationMgr {get;}
 
 
         public PhotonAgent()
@@ -51,6 +53,7 @@ namespace Photon.Agent.Internal
             messageListener = new MessageListener(MessageRegistry);
             AgentConfiguration = new AgentConfigurationManager();
             UserMgr = new UserGroupManager();
+            ApplicationMgr = new ApplicationManager();
 
             RepositorySources.RepositorySourceDirectory = Configuration.RepositoryDirectory;
             messageListener.ConnectionReceived += MessageListener_ConnectionReceived;
@@ -95,6 +98,7 @@ namespace Photon.Agent.Internal
             AgentConfiguration.Load();
 
             SecurityTest.Initialize(UserMgr);
+            ApplicationMgr.Initialize();
 
             if (!IPAddress.TryParse(AgentConfiguration.Value.Tcp.Host, out var _address))
                 throw new Exception($"Invalid TCP Host '{AgentConfiguration.Value.Tcp.Host}'!");

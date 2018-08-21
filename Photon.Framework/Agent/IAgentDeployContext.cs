@@ -2,12 +2,10 @@
 {
     public interface IAgentDeployContext : IAgentContext
     {
-        uint DeploymentNumber {get; set;}
+        uint DeploymentNumber {get;}
         string ProjectPackageId {get;}
         string ProjectPackageVersion {get;}
-        string EnvironmentName {get; set;}
+        string EnvironmentName {get;}
         string TaskName {get;}
-
-        string GetApplicationDirectory(string applicationName, string applicationVersion);
     }
 }
