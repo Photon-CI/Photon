@@ -1,5 +1,8 @@
-﻿namespace Photon.Framework.Applications
+﻿using System;
+
+namespace Photon.Framework.Applications
 {
+    [Serializable]
     public class DomainApplicationManager
     {
         private readonly IApplicationManager appMgr;

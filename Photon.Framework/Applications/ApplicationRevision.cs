@@ -3,6 +3,7 @@ using System;
 
 namespace Photon.Framework.Applications
 {
+    [Serializable]
     public class ApplicationRevision
     {
         public string PackageId {get; set;}

@@ -2,6 +2,7 @@
 
 namespace Photon.Framework.Applications
 {
+    [Serializable]
     public class DomainApplicationRevision
     {
         private readonly ApplicationRevision revision;

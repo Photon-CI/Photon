@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Photon.Framework.Applications
 {
+    [Serializable]
     public class Application
     {
         public string Name {get; set;}

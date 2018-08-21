@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Photon.Framework.Applications
 {
+    [Serializable]
     public class DomainApplication
     {
         private readonly Application application;
