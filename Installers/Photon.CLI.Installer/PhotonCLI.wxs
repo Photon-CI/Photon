@@ -72,9 +72,6 @@
 			<Component Id="Newtonsoft.Json.Bson.dll" Guid="996580f1-369f-4fc7-9964-64a924fa9fb6">
 			  <File Id="Newtonsoft.Json.Bson.dll" Name="Newtonsoft.Json.Bson.dll" Source="$(var.PhotonCLI_TargetDir)Newtonsoft.Json.Bson.dll" />
 			</Component>
-      <Component Id="photon_light.ico" Guid="17661265-79c3-4319-b711-851254184783">
-        <File Id="photon_light.ico" Name="photon_light.ico" Source="$(var.PhotonCLI_TargetDir)photon_light.ico" />
-      </Component>
 		</ComponentGroup>
 	</Fragment>
 </Wix>

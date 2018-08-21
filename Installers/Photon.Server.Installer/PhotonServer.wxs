@@ -167,9 +167,9 @@
           <util:PermissionEx User="Users" GenericAll="yes" />
         </File>
       </Component>
-      <Component Id="ServerUninstaller" Guid="3F44476F-9CDE-4C04-9728-8B8258ADCA9A">
+      <!--<Component Id="ServerUninstaller" Guid="3F44476F-9CDE-4C04-9728-8B8258ADCA9A">
         <Shortcut Id="UninstallProduct" Name="Uninstall Photon.Server" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" Description="Uninstalls Photon Server." />
-      </Component>
+      </Component>-->
     </ComponentGroup>
 	</Fragment>
   <Fragment>
