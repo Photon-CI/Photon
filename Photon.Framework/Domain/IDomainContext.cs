@@ -1,4 +1,5 @@
-﻿using Photon.Framework.Projects;
+﻿using Photon.Framework.Applications;
+using Photon.Framework.Projects;
 using Photon.Framework.Variables;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,5 +25,7 @@ namespace Photon.Framework.Domain
         Task PushApplicationPackageAsync(string filename, CancellationToken token);
         Task<string> PullProjectPackageAsync(string id, string version);
         Task<string> PullApplicationPackageAsync(string id, string version);
+        Task<DomainApplicationRevision> GetApplicationRevision(string projectId, string appName, uint deploymentNumber);
+        Task<DomainApplicationRevision> RegisterApplicationRevision(DomainApplicationRevisionRequest revisionRequest);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Photon.Framework.Applications;
-using Photon.Framework.Domain;
+﻿using Photon.Framework.Domain;
 using Photon.Framework.Server;
 
 namespace Photon.Framework.Agent
@@ -8,6 +7,5 @@ namespace Photon.Framework.Agent
     {
         string AgentSessionId {get;}
         ServerAgent Agent {get;}
-        DomainApplicationClient Applications {get;}
     }
 }

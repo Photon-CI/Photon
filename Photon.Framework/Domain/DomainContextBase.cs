@@ -117,5 +117,19 @@ namespace Photon.Framework.Domain
                 Packages.PullApplicationPackage(id, version, task);
             });
         }
+
+        public async Task<DomainApplicationRevision> GetApplicationRevision(string projectId, string appName, uint deploymentNumber)
+        {
+            return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
+                Applications.GetApplicationRevision(projectId, appName, deploymentNumber, task);
+            });
+        }
+
+        public async Task<DomainApplicationRevision> RegisterApplicationRevision(DomainApplicationRevisionRequest revisionRequest)
+        {
+            return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
+                Applications.RegisterApplicationRevision(revisionRequest, task);
+            });
+        }
     }
 }
