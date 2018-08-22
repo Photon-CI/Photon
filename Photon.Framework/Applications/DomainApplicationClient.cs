@@ -13,7 +13,7 @@ namespace Photon.Framework.Applications
         Task<DomainApplicationRevision> RegisterApplicationRevision(DomainApplicationRevisionRequest appRevisionRequest, CancellationToken token = default(CancellationToken));
     }
 
-    public class DomainApplicationClient : IDomainApplicationClient
+    public class DomainApplicationClient : MarshalByRefInstance, IDomainApplicationClient
     {
         public event GetApplicationRevisionFunc OnGetApplicationRevision;
         public event RegisterApplicationRevisionFunc OnRegisterApplicationRevision;
