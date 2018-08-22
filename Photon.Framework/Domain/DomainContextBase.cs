@@ -22,7 +22,7 @@ namespace Photon.Framework.Domain
         public DomainPackageClient Packages {get; set;}
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
-        public DomainApplicationManager Applications {get; set;}
+        public IDomainApplicationClient Applications {get; set;}
 
 
         public void RunCommandLine(string command)

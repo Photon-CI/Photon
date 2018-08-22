@@ -1,7 +1,9 @@
-﻿using Photon.Agent.Internal.Git;
+﻿using Photon.Agent.Internal.Applications;
+using Photon.Agent.Internal.Git;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Agent;
+using Photon.Framework.Applications;
 using Photon.Framework.Domain;
 using Photon.Framework.Projects;
 using Photon.Framework.Tools.Content;
@@ -44,6 +46,10 @@ namespace Photon.Agent.Internal.Session
                 contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
                 contextOutput.OnWriteRaw += (text) => Output.WriteRaw(text);
 
+                var appMgr = new DomainApplicationClient();
+                appMgr.OnGetApplicationRevision += AppMgr_OnGetApplicationRevision;
+                appMgr.OnRegisterApplicationRevision += AppMgr_OnRegisterApplicationRevision;
+
                 var context = new AgentBuildContext {
                     Project = Project,
                     Agent = Agent,
@@ -58,6 +64,7 @@ namespace Photon.Agent.Internal.Session
                     Packages = PackageClient,
                     ServerVariables = ServerVariables,
                     AgentVariables = AgentVariables,
+                    Applications = appMgr,
                     CommitHash = CommitHash,
                     CommitAuthor = CommitAuthor,
                     CommitMessage = CommitMessage,
@@ -77,6 +84,67 @@ namespace Photon.Agent.Internal.Session
                     throw;
                 }
             }
+        }
+
+        private void AppMgr_OnGetApplicationRevision(string projectId, string appName, uint deploymentNumber, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle)
+        {
+            var app = PhotonAgent.Instance.ApplicationMgr.GetApplication(projectId, appName);
+            if (app == null) {
+                taskHandle.SetResult(null);
+                return;
+            }
+
+            var revision = app.GetRevision(deploymentNumber);
+            if (revision == null) {
+                taskHandle.SetResult(null);
+                return;
+            }
+
+            var _rev = new DomainApplicationRevision {
+                ProjectId = app.ProjectId,
+                ApplicationName = app.Name,
+                ApplicationPath = revision.Location,
+                DeploymentNumber = revision.DeploymentNumber,
+                PackageId = revision.PackageId,
+                PackageVersion = revision.PackageVersion,
+                CreatedTime = revision.Time,
+            };
+
+            taskHandle.SetResult(_rev);
+        }
+
+        private void AppMgr_OnRegisterApplicationRevision(DomainApplicationRevisionRequest appRevisionRequest, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle)
+        {
+            var appMgr = PhotonAgent.Instance.ApplicationMgr;
+            var app = appMgr.GetApplication(appRevisionRequest.ProjectId, appRevisionRequest.ApplicationName)
+                ?? appMgr.RegisterApplication(appRevisionRequest.ProjectId, appRevisionRequest.ApplicationName);
+
+            var pathName = appRevisionRequest.DeploymentNumber.ToString();
+
+            var revision = new ApplicationRevision {
+                DeploymentNumber = appRevisionRequest.DeploymentNumber,
+                PackageId = appRevisionRequest.PackageId,
+                PackageVersion = appRevisionRequest.PackageVersion,
+                Location = NetPath.Combine(app.Location, pathName),
+                Time = DateTime.Now,
+            };
+
+            app.Revisions.Add(revision);
+            appMgr.Save();
+
+            revision.Initialize();
+
+            var _rev = new DomainApplicationRevision {
+                ProjectId = app.ProjectId,
+                ApplicationName = app.Name,
+                ApplicationPath = revision.Location,
+                DeploymentNumber = revision.DeploymentNumber,
+                PackageId = revision.PackageId,
+                PackageVersion = revision.PackageVersion,
+                CreatedTime = revision.Time,
+            };
+
+            taskHandle.SetResult(_rev);
         }
 
         public override async Task CompleteAsync()

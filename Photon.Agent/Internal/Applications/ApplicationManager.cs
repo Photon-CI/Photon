@@ -1,5 +1,4 @@
 ﻿using Photon.Framework;
-using Photon.Framework.Applications;
 using Photon.Framework.Extensions;
 using System;
 using System.Collections;
@@ -10,7 +9,7 @@ using System.Linq;
 
 namespace Photon.Agent.Internal.Applications
 {
-    internal class ApplicationManager : IApplicationManager
+    internal class ApplicationManager
     {
         private const string FileName = "Applications.json";
 

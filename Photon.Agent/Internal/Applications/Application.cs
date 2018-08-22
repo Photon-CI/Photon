@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Photon.Framework.Applications
+namespace Photon.Agent.Internal.Applications
 {
     [Serializable]
     public class Application
