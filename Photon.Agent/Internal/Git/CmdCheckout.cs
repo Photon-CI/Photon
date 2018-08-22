@@ -15,6 +15,10 @@ namespace Photon.Agent.Internal.Git
         public string Password {get; set;}
         public bool EnableTracing {get; set;}
 
+        public string CommitHash {get; private set;}
+        public string CommitAuthor {get; private set;}
+        public string CommitMessage {get; private set;}
+
 
         public CmdCheckout()
         {
@@ -32,33 +36,57 @@ namespace Photon.Agent.Internal.Git
 
             GitCheckout(refspec, token);
 
-            var headCommit = GitGetHeadCommit(token);
+            var headCommit = GitGetHeadCommitSha(token);
             var commonCommit = GitGetCommonCommit(refspec, token);
 
             if (!string.Equals(headCommit, commonCommit))
                 GitResetHard(commonCommit, token);
 
             GitPull(token);
+
+            CommitHash = GitGetHeadCommitSha(token);
+            CommitAuthor = GitGetHeadCommitAuthor(token);
+            CommitMessage = GitGetHeadCommitMessage(token);
         }
 
         private bool GitIsValidRepo(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: "rev-parse --is-inside-work-tree",
                 token: token);
 
             return r.ExitCode == 0 && string.Equals(r.Output.Trim(), "true");
         }
 
-        private string GitGetHeadCommit(CancellationToken token = default(CancellationToken))
+        private string GitGetHeadCommitSha(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: "rev-parse HEAD",
                 token: token);
 
-            if (r.ExitCode != 0) throw new Exception("Failed to get HEAD commit!");
+            if (r.ExitCode != 0) throw new Exception("Failed to get HEAD commit SHA!");
+
+            return r.Output.Trim();
+        }
+
+        private string GitGetHeadCommitAuthor(CancellationToken token = default(CancellationToken))
+        {
+            var r = GitCmd(
+                arguments: "show -s --format=\"%aN <%aE>\" HEAD",
+                token: token);
+
+            if (r.ExitCode != 0) throw new Exception("Failed to get HEAD commit author!");
+
+            return r.Output.Trim();
+        }
+
+        private string GitGetHeadCommitMessage(CancellationToken token = default(CancellationToken))
+        {
+            var r = GitCmd(
+                arguments: "git show -s --format=\"%B\" HEAD",
+                token: token);
+
+            if (r.ExitCode != 0) throw new Exception("Failed to get HEAD commit author!");
 
             return r.Output.Trim();
         }
@@ -66,7 +94,6 @@ namespace Photon.Agent.Internal.Git
         private string GitGetCommonCommit(string refspec, CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: $"merge-base HEAD origin/{refspec}",
                 token: token);
 
@@ -78,7 +105,6 @@ namespace Photon.Agent.Internal.Git
         private void GitClone(CancellationToken token = default(CancellationToken))
         {
             var result = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: $"clone -v {CredentialsUrl()} \"{Source.RepositoryPath}\"",
                 printArgs: $"clone -v {Source.RepositoryUrl}",
                 token: token);
@@ -89,7 +115,6 @@ namespace Photon.Agent.Internal.Git
         private void Gitfetch(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: "fetch -p -P -t",
                 token: token);
 
@@ -99,7 +124,6 @@ namespace Photon.Agent.Internal.Git
         private void GitResetHard(string commit, CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: $"reset --hard {commit}",
                 token: token);
 
@@ -109,7 +133,6 @@ namespace Photon.Agent.Internal.Git
         private void GitCheckout(string refspec, CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: $"checkout -f {refspec}",
                 token: token);
 
@@ -119,21 +142,20 @@ namespace Photon.Agent.Internal.Git
         private void GitPull(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                root: Source.RepositoryPath,
                 arguments: "pull",
                 token: token);
 
             if (r.ExitCode != 0) throw new Exception("Failed to pull updates from remote!");
         }
 
-        private ProcessResult GitCmd(string root, string arguments, string printArgs = null, CancellationToken token = default(CancellationToken))
+        private ProcessResult GitCmd(string arguments, string printArgs = null, CancellationToken token = default(CancellationToken))
         {
             Output.WriteLine($" > git {printArgs ?? arguments}", ConsoleColor.White);
 
             var runInfo = new ProcessRunInfo {
                 Filename = Exe,
                 Arguments = arguments,
-                WorkingDirectory = root,
+                WorkingDirectory = Source.RepositoryPath,
                 EchoCommand = false,
             };
 

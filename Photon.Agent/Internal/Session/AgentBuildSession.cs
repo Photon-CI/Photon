@@ -19,7 +19,10 @@ namespace Photon.Agent.Internal.Session
         public string GitRefspec {get; set;}
         public string TaskName {get; set;}
         public uint BuildNumber {get; set;}
-        public GithubCommit Commit {get; set;}
+        public GithubCommit SourceCommit {get; set;}
+        public string CommitHash {get; private set;}
+        public string CommitAuthor {get; private set;}
+        public string CommitMessage {get; private set;}
 
 
         public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
@@ -55,12 +58,15 @@ namespace Photon.Agent.Internal.Session
                     Packages = PackageClient,
                     ServerVariables = ServerVariables,
                     AgentVariables = AgentVariables,
+                    CommitHash = CommitHash,
+                    CommitAuthor = CommitAuthor,
+                    CommitMessage = CommitMessage,
                 };
 
                 var githubSource = Project?.Source as ProjectGithubSource;
                 var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-                if (notifyGithub && Commit != null)
+                if (notifyGithub && SourceCommit != null)
                     await NotifyGithubStarted(githubSource);
 
                 try {
@@ -78,7 +84,7 @@ namespace Photon.Agent.Internal.Session
             var githubSource = Project?.Source as ProjectGithubSource;
             var notifyGithub =  githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-            if (notifyGithub && Commit != null)
+            if (notifyGithub && SourceCommit != null)
                 await NotifyGithubComplete(githubSource);
         }
 
@@ -106,6 +112,10 @@ namespace Photon.Agent.Internal.Session
                     handle.Output = Output;
 
                     handle.Checkout(GitRefspec, TokenSource.Token);
+
+                    CommitHash = handle.Module?.CommitHash;
+                    CommitAuthor = handle.Module?.CommitAuthor;
+                    CommitMessage = handle.Module?.CommitMessage;
 
                     Output.WriteLine("Copying repository to work content directory.", ConsoleColor.DarkCyan);
                     CopyDirectory(handle.Source.RepositoryPath, ContentDirectory);
@@ -207,14 +217,14 @@ namespace Photon.Agent.Internal.Session
             return new CommitStatusUpdater {
                 Username = githubSource.Username,
                 Password = githubSource.Password,
-                StatusUrl = Commit.StatusesUrl,
-                Sha = Commit.Sha,
+                StatusUrl = SourceCommit.StatusesUrl,
+                Sha = SourceCommit.Sha,
             };
         }
 
         private async Task NotifyGithubStarted(ProjectGithubSource githubSource)
         {
-            if (Commit == null) {
+            if (SourceCommit == null) {
                 Log.Error("Unable to send GitHub notification! Commit is undefined!");
                 return;
             }
@@ -230,7 +240,7 @@ namespace Photon.Agent.Internal.Session
 
         private async Task NotifyGithubComplete(ProjectGithubSource githubSource)
         {
-            if (Commit == null) {
+            if (SourceCommit == null) {
                 Log.Error("Unable to send GitHub notification! Commit is undefined!");
                 return;
             }

@@ -18,7 +18,7 @@ namespace Photon.Agent.Internal.Git
         public bool UseCommandLine {get; set;}
         public bool EnableTracing {get; set;}
         public string CommandLineExe {get; set;}
-
+        public ICheckout Module {get; private set;}
 
         public RepositoryHandle(RepositorySource source, Action disposeAction)
         {
@@ -33,12 +33,13 @@ namespace Photon.Agent.Internal.Git
 
         public void Checkout(string refspec = "master", CancellationToken token = default(CancellationToken))
         {
-            ICheckout checkout;
+            Module = null;
+
             if (UseCommandLine) {
                 Log.Debug("Using Git command-line.");
                 Output.WriteLine("Using Git Command-Line.", ConsoleColor.DarkCyan);
 
-                checkout = new CmdCheckout {
+                Module = new CmdCheckout {
                     Output = Output.Writer,
                     Source = Source,
                     Username = Username,
@@ -50,7 +51,7 @@ namespace Photon.Agent.Internal.Git
                 Log.Debug("Using Git Core.");
                 Output.WriteLine("Using Git Core.", ConsoleColor.DarkCyan);
 
-                checkout = new LibCheckout {
+                Module = new LibCheckout {
                     Output = Output.Writer,
                     Source = Source,
                     Username = Username,
@@ -59,7 +60,7 @@ namespace Photon.Agent.Internal.Git
                 };
             }
 
-            checkout.Checkout(refspec, token);
+            Module.Checkout(refspec, token);
         }
     }
 }

@@ -12,6 +12,10 @@ namespace Photon.Agent.Internal.Git
         public string Username {get; set;}
         public string Password {get; set;}
 
+        public string CommitHash {get; private set;}
+        public string CommitAuthor {get; private set;}
+        public string CommitMessage {get; private set;}
+
 
         public void Checkout(string refspec = "master", CancellationToken token = default(CancellationToken))
         {
@@ -112,10 +116,15 @@ namespace Photon.Agent.Internal.Git
                     LibGit2Sharp.Commands.Checkout(repo, localBranch, checkoutOptions);
                 }
 
+                var commit = repo.Head?.Tip;
+                CommitHash = commit?.Sha;
+                CommitAuthor = commit?.Author?.Name;
+                CommitMessage = commit?.Message;
+
                 Output.WriteLine("Current Commit:", ConsoleColor.DarkBlue)
-                    .WriteLine($"  {repo.Head.Tip.Sha}", ConsoleColor.Blue)
-                    .WriteLine($"  {repo.Head.Tip.Author?.Name}", ConsoleColor.Blue)
-                    .WriteLine(repo.Head.Tip.Message, ConsoleColor.Cyan);
+                    .WriteLine($"  {CommitHash}", ConsoleColor.Blue)
+                    .WriteLine($"  {CommitAuthor}", ConsoleColor.Blue)
+                    .WriteLine(CommitMessage, ConsoleColor.Cyan);
             }
         }
 

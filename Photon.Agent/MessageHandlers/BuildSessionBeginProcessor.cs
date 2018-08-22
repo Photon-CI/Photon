@@ -24,7 +24,7 @@ namespace Photon.Agent.MessageHandlers
                 GitRefspec = requestMessage.GitRefspec,
                 BuildNumber = requestMessage.BuildNumber,
                 ServerVariables = requestMessage.Variables,
-                Commit = requestMessage.Commit,
+                SourceCommit = requestMessage.Commit,
                 Agent = requestMessage.Agent,
             };
 
