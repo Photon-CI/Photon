@@ -86,67 +86,6 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        private void AppMgr_OnGetApplicationRevision(string projectId, string appName, uint deploymentNumber, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle)
-        {
-            var app = PhotonAgent.Instance.ApplicationMgr.GetApplication(projectId, appName);
-            if (app == null) {
-                taskHandle.SetResult(null);
-                return;
-            }
-
-            var revision = app.GetRevision(deploymentNumber);
-            if (revision == null) {
-                taskHandle.SetResult(null);
-                return;
-            }
-
-            var _rev = new DomainApplicationRevision {
-                ProjectId = app.ProjectId,
-                ApplicationName = app.Name,
-                ApplicationPath = revision.Location,
-                DeploymentNumber = revision.DeploymentNumber,
-                PackageId = revision.PackageId,
-                PackageVersion = revision.PackageVersion,
-                CreatedTime = revision.Time,
-            };
-
-            taskHandle.SetResult(_rev);
-        }
-
-        private void AppMgr_OnRegisterApplicationRevision(DomainApplicationRevisionRequest appRevisionRequest, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle)
-        {
-            var appMgr = PhotonAgent.Instance.ApplicationMgr;
-            var app = appMgr.GetApplication(appRevisionRequest.ProjectId, appRevisionRequest.ApplicationName)
-                ?? appMgr.RegisterApplication(appRevisionRequest.ProjectId, appRevisionRequest.ApplicationName);
-
-            var pathName = appRevisionRequest.DeploymentNumber.ToString();
-
-            var revision = new ApplicationRevision {
-                DeploymentNumber = appRevisionRequest.DeploymentNumber,
-                PackageId = appRevisionRequest.PackageId,
-                PackageVersion = appRevisionRequest.PackageVersion,
-                Location = NetPath.Combine(app.Location, pathName),
-                Time = DateTime.Now,
-            };
-
-            app.Revisions.Add(revision);
-            appMgr.Save();
-
-            revision.Initialize();
-
-            var _rev = new DomainApplicationRevision {
-                ProjectId = app.ProjectId,
-                ApplicationName = app.Name,
-                ApplicationPath = revision.Location,
-                DeploymentNumber = revision.DeploymentNumber,
-                PackageId = revision.PackageId,
-                PackageVersion = revision.PackageVersion,
-                CreatedTime = revision.Time,
-            };
-
-            taskHandle.SetResult(_rev);
-        }
-
         public override async Task CompleteAsync()
         {
             var githubSource = Project?.Source as ProjectGithubSource;
@@ -337,6 +276,67 @@ namespace Photon.Agent.Internal.Session
 
             if (result.ExitCode != 0)
                 throw new ApplicationException("Process terminated with a non-zero exit code!");
+        }
+
+        private void AppMgr_OnGetApplicationRevision(string projectId, string appName, uint deploymentNumber, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle)
+        {
+            var app = PhotonAgent.Instance.ApplicationMgr.GetApplication(projectId, appName);
+            if (app == null) {
+                taskHandle.SetResult(null);
+                return;
+            }
+
+            var revision = app.GetRevision(deploymentNumber);
+            if (revision == null) {
+                taskHandle.SetResult(null);
+                return;
+            }
+
+            var _rev = new DomainApplicationRevision {
+                ProjectId = app.ProjectId,
+                ApplicationName = app.Name,
+                ApplicationPath = revision.Location,
+                DeploymentNumber = revision.DeploymentNumber,
+                PackageId = revision.PackageId,
+                PackageVersion = revision.PackageVersion,
+                CreatedTime = revision.Time,
+            };
+
+            taskHandle.SetResult(_rev);
+        }
+
+        private void AppMgr_OnRegisterApplicationRevision(DomainApplicationRevisionRequest appRevisionRequest, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle)
+        {
+            var appMgr = PhotonAgent.Instance.ApplicationMgr;
+            var app = appMgr.GetApplication(appRevisionRequest.ProjectId, appRevisionRequest.ApplicationName)
+                ?? appMgr.RegisterApplication(appRevisionRequest.ProjectId, appRevisionRequest.ApplicationName);
+
+            var pathName = appRevisionRequest.DeploymentNumber.ToString();
+
+            var revision = new ApplicationRevision {
+                DeploymentNumber = appRevisionRequest.DeploymentNumber,
+                PackageId = appRevisionRequest.PackageId,
+                PackageVersion = appRevisionRequest.PackageVersion,
+                Location = NetPath.Combine(app.Location, pathName),
+                Time = DateTime.Now,
+            };
+
+            app.Revisions.Add(revision);
+            appMgr.Save();
+
+            revision.Initialize();
+
+            var _rev = new DomainApplicationRevision {
+                ProjectId = app.ProjectId,
+                ApplicationName = app.Name,
+                ApplicationPath = revision.Location,
+                DeploymentNumber = revision.DeploymentNumber,
+                PackageId = revision.PackageId,
+                PackageVersion = revision.PackageVersion,
+                CreatedTime = revision.Time,
+            };
+
+            taskHandle.SetResult(_rev);
         }
     }
 }
