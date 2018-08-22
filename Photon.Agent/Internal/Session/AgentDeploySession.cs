@@ -94,9 +94,7 @@ namespace Photon.Agent.Internal.Session
             domainOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
             domainOutput.OnWriteRaw += (text) => Output.WriteRaw(text);
 
-            var appMgr = new DomainApplicationClient();
-            appMgr.OnGetApplicationRevision += AppMgr_OnGetApplicationRevision;
-            appMgr.OnRegisterApplicationRevision += AppMgr_OnRegisterApplicationRevision;
+            var appHost = new DomainApplicationHost();
 
             var context = new AgentDeployContext {
                 DeploymentNumber = DeploymentNumber,
@@ -113,6 +111,7 @@ namespace Photon.Agent.Internal.Session
                 Packages = PackageClient,
                 AgentVariables = AgentVariables,
                 ServerVariables = ServerVariables,
+                Applications = appHost.Client,
                 EnvironmentName = EnvironmentName,
                 Agent = Agent,
             };

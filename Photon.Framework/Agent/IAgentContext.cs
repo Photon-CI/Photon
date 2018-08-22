@@ -8,6 +8,6 @@ namespace Photon.Framework.Agent
     {
         string AgentSessionId {get;}
         ServerAgent Agent {get;}
-        IDomainApplicationClient Applications {get;}
+        DomainApplicationClient Applications {get;}
     }
 }

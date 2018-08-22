@@ -113,6 +113,7 @@
     <Compile Include="Internal\Applications\Application.cs" />
     <Compile Include="Internal\Applications\ApplicationManager.cs" />
     <Compile Include="Internal\Applications\ApplicationRevision.cs" />
+    <Compile Include="Internal\Applications\DomainApplicationHost.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\Security\SecurityTest.cs" />
     <Compile Include="MessageHandlers\HealthCheckProcessor.cs" />
