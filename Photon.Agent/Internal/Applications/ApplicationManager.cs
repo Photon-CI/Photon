@@ -57,11 +57,11 @@ namespace Photon.Agent.Internal.Applications
 
         public Application GetApplication(string projectId, string appName)
         {
-            if (!applicationList.TryGetValue(projectId, out var projectAppList))
-                throw new ApplicationException($"Project '{projectId}' not found!");
+            if (!applicationList.TryGetValue(projectId, out var projectAppList)) return null;
+                //throw new ApplicationException($"Project '{projectId}' not found!");
 
-            if (!projectAppList.TryGetApplication(appName, out var application))
-                throw new ApplicationException($"Application '{appName}' not found!");
+            if (!projectAppList.TryGetApplication(appName, out var application)) return null;
+                //throw new ApplicationException($"Application '{appName}' not found!");
 
             return application;
         }
@@ -72,6 +72,7 @@ namespace Photon.Agent.Internal.Applications
                 var location = Path.Combine(Configuration.ApplicationsDirectory, appName);
                 return new ProjectApplicationList(pid, location);
             });
+
             return projectAppList.RegisterApplication(appName);
         }
 
