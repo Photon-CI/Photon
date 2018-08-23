@@ -1,8 +1,10 @@
 ﻿using Photon.Framework.Domain;
+using System;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Artifacts
 {
+    [Serializable]
     public class ArtifactManagerClient
     {
         private readonly ArtifactManagerBoundary artifactMgr;
