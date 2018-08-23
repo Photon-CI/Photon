@@ -134,7 +134,7 @@ namespace Photon.CLI.Actions
             return await WebClientEx(server,
                 client => {
                     client.Method = "POST";
-
+                    client.Url = NetPath.Combine(server.Url, "api/agent/update/start");
                     client.Query = new {
                         agents = string.Join(";", agentIds),
                     };
