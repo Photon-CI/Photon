@@ -1,9 +1,11 @@
 ﻿using Photon.Framework.Domain;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Packages
 {
+    [Serializable]
     public class DomainPackageClient
     {
         private readonly DomainPackageBoundary packageMgr;

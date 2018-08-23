@@ -30,7 +30,7 @@ namespace Photon.Agent.Internal.Applications
 
             Application[] apps;
             using (var stream = File.Open(_filename, FileMode.Open, FileAccess.Read)) {
-                apps = JsonSettings.Serializer.Deserialize(stream);
+                apps = JsonSettings.Serializer.Deserialize<Application[]>(stream);
             }
 
             applicationList.Clear();

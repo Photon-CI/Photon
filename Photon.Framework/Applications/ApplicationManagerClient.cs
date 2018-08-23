@@ -1,8 +1,10 @@
 ﻿using Photon.Framework.Domain;
+using System;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Applications
 {
+    [Serializable]
     public class ApplicationManagerClient
     {
         private readonly ApplicationManagerBoundary appMgr;
