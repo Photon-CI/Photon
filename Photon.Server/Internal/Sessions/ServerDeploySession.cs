@@ -63,6 +63,8 @@ namespace Photon.Server.Internal.Sessions
                     agents = agents.Where(x => env.AgentIdList.Contains(x.Id, StringComparer.OrdinalIgnoreCase)).ToArray();
                 }
 
+                var packageClient = new DomainPackageClient(Packages.Client);
+
                 var context = new ServerDeployContext {
                     DeploymentNumber = Deployment.Number,
                     Project = Project,
@@ -74,7 +76,7 @@ namespace Photon.Server.Internal.Sessions
                     WorkDirectory = WorkDirectory,
                     BinDirectory = BinDirectory,
                     ContentDirectory = ContentDirectory,
-                    Packages = PackageClient,
+                    Packages = packageClient,
                     ConnectionFactory = ConnectionFactory,
                     Output = contextOutput,
                     ServerVariables = Variables,

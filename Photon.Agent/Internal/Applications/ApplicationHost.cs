@@ -7,29 +7,34 @@ using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Applications
 {
-    public class DomainApplicationHost
+    public class ApplicationHost : IDisposable
     {
-        public DomainApplicationClient Client {get;}
+        public ApplicationManagerBoundary Boundary {get;}
 
 
-        public DomainApplicationHost()
+        public ApplicationHost()
         {
-            Client = new DomainApplicationClient();
-            Client.OnGetApplicationRevision += AppMgr_OnGetApplicationRevision;
-            Client.OnRegisterApplicationRevision += AppMgr_OnRegisterApplicationRevision;
+            Boundary = new ApplicationManagerBoundary();
+            Boundary.OnGetApplicationRevision += AppMgr_OnGetApplicationRevision;
+            Boundary.OnRegisterApplicationRevision += AppMgr_OnRegisterApplicationRevision;
+        }
+
+        public void Dispose()
+        {
+            Boundary.Dispose();
         }
 
         public async Task<DomainApplicationRevision> GetApplicationRevision(string projectId, string appName, uint deploymentNumber, CancellationToken token = default(CancellationToken))
         {
             return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
-                Client.GetApplicationRevision(projectId, appName, deploymentNumber, task);
+                Boundary.GetApplicationRevision(projectId, appName, deploymentNumber, task);
             }, token);
         }
 
         public async Task<DomainApplicationRevision> RegisterApplicationRevision(DomainApplicationRevisionRequest appRevisionRequest, CancellationToken token = default(CancellationToken))
         {
             return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
-                Client.RegisterApplicationRevision(appRevisionRequest, task);
+                Boundary.RegisterApplicationRevision(appRevisionRequest, task);
             }, token);
         }
 

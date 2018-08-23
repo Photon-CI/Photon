@@ -22,7 +22,7 @@ namespace Photon.Server.MessageProcessors
                     throw new Exception($"Agent Session ID '{requestMessage.ServerSessionId}' not found!");
 
                 await RemoteTaskCompletionSource.Run(taskHandle => {
-                    session.PackageClient.PushProjectPackage(requestMessage.Filename, taskHandle);
+                    session.Packages.Client.PushProjectPackage(requestMessage.Filename, taskHandle);
                 });
             }
             finally {

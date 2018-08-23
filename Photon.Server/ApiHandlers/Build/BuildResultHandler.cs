@@ -27,9 +27,9 @@ namespace Photon.Server.ApiHandlers.Build
                 var response = new HttpBuildResultResponse {
                     BuildNumber = buildSession.Build.Number,
                     Result = buildSession.Result,
-                    ProjectPackages = buildSession.PushedProjectPackages
+                    ProjectPackages = buildSession.Packages.PushedProjectPackages
                         .Select(x => new HttpPackageReference(x)).ToArray(),
-                    ApplicationPackages = buildSession.PushedApplicationPackages
+                    ApplicationPackages = buildSession.Packages.PushedApplicationPackages
                         .Select(x => new HttpPackageReference(x)).ToArray(),
                 };
 

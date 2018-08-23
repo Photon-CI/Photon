@@ -2,10 +2,10 @@
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Framework.Domain;
+using Photon.Framework.Tools;
 using Photon.Library.TcpMessages;
 using Photon.Server.Internal;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Photon.Server.MessageProcessors
@@ -22,12 +22,12 @@ namespace Photon.Server.MessageProcessors
                     throw new Exception($"Agent Session ID '{requestMessage.ServerSessionId}' not found!");
 
                 await RemoteTaskCompletionSource.Run(taskHandle => {
-                    session.PackageClient.PushApplicationPackage(requestMessage.Filename, taskHandle);
+                    session.Packages.Client.PushApplicationPackage(requestMessage.Filename, taskHandle);
                 });
             }
             finally {
                 try {
-                    File.Delete(requestMessage.Filename);
+                    PathEx.Delete(requestMessage.Filename);
                 }
                 catch (Exception error) {
                     Log.Warn("Failed to remove temporary project package!", error);

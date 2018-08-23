@@ -55,7 +55,7 @@ namespace Photon.Framework.Packages
             context.Output.WriteLine($"Publishing '{packageName}'...", ConsoleColor.Gray);
 
             try {
-                await context.PushApplicationPackageAsync(packageFilename, token);
+                await context.Packages.PushApplicationPackageAsync(packageFilename, token);
 
                 context.Output.WriteLine($"Published '{packageName}' successfully.", ConsoleColor.DarkCyan);
             }

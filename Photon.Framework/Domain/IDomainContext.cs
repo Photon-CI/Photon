@@ -1,7 +1,7 @@
 ﻿using Photon.Framework.Applications;
+using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Variables;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
@@ -16,16 +16,12 @@ namespace Photon.Framework.Domain
         DomainOutput Output {get;}
         VariableSetCollection ServerVariables {get;}
         VariableSetCollection AgentVariables {get;}
+        ApplicationManagerClient Applications {get;}
+        DomainPackageClient Packages {get;}
 
         void RunCommandLine(string command);
         void RunCommandLine(string command, params string[] args);
         Task RunCommandLineAsync(string command);
         Task RunCommandLineAsync(string command, params string[] args);
-        Task PushProjectPackageAsync(string filename, CancellationToken token);
-        Task PushApplicationPackageAsync(string filename, CancellationToken token);
-        Task<string> PullProjectPackageAsync(string id, string version);
-        Task<string> PullApplicationPackageAsync(string id, string version);
-        Task<DomainApplicationRevision> GetApplicationRevision(string projectId, string appName, uint deploymentNumber);
-        Task<DomainApplicationRevision> RegisterApplicationRevision(DomainApplicationRevisionRequest revisionRequest);
     }
 }

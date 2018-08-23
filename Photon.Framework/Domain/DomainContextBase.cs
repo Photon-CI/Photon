@@ -1,11 +1,11 @@
 ﻿using Photon.Framework.Applications;
+using Photon.Framework.Artifacts;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Variables;
 using System;
 using System.ComponentModel;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
@@ -22,7 +22,8 @@ namespace Photon.Framework.Domain
         public DomainPackageClient Packages {get; set;}
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
-        public DomainApplicationClient Applications {get; set;}
+        public ApplicationManagerClient Applications {get; set;}
+        public ArtifactManagerClient Artifacts {get; set;}
 
 
         public void RunCommandLine(string command)
@@ -88,48 +89,6 @@ namespace Photon.Framework.Domain
         {
             var argString = string.Join(" ", args);
             await RunCommandLineAsync($"{command} {argString}");
-        }
-
-        public async Task PushProjectPackageAsync(string filename, CancellationToken token = default(CancellationToken))
-        {
-            await RemoteTaskCompletionSource.Run(task => {
-                Packages.PushProjectPackage(filename, task);
-            }, token);
-        }
-
-        public async Task PushApplicationPackageAsync(string filename, CancellationToken token = default(CancellationToken))
-        {
-            await RemoteTaskCompletionSource.Run(task => {
-                Packages.PushApplicationPackage(filename, task);
-            }, token);
-        }
-
-        public async Task<string> PullProjectPackageAsync(string id, string version)
-        {
-            return await RemoteTaskCompletionSource<string>.Run(task => {
-                Packages.PullProjectPackage(id, version, task);
-            });
-        }
-
-        public async Task<string> PullApplicationPackageAsync(string id, string version)
-        {
-            return await RemoteTaskCompletionSource<string>.Run(task => {
-                Packages.PullApplicationPackage(id, version, task);
-            });
-        }
-
-        public async Task<DomainApplicationRevision> GetApplicationRevision(string projectId, string appName, uint deploymentNumber)
-        {
-            return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
-                Applications.GetApplicationRevision(projectId, appName, deploymentNumber, task);
-            });
-        }
-
-        public async Task<DomainApplicationRevision> RegisterApplicationRevision(DomainApplicationRevisionRequest revisionRequest)
-        {
-            return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
-                Applications.RegisterApplicationRevision(revisionRequest, task);
-            });
         }
     }
 }

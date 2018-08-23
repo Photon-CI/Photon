@@ -1,37 +1,45 @@
 ﻿using Photon.Framework.Domain;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Framework.Packages
 {
-    public delegate void PushPackageFunc(string filename, RemoteTaskCompletionSource taskHandle);
-
-    public delegate void PullPackageFunc(string id, string version, RemoteTaskCompletionSource<string> taskHandle);
-
-    public class DomainPackageClient : MarshalByRefInstance
+    public class DomainPackageClient
     {
-        public event PushPackageFunc OnPushProjectPackage;
-        public event PushPackageFunc OnPushApplicationPackage;
-        public event PullPackageFunc OnPullProjectPackage;
-        public event PullPackageFunc OnPullApplicationPackage;
+        private readonly DomainPackageBoundary packageMgr;
 
 
-        public void PushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)
+        public DomainPackageClient(DomainPackageBoundary packageMgr)
         {
-            OnPushProjectPackage?.Invoke(filename, taskHandle);
+            this.packageMgr = packageMgr;
         }
 
-        public void PushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
+        public async Task PushProjectPackageAsync(string filename, CancellationToken token = default(CancellationToken))
         {
-            OnPushApplicationPackage?.Invoke(filename, taskHandle);
+            await RemoteTaskCompletionSource.Run(task => {
+                packageMgr.PushProjectPackage(filename, task);
+            }, token);
         }
 
-        public void PullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
+        public async Task PushApplicationPackageAsync(string filename, CancellationToken token = default(CancellationToken))
         {
-            OnPullProjectPackage?.Invoke(id, version, taskHandle);
+            await RemoteTaskCompletionSource.Run(task => {
+                packageMgr.PushApplicationPackage(filename, task);
+            }, token);
         }
 
-        public void PullApplicationPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
+        public async Task<string> PullProjectPackageAsync(string id, string version)
         {
-            OnPullApplicationPackage?.Invoke(id, version, taskHandle);
+            return await RemoteTaskCompletionSource<string>.Run(task => {
+                packageMgr.PullProjectPackage(id, version, task);
+            });
+        }
+
+        public async Task<string> PullApplicationPackageAsync(string id, string version)
+        {
+            return await RemoteTaskCompletionSource<string>.Run(task => {
+                packageMgr.PullApplicationPackage(id, version, task);
+            });
         }
     }
 }

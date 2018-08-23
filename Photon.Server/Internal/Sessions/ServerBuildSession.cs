@@ -1,5 +1,6 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
+using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Library.GitHub;
@@ -29,7 +30,9 @@ namespace Photon.Server.Internal.Sessions
             var contextOutput = new DomainOutput();
             contextOutput.OnWrite += (text, color) => Output.Write(text, color);
             contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
-            contextOutput.OnWriteRaw += (text) => Output.WriteRaw(text);
+            contextOutput.OnWriteRaw += text => Output.WriteRaw(text);
+
+            var packageClient = new DomainPackageClient(Packages.Client);
 
             var context = new ServerBuildContext {
                 BuildNumber = Build.Number,
@@ -41,7 +44,7 @@ namespace Photon.Server.Internal.Sessions
                 WorkDirectory = WorkDirectory,
                 ContentDirectory = ContentDirectory,
                 BinDirectory = BinDirectory,
-                Packages = PackageClient,
+                Packages = packageClient,
                 ConnectionFactory = ConnectionFactory,
                 Output = contextOutput,
                 ServerVariables = Variables,
@@ -71,8 +74,8 @@ namespace Photon.Server.Internal.Sessions
             finally {
                 Build.IsComplete = true;
                 Build.Duration = DateTime.UtcNow - Build.Created;
-                Build.ProjectPackages = PushedProjectPackages.ToArray();
-                Build.ApplicationPackages = PushedApplicationPackages.ToArray();
+                Build.ProjectPackages = Packages.PushedProjectPackages.ToArray();
+                Build.ApplicationPackages = Packages.PushedApplicationPackages.ToArray();
                 Build.Save();
 
                 await Build.SetOutput(Output.GetString());

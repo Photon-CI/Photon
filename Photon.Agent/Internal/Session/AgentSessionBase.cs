@@ -1,13 +1,12 @@
 ﻿using log4net;
+using Photon.Agent.Internal.Applications;
+using Photon.Agent.Internal.Packages;
 using Photon.Communication;
-using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
-using Photon.Framework.Packages;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Framework.Tools;
 using Photon.Framework.Variables;
-using Photon.Library.TcpMessages;
 using System;
 using System.IO;
 using System.Threading;
@@ -37,7 +36,8 @@ namespace Photon.Agent.Internal.Session
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
         protected AgentSessionDomain Domain {get; set;}
-        protected DomainPackageClient PackageClient {get;}
+        protected PackageHost Packages {get;}
+        protected ApplicationHost Applications {get;}
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
         public VariableSetCollection ServerVariables {get; set;}
@@ -65,11 +65,12 @@ namespace Photon.Agent.Internal.Session
             ContentDirectory = Path.Combine(WorkDirectory, "content");
             BinDirectory = Path.Combine(WorkDirectory, "bin");
 
-            PackageClient = new DomainPackageClient();
-            PackageClient.OnPushProjectPackage += PackageClient_OnPushProjectPackage;
-            PackageClient.OnPushApplicationPackage += PackageClient_OnPushApplicationPackage;
-            PackageClient.OnPullProjectPackage += PackageClient_OnPullProjectPackage;
-            PackageClient.OnPullApplicationPackage += PackageClient_OnPullApplicationPackage;
+            Packages = new PackageHost {
+                ServerSessionId = serverSessionId,
+                Transceiver = transceiver,
+            };
+
+            Applications = new ApplicationHost();
         }
 
         public virtual void Dispose()
@@ -78,7 +79,8 @@ namespace Photon.Agent.Internal.Session
                 Log.Error("Session was disposed without being released!");
             
             TokenSource?.Dispose();
-            PackageClient?.Dispose();
+            Applications.Dispose();
+            Packages?.Dispose();
             Domain?.Dispose();
         }
 
@@ -187,60 +189,6 @@ namespace Photon.Agent.Internal.Session
             if (!successful) {
                 Log.Warn($"Failed to clean the work directory after {retryCount} attempts! {lastError?.UnfoldMessages()}");
             }
-        }
-
-        private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)
-        {
-            var packageRequest = new ProjectPackagePushRequest {
-                ServerSessionId = ServerSessionId,
-                Filename = filename,
-            };
-
-            Transceiver.Send(packageRequest)
-                .GetResponseAsync()
-                .ContinueWith(taskHandle.FromTask);
-        }
-
-        private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
-        {
-            var packageRequest = new ApplicationPackagePushRequest {
-                ServerSessionId = ServerSessionId,
-                Filename = filename,
-            };
-
-            Transceiver.Send(packageRequest)
-                .GetResponseAsync()
-                .ContinueWith(taskHandle.FromTask);
-        }
-
-        private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
-        {
-            var packageRequest = new ProjectPackagePullRequest {
-                ProjectPackageId = id,
-                ProjectPackageVersion = version,
-            };
-
-            Task.Run(async () => {
-                var response = await Transceiver.Send(packageRequest)
-                    .GetResponseAsync<ProjectPackagePullResponse>();
-
-                return response.Filename;
-            }).ContinueWith(taskHandle.FromTask);
-        }
-
-        private void PackageClient_OnPullApplicationPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
-        {
-            Task.Run(async () => {
-                var packageRequest = new ApplicationPackagePullRequest {
-                    PackageId = id,
-                    PackageVersion = version,
-                };
-
-                var response = await Transceiver.Send(packageRequest)
-                    .GetResponseAsync<ApplicationPackagePullResponse>();
-
-                return response.Filename;
-            }).ContinueWith(taskHandle.FromTask);
         }
     }
 }

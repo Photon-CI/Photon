@@ -5,7 +5,7 @@ namespace Photon.Framework.Applications
     public delegate void GetApplicationRevisionFunc(string projectId, string appName, uint deploymentNumber, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle);
     public delegate void RegisterApplicationRevisionFunc(DomainApplicationRevisionRequest appRevisionRequest, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle);
 
-    public class DomainApplicationClient : MarshalByRefInstance
+    public class ApplicationManagerBoundary : MarshalByRefInstance
     {
         public event GetApplicationRevisionFunc OnGetApplicationRevision;
         public event RegisterApplicationRevisionFunc OnRegisterApplicationRevision;

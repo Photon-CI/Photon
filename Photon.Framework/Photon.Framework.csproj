@@ -43,9 +43,12 @@
     <Compile Include="Agent\AgentContextBase.cs" />
     <Compile Include="Agent\IAgentContext.cs" />
     <Compile Include="AnsiWriter.cs" />
-    <Compile Include="Applications\DomainApplicationClient.cs" />
+    <Compile Include="Applications\ApplicationManagerBoundary.cs" />
+    <Compile Include="Applications\ApplicationManagerClient.cs" />
     <Compile Include="Applications\DomainApplicationRevisionRequest.cs" />
     <Compile Include="Applications\DomainApplicationRevision.cs" />
+    <Compile Include="Artifacts\ArtifactManagerClient.cs" />
+    <Compile Include="Artifacts\ArtifactManagerBoundary.cs" />
     <Compile Include="Domain\DomainAgentBase.cs" />
     <Compile Include="Domain\DomainAgentSessionClient.cs" />
     <Compile Include="Domain\DomainAgentSessionHandle.cs" />
@@ -66,6 +69,7 @@
     <Compile Include="IWriteAnsi.cs" />
     <Compile Include="JsonSettings.cs" />
     <Compile Include="Packages\ApplicationPackageDefinition.cs" />
+    <Compile Include="Packages\DomainPackageBoundary.cs" />
     <Compile Include="Packages\ProjectPackageDefinition.cs" />
     <Compile Include="Packages\ProjectPackageUtility.cs" />
     <Compile Include="Packages\ApplicationPackageUtility.cs" />
