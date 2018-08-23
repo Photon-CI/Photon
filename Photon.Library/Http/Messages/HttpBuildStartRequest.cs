@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Photon.Library.HttpMessages
+namespace Photon.Library.Http.Messages
 {
     public class HttpBuildStartRequest
     {

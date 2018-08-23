@@ -1,4 +1,5 @@
-﻿using Photon.Server.Internal;
+﻿using Photon.Library.Http;
+using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
@@ -8,7 +9,7 @@ namespace Photon.Server.ApiHandlers.Variable
     [Secure]
     [RequiresRoles(GroupRole.VariablesEdit)]
     [HttpHandler("/api/variable/delete")]
-    internal class DeleteHandler : HttpHandler
+    internal class DeleteHandler : HttpApiHandler
     {
         public override HttpHandlerResult Post()
         {

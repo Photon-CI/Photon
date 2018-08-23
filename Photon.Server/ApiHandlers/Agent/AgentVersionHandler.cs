@@ -3,7 +3,8 @@ using Photon.Communication;
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
 using Photon.Library.Extensions;
-using Photon.Library.HttpMessages;
+using Photon.Library.Http;
+using Photon.Library.Http.Messages;
 using Photon.Library.TcpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
@@ -30,7 +31,7 @@ namespace Photon.Server.ApiHandlers.Agent
     [Secure]
     [RequiresRoles(GroupRole.AgentView)]
     [HttpHandler("api/agent/versions")]
-    internal class AgentVersionHandler : HttpHandlerAsync
+    internal class AgentVersionHandler : HttpApiHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AgentVersionHandler));
 

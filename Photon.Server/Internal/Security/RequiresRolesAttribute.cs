@@ -1,6 +1,6 @@
-﻿using Photon.Library.HttpSecurity;
-using PiServerLite.Http.Handlers;
+﻿using PiServerLite.Http.Handlers;
 using System.Linq;
+using Photon.Library.Http.Security;
 
 namespace Photon.Server.Internal.Security
 {

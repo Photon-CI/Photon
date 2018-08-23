@@ -1,5 +1,6 @@
 ﻿using Photon.Library.Extensions;
-using Photon.Library.HttpMessages;
+using Photon.Library.Http;
+using Photon.Library.Http.Messages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using Photon.Server.Internal.Sessions;
@@ -12,7 +13,7 @@ namespace Photon.Server.ApiHandlers.Agent
     [Secure]
     [RequiresRoles(GroupRole.AgentEdit)]
     [HttpHandler("api/agent/update/result")]
-    internal class UpdateResultHandler : HttpHandler
+    internal class UpdateResultHandler : HttpApiHandler
     {
         public override HttpHandlerResult Get()
         {

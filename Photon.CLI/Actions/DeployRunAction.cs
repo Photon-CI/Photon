@@ -1,11 +1,11 @@
 ﻿using Photon.CLI.Internal;
 using Photon.CLI.Internal.Http;
 using Photon.Framework;
-using Photon.Library.HttpMessages;
 using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Photon.Library.Http.Messages;
 
 namespace Photon.CLI.Actions
 {

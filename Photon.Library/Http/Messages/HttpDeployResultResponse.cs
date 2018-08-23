@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Photon.Framework.Tasks;
 
-namespace Photon.Library.HttpMessages
+namespace Photon.Library.Http.Messages
 {
     public class HttpDeployResultResponse
     {

@@ -1,7 +1,8 @@
 ﻿using log4net;
 using Photon.Framework.Packages;
 using Photon.Library.Extensions;
-using Photon.Library.HttpMessages;
+using Photon.Library.Http;
+using Photon.Library.Http.Messages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using Photon.Server.Internal.Sessions;
@@ -16,7 +17,7 @@ namespace Photon.Server.ApiHandlers.Deploy
     [Secure]
     [RequiresRoles(GroupRole.DeployStart)]
     [HttpHandler("api/deploy/start")]
-    internal class DeployHandler : HttpHandlerAsync
+    internal class DeployHandler : HttpApiHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DeployHandler));
 

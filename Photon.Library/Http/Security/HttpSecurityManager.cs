@@ -1,12 +1,12 @@
-﻿using Photon.Framework.Pooling;
+﻿using System;
+using System.Net;
+using System.Text;
+using Photon.Framework.Pooling;
 using PiServerLite.Http;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
-using System;
-using System.Net;
-using System.Text;
 
-namespace Photon.Library.HttpSecurity
+namespace Photon.Library.Http.Security
 {
     public class HttpSecurityManager : ISecurityManager
     {

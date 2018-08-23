@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Photon.Framework.Server;
 using Photon.Library.Extensions;
+using Photon.Library.Http;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
@@ -13,7 +14,7 @@ namespace Photon.Server.ApiHandlers.Agent
     [Secure]
     [RequiresRoles(GroupRole.AgentEdit)]
     [HttpHandler("/api/agent/json")]
-    internal class JsonHandler : HttpHandlerAsync
+    internal class JsonHandler : HttpApiHandlerAsync
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {

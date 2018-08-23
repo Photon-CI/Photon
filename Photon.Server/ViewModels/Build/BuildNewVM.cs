@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Photon.Library.HttpMessages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
@@ -7,6 +6,7 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using Photon.Library.Http.Messages;
 
 namespace Photon.Server.ViewModels.Build
 {

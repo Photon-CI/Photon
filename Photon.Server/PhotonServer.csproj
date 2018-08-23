@@ -58,8 +58,8 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.3.2\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.3.3\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
@@ -83,6 +83,7 @@
     <Compile Include="ApiHandlers\Security\SecurityDomainEnabledHandler.cs" />
     <Compile Include="ApiHandlers\Security\SecurityEnabledHandler.cs" />
     <Compile Include="ApiHandlers\Session\CancelHandler.cs" />
+    <Compile Include="ApiHandlers\Session\OutputHandler.cs" />
     <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />

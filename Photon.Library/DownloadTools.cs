@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Photon.Framework;
-using Photon.Library.HttpMessages;
 using System.Net;
 using System.Threading.Tasks;
+using Photon.Library.Http.Messages;
 
 namespace Photon.Library
 {

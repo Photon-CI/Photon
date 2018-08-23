@@ -1,6 +1,7 @@
 ﻿using log4net;
 using log4net.Appender;
 using log4net.Repository.Hierarchy;
+using Photon.Library.Http;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System.IO;
@@ -11,7 +12,7 @@ namespace Photon.Server.ApiHandlers
 {
     [Secure]
     [HttpHandler("api/log")]
-    internal class LogHandler : HttpHandler
+    internal class LogHandler : HttpApiHandler
     {
         public override HttpHandlerResult Get()
         {

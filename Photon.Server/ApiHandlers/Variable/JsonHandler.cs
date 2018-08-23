@@ -1,4 +1,5 @@
-﻿using Photon.Library.Variables;
+﻿using Photon.Library.Http;
+using Photon.Library.Variables;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
@@ -11,7 +12,7 @@ namespace Photon.Server.ApiHandlers.Variable
     [Secure]
     [RequiresRoles(GroupRole.VariablesView)]
     [HttpHandler("/api/variable/json")]
-    internal class JsonGetHandler : HttpHandlerAsync
+    internal class JsonGetHandler : HttpApiHandlerAsync
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {

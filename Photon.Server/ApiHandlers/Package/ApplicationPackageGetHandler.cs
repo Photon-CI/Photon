@@ -1,4 +1,5 @@
-﻿using Photon.Server.Internal;
+﻿using Photon.Library.Http;
+using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
@@ -9,7 +10,7 @@ namespace Photon.Server.ApiHandlers.Package
     [Secure]
     [RequiresRoles(GroupRole.PackagesView)]
     [HttpHandler("api/applicationPackage/get")]
-    internal class ApplicationPackageGetHandler : HttpHandler
+    internal class ApplicationPackageGetHandler : HttpApiHandler
     {
         public override HttpHandlerResult Get()
         {

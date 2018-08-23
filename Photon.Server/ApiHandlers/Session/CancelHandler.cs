@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Photon.Library.Http;
 using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
 using System;
@@ -6,7 +7,7 @@ using System;
 namespace Photon.Server.ApiHandlers.Session
 {
     [HttpHandler("/api/session/cancel")]
-    internal class CancelHandler : HttpHandler
+    internal class CancelHandler : HttpApiHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(CancelHandler));
 

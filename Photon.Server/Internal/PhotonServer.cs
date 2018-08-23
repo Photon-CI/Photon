@@ -2,7 +2,6 @@
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Library;
-using Photon.Library.HttpSecurity;
 using Photon.Library.Packages;
 using Photon.Library.Security;
 using Photon.Library.Variables;
@@ -17,6 +16,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Library.Http.Security;
 using Photon.Server.Internal.Security;
 
 namespace Photon.Server.Internal

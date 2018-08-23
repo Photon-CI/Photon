@@ -1,7 +1,7 @@
 ﻿using System.DirectoryServices.AccountManagement;
 using Photon.Library.Security;
 
-namespace Photon.Library.HttpSecurity
+namespace Photon.Library.Http.Security
 {
     public class HybridAuthorization : IAuthorize
     {

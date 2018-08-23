@@ -1,4 +1,4 @@
-﻿using Photon.Library.HttpSecurity;
+﻿using Photon.Library.Http.Security;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Server.ViewHandlers

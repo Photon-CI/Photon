@@ -2,10 +2,10 @@
 using Photon.Agent.Internal;
 using Photon.Agent.Internal.AgentConfiguration;
 using Photon.Agent.Internal.Security;
-using Photon.Library.HttpSecurity;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System;
+using Photon.Library.Http.Security;
 
 namespace Photon.Agent.ApiHandlers.Security
 {

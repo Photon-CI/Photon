@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Library.HttpMessages
+namespace Photon.Library.Http.Messages
 {
     public class HttpDeployStartResponse
     {

@@ -1,5 +1,6 @@
 ﻿using Photon.Library.Extensions;
-using Photon.Library.HttpMessages;
+using Photon.Library.Http;
+using Photon.Library.Http.Messages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
@@ -10,7 +11,7 @@ namespace Photon.Server.ApiHandlers.Deploy
 {
     [Secure]
     [HttpHandler("api/deploy/result")]
-    internal class DeployResultHandler : HttpHandler
+    internal class DeployResultHandler : HttpApiHandler
     {
         public override HttpHandlerResult Get()
         {

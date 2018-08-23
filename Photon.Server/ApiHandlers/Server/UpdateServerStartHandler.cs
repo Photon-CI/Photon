@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Photon.Framework;
 using Photon.Framework.Tools;
+using Photon.Library.Http;
 using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
@@ -13,7 +14,7 @@ namespace Photon.Server.ApiHandlers.Server
 {
     [Secure]
     [HttpHandler("api/server/update")]
-    internal class UpdateServerStartHandler : HttpHandlerAsync
+    internal class UpdateServerStartHandler : HttpApiHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateServerStartHandler));
 

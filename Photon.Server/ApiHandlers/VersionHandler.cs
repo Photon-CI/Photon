@@ -1,4 +1,5 @@
-﻿using PiServerLite.Http.Handlers;
+﻿using Photon.Library.Http;
+using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System.Reflection;
 
@@ -6,7 +7,7 @@ namespace Photon.Server.ApiHandlers
 {
     [Secure]
     [HttpHandler("api/version")]
-    internal class VersionHandler : HttpHandler
+    internal class VersionHandler : HttpApiHandler
     {
         public override HttpHandlerResult Get()
         {

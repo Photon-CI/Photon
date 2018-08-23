@@ -1,7 +1,7 @@
-﻿using Photon.CLI.Internal;
-using Photon.CLI.Internal.Http;
+﻿using Newtonsoft.Json;
+using Photon.CLI.Internal;
 using Photon.Framework;
-using Photon.Library.HttpMessages;
+using Photon.Library.Http.Messages;
 using System;
 using System.IO;
 using System.Net;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Photon.CLI.Actions
 {
-    internal class BuildRunAction
+    internal class BuildRunAction : ActionBase
     {
         private const int PollIntervalMs = 400;
 
@@ -24,7 +24,11 @@ namespace Photon.CLI.Actions
         {
             var server = context.Servers.Get(ServerName);
 
-            var startResult = await StartSession(server);
+            HttpBuildStartResponse startResult = null;
+            await HttpAuthAsync(async () => {
+                startResult = await StartSession(server);
+            });
+
             var sessionId = startResult?.SessionId;
 
             if (string.IsNullOrEmpty(sessionId))
@@ -66,113 +70,67 @@ namespace Photon.CLI.Actions
 
         private async Task<HttpBuildStartResponse> StartSession(PhotonServerDefinition server)
         {
-            HttpClientEx client = null;
-
-            try {
-                var url = NetPath.Combine(server.Url, "api/build/start");
-
-                client = HttpClientEx.Post(url, new {
-                    project = ProjectId,
-                    task = TaskName,
-                    refspec = GitRefspec,
-                });
-
-                await client.Send();
-
-                if (client.ResponseBase.StatusCode == HttpStatusCode.BadRequest) {
-                    var text = await client.GetResponseTextAsync();
-                    throw new ApplicationException($"Bad Build Request! {text}");
-                }
-
-                return client.ParseJsonResponse<HttpBuildStartResponse>();
-            }
-            catch (HttpStatusCodeException error) {
-                if (error.HttpCode == HttpStatusCode.NotFound)
-                    throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
-
-                throw;
-            }
-            finally {
-                client?.Dispose();
-            }
-        }
-
-        private async Task<OutputData> UpdateOutput(PhotonServerDefinition server, string sessionId, int position)
-        {
-            HttpClientEx client = null;
-
-            try {
-                var url = NetPath.Combine(server.Url, "api/session/output");
-
-                client = HttpClientEx.Get(url, new {
-                    session = sessionId,
-                    start = position,
-                });
-
-                await client.Send();
-
-                bool _complete;
-                if (client.ResponseBase.StatusCode == HttpStatusCode.NotModified) {
-                    bool.TryParse(client.ResponseBase.Headers.Get("X-Complete"), out _complete);
-
-                    return new OutputData {IsComplete = _complete};
-                }
-
-                var result = new OutputData();
-
-                if (bool.TryParse(client.ResponseBase.Headers.Get("X-Complete"), out _complete))
-                    result.IsComplete = _complete;
-
-                if (int.TryParse(client.ResponseBase.Headers.Get("X-Text-Pos"), out var _textPos))
-                    result.NewLength = _textPos;
-
-                using (var responseStream = client.ResponseBase.GetResponseStream()) {
-                    if (responseStream == null)
-                        return result;
-
-                    using (var reader = new StreamReader(responseStream)) {
-                        result.NewText = reader.ReadToEnd();
-                    }
-                }
-
-                result.IsModified = true;
-                return result;
-            }
-            catch (HttpStatusCodeException error) {
-                if (error.HttpCode == HttpStatusCode.NotFound)
-                    throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
-
-                throw;
-            }
-            finally {
-                client?.Dispose();
-            }
+            return await WebClientEx(server,
+                client => {
+                    client.Url = NetPath.Combine(server.Url, "api/build/start");
+                    client.Method = "POST";
+                    client.Query = new {
+                        project = ProjectId,
+                        task = TaskName,
+                        refspec = GitRefspec,
+                    };
+                },
+                client => client.ParseJsonResponse<HttpBuildStartResponse>());
         }
 
         private async Task<HttpBuildResultResponse> GetResult(PhotonServerDefinition server, string sessionId)
         {
-            HttpClientEx client = null;
+            return await WebClient(server, async client => {
+                client.QueryString["session"] = sessionId;
 
-            try {
-                var url = NetPath.Combine(server.Url, "api/build/result");
+                var json = await client.DownloadStringTaskAsync("api/build/result");
+                return JsonConvert.DeserializeObject<HttpBuildResultResponse>(json);
+            });
+        }
 
-                client = HttpClientEx.Get(url, new {
-                    session = sessionId,
+        private async Task<OutputData> UpdateOutput(PhotonServerDefinition server, string sessionId, int position)
+        {
+            return await WebClientEx(server,
+                client => {
+                    client.Url = NetPath.Combine(server.Url, "api/session/output");
+                    client.Query = new {
+                        session = sessionId,
+                        start = position,
+                    };
+                },
+                client => {
+                    bool _complete;
+                    if (client.ResponseBase.StatusCode == HttpStatusCode.NotModified) {
+                        bool.TryParse(client.ResponseBase.Headers.Get("X-Complete"), out _complete);
+
+                        return new OutputData {IsComplete = _complete};
+                    }
+
+                    var result = new OutputData();
+
+                    if (bool.TryParse(client.ResponseBase.Headers.Get("X-Complete"), out _complete))
+                        result.IsComplete = _complete;
+
+                    if (int.TryParse(client.ResponseBase.Headers.Get("X-Text-Pos"), out var _textPos))
+                        result.NewLength = _textPos;
+
+                    using (var responseStream = client.ResponseBase.GetResponseStream()) {
+                        if (responseStream == null)
+                            return result;
+
+                        using (var reader = new StreamReader(responseStream)) {
+                            result.NewText = reader.ReadToEnd();
+                        }
+                    }
+
+                    result.IsModified = true;
+                    return result;
                 });
-
-                await client.Send();
-
-                return client.ParseJsonResponse<HttpBuildResultResponse>();
-            }
-            catch (HttpStatusCodeException error) {
-                if (error.HttpCode == HttpStatusCode.NotFound)
-                    throw new ApplicationException($"Photon-Server instance '{server.Name}' not found!");
-
-                throw;
-            }
-            finally {
-                client?.Dispose();
-            }
         }
 
         private class OutputData

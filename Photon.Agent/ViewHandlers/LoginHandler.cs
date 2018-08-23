@@ -1,5 +1,5 @@
 ﻿using Photon.Agent.ViewModels;
-using Photon.Library.HttpSecurity;
+using Photon.Library.Http.Security;
 using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ViewHandlers

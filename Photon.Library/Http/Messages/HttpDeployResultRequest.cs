@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Photon.Library.HttpMessages
+namespace Photon.Library.Http.Messages
 {
-    public class HttpBuildResultRequest
+    public class HttpDeployResultRequest
     {
         [JsonProperty("session")]
         public string ServerSessionId {get; set;}

@@ -3,11 +3,11 @@ using Photon.CLI.Internal.Http;
 using Photon.Framework;
 using Photon.Framework.Tools;
 using Photon.Library;
-using Photon.Library.HttpMessages;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Photon.Library.Http.Messages;
 
 namespace Photon.CLI.Actions
 {

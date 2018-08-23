@@ -1,6 +1,6 @@
 ﻿using Photon.Framework.Pooling;
 
-namespace Photon.Library.HttpSecurity
+namespace Photon.Library.Http.Security
 {
     public class HttpUserContext : LifespanReferenceItem
     {

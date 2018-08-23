@@ -13,6 +13,7 @@ namespace Photon.CLI.Commands
         public string AgentNames {get; set;}
         public string Username {get; set;}
         public string Password {get; set;}
+        public bool Passive {get; set;}
 
 
         public UpdateCommands(CommandContext context) : base(context)
@@ -26,6 +27,7 @@ namespace Photon.CLI.Commands
             Map("-n", "-names").ToProperty(v => AgentNames = v);
             Map("-u", "-user").ToProperty(v => Username = v);
             Map("-p", "-pass").ToProperty(v => Password = v);
+            Map("-passive").ToProperty(v => Passive = v, true);
         }
 
         private async Task OnHelp(string[] args)
@@ -45,6 +47,7 @@ namespace Photon.CLI.Commands
                     .Add("-server  | -s", "The name of the target Photon Server.")
                     .Add("-user    | -u", "The optional username.")
                     .Add("-pass    | -p", "The optional password.")
+                    .Add("-passive     ", "Disable input prompts.")
                     .PrintAsync();
 
                 return;
@@ -54,6 +57,7 @@ namespace Photon.CLI.Commands
                 ServerName = Server,
                 Username = Username,
                 Password = Password,
+                Passive = Passive,
             };
 
             await updateAction.Run(Context);
@@ -65,7 +69,10 @@ namespace Photon.CLI.Commands
             if (args.ContainsAny("help", "?")) {
                 await new HelpPrinter(typeof(UpdateCommands), nameof(UpdateAgentsCommand))
                     .Add("-server | -s", "The name of the target Photon Server.")
+                    .Add("-user   | -u", "The optional username.")
+                    .Add("-pass   | -p", "The optional password.")
                     .Add("-names  | -n", "An optional list of Agent names, separated by ';'. Supports '*' wildchar.")
+                    .Add("-passive    ", "Disable input prompts.")
                     .PrintAsync();
 
                 return;
@@ -74,6 +81,9 @@ namespace Photon.CLI.Commands
             var updateAction = new UpdateAgentsAction {
                 ServerName = Server,
                 AgentNames = AgentNames,
+                Username = Username,
+                Password = Password,
+                Passive = Passive,
             };
 
             await updateAction.Run(Context);

@@ -1,4 +1,4 @@
-﻿namespace Photon.Library.HttpSecurity
+﻿namespace Photon.Library.Http.Security
 {
     public interface IAuthorize
     {

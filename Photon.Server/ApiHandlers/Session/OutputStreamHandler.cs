@@ -1,4 +1,5 @@
-﻿using Photon.Server.Internal;
+﻿using Photon.Library.Http;
+using Photon.Server.Internal;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System;
@@ -9,7 +10,7 @@ namespace Photon.Server.ApiHandlers.Session
 {
     [Secure]
     [HttpHandler("api/session/output-stream")]
-    internal class OutputStreamHandler : HttpHandler
+    internal class OutputStreamHandler : HttpApiHandler
     {
         public override HttpHandlerResult Get()
         {

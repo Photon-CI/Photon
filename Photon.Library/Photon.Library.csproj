@@ -34,8 +34,8 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PiServerLite, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PiServerLite.0.3.2\lib\net45\PiServerLite.dll</HintPath>
+    <Reference Include="PiServerLite, Version=0.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PiServerLite.0.3.3\lib\net45\PiServerLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -56,23 +56,25 @@
     <Compile Include="GitHub\CommitStatusResponse.cs" />
     <Compile Include="GitHub\CommitStatusUpdater.cs" />
     <Compile Include="GitHub\GithubCommit.cs" />
-    <Compile Include="HttpMessages\HttpAgentUpdateResultResponse.cs" />
-    <Compile Include="HttpMessages\HttpAgentVersionListResponse.cs" />
-    <Compile Include="HttpMessages\HttpBuildStartRequest.cs" />
-    <Compile Include="HttpMessages\HttpAgentUpdateStartResponse.cs" />
-    <Compile Include="HttpMessages\HttpDeployResultResponse.cs" />
-    <Compile Include="HttpMessages\HttpDeployResultRequest.cs" />
-    <Compile Include="HttpMessages\HttpBuildResultRequest.cs" />
-    <Compile Include="HttpMessages\HttpBuildResultResponse.cs" />
-    <Compile Include="HttpMessages\HttpDeployStartResponse.cs" />
-    <Compile Include="HttpMessages\HttpBuildStartResponse.cs" />
-    <Compile Include="HttpMessages\HttpPackageIndex.cs" />
-    <Compile Include="HttpMessages\HttpPackageReference.cs" />
-    <Compile Include="HttpSecurity\HttpUserContext.cs" />
-    <Compile Include="HttpSecurity\HttpUserCredentials.cs" />
-    <Compile Include="HttpSecurity\IAuthorize.cs" />
-    <Compile Include="HttpSecurity\HybridAuthorization.cs" />
-    <Compile Include="HttpSecurity\HttpSecurityManager.cs" />
+    <Compile Include="Http\Messages\HttpAgentUpdateResultResponse.cs" />
+    <Compile Include="Http\Messages\HttpAgentVersionListResponse.cs" />
+    <Compile Include="Http\Messages\HttpBuildStartRequest.cs" />
+    <Compile Include="Http\Messages\HttpAgentUpdateStartResponse.cs" />
+    <Compile Include="Http\Messages\HttpDeployResultResponse.cs" />
+    <Compile Include="Http\Messages\HttpDeployResultRequest.cs" />
+    <Compile Include="Http\Messages\HttpBuildResultRequest.cs" />
+    <Compile Include="Http\Messages\HttpBuildResultResponse.cs" />
+    <Compile Include="Http\Messages\HttpDeployStartResponse.cs" />
+    <Compile Include="Http\Messages\HttpBuildStartResponse.cs" />
+    <Compile Include="Http\Messages\HttpPackageIndex.cs" />
+    <Compile Include="Http\Messages\HttpPackageReference.cs" />
+    <Compile Include="Http\Security\HttpUserContext.cs" />
+    <Compile Include="Http\Security\HttpUserCredentials.cs" />
+    <Compile Include="Http\Security\IAuthorize.cs" />
+    <Compile Include="Http\Security\HybridAuthorization.cs" />
+    <Compile Include="Http\Security\HttpSecurityManager.cs" />
+    <Compile Include="Http\HttpApiHandler.cs" />
+    <Compile Include="Http\HttpApiHandlerAsync.cs" />
     <Compile Include="ILibraryAssembly.cs" />
     <Compile Include="JsonDynamicDocument.cs" />
     <Compile Include="LazyAsync.cs" />

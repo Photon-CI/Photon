@@ -1,4 +1,5 @@
-﻿using Photon.Server.Internal;
+﻿using Photon.Library.Http;
+using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
@@ -11,7 +12,7 @@ namespace Photon.Server.ApiHandlers.Deploy
     [Secure]
     [RequiresRoles(GroupRole.DeployView)]
     [HttpHandler("api/deployment/output")]
-    internal class OutputStreamHandler : HttpHandlerAsync
+    internal class OutputStreamHandler : HttpApiHandlerAsync
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {

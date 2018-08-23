@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Photon.Framework.Projects;
 using Photon.Library.GitHub;
+using Photon.Library.Http;
 using Photon.Server.Internal;
 using Photon.Server.Internal.GitHub;
 using Photon.Server.Internal.Sessions;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 namespace Photon.Server.ApiHandlers.GitHub
 {
     [HttpHandler("api/github/webhook")]
-    internal class WebHookHandler : HttpHandlerAsync
+    internal class WebHookHandler : HttpApiHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(WebHookHandler));
 

@@ -46,6 +46,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\ActionBase.cs" />
     <Compile Include="Actions\LogServerAction.cs" />
     <Compile Include="Actions\UpdateAgentsAction.cs" />
     <Compile Include="Actions\ServerEditAction.cs" />
@@ -69,7 +70,9 @@
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\ConsoleEx.cs" />
     <Compile Include="Internal\Http\HttpClientEx.cs" />
+    <Compile Include="Internal\Http\HttpUnauthorizedException.cs" />
     <Compile Include="Internal\Http\HttpUtility.cs" />
+    <Compile Include="Internal\Http\WebClientFactory.cs" />
     <Compile Include="Internal\ServerCollection.cs" />
     <Compile Include="Internal\PhotonServerDefinition.cs" />
     <Compile Include="Program.cs" />

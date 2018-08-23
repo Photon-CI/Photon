@@ -6,7 +6,6 @@ using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Library;
-using Photon.Library.HttpSecurity;
 using Photon.Library.Security;
 using Photon.Library.Variables;
 using PiServerLite.Http;
@@ -17,6 +16,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Photon.Agent.Internal.Applications;
+using Photon.Library.Http.Security;
 
 namespace Photon.Agent.Internal
 {
