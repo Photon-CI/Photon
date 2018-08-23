@@ -82,6 +82,7 @@ namespace Photon.CLI.Actions
                 .WriteLine("Uploading update to Server...", ConsoleColor.DarkCyan);
 
             await WebClientEx(server, client => {
+                client.Method = "POST";
                 client.Url = NetPath.Combine(server.Url, "api/server/update");
                 client.ContentType = "application/octet-stream";
                 client.BodyFunc = () => File.Open(updateFilename, FileMode.Open, FileAccess.Read);
