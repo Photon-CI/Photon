@@ -47,7 +47,10 @@ namespace Photon.Agent.Internal.Session
                 contextOutput.OnWriteRaw += text => Output.WriteRaw(text);
 
                 var packageClient = new DomainPackageClient(Packages.Boundary);
-                var applicationClient = new ApplicationManagerClient(Applications.Boundary);
+                var applicationClient = new ApplicationManagerClient(Applications.Boundary) {
+                    CurrentProjectId = Project.Id,
+                    CurrentDeploymentNumber = BuildNumber, // TODO: BuildTask should not have access
+                };
 
                 var context = new AgentBuildContext {
                     Project = Project,

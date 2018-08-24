@@ -6,5 +6,11 @@ namespace Photon.Agent.Internal.AgentConfiguration
     {
         [JsonProperty("maxCount")]
         public int MaxCount {get; set;}
+
+
+        public AgentApplicationConfiguration()
+        {
+            MaxCount = 10;
+        }
     }
 }

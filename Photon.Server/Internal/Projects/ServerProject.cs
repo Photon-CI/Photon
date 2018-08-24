@@ -154,10 +154,8 @@ namespace Photon.Server.Internal.Projects
 
         private void LoadProject()
         {
-            if (!File.Exists(ProjectFilename)) {
-                Description = null;
-                return;
-            }
+            Description = null;
+            if (!File.Exists(ProjectFilename)) return;
 
             using (var stream = File.Open(ProjectFilename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                 Description = JsonSettings.Serializer.Deserialize<Project>(stream);
@@ -166,10 +164,8 @@ namespace Photon.Server.Internal.Projects
 
         private void LoadLastBuild()
         {
-            if (!File.Exists(LastBuildFilename)) {
-                LastBuild = null;
-                return;
-            }
+            LastBuild = null;
+            if (!File.Exists(LastBuildFilename)) return;
 
             using (var stream = File.Open(LastBuildFilename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                 LastBuild = JsonSettings.Serializer.Deserialize<ProjectLastBuild>(stream);
@@ -178,10 +174,8 @@ namespace Photon.Server.Internal.Projects
 
         private void LoadLastDeployment()
         {
-            if (!File.Exists(LastDeploymentFilename)) {
-                LastDeployment = null;
-                return;
-            }
+            LastDeployment = null;
+            if (!File.Exists(LastDeploymentFilename)) return;
 
             using (var stream = File.Open(LastDeploymentFilename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                 LastDeployment = JsonSettings.Serializer.Deserialize<ProjectLastDeployment>(stream);
