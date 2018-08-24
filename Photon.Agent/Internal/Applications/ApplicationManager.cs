@@ -11,10 +11,7 @@ namespace Photon.Agent.Internal.Applications
 {
     internal class ApplicationManager
     {
-        private const string FileName = "Applications.json";
-
         private readonly ConcurrentDictionary<string, ProjectApplicationList> applicationList;
-        private string _filename;
 
 
         public ApplicationManager()
@@ -24,12 +21,10 @@ namespace Photon.Agent.Internal.Applications
 
         public void Initialize()
         {
-            _filename = Path.Combine(Configuration.Directory, FileName);
-
-            if (!File.Exists(_filename)) return;
+            if (!File.Exists(Configuration.ApplicationsFile)) return;
 
             Application[] apps;
-            using (var stream = File.Open(_filename, FileMode.Open, FileAccess.Read)) {
+            using (var stream = File.Open(Configuration.ApplicationsFile, FileMode.Open, FileAccess.Read)) {
                 apps = JsonSettings.Serializer.Deserialize<Application[]>(stream);
             }
 
@@ -50,7 +45,7 @@ namespace Photon.Agent.Internal.Applications
             var apps = applicationList.Values
                 .SelectMany(x => x).ToArray();
 
-            using (var stream = File.Open(_filename, FileMode.OpenOrCreate, FileAccess.Write)) {
+            using (var stream = File.Open(Configuration.ApplicationsFile, FileMode.OpenOrCreate, FileAccess.Write)) {
                 JsonSettings.Serializer.Serialize(stream, apps);
             }
         }

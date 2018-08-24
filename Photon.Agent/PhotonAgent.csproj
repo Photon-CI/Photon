@@ -95,6 +95,7 @@
     <Compile Include="AgentService.Designer.cs">
       <DependentUpon>AgentService.cs</DependentUpon>
     </Compile>
+    <Compile Include="ApiHandlers\Applications\ApplicationJsonHandler.cs" />
     <Compile Include="ApiHandlers\ConfigurationHandler.cs" />
     <Compile Include="ApiHandlers\Security\SecurityEnabledHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />

@@ -14,6 +14,7 @@ namespace Photon.Agent.Internal
 
         public static int Parallelism => ConfigurationReader.AppSetting("parallelism", 1);
         private static string AgentFilePath => ConfigurationReader.AppSetting("agentFile", "agent.json");
+        private static string ApplicationsFilePath => ConfigurationReader.AppSetting("applicationsFile", "Applications.json");
         private static string WorkPath => ConfigurationReader.AppSetting("work", "Work");
         private static string ApplicationsPath => ConfigurationReader.AppSetting("applications", "Applications");
         private static string VariablesPath => ConfigurationReader.AppSetting("variables", "Variables");
@@ -23,6 +24,7 @@ namespace Photon.Agent.Internal
         private static string HttpViewPath => ConfigurationReader.AppSetting("httpViews", ".\\Views");
 
         public static string AgentFile => FullPath(Directory, AgentFilePath);
+        public static string ApplicationsFile => FullPath(Directory, ApplicationsFilePath);
         public static string WorkDirectory => FullPath(Directory, WorkPath);
         public static string ApplicationsDirectory => FullPath(Directory, ApplicationsPath);
         public static string VariablesDirectory => FullPath(Directory, VariablesPath);
