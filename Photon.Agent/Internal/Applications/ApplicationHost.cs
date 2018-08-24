@@ -1,7 +1,7 @@
-﻿using Photon.Framework;
-using Photon.Framework.Applications;
+﻿using Photon.Framework.Applications;
 using Photon.Framework.Domain;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -77,7 +77,7 @@ namespace Photon.Agent.Internal.Applications
                 DeploymentNumber = appRevisionRequest.DeploymentNumber,
                 PackageId = appRevisionRequest.PackageId,
                 PackageVersion = appRevisionRequest.PackageVersion,
-                Location = NetPath.Combine(app.Location, pathName),
+                Location = Path.Combine(app.Location, pathName),
                 Time = DateTime.Now,
             };
 

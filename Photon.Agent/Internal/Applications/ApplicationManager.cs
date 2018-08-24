@@ -53,10 +53,8 @@ namespace Photon.Agent.Internal.Applications
         public Application GetApplication(string projectId, string appName)
         {
             if (!applicationList.TryGetValue(projectId, out var projectAppList)) return null;
-                //throw new ApplicationException($"Project '{projectId}' not found!");
 
             if (!projectAppList.TryGetApplication(appName, out var application)) return null;
-                //throw new ApplicationException($"Application '{appName}' not found!");
 
             return application;
         }
