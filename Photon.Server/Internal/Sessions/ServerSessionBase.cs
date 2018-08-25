@@ -1,5 +1,6 @@
 ﻿using log4net;
 using Photon.Framework.Domain;
+using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
@@ -27,6 +28,7 @@ namespace Photon.Server.Internal.Sessions
         public bool IsUserAborted {get; private set;}
 
         public string SessionId {get;}
+        public Project Project {get; set;}
         public string WorkDirectory {get;}
         public string BinDirectory {get;}
         public string ContentDirectory {get;}
@@ -71,6 +73,8 @@ namespace Photon.Server.Internal.Sessions
 
         public virtual async Task InitializeAsync()
         {
+            Packages.ProjectId = Project.Id;
+
             Variables = await PhotonServer.Instance.Variables.GetCollection();
         }
 

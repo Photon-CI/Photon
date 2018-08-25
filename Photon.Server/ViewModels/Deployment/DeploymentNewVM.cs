@@ -20,6 +20,7 @@ namespace Photon.Server.ViewModels.Deployment
         public string ServerSessionId {get; private set;}
 
         public DeploymentEnvironmentRow[] Environments {get; set;}
+        public string[] PackageIdList {get; set;}
 
 
         public DeploymentNewVM(IHttpHandler handler) : base(handler)
@@ -42,6 +43,10 @@ namespace Photon.Server.ViewModels.Deployment
                     Name = x.Name,
                     Selected = string.Equals(x.Name, EnvironmentName, StringComparison.OrdinalIgnoreCase),
                 }).ToArray();
+
+            PackageIdList = PhotonServer.Instance.ProjectPackageCache.All
+                .Where(x => string.Equals(x.Project, ProjectId, StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.Id).ToArray();
         }
 
         public void Restore(NameValueCollection form)

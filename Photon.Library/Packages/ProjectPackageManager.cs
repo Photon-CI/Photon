@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Photon.Framework.Packages;
+using System;
 using System.Threading.Tasks;
-using Photon.Framework.Packages;
 
 namespace Photon.Library.Packages
 {

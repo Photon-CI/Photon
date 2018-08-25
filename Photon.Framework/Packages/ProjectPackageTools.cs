@@ -72,7 +72,7 @@ namespace Photon.Framework.Packages
         {
             var metadata = new ProjectPackage {
                 Id = definition.Id,
-                ProjectId = definition.ProjectId,
+                Project = definition.Project,
                 Name = definition.Name,
                 Description = definition.Description,
                 AssemblyFilename = definition.Assembly,

@@ -19,20 +19,16 @@ namespace Photon.Server.Internal.Packages
         public IEnumerable<PackageReference> PushedApplicationPackages => PushedApplicationPackageList;
 
         public DomainPackageBoundary Client {get;}
+        public string ProjectId {get; set;}
 
 
         public PackageHost()
         {
-            projectPackages = new ProjectPackageManager {
-                PackageDirectory = Configuration.ProjectPackageDirectory,
-            };
-
-            applicationPackages = new ApplicationPackageManager {
-                PackageDirectory = Configuration.ApplicationPackageDirectory,
-            };
-
             PushedProjectPackageList = new List<PackageReference>();
             PushedApplicationPackageList = new List<PackageReference>();
+
+            projectPackages = PhotonServer.Instance.ProjectPackages;
+            applicationPackages = PhotonServer.Instance.ApplicationPackages;
 
             Client = new DomainPackageBoundary();
             Client.OnPushProjectPackage += PackageClient_OnPushProjectPackage;

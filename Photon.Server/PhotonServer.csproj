@@ -88,6 +88,7 @@
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
     <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
+    <Compile Include="Internal\Packages\ProjectPackageCache.cs" />
     <Compile Include="Internal\Packages\PackageHost.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\HealthChecks\AgentStatusItem.cs" />

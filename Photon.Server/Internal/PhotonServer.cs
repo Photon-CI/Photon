@@ -1,12 +1,16 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Framework;
+using Photon.Framework.Packages;
 using Photon.Library;
+using Photon.Library.Http.Security;
 using Photon.Library.Packages;
 using Photon.Library.Security;
 using Photon.Library.Variables;
 using Photon.Server.Internal.HealthChecks;
+using Photon.Server.Internal.Packages;
 using Photon.Server.Internal.Projects;
+using Photon.Server.Internal.Security;
 using Photon.Server.Internal.ServerAgents;
 using Photon.Server.Internal.ServerConfiguration;
 using Photon.Server.Internal.Sessions;
@@ -16,8 +20,6 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Library.Http.Security;
-using Photon.Server.Internal.Security;
 
 namespace Photon.Server.Internal
 {
@@ -42,6 +44,8 @@ namespace Photon.Server.Internal
         public ServerAgentManager Agents {get;}
         public HealthCheckService HealthChecks {get;}
         public UserGroupManager UserMgr {get;}
+        public ProjectPackageCache ProjectPackageCache {get;}
+        //public PackageCache ApplicationPackageCache {get;}
 
 
         public PhotonServer()
@@ -52,6 +56,9 @@ namespace Photon.Server.Internal
             Variables = new VariableSetDocumentManager();
             HealthChecks = new HealthCheckService();
             UserMgr = new UserGroupManager();
+            ProjectPackageCache = new ProjectPackageCache();
+            ServerConfiguration = new ServerConfigurationManager();
+            Agents = new ServerAgentManager();
 
             ProjectPackages = new ProjectPackageManager {
                 PackageDirectory = Configuration.ProjectPackageDirectory,
@@ -65,8 +72,7 @@ namespace Photon.Server.Internal
                 MaxDegreeOfParallelism = Configuration.Parallelism,
             };
 
-            ServerConfiguration = new ServerConfigurationManager();
-            Agents = new ServerAgentManager();
+            ProjectPackages.PackageAdded += ProjectPackages_OnPackageAdded;
         }
 
         public void Dispose()
@@ -115,6 +121,9 @@ namespace Photon.Server.Internal
                 taskAgents,
                 taskProjects,
                 taskHttp);
+
+            ProjectPackageCache.Initialize()
+                .GetAwaiter().GetResult();
 
             HealthChecks.Start();
 
@@ -228,6 +237,12 @@ namespace Photon.Server.Internal
             catch (Exception error) {
                 Log.Error("Failed to start HTTP Receiver!", error);
             }
+        }
+
+        private void ProjectPackages_OnPackageAdded(IPackageMetadata metadata)
+        {
+            var projectMetadata = (ProjectPackage)metadata;
+            ProjectPackageCache.AddPackage(projectMetadata);
         }
     }
 }

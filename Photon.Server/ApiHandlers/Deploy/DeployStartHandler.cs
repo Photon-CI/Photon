@@ -40,7 +40,7 @@ namespace Photon.Server.ApiHandlers.Deploy
                     return Response.BadRequest().SetText($"Project Package '{projectPackageId}.{projectPackageVersion}' was not found!");
 
                 var metadata = await ProjectPackageTools.GetMetadataAsync(packageFilename);
-                var projectId = metadata.ProjectId;
+                var projectId = metadata.Project;
 
                 if (!string.IsNullOrEmpty(qProjectId))
                     projectId = qProjectId;

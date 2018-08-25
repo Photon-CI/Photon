@@ -1,7 +1,6 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
-using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Server.Internal.Deployments;
 using System;
@@ -14,7 +13,6 @@ namespace Photon.Server.Internal.Sessions
     internal class ServerDeploySession : ServerSessionBase
     {
         public DeploymentData Deployment {get; set;}
-        public Project Project {get; set;}
         public string AssemblyFilename {get; set;}
         public string ScriptName {get; set;}
         public string ProjectPackageId {get; set;}

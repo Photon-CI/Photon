@@ -1,21 +1,19 @@
 ﻿using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
-using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Library.GitHub;
+using Photon.Library.Http.Messages;
 using Photon.Server.Internal.Builds;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Photon.Library.Http.Messages;
 
 namespace Photon.Server.Internal.Sessions
 {
     internal class ServerBuildSession : ServerSessionBase
     {
         public BuildData Build {get; set;}
-        public Project Project {get; set;}
         public string AssemblyFilename {get; set;}
         public string PreBuild {get; set;}
         public string TaskName {get; set;}

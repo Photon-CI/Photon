@@ -32,7 +32,7 @@
     <input type="hidden" Name="ProjectId" value="{{ProjectId}}" />
     <div class="container mt-3">
         {{#If Errors}}
-        <div class="alert alert-danger">
+        <div class="alert alert-danger mb-2">
             <ul class="my-0">
                 {{#Each Errors.error}}
                 <li>{{error.Message}}</li>
@@ -40,10 +40,23 @@
             </ul>
         </div>
         {{#EndIf}}
+        {{#If !PackageIdList}}
+        <div class="alert alert-warning mb-2">
+            <p class="my-0">
+                No Project-Packages have been created. Before deploying a package, a Build-Task must first
+                generate one. Go to <a href="{{#Url build/new}}?project={{&ProjectId}}">Builds</a>.
+            </p>
+        </div>
+        {{#EndIf}}
         <div class="row">
             <div class="col-12 form-group">
                 <label for="PackageIdText">Package ID</label>
-                <input type="text" id="PackageIdText" name="PackageId" class="form-control" value="{{PackageId}}" />
+                <!--<input type="text" id="PackageIdText" name="PackageId" class="form-control" value="{{PackageId}}" />-->
+                <select id="PackageIdText" name="PackageId" class="form-control" value="{{PackageId}}">
+                    {{#Each PackageIdList.packageId}}
+                    <option value="{{packageId}}">{{packageId}}</option>
+                    {{#EndEach}}
+                </select>
                 <small class="text-muted">The ID of the Project Package to deploy.</small>
             </div>
         </div>

@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 
 namespace Photon.Library.Packages
 {
-    [Serializable]
+    public delegate void PackageManagerAddedEventHandler(IPackageMetadata metadata);
+
     public abstract class PackageManagerBase
     {
+        public event PackageManagerAddedEventHandler PackageAdded;
+
         public string PackageDirectory {get; set;}
 
 
@@ -37,6 +40,8 @@ namespace Photon.Library.Packages
 
                 File.Copy(filename, packageFilename);
             });
+
+            PackageAdded?.Invoke(metadata);
         }
 
         protected string GetPackageFilename(string packageId, string packageVersion)
