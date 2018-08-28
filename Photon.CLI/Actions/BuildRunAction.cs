@@ -25,7 +25,7 @@ namespace Photon.CLI.Actions
             var server = context.Servers.Get(ServerName);
 
             HttpBuildStartResponse startResult = null;
-            await HttpAuthAsync(async () => {
+            await AuthRetryAsync(async () => {
                 startResult = await StartSession(server);
             });
 

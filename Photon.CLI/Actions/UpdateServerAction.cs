@@ -25,7 +25,7 @@ namespace Photon.CLI.Actions
             ConsoleEx.Out.WriteLine("Checking server version...", ConsoleColor.DarkCyan);
 
             string currentVersion = null;
-            await HttpAuthAsync(async () => {
+            await AuthRetryAsync(async () => {
                 currentVersion = await WebClient(server, async client => {
                     return (await client.DownloadStringTaskAsync("api/version")).Trim();
                 });

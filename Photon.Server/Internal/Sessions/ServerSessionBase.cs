@@ -73,7 +73,7 @@ namespace Photon.Server.Internal.Sessions
 
         public virtual async Task InitializeAsync()
         {
-            Packages.ProjectId = Project.Id;
+            Packages.ProjectId = Project?.Id;
 
             Variables = await PhotonServer.Instance.Variables.GetCollection();
         }

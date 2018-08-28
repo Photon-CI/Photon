@@ -38,7 +38,7 @@ namespace Photon.CLI.Actions
 
             HttpAgentVersionListResponse agentVersionResponse = null;
 
-            await HttpAuthAsync(async () => {
+            await AuthRetryAsync(async () => {
                 agentVersionResponse = await WebClient(server, async client => {
                     var json = (await client.DownloadStringTaskAsync("api/agent/versions")).Trim();
                     return JsonConvert.DeserializeObject<HttpAgentVersionListResponse>(json);
@@ -46,7 +46,7 @@ namespace Photon.CLI.Actions
             });
 
             var updateAgents = new List<string>();
-            foreach (var agentVersion in agentVersionResponse.VersionList) {
+            foreach (var agentVersion in agentVersionResponse.VersionList.OrderBy(x => x.AgentName)) {
                 if (!string.IsNullOrEmpty(agentVersion.Exception)) {
                     ConsoleEx.Out.Write("Failed to get version of agent ", ConsoleColor.DarkYellow)
                         .Write(agentVersion.AgentName, ConsoleColor.Yellow)

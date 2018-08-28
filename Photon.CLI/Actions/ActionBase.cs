@@ -18,7 +18,7 @@ namespace Photon.CLI.Actions
         public bool HasCredentials => !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
 
 
-        protected void HttpAuth(Action httpAction)
+        protected void AuthRetry(Action httpAction)
         {
             while (true) {
                 try {
@@ -36,7 +36,7 @@ namespace Photon.CLI.Actions
             }
         }
 
-        protected async Task HttpAuthAsync(Func<Task> httpAction)
+        protected async Task AuthRetryAsync(Func<Task> httpAction)
         {
             while (true) {
                 try {
