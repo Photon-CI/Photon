@@ -2,7 +2,7 @@
 using Photon.Agent.Internal;
 using Photon.Communication;
 using Photon.Communication.Messages;
-using Photon.Framework;
+using Photon.Framework.Process;
 using Photon.Framework.Tools;
 using Photon.Library.TcpMessages;
 using System;
@@ -32,8 +32,6 @@ namespace Photon.Agent.MessageHandlers
                 .ContinueWith(async t => {
                     await BeginInstall(updatePath, msiFilename);
                 });
-
-            //BeginInstall(updatePath, msiFilename);
 
             var response = new AgentUpdateResponse();
 

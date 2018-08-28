@@ -79,6 +79,7 @@
     <Compile Include="Pooling\LifespanReferenceItem.cs" />
     <Compile Include="Packages\IPackageMetadata.cs" />
     <Compile Include="Pooling\ReferencePool.cs" />
+    <Compile Include="Process\ProcessRunInfo.cs" />
     <Compile Include="Projects\IProjectSource.cs" />
     <Compile Include="Projects\ProjectBuildTask.cs" />
     <Compile Include="Projects\ProjectEnvironment.cs" />
@@ -100,8 +101,8 @@
     <Compile Include="Packages\ApplicationPackage.cs" />
     <Compile Include="Packages\ProjectPackage.cs" />
     <Compile Include="Domain\RemoteTaskCompletionSource.cs" />
-    <Compile Include="ProcessResult.cs" />
-    <Compile Include="ProcessRunner.cs" />
+    <Compile Include="Process\ProcessResult.cs" />
+    <Compile Include="Process\ProcessRunner.cs" />
     <Compile Include="Projects\Project.cs" />
     <Compile Include="Server\DeployScriptRegistry.cs" />
     <Compile Include="Server\IDeployScript.cs" />

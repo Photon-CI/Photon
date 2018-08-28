@@ -10,6 +10,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Photon.Server.Internal.HealthChecks
 {
@@ -18,34 +20,66 @@ namespace Photon.Server.Internal.HealthChecks
         private static readonly ILog Log = LogManager.GetLogger(typeof(HealthCheckService));
 
         private readonly ConcurrentDictionary<string, AgentStatusItem> items;
-        private CancellationTokenSource tokenSource;
+        private readonly CancellationTokenSource tokenSource;
+        private readonly Timer timer;
+        private ActionBlock<ServerAgent> queue;
 
-        public TimeSpan Interval {get; set;}
         public int Parallelism {get; set;}
+        public TimeSpan AgentTimeout {get; set;}
+        public DateTime LastUpdate {get; private set;}
+
+        public TimeSpan Interval {
+            get => TimeSpan.FromMilliseconds(timer.Interval);
+            set => timer.Interval = value.TotalMilliseconds;
+        }
 
 
         public HealthCheckService()
         {
-            Interval = TimeSpan.FromMinutes(10);
-            Parallelism = 8;
-
             items = new ConcurrentDictionary<string, AgentStatusItem>(StringComparer.Ordinal);
+            tokenSource = new CancellationTokenSource();
+            timer = new Timer();
+            timer.Elapsed += Timer_OnElapsed;
+
+            Interval = TimeSpan.FromMinutes(6);
+            AgentTimeout = TimeSpan.FromMinutes(2);
+            Parallelism = 8;
         }
 
         public void Dispose()
         {
             tokenSource?.Dispose();
+            timer?.Dispose();
+            tokenSource?.Dispose();
         }
 
         public void Start()
         {
-            tokenSource = new CancellationTokenSource();
-            _ = Run(tokenSource.Token);
+            var queueOptions = new ExecutionDataflowBlockOptions {
+                MaxDegreeOfParallelism = Parallelism,
+                CancellationToken = tokenSource.Token,
+            };
+
+            queue = new ActionBlock<ServerAgent>(RunAgent, queueOptions);
+
+            timer.Start();
+
+            RunAllAgents();
         }
 
-        public void Stop()
+        public void Stop(bool abort = false)
         {
-            tokenSource.Cancel();
+            timer.Stop();
+            queue.Complete();
+
+            if (abort) tokenSource.Cancel();
+
+            try {
+                Task.WaitAll(queue.Completion);
+            }
+            catch (Exception error) {
+                Log.Warn("An error occurred while performing health checks!", error);
+            }
         }
 
         public AgentStatusItem GetStatus(string agentId)
@@ -53,58 +87,52 @@ namespace Photon.Server.Internal.HealthChecks
             return items.TryGetValue(agentId, out var item) ? item : null;
         }
 
-        private async Task Run(CancellationToken token)
+        private void RunAllAgents()
         {
-            while (true) {
-                token.ThrowIfCancellationRequested();
+            LastUpdate = DateTime.UtcNow;
 
-                var agents = PhotonServer.Instance.Agents.All.ToArray();
+            var agents = PhotonServer.Instance.Agents.All.ToArray();
 
-                foreach (var key in items.Keys) {
-                    if (!agents.Any(a => string.Equals(a.Id, key, StringComparison.Ordinal)))
-                        items.TryRemove(key, out _);
-                }
-
-                var queueOptions = new ExecutionDataflowBlockOptions {
-                    MaxDegreeOfParallelism = Parallelism,
-                    CancellationToken = token,
-                };
-
-                var lastUpdate = DateTime.Now;
-                var queue = new ActionBlock<ServerAgent>(async agent => await RunAgent(agent, token), queueOptions);
-
-                foreach (var agent in agents)
-                    queue.Post(agent);
-
-                queue.Complete();
-
-                try {
-                    await queue.Completion;
-                }
-                catch (Exception error) {
-                    Log.Warn("An error occurred while performing health checks!", error);
-                }
-
-                var duration = DateTime.Now - lastUpdate;
-                var waitTime = Interval - duration;
-
-                if (waitTime.TotalMilliseconds > 10)
-                    await Task.Delay(waitTime, token);
+            foreach (var key in items.Keys) {
+                if (!agents.Any(a => string.Equals(a.Id, key, StringComparison.Ordinal)))
+                    items.TryRemove(key, out _);
             }
+
+            foreach (var agent in agents)
+                queue.Post(agent);
         }
 
-        private async Task RunAgent(ServerAgent agent, CancellationToken token)
+        private async Task RunAgent(ServerAgent agent)
         {
-            var result = await GetAgentStatus(agent, token);
-
             var item = new AgentStatusItem {
                 AgentId = agent.Id,
                 AgentName = agent.Name,
-                AgentVersion = result.Version,
-                Status = result.Status,
-                Warnings = result.Warnings?.ToArray(),
-                Errors = result.Errors?.ToArray(),
             };
+
+            try {
+                HealthCheckResult result;
+                using (var timeoutTokenSource = new CancellationTokenSource(AgentTimeout))
+                using (var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(tokenSource.Token, timeoutTokenSource.Token)) {
+                    result = await GetAgentStatus(agent, mergedTokenSource.Token);
+                }
+
+                item.AgentVersion = result.Version;
+                item.Status = result.Status;
+                item.Warnings = result.Warnings?.ToArray();
+                item.Errors = result.Errors?.ToArray();
+            }
+            catch (TaskCanceledException) {
+                item.Status = AgentStatus.Error;
+                item.Warnings = new[] {
+                    "A timeout occurred while performing the health check.",
+                };
+            }
+            catch (Exception error) {
+                item.Status = AgentStatus.Error;
+                item.Errors = new [] {
+                    $"Health-check failed! {error.UnfoldMessages()}",
+                };
+            }
 
             items.AddOrUpdate(agent.Id, item, (x, y) => item);
         }
@@ -161,6 +189,11 @@ namespace Photon.Server.Internal.HealthChecks
                     catch {}
                 }
             }
+        }
+
+        private void Timer_OnElapsed(object sender, ElapsedEventArgs e)
+        {
+            RunAllAgents();
         }
     }
 

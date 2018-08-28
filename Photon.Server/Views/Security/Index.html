@@ -150,18 +150,12 @@
 {{#If Master.IsSecured}}
 <div class="bg-info p-1">
     <div class="container">
-        <div class="row h-100">
-            {{#If UserCanEdit}}
-            <div class="col-12 col-md-4 col-lg-3 p-1 my-auto">
-                <button class="btn btn-warning w-100" onclick="disableSecurity(this)">
-                    <i class="fas fa-lock-open"></i>&nbsp;Disable Security
-                </button>
-            </div>
-            {{#EndIf}}
-            <div class="col-12 col-md-8 col-lg-9 py-1 my-auto">
-                <b class="align-middle m-0 text-light">Security is enabled.</b>
-            </div>
-        </div>
+        {{#If UserCanEdit}}
+        <button class="btn btn-link float-right" onclick="disableSecurity(this)">
+            <i class="fas fa-lock-open"></i>&nbsp;Disable Security
+        </button>
+        {{#EndIf}}
+        <b class="align-middle m-0 text-light">Security is enabled.</b>
     </div>
 </div>
 

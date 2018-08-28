@@ -1,0 +1,43 @@
+﻿{{#Master Master.html}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">{{AgentName}}</h3>
+    </div>
+    <ul class="navbar-nav">
+        {{#If !IsNew}}
+        <li class="nav-item px-2">
+            <a href="{{#Url agent/edit/json}}?id={{&AgentId}}" class="nav-link">
+                JSON <i class="fas fa-code"></i>
+            </a>
+        </li>
+        {{#EndIf}}
+    </ul>
+</nav>
+
+<div class="container mt-3">
+    {{#If Errors}}
+    <div class="alert alert-danger">
+        <ul>
+            {{#Each Errors.error}}
+            <li>{{error.Message}}</li>
+            {{#EndEach}}
+        </ul>
+    </div>
+    {{#EndIf}}
+</div>
+
+<div class="jumbotron">
+    {{#If AgentStatusIsPending}}
+    <i class="fas fa-ellipsis-h text-muted"></i> Healthy
+    {{#EndIf}}
+    {{#If AgentStatusIsOk}}
+    <i class="fas fa-check-circle text-success"></i> Healthy
+    {{#EndIf}}
+    {{#If AgentStatusIsWarning}}
+    <i class="fas fa-exclamation-triangle text-warning"></i> Warning
+    {{#EndIf}}
+    {{#If AgentStatusIsError}}
+    <i class="fas fa-exclamation text-danger"></i> Error
+    {{#EndIf}}
+</div>

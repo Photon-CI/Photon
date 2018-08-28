@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Photon.Framework;
+using Photon.Framework.Process;
 using Photon.Tests.Internal;
 using System;
 

@@ -195,6 +195,7 @@
     <Compile Include="ApiHandlers\Build\BuildStartHandler.cs" />
     <Compile Include="ApiHandlers\Deploy\DeployStartHandler.cs" />
     <Compile Include="ViewHandlers\IndexHandler.cs" />
+    <Compile Include="ViewModels\Agent\AgentDetailsVM.cs" />
     <Compile Include="ViewModels\Agent\AgentEditVM.cs" />
     <Compile Include="ViewModels\Agent\AgentEditJsonVM.cs" />
     <Compile Include="ViewModels\Agent\AgentIndexVM.cs" />
@@ -396,6 +397,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="photon_light.ico" />
+    <Content Include="Views\Agent\Details.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Agent\Edit.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

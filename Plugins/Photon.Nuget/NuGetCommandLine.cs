@@ -1,9 +1,10 @@
-﻿using Photon.Framework;
-using Photon.Framework.Domain;
+﻿using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
+using Photon.Framework.Process;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -44,12 +45,9 @@ namespace Photon.NuGetPlugin
                 var args = new List<string>(new[] {
                     "pack", $"\"{nuspecName}\"", "-NonInteractive",
                     $"-OutputDirectory \"{outputPath}\"",
-                    //"-Prop Configuration=\"Release\"",
-                    //"-Prop Platform=\"AnyCPU\"",
                 });
 
-                foreach (var prop in properties)
-                    args.Add($"-Prop {prop.Key}=\"{prop.Value}\"");
+                args.AddRange(properties.Select(prop => $"-Prop {prop.Key}=\"{prop.Value}\""));
 
                 var argStr = string.Join(" ", args);
 
