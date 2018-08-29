@@ -42,7 +42,7 @@ namespace Photon.Server.ApiHandlers.Agent
                 };
 
                 if (!string.IsNullOrEmpty(agentIds))
-                    session.AgentIds = ParseNames(agentIds).ToArray();
+                    session.AgentIds = ParseNames(agentIds).OrderBy(x => x).ToArray();
 
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);

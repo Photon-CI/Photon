@@ -84,7 +84,7 @@ namespace Photon.Agent.Internal.Git
         private string GitGetHeadCommitMessage(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
-                arguments: "git show -s --format=\"%B\" HEAD",
+                arguments: "show -s --format=\"%B\" HEAD",
                 token: token);
 
             if (r.ExitCode != 0) throw new Exception("Failed to get HEAD commit author!");
