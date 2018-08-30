@@ -18,13 +18,8 @@ namespace Photon.WindowsServices
 
     public static class WindowsServiceManager
     {
-        //private const int STANDARD_RIGHTS_REQUIRED = 0xF0000;
         private const int SERVICE_WIN32_OWN_PROCESS = 0x00000010;
-
         private const uint SERVICE_NO_CHANGE = 0xFFFFFFFF;
-        //private const uint SERVICE_QUERY_CONFIG = 0x00000001;
-        //private const uint SERVICE_CHANGE_CONFIG = 0x00000002;
-        //private const uint SC_MANAGER_ALL_ACCESS = 0x000F003F;
 
         [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern IntPtr OpenSCManager(string machineName, string databaseName, ScmAccessRights dwDesiredAccess);
@@ -55,10 +50,6 @@ namespace Photon.WindowsServices
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool ChangeServiceConfig(IntPtr hService, uint nServiceType, uint nStartType, uint nErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, [In] char[] lpDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
 
-        //[DllImport("advapi32.dll", SetLastError=true, CharSet=CharSet.Auto)]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool ChangeServiceConfig2(IntPtr hService, int dwInfoLevel, IntPtr lpInfo);
-
 
         public static void Install(WindowsServiceDescription description, CancellationToken token = default(CancellationToken))
         {
@@ -88,13 +79,6 @@ namespace Photon.WindowsServices
                     throw new ApplicationException("Failed to install service.");
 
                 CloseServiceHandle(service);
-
-                //try {
-                //    await StartServiceAsync(service, token);
-                //}
-                //finally {
-                //    CloseServiceHandle(service);
-                //}
             }
             finally {
                 CloseServiceHandle(scm);
@@ -112,8 +96,6 @@ namespace Photon.WindowsServices
                     throw new ApplicationException("Service not installed.");
 
                 try {
-                    //await StopServiceAsync(service);
-
                     if (!DeleteService(service))
                         throw new ApplicationException("Could not delete service " + Marshal.GetLastWin32Error());
                 }
@@ -125,31 +107,6 @@ namespace Photon.WindowsServices
                 CloseServiceHandle(scm);
             }
         }
-
-        //public static void StopAndUninstallAsync(string serviceName)
-        //{
-        //    var scm = OpenSCManager(ScmAccessRights.AllAccess);
-
-        //    try {
-        //        var service = OpenService(scm, serviceName, ServiceAccessRights.AllAccess);
-
-        //        if (service == IntPtr.Zero)
-        //            throw new ApplicationException("Service not installed.");
-
-        //        try {
-        //            //await StopServiceAsync(service);
-
-        //            if (!DeleteService(service))
-        //                throw new ApplicationException("Could not delete service " + Marshal.GetLastWin32Error());
-        //        }
-        //        finally {
-        //            CloseServiceHandle(service);
-        //        }
-        //    }
-        //    finally {
-        //        CloseServiceHandle(scm);
-        //    }
-        //}
 
         public static bool ServiceIsInstalled(string serviceName)
         {
@@ -168,31 +125,6 @@ namespace Photon.WindowsServices
                 CloseServiceHandle(scm);
             }
         }
-
-        //public static async Task InstallAndStartAsync(string serviceName, string displayName, string fileName, CancellationToken token = default(CancellationToken))
-        //{
-        //    var scm = OpenSCManager(ScmAccessRights.AllAccess);
-
-        //    try {
-        //        var service = OpenService(scm, serviceName, ServiceAccessRights.AllAccess);
-
-        //        if (service == IntPtr.Zero)
-        //            service = CreateService(scm, serviceName, displayName, ServiceAccessRights.AllAccess, SERVICE_WIN32_OWN_PROCESS, ServiceStartMode.AutoStart, ServiceError.Normal, fileName, null, IntPtr.Zero, null, null, null);
-
-        //        if (service == IntPtr.Zero)
-        //            throw new ApplicationException("Failed to install service.");
-
-        //        try {
-        //            await StartServiceAsync(service, token);
-        //        }
-        //        finally {
-        //            CloseServiceHandle(service);
-        //        }
-        //    }
-        //    finally {
-        //        CloseServiceHandle(scm);
-        //    }
-        //}
 
         public static async Task StartServiceAsync(string serviceName, CancellationToken token = default(CancellationToken))
         {
@@ -302,7 +234,6 @@ namespace Photon.WindowsServices
 
         private static async Task StartServiceAsync(IntPtr service, CancellationToken token = default(CancellationToken))
         {
-            //var status = new SERVICE_STATUS();
             StartService(service, 0, 0);
 
             var changedStatus = await WaitForServiceStatusAsync(service, ServiceState.StartPending, ServiceState.Running, token);
@@ -339,39 +270,23 @@ namespace Photon.WindowsServices
             QueryServiceStatus(service, status);
             if (status.dwCurrentState == desiredStatus) return true;
 
-            var dwStartTickCount = Environment.TickCount;
-            var dwOldCheckPoint = status.dwCheckPoint;
-
             while (status.dwCurrentState == waitStatus) {
+                token.ThrowIfCancellationRequested();
+
                 // Do not wait longer than the wait hint. A good interval is
                 // one tenth the wait hint, but no less than 1 second and no
                 // more than 10 seconds.
-
                 var dwWaitTime = status.dwWaitHint / 10;
 
-                if (dwWaitTime < 1000) dwWaitTime = 1000;
-                else if (dwWaitTime > 10000) dwWaitTime = 10000;
+                if (dwWaitTime < 1_000) dwWaitTime = 1_000;
+                else if (dwWaitTime > 10_000) dwWaitTime = 10_000;
 
                 await Task.Delay(dwWaitTime, token);
 
-                // Check the status again.
-
                 if (QueryServiceStatus(service, status) == 0) break;
-
-                if (status.dwCheckPoint > dwOldCheckPoint) {
-                    // The service is making progress.
-                    dwStartTickCount = Environment.TickCount;
-                    dwOldCheckPoint = status.dwCheckPoint;
-                }
-                else {
-                    if (Environment.TickCount - dwStartTickCount > status.dwWaitHint) {
-                        // No progress made within the wait hint
-                        break;
-                    }
-                }
             }
 
-            return (status.dwCurrentState == desiredStatus);
+            return status.dwCurrentState == desiredStatus;
         }
 
         private static IntPtr OpenSCManager(ScmAccessRights rights)
@@ -396,20 +311,6 @@ namespace Photon.WindowsServices
         public int dwCheckPoint = 0;
         public int dwWaitHint = 0;
     }
-
-    //[StructLayout(LayoutKind.Sequential)]
-    //public class QUERY_SERVICE_CONFIG
-    //{
-    //    [MarshalAs(UnmanagedType.U4)] public uint dwServiceType;
-    //    [MarshalAs(UnmanagedType.U4)] public uint dwStartType;
-    //    [MarshalAs(UnmanagedType.U4)] public uint dwErrorControl;
-    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpBinaryPathName;
-    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpLoadOrderGroup;
-    //    [MarshalAs(UnmanagedType.U4)] public uint dwTagID;
-    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpDependencies;
-    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpServiceStartName;
-    //    [MarshalAs(UnmanagedType.LPWStr)] public string lpDisplayName;
-    //};
 
     public enum ServiceState
     {

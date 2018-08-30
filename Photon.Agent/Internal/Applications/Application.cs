@@ -18,12 +18,6 @@ namespace Photon.Agent.Internal.Applications
             Revisions = new List<ApplicationRevision>();
         }
 
-        public bool Matches(string projectId, string appName)
-        {
-            return string.Equals(projectId, ProjectId, StringComparison.OrdinalIgnoreCase)
-                && string.Equals(appName, Name, StringComparison.OrdinalIgnoreCase);
-        }
-
         public ApplicationRevision GetRevision(uint deploymentNumber)
         {
             return Revisions.FirstOrDefault(x => x.Matches(deploymentNumber));

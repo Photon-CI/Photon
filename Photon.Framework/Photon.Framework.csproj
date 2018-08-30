@@ -124,6 +124,7 @@
     <Compile Include="Tasks\TaskDescription.cs" />
     <Compile Include="Tasks\TaskRegistryBase.cs" />
     <Compile Include="Tasks\TaskResult.cs" />
+    <Compile Include="TimeoutTokenSource.cs" />
     <Compile Include="Tools\AssemblyTools.cs" />
     <Compile Include="Tools\Content\ContentFilter.cs" />
     <Compile Include="Tools\Content\IContentProvider.cs" />
