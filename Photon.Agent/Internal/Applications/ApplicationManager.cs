@@ -61,10 +61,8 @@ namespace Photon.Agent.Internal.Applications
 
         public Application RegisterApplication(string projectId, string appName)
         {
-            var projectAppList = applicationList.GetOrAdd(projectId, pid => {
-                var location = Path.Combine(Configuration.ApplicationsDirectory, appName);
-                return new ProjectApplicationList(pid, location);
-            });
+            var projectAppList = applicationList.GetOrAdd(projectId, pid =>
+                new ProjectApplicationList(pid, Configuration.ApplicationsDirectory));
 
             return projectAppList.RegisterApplication(appName);
         }
@@ -115,10 +113,12 @@ namespace Photon.Agent.Internal.Applications
 
         public Application RegisterApplication(string appName)
         {
+            var location = Path.Combine(AppLocation, appName);
+
             var app = new Application {
                 ProjectId = ProjectId,
                 Name = appName,
-                Location = AppLocation,
+                Location = location,
             };
 
             applicationList[app.Name] = app;
