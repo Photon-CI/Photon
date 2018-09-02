@@ -1,11 +1,10 @@
 ﻿using NUnit.Framework;
 using Photon.Framework.Process;
-using Photon.Tests.Internal;
 using System;
 
 namespace Photon.Tests.Extensions
 {
-    [TestFixture, UnitTest]
+    [TestFixture, Category("unit")]
     public class ArgSplitTests
     {
         [Test]
