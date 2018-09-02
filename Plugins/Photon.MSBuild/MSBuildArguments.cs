@@ -135,7 +135,7 @@ namespace Photon.MSBuild
                 yield return $"/pp:\"{PreProcess}\"";
 
             foreach (var property in Properties)
-                yield return $"/p:\"{property.Key}={property.Value}\"";
+                yield return $"/p:{property.Key}=\"{property.Value}\"";
 
             foreach (var target in Targets)
                 yield return $"/t:\"{target}\"";
@@ -147,7 +147,7 @@ namespace Photon.MSBuild
                 yield return $"/val:\"{Validate}\"";
 
             if (Verbosity != MSBuildVerbosityLevel.Normal)
-                yield return GetVerbosityString();
+                yield return $"/v:{GetVerbosityString()}";
 
             if (Version)
                 yield return "/ver";

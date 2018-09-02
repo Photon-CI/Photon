@@ -77,6 +77,8 @@ namespace Photon.Publishing
                     ["Platform"] = "Any CPU",
                 },
                 Verbosity = MSBuildVerbosityLevel.Minimal,
+                NodeReuse = false,
+                NoLogo = true,
                 MaxCpuCount = 0,
             };
 
