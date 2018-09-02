@@ -165,13 +165,11 @@ namespace Photon.Publishing
                 PackageDefinition = packageDefinitionFilename,
                 PackageId = packageId,
                 Version = assemblyVersion,
-                CL = new NuGetCommandLine {
+                CL = new NuGetCommandLine(Context) {
                     ExeFilename = nugetExe,
                     ApiKey = nugetApiKey,
-                    Output = Context.Output,
                 },
-                Client = new NuGetCore {
-                    Output = Context.Output,
+                Client = new NuGetCore(Context) {
                     ApiKey = nugetApiKey,
                 },
                 PackProperties = {

@@ -13,10 +13,20 @@ namespace Photon.Framework.Domain
         public event WriteRawFunc OnWriteRaw;
 
 
+        void IWrite.Write(string text, ConsoleColor color)
+        {
+            OnWrite?.Invoke(text, color);
+        }
+
         public DomainOutput Write(string text, ConsoleColor color)
         {
             OnWrite?.Invoke(text, color);
             return this;
+        }
+
+        void IWrite.Write(object value, ConsoleColor color)
+        {
+            OnWrite?.Invoke(value, color);
         }
 
         public DomainOutput Write(object value, ConsoleColor color)
@@ -25,10 +35,20 @@ namespace Photon.Framework.Domain
             return this;
         }
 
+        void IWrite.WriteLine(string text, ConsoleColor color)
+        {
+            OnWriteLine?.Invoke(text, color);
+        }
+
         public DomainOutput WriteLine(string text, ConsoleColor color)
         {
             OnWriteLine?.Invoke(text, color);
             return this;
+        }
+
+        void IWrite.WriteLine(object value, ConsoleColor color)
+        {
+            OnWriteLine?.Invoke(value, color);
         }
 
         public DomainOutput WriteLine(object value, ConsoleColor color)
@@ -41,6 +61,11 @@ namespace Photon.Framework.Domain
         {
             OnWriteRaw?.Invoke(text);
             return this;
+        }
+
+        IBlockWriter IWriteBlocks.WriteBlock()
+        {
+            return new DomainBlockWriter(this);
         }
 
         public DomainBlockWriter WriteBlock()

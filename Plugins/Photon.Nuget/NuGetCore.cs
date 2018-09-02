@@ -40,8 +40,11 @@ namespace Photon.NuGetPlugin
             existsExp = new Regex(@":\s*409\s*\(A package with ID '\S+' and version '\S+' already exists", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
-        public NuGetCore()
+        public NuGetCore(IDomainContext context = null)
         {
+            //this.context = context;
+            Output = context?.Output;
+
             SourceUrl = "https://api.nuget.org/v3/index.json";
             PushTimeout = 60;
             EnableV3 = true;

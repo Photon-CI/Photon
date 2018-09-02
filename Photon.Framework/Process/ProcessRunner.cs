@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Photon.Framework.Domain;
+using Photon.Framework.Extensions;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,9 +11,21 @@ using SysProcess = System.Diagnostics.Process;
 
 namespace Photon.Framework.Process
 {
-    public static class ProcessRunner
+    public class ProcessRunner
     {
-        public static SysProcess Start(ProcessRunInfo info)
+        private readonly IDomainContext context;
+
+        public IWriteBlocks Output {get; set;}
+
+
+        public ProcessRunner(IDomainContext context = null)
+        {
+            this.context = context;
+
+            Output = context?.Output;
+        }
+
+        public SysProcess Start(ProcessRunInfo info)
         {
             if (info.Filename == null) throw new ArgumentNullException(nameof(info.Filename));
 
@@ -39,11 +53,12 @@ namespace Photon.Framework.Process
             foreach (var key in info.EnvironmentVariables.Keys)
                 startInfo.EnvironmentVariables[key] = info.EnvironmentVariables[key];
 
+            Output?.WriteActionBlock(context, $"Run Command: {info.Filename} {info.Arguments}");
+
             return SysProcess.Start(startInfo);
         }
 
-        public static ProcessResult Run<TOutput>(ProcessRunInfo info, TOutput output = null, CancellationToken token = default(CancellationToken))
-            where TOutput : class, IWrite<TOutput>
+        public ProcessResult Run(ProcessRunInfo info, CancellationToken token = default(CancellationToken))
         {
             using (var process = Start(info)) {
                 if (process == null)
@@ -51,8 +66,8 @@ namespace Photon.Framework.Process
 
                 var p = process;
                 using (token.Register(() => p.Kill())) {
-                    var readOutTask = ReadToOutput(process.StandardOutput, output, ConsoleColor.Gray, token);
-                    var readErrorTask = ReadToOutput(process.StandardError, output, ConsoleColor.DarkYellow, token);
+                    var readOutTask = ReadToOutput(process.StandardOutput, ConsoleColor.Gray, token);
+                    var readErrorTask = ReadToOutput(process.StandardError, ConsoleColor.DarkYellow, token);
 
                     process.WaitForExit();
                     Task.WaitAll(readOutTask, readErrorTask);
@@ -66,8 +81,7 @@ namespace Photon.Framework.Process
             }
         }
 
-        public static async Task<ProcessResult> RunAsync<TOutput>(ProcessRunInfo info, TOutput output = null, CancellationToken token = default(CancellationToken))
-            where TOutput : class, IWrite<TOutput>
+        public async Task<ProcessResult> RunAsync(ProcessRunInfo info, CancellationToken token = default(CancellationToken))
         {
             using (var process = Start(info)) {
                 if (process == null)
@@ -75,8 +89,8 @@ namespace Photon.Framework.Process
 
                 var p = process;
                 using (token.Register(() => p.Kill())) {
-                    var readOutTask = ReadToOutput(process.StandardOutput, output, ConsoleColor.Gray, token);
-                    var readErrorTask = ReadToOutput(process.StandardError, output, ConsoleColor.DarkYellow, token);
+                    var readOutTask = ReadToOutput(process.StandardOutput, ConsoleColor.Gray, token);
+                    var readErrorTask = ReadToOutput(process.StandardError, ConsoleColor.DarkYellow, token);
 
                     await Task.Run(() => p.WaitForExit(), token);
                     await Task.WhenAll(readOutTask, readErrorTask);
@@ -90,8 +104,7 @@ namespace Photon.Framework.Process
             }
         }
 
-        private static async Task<string> ReadToOutput<TOutput>(StreamReader reader, TOutput output, ConsoleColor color, CancellationToken token = default(CancellationToken))
-            where TOutput : class, IWrite<TOutput>
+        private async Task<string> ReadToOutput(StreamReader reader, ConsoleColor color, CancellationToken token = default(CancellationToken))
         {
             var builder = new StringBuilder();
 
@@ -102,7 +115,7 @@ namespace Photon.Framework.Process
                 var line = await reader.ReadLineAsync();
 
                 builder.AppendLine(line);
-                output?.WriteLine(line, color);
+                Output?.WriteLine(line, color);
             }
 
             return builder.ToString();

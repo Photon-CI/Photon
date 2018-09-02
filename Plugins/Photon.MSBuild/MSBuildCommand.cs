@@ -1,4 +1,5 @@
 ﻿using Photon.Framework;
+using Photon.Framework.Agent;
 using Photon.Framework.Domain;
 using Photon.Framework.Process;
 using System;
@@ -13,6 +14,8 @@ namespace Photon.MSBuild
     /// </summary>
     public class MSBuildCommand
     {
+        private readonly IAgentContext context;
+
         /// <summary>
         /// Gets or sets the writer to print to process output to.
         /// </summary>
@@ -34,14 +37,12 @@ namespace Photon.MSBuild
         public bool EchoCommand {get; set;}
 
 
-        public MSBuildCommand()
+        public MSBuildCommand(IAgentContext context = null)
         {
+            this.context = context;
+
             Exe = "msbuild";
             EchoCommand = true;
-        }
-
-        public MSBuildCommand(IDomainContext context) : this()
-        {
             Output = context?.Output;
         }
 
@@ -70,7 +71,10 @@ namespace Photon.MSBuild
         private ProcessResult Execute(string arguments, CancellationToken cancelToken)
         {
             var info = GetProcessArgs(arguments);
-            var result = ProcessRunner.Run(info, Output, cancelToken);
+
+            var result = new ProcessRunner(context) {
+                Output = Output,
+            }.Run(info, cancelToken);
 
             if (result.ExitCode != 0) throw new ApplicationException($"MSBuild process returned a non-zero exit code! [{result.ExitCode}]");
             return result;
@@ -79,7 +83,10 @@ namespace Photon.MSBuild
         private async Task<ProcessResult> ExecuteAsync(string arguments, CancellationToken cancelToken)
         {
             var info = GetProcessArgs(arguments);
-            var result = await ProcessRunner.RunAsync(info, Output, cancelToken);
+
+            var result = await new ProcessRunner(context) {
+                Output = Output,
+            }.RunAsync(info, cancelToken);
 
             if (result.ExitCode != 0) throw new ApplicationException($"MSBuild process returned a non-zero exit code! [{result.ExitCode}]");
             return result;

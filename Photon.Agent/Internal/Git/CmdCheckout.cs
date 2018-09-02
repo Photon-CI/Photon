@@ -1,6 +1,6 @@
 ﻿using Photon.Framework;
+using Photon.Framework.Domain;
 using Photon.Framework.Process;
-using Photon.Framework.Server;
 using System;
 using System.Threading;
 using System.Web;
@@ -9,8 +9,10 @@ namespace Photon.Agent.Internal.Git
 {
     internal class CmdCheckout : ICheckout
     {
+        private readonly IDomainContext context;
+
         public string Exe {get; set;}
-        public ScriptOutput Output {get; set;}
+        public IWriteBlocks Output {get; set;}
         public RepositorySource Source {get; set;}
         public string Username {get; set;}
         public string Password {get; set;}
@@ -21,10 +23,13 @@ namespace Photon.Agent.Internal.Git
         public string CommitMessage {get; private set;}
 
 
-        public CmdCheckout()
+        public CmdCheckout(IDomainContext context = null)
         {
+            this.context = context;
+
             Exe = "git";
             EnableTracing = false;
+            Output = context?.Output;
         }
 
         public void Checkout(string refspec = "master", CancellationToken token = default(CancellationToken))
@@ -33,7 +38,7 @@ namespace Photon.Agent.Internal.Git
                 GitClone(token);
             }
 
-            Gitfetch(token);
+            GitFetch(token);
 
             GitCheckout(refspec, token);
 
@@ -113,7 +118,7 @@ namespace Photon.Agent.Internal.Git
             if (result.ExitCode != 0) throw new Exception("Failed to clone repository!");
         }
 
-        private void Gitfetch(CancellationToken token = default(CancellationToken))
+        private void GitFetch(CancellationToken token = default(CancellationToken))
         {
             var r = GitCmd(
                 arguments: "fetch -p -P -t",
@@ -163,7 +168,9 @@ namespace Photon.Agent.Internal.Git
             if (EnableTracing)
                 runInfo.EnvironmentVariables["GIT_TRACE"] = "1";
 
-            return ProcessRunner.Run(runInfo, Output, token);
+            return new ProcessRunner(context) {
+                Output = Output,
+            }.Run(runInfo, token);
         }
 
         private string CredentialsUrl()

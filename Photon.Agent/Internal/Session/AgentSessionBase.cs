@@ -111,6 +111,7 @@ namespace Photon.Agent.Internal.Session
 
             IsReleased = true;
             TimeReleased = DateTime.UtcNow;
+            Output?.Close();
             OnReleased();
 
             using (var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(8))) {

@@ -38,7 +38,7 @@ namespace Photon.Framework.Domain
             try {
                 var runInfo = ProcessRunInfo.FromCommand(command);
                 runInfo.WorkingDirectory = ContentDirectory;
-                result = ProcessRunner.Run(runInfo, Output);
+                result = new ProcessRunner(this).Run(runInfo);
             }
             catch (Win32Exception error) when (error.ErrorCode == -2147467259) {
                 using (var block = Output.WriteBlock()) {

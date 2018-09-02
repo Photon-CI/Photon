@@ -1,4 +1,5 @@
 ﻿using Photon.Communication;
+using Photon.Framework;
 using Photon.Framework.Server;
 using Photon.Library.TcpMessages;
 using System;
@@ -9,7 +10,7 @@ namespace Photon.Agent.Internal.Session
     /// Wraps a <see cref="ScriptOutput"/> object
     /// and sends updates to a TCP host.
     /// </summary>
-    public class SessionOutput
+    public class SessionOutput : IWrite<SessionOutput>
     {
         private readonly string serverSessionId;
         private readonly string sessionClientId;
@@ -36,25 +37,25 @@ namespace Photon.Agent.Internal.Session
             Writer.Changed -= Output_OnChanged;
         }
 
-        public SessionOutput Write(string text, ConsoleColor color = ConsoleColor.Gray)
+        public SessionOutput Write(string text, ConsoleColor color)
         {
             Writer.Write(text, color);
             return this;
         }
 
-        public SessionOutput Write(object value, ConsoleColor color = ConsoleColor.Gray)
+        public SessionOutput Write(object value, ConsoleColor color)
         {
             Writer.Write(value, color);
             return this;
         }
 
-        public SessionOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
+        public SessionOutput WriteLine(string text, ConsoleColor color)
         {
             Writer.WriteLine(text, color);
             return this;
         }
 
-        public SessionOutput WriteLine(object value, ConsoleColor color = ConsoleColor.Gray)
+        public SessionOutput WriteLine(object value, ConsoleColor color)
         {
             Writer.WriteLine(value, color);
             return this;
@@ -82,5 +83,10 @@ namespace Photon.Agent.Internal.Session
 
             transceiver.SendOneWay(message);
         }
+
+        void IWrite.Write(string text, ConsoleColor color) => Write(text, color);
+        void IWrite.Write(object value, ConsoleColor color) => Write(value, color);
+        void IWrite.WriteLine(string text, ConsoleColor color) => WriteLine(text, color);
+        void IWrite.WriteLine(object value, ConsoleColor color) => WriteLine(value, color);
     }
 }

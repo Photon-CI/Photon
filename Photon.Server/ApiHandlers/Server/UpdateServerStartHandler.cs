@@ -67,7 +67,7 @@ namespace Photon.Server.ApiHandlers.Server
                     WorkingDirectory = updatePath,
                 };
 
-                ProcessRunner.Start(runInfo);
+                new ProcessRunner().Start(runInfo);
 
                 Log.Info("Server update started.");
             }

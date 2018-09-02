@@ -58,7 +58,7 @@ namespace Photon.Agent.MessageHandlers
                     WorkingDirectory = updatePath,
                 };
 
-                using (var process = ProcessRunner.Start(runInfo)) {
+                using (var process = new ProcessRunner().Start(runInfo)) {
                     if (process == null)
                         throw new ApplicationException("Failed to start process!");
                 }

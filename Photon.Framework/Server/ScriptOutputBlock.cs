@@ -54,5 +54,10 @@ namespace Photon.Framework.Server
 
             scriptOutput.WriteRaw(blockOutput.GetString());
         }
+
+        void IWrite.Write(string text, ConsoleColor color) => Write(text, color);
+        void IWrite.Write(object value, ConsoleColor color) => Write(value, color);
+        void IWrite.WriteLine(string text, ConsoleColor color) => WriteLine(text, color);
+        void IWrite.WriteLine(object value, ConsoleColor color) => WriteLine(value, color);
     }
 }

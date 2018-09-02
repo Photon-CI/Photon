@@ -13,6 +13,7 @@ namespace Photon.NuGetPlugin
     public class NuGetCommandLine
     {
         private static readonly Regex existsExp;
+        private readonly IDomainContext context;
 
         public string ExeFilename {get; set;}
         public string SourceUrl {get; set;}
@@ -25,12 +26,15 @@ namespace Photon.NuGetPlugin
             existsExp = new Regex(@":\s*409\s*\(A package with ID '\S+' and version '\S+' already exists", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
-        public NuGetCommandLine()
+        public NuGetCommandLine(IDomainContext context = null)
         {
+            this.context = context;
+
+            Output = context?.Output;
             SourceUrl = "https://api.nuget.org/v3/index.json";
         }
 
-        public void Pack(string nuspecFilename, string outputPath, IDictionary<string, string> properties)
+        public void Pack(string nuspecFilename, string outputPath, IDictionary<string, string> properties, CancellationToken cancelToken = default(CancellationToken))
         {
             var path = Path.GetDirectoryName(nuspecFilename);
             var nuspecName = Path.GetFileName(nuspecFilename);
@@ -57,7 +61,9 @@ namespace Photon.NuGetPlugin
                     WorkingDirectory = path,
                 };
 
-                var result = ProcessRunner.Run(runInfo, Output);
+                var result = new ProcessRunner(context) {
+                    Output = Output,
+                }.Run(runInfo, cancelToken);
 
                 if (result.ExitCode != 0)
                     throw new ApplicationException($"NuGet Pack failed with exit code {result.ExitCode}!");
@@ -74,7 +80,7 @@ namespace Photon.NuGetPlugin
             }
         }
 
-        public void Push(string packageFilename, CancellationToken token)
+        public void Push(string packageFilename, CancellationToken cancelToken = default(CancellationToken))
         {
             var packageName = Path.GetFileName(packageFilename);
 
@@ -99,7 +105,9 @@ namespace Photon.NuGetPlugin
                     WorkingDirectory = path,
                 };
 
-                var result = ProcessRunner.Run(runInfo, Output, token);
+                var result = new ProcessRunner(context) {
+                    Output = Output,
+                }.Run(runInfo, cancelToken);
 
                 if (result.ExitCode != 0) {
                     if (existsExp.IsMatch(result.Error)) {
