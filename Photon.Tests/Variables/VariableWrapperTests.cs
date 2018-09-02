@@ -56,7 +56,7 @@ namespace Photon.Tests.Variables
         [Test]
         public void GetDeepPathValueSuccessfully()
         {
-            Assert.That(wrapper.GetValue("Path1.Path2.Path3"), Is.EqualTo("PathValue"));
+            Assert.That(wrapper.GetValue("Path1/Path2/Path3"), Is.EqualTo("PathValue"));
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace Photon.Tests.Variables
         [Test]
         public void NullInPathThrowsException()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => wrapper.GetValue("Null.NotFound"));
+            Assert.Throws(typeof(ArgumentNullException), () => wrapper.GetValue("Null/NotFound"));
         }
     }
 }
