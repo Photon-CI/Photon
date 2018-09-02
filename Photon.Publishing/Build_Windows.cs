@@ -48,8 +48,7 @@ namespace Photon.Publishing
                 Arguments = "\"Photon.Tests\\bin\\Release\\Photon.Tests.dll\" --where=\"cat == 'unit'\"",
             };
 
-            await new ProcessRunner(Context)
-                .RunAsync(info, token);
+            await Context.Process.RunAsync(info, token);
         }
     }
 }

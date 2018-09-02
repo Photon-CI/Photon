@@ -1,13 +1,10 @@
 ﻿using Photon.Framework.Applications;
 using Photon.Framework.Artifacts;
-using Photon.Framework.Extensions;
 using Photon.Framework.Packages;
 using Photon.Framework.Process;
 using Photon.Framework.Projects;
 using Photon.Framework.Variables;
 using System;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
 {
@@ -25,71 +22,12 @@ namespace Photon.Framework.Domain
         public VariableSetCollection AgentVariables {get; set;}
         public ApplicationManagerClient Applications {get; set;}
         public ArtifactManagerClient Artifacts {get; set;}
+        public ProcessClient Process {get; set;}
 
 
-        public void RunCommandLine(string command)
+        protected DomainContextBase()
         {
-            using (var block = Output.WriteBlock()) {
-                block.Write("Running Command: ", ConsoleColor.DarkCyan);
-                block.WriteLine(command, ConsoleColor.Cyan);
-            }
-
-            ProcessResult result;
-            try {
-                var runInfo = ProcessRunInfo.FromCommand(command);
-                runInfo.WorkingDirectory = ContentDirectory;
-                result = new ProcessRunner(this).Run(runInfo);
-            }
-            catch (Win32Exception error) when (error.ErrorCode == -2147467259) {
-                using (var block = Output.WriteBlock()) {
-                    block.Write("Command Failed!", ConsoleColor.DarkYellow);
-                    block.WriteLine(" Application not found!", ConsoleColor.Yellow);
-                }
-
-                throw;
-            }
-            catch (Exception error) {
-                Output.WriteBlock()
-                    .Write("Command Failed!", ConsoleColor.DarkRed)
-                    .WriteLine($" {error.UnfoldMessages()}", ConsoleColor.Red)
-                    .Post();
-
-                throw;
-            }
-
-            if (result.ExitCode != 0) {
-                Output.WriteBlock()
-                    .Write("Command Failed! Exit Code ", ConsoleColor.DarkYellow)
-                    .WriteLine(result.ExitCode.ToString(), ConsoleColor.Yellow)
-                    .Post();
-
-                throw new ApplicationException("Process terminated with a non-zero exit code!");
-            }
-        }
-
-        public async Task RunCommandLineAsync(string command)
-        {
-            var taskHandle = new TaskCompletionSource<object>();
-
-            var _ = Task.Run(() => {
-                    RunCommandLine(command);
-                    return (object) null;
-                })
-                .ContinueWith(t => taskHandle.FromTask(t));
-
-            await taskHandle.Task;
-        }
-
-        public void RunCommandLine(string command, params string[] args)
-        {
-            var argString = string.Join(" ", args);
-            RunCommandLine($"{command} {argString}");
-        }
-
-        public async Task RunCommandLineAsync(string command, params string[] args)
-        {
-            var argString = string.Join(" ", args);
-            await RunCommandLineAsync($"{command} {argString}");
+            Process = new ProcessClient(this);
         }
     }
 }

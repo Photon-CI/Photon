@@ -80,6 +80,7 @@
     <Compile Include="Pooling\LifespanReferenceItem.cs" />
     <Compile Include="Packages\IPackageMetadata.cs" />
     <Compile Include="Pooling\ReferencePool.cs" />
+    <Compile Include="Process\ProcessClient.cs" />
     <Compile Include="Process\ProcessRunInfo.cs" />
     <Compile Include="Projects\IProjectSource.cs" />
     <Compile Include="Projects\ProjectBuildTask.cs" />

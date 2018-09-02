@@ -1,8 +1,8 @@
 ﻿using Photon.Framework.Applications;
 using Photon.Framework.Packages;
+using Photon.Framework.Process;
 using Photon.Framework.Projects;
 using Photon.Framework.Variables;
-using System.Threading.Tasks;
 
 namespace Photon.Framework.Domain
 {
@@ -18,10 +18,6 @@ namespace Photon.Framework.Domain
         VariableSetCollection AgentVariables {get;}
         ApplicationManagerClient Applications {get;}
         DomainPackageClient Packages {get;}
-
-        void RunCommandLine(string command);
-        void RunCommandLine(string command, params string[] args);
-        Task RunCommandLineAsync(string command);
-        Task RunCommandLineAsync(string command, params string[] args);
+        ProcessClient Process {get;}
     }
 }

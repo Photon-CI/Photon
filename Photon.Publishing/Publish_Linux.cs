@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Photon.Framework.Agent;
+using Photon.Framework.Packages;
+using Photon.Framework.Tasks;
+using Photon.MSBuild;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Framework.Agent;
-using Photon.Framework.Packages;
-using Photon.Framework.Tasks;
 
 namespace Photon.Publishing
 {
@@ -19,7 +20,7 @@ namespace Photon.Publishing
 
         public async Task RunAsync(CancellationToken token)
         {
-            await BuildSolution();
+            await BuildSolution(token);
 
             var d = DateTime.Now;
             packageVersion = $"{d.Year}.{d.Month}.{d.Day}.{Context.BuildNumber}";
@@ -35,14 +36,27 @@ namespace Photon.Publishing
                 PackageAgent(token));
         }
 
-        private async Task BuildSolution()
+        private async Task BuildSolution(CancellationToken token)
         {
-            await Context.RunCommandLineAsync(
-                ".\\bin\\msbuild.cmd", "/m", "/v:m",
-                "Photon.sln",
-                "/p:Configuration=Linux",
-                "/p:Platform=\"Any CPU\"",
-                "/t:Rebuild");
+            var msbuild = new MSBuildCommand(Context) {
+                Exe = Context.AgentVariables["global"]["msbuild_exe"],
+                WorkingDirectory = Context.ContentDirectory,
+            };
+
+            var buildArgs = new MSBuildArguments {
+                ProjectFile = "Photon.sln",
+                Targets = {"Rebuild"},
+                Properties = {
+                    ["Configuration"] = "Release",
+                    ["Platform"] = "Any CPU",
+                },
+                Verbosity = MSBuildVerbosityLevel.Minimal,
+                NodeReuse = false,
+                NoLogo = true,
+                MaxCpuCount = 0,
+            };
+
+            await msbuild.RunAsync(buildArgs, token);
         }
 
         private async Task PackageProject(CancellationToken token)

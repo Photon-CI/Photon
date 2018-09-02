@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.67")]
-[assembly: AssemblyFileVersion("0.0.67")]
+[assembly: AssemblyVersion("0.0.68")]
+[assembly: AssemblyFileVersion("0.0.68")]
 
 [assembly: AssemblyTitle("Photon Framework")]
 [assembly: AssemblyDescription("Framework for Photon projects and plugins.")]
