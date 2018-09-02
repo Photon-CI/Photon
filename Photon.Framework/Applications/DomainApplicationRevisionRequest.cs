@@ -10,5 +10,6 @@ namespace Photon.Framework.Applications
         public string PackageId {get; set;}
         public string PackageVersion {get; set;}
         public uint DeploymentNumber {get; set;}
+        public string EnvironmentName {get; set;}
     }
 }

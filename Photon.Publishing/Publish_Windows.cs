@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Photon.Framework;
+﻿using Photon.Framework;
 using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
 using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Publishing
 {
@@ -54,10 +54,11 @@ namespace Photon.Publishing
             frameworkVersion = AssemblyTools.GetVersion(assemblyFilename);
 
             await PublishFrameworkPackage(token);
-            await PublishPluginPackage("Photon.IIS", token);
-            await PublishPluginPackage("Photon.NuGet", token);
+            await PublishPluginPackage("Photon.MSBuild", token);
             await PublishPluginPackage("Photon.WindowsServices", token);
             await PublishPluginPackage("Photon.Config", token);
+            await PublishPluginPackage("Photon.NuGet", token);
+            await PublishPluginPackage("Photon.IIS", token);
         }
 
         private async Task BuildSolution()

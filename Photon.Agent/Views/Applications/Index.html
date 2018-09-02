@@ -8,11 +8,6 @@
 </script>
 {{#EndScript}}
 
-{{#Style}}
-<style>
-</style>
-{{#EndStyle}}
-
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto">
         <!--<h3 class="text-primary my-0">Applications</h3>-->
@@ -20,10 +15,33 @@
 </nav>
 
 <div class="container mt-3">
+    {{#If Applications}}
+    <table class="table table-sm table-striped bg-light">
+        <thead class="thead-light">
+        <tr>
+            <th>Project ID</th>
+            <th>Application Name</th>
+            <th>Revisions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#Each Applications.app}}
+        <tr>
+            <td>{{app.ProjectId}}</td>
+            <td>
+                <a href="{{#Url Application/Details}}?project={{&app.ProjectId}}&name={{&app.Name}}">{{app.Name}}</a>
+            </td>
+            <td>{{app.RevisionCount}}</td>
+        </tr>
+        {{#EndEach}}
+        </tbody>
+    </table>
+    {{#Else}}
     <div class="px-3 py-0">
-        <h3 class="py-0 text-muted">Feature in development.</h3>
+        <h3 class="py-0 text-muted">No Application Found.</h3>
         <p>
-            While applications may be installed, the UI for managing them is still in development.
+            No applications have been installed on this machine.
         </p>
     </div>
+    {{#EndIf}}
 </div>

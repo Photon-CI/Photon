@@ -9,6 +9,7 @@ namespace Photon.Agent.Internal.Applications
         public string PackageId {get; set;}
         public string PackageVersion {get; set;}
         public uint DeploymentNumber {get; set;}
+        public string EnvironmentName {get; set;}
         public string Location {get; set;}
         public DateTime Time {get; set;}
 

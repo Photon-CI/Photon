@@ -2,8 +2,6 @@
 using Photon.Framework.Domain;
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Applications
 {
@@ -24,20 +22,6 @@ namespace Photon.Agent.Internal.Applications
             Boundary.Dispose();
         }
 
-        public async Task<DomainApplicationRevision> GetApplicationRevision(string projectId, string appName, uint deploymentNumber, CancellationToken token = default(CancellationToken))
-        {
-            return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
-                Boundary.GetApplicationRevision(projectId, appName, deploymentNumber, task);
-            }, token);
-        }
-
-        public async Task<DomainApplicationRevision> RegisterApplicationRevision(DomainApplicationRevisionRequest appRevisionRequest, CancellationToken token = default(CancellationToken))
-        {
-            return await RemoteTaskCompletionSource<DomainApplicationRevision>.Run(task => {
-                Boundary.RegisterApplicationRevision(appRevisionRequest, task);
-            }, token);
-        }
-
         private void AppMgr_OnGetApplicationRevision(string projectId, string appName, uint deploymentNumber, RemoteTaskCompletionSource<DomainApplicationRevision> taskHandle)
         {
             var app = PhotonAgent.Instance.ApplicationMgr.GetApplication(projectId, appName);
@@ -52,15 +36,7 @@ namespace Photon.Agent.Internal.Applications
                 return;
             }
 
-            var _rev = new DomainApplicationRevision {
-                ProjectId = app.ProjectId,
-                ApplicationName = app.Name,
-                ApplicationPath = revision.Location,
-                DeploymentNumber = revision.DeploymentNumber,
-                PackageId = revision.PackageId,
-                PackageVersion = revision.PackageVersion,
-                CreatedTime = revision.Time,
-            };
+            var _rev = GetDomainRevision(app, revision);
 
             taskHandle.SetResult(_rev);
         }
@@ -75,6 +51,7 @@ namespace Photon.Agent.Internal.Applications
 
             var revision = new ApplicationRevision {
                 DeploymentNumber = appRevisionRequest.DeploymentNumber,
+                EnvironmentName = appRevisionRequest.EnvironmentName,
                 PackageId = appRevisionRequest.PackageId,
                 PackageVersion = appRevisionRequest.PackageVersion,
                 Location = Path.Combine(app.Location, pathName),
@@ -86,17 +63,23 @@ namespace Photon.Agent.Internal.Applications
 
             revision.Initialize();
 
-            var _rev = new DomainApplicationRevision {
+            var _rev = GetDomainRevision(app, revision);
+
+            taskHandle.SetResult(_rev);
+        }
+
+        private DomainApplicationRevision GetDomainRevision(Application app, ApplicationRevision revision)
+        {
+            return new DomainApplicationRevision {
                 ProjectId = app.ProjectId,
                 ApplicationName = app.Name,
                 ApplicationPath = revision.Location,
                 DeploymentNumber = revision.DeploymentNumber,
+                EnvironmentName = revision.EnvironmentName,
                 PackageId = revision.PackageId,
                 PackageVersion = revision.PackageVersion,
                 CreatedTime = revision.Time,
             };
-
-            taskHandle.SetResult(_rev);
         }
     }
 }

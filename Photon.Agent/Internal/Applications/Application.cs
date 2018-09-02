@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using log4net;
 
 namespace Photon.Agent.Internal.Applications
 {
     [Serializable]
     public class Application
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Application));
+
         public string Name {get; set;}
         public string ProjectId {get; set;}
         public string Location {get; set;}
+        public int? MaxRevisionCount {get; set;}
         public List<ApplicationRevision> Revisions {get; set;}
 
 
@@ -25,18 +29,31 @@ namespace Photon.Agent.Internal.Applications
 
         public void ApplyRetentionPolicy(int maxCount)
         {
-            var revList = Revisions
-                .OrderByDescending(x => x.Time)
-                .Skip(maxCount).ToArray();
+            var keepCount = MaxRevisionCount ?? maxCount;
+
+            var revGroupList = Revisions
+                .GroupBy(x => x.EnvironmentName ?? string.Empty)
+                .ToArray();
 
             var errorList = new List<Exception>();
 
-            foreach (var rev in revList) {
-                try {
-                    rev.Destroy();
-                }
-                catch (Exception error) {
-                    errorList.Add(error);
+            foreach (var revGroup in revGroupList) {
+                var revList = revGroup
+                    .OrderByDescending(x => x.Time)
+                    .Skip(keepCount).ToArray();
+
+                foreach (var rev in revList) {
+                    try {
+                        Revisions.Remove(rev);
+                        rev.Destroy();
+
+                        Log.Info($"Pruned revision '{rev.DeploymentNumber}' of application '{Name}'.");
+                    }
+                    catch (Exception error) {
+                        Log.Error($"Failed to prune revision '{rev.DeploymentNumber}' of application '{Name}'!", error);
+
+                        errorList.Add(new ApplicationException($"Failed to remove revision '{rev.DeploymentNumber}'!", error));
+                    }
                 }
             }
 
