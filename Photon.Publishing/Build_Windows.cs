@@ -45,7 +45,8 @@ namespace Photon.Publishing
         {
             var info = new ProcessRunInfo {
                 Filename = Context.AgentVariables["global"]["nunit_exe"],
-                Arguments = "\"Photon.Tests\\bin\\Release\\Photon.Tests.dll\" --where=\"cat == 'unit'\"",
+                Arguments = "\".\\Photon.Tests\\bin\\Release\\Photon.Tests.dll\" --where=\"cat == 'unit'\"",
+                WorkingDirectory = Context.ContentDirectory,
             };
 
             await Context.Process.RunAsync(info, token);
