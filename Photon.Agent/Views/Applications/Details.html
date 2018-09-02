@@ -1,0 +1,53 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="applications"]').addClass('active');
+    });
+</script>
+{{#EndScript}}
+
+<nav class="navbar navbar-dark bg-dark content-navbar">
+    <div class="navbar-brand mr-auto">
+        <h3 class="text-primary my-0">{{PageTitle}}</h3>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    {{#If Errors}}
+    <div class="alert alert-danger">
+        <ul class="my-0">
+            {{#Each Errors.error}}
+            <li>{{error.Message}}</li>
+            {{#EndEach}}
+        </ul>
+    </div>
+    {{#EndIf}}
+    {{#If Revisions}}
+    <table class="table table-sm table-striped bg-light">
+        <thead class="thead-light">
+        <tr>
+            <th>#</th>
+            <th>Environment</th>
+            <th>Package</th>
+            <th>Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#Each Revisions.revision}}
+        <tr>
+            <td>{{revision.DeploymentNumber}}</td>
+            <td>{{revision.EnvironmentName}}</td>
+            <td>{{revision.Package}}</td>
+            <td>{{revision.Time}}</td>
+        </tr>
+        {{#EndEach}}
+        </tbody>
+    </table>
+    {{#Else}}
+    <div class="alert alert-warning">
+        No revisions of this application are currently deployed.
+    </div>
+    {{#EndIf}}
+</div>

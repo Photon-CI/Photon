@@ -21,9 +21,16 @@ namespace Photon.Library
 
         protected abstract void OnBuild();
 
-        public void Build()
+        public bool Build()
         {
-            OnBuild();
+            try {
+                OnBuild();
+                return true;
+            }
+            catch (Exception error) {
+                Errors.Add(error);
+                return false;
+            }
         }
     }
 

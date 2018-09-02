@@ -1,0 +1,9 @@
+﻿{{#If Errors}}
+<div class="alert alert-danger mb-2">
+    <ul class="my-0">
+        {{#Each Errors.error}}
+        <li>{{error.Message}}</li>
+        {{#EndEach}}
+    </ul>
+</div>
+{{#EndIf}}

@@ -27,7 +27,8 @@ namespace Photon.MSBuild
         public List<string> IgnoreProjectExtensions {get; set;}
 
         /// <summary>
-        /// Specifies the maximum number of concurrent processes to use when building. If you don't include this switch, the default value is 1. If you include this switch without specifying a value, MSBuild will use up to the number of processors in the computer.
+        /// Specifies the maximum number of concurrent processes to use when building. The default
+        /// value is 1. Setting this value to 0 will use up to the number of processors in the computer.
         /// </summary>
         public int MaxCpuCount {get; set;}
 
@@ -108,6 +109,9 @@ namespace Photon.MSBuild
 
             if (IgnoreProjectExtensions?.Any() ?? false)
                 yield return $"/ignore:{string.Join(";", IgnoreProjectExtensions)}";
+
+            if (MaxCpuCount == 0)
+                yield return "/m";
 
             if (MaxCpuCount > 1)
                 yield return $"/m:{MaxCpuCount}";

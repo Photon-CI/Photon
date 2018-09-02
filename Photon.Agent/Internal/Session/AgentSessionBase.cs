@@ -139,6 +139,7 @@ namespace Photon.Agent.Internal.Session
 
             var maxAppCount = PhotonAgent.Instance.AgentConfiguration.Value.Applications.MaxCount;
             PhotonAgent.Instance.ApplicationMgr.ApplyRetentionPolicy(maxAppCount);
+            PhotonAgent.Instance.ApplicationMgr.Save();
         }
 
         public void Abort()
