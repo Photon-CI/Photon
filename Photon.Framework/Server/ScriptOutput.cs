@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Photon.Framework.Server
 {
-    public class ScriptOutput : MarshalByRefInstance, IWriteAnsi
+    public class ScriptOutput : MarshalByRefInstance, IWriteBlocks<ScriptOutput, ScriptOutputBlock>
     {
         public event EventHandler Changed;
 
@@ -41,7 +41,7 @@ namespace Photon.Framework.Server
             writer?.Dispose();
         }
 
-        public IWriteAnsi Write(string text, ConsoleColor color = ConsoleColor.Gray)
+        public ScriptOutput Write(string text, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
@@ -53,7 +53,7 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public IWriteAnsi Write(object value, ConsoleColor color = ConsoleColor.Gray)
+        public ScriptOutput Write(object value, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
@@ -65,7 +65,7 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public IWriteAnsi WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
+        public ScriptOutput WriteLine(string text, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
@@ -77,7 +77,7 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public IWriteAnsi WriteLine(object value, ConsoleColor color = ConsoleColor.Gray)
+        public ScriptOutput WriteLine(object value, ConsoleColor color = ConsoleColor.Gray)
         {
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");
 
@@ -89,7 +89,12 @@ namespace Photon.Framework.Server
             return this;
         }
 
-        public IWriteAnsi WriteBlock(Action<IWriteAnsi> writerAction)
+        public ScriptOutputBlock WriteBlock()
+        {
+            return new ScriptOutputBlock(this);
+        }
+
+        public ScriptOutput WriteBlock(Action<ScriptOutput> writerAction)
         {
             if (writerAction == null) throw new ArgumentNullException(nameof(writerAction));
             if (lockHandle == null) throw new ApplicationException("LockHandle is undefined!");

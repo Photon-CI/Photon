@@ -2,6 +2,7 @@
 using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
+using Photon.MSBuild;
 using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
 using System;
@@ -40,7 +41,7 @@ namespace Photon.Publishing
             ftpUser = photonVars["ftp.user"];
             ftpPass = photonVars["ftp.pass"];
 
-            await BuildSolution();
+            await BuildSolution(token);
 
             await Task.WhenAll(
                 PublishServer(token),
@@ -61,17 +62,24 @@ namespace Photon.Publishing
             await PublishPluginPackage("Photon.IIS", token);
         }
 
-        private async Task BuildSolution()
+        private async Task BuildSolution(CancellationToken token)
         {
-            var msbuild_exe = Context.AgentVariables["global"]["msbuild_exe"];
+            var msbuild = new MSBuildCommand(Context) {
+                Exe = Context.AgentVariables["global"]["msbuild_exe"],
+            };
 
-            await Context.RunCommandLineAsync(
-                //".\\bin\\msbuild.cmd", "/m", "/v:m",
-                $"\"{msbuild_exe}\"",
-                "Photon.sln", "/m", "/v:m",
-                "/p:Configuration=\"Release\"",
-                "/p:Platform=\"Any CPU\"",
-                "/t:Rebuild");
+            var buildArgs = new MSBuildArguments {
+                ProjectFile = "Photon.sln",
+                Targets = {"Rebuild"},
+                Properties = {
+                    ["Configuration"] = "Release",
+                    ["Platform"] = "Any CPU",
+                },
+                Verbosity = MSBuildVerbosityLevel.Minimal,
+                MaxCpuCount = 0,
+            };
+
+            await msbuild.RunAsync(buildArgs, token);
         }
 
         private async Task PublishServer(CancellationToken token)

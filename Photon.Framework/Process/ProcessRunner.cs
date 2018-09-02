@@ -42,7 +42,8 @@ namespace Photon.Framework.Process
             return SysProcess.Start(startInfo);
         }
 
-        public static ProcessResult Run(ProcessRunInfo info, IWriteAnsi output = null, CancellationToken token = default(CancellationToken))
+        public static ProcessResult Run<TOutput>(ProcessRunInfo info, TOutput output = null, CancellationToken token = default(CancellationToken))
+            where TOutput : class, IWrite<TOutput>
         {
             using (var process = Start(info)) {
                 if (process == null)
@@ -65,7 +66,8 @@ namespace Photon.Framework.Process
             }
         }
 
-        public static async Task<ProcessResult> RunAsync(ProcessRunInfo info, IWriteAnsi output = null, CancellationToken token = default(CancellationToken))
+        public static async Task<ProcessResult> RunAsync<TOutput>(ProcessRunInfo info, TOutput output = null, CancellationToken token = default(CancellationToken))
+            where TOutput : class, IWrite<TOutput>
         {
             using (var process = Start(info)) {
                 if (process == null)
@@ -88,7 +90,8 @@ namespace Photon.Framework.Process
             }
         }
 
-        private static async Task<string> ReadToOutput(StreamReader reader, IWriteAnsi output, ConsoleColor color, CancellationToken token = default(CancellationToken))
+        private static async Task<string> ReadToOutput<TOutput>(StreamReader reader, TOutput output, ConsoleColor color, CancellationToken token = default(CancellationToken))
+            where TOutput : class, IWrite<TOutput>
         {
             var builder = new StringBuilder();
 

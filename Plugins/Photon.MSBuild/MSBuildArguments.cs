@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Photon.MSBuild
 {
+    /// <summary>
+    /// Defines the collection of arguments that can be passed to MSBuild on the command line.
+    /// </summary>
     public class MSBuildArguments
     {
         /// <summary>
@@ -102,6 +105,9 @@ namespace Photon.MSBuild
             Targets = new List<string>();
         }
 
+        /// <summary>
+        /// Returns the collection of argument strings defined by this instance.
+        /// </summary>
         public IEnumerable<string> GetArguments()
         {
             if (DetailedSummary)

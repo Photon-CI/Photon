@@ -1,4 +1,4 @@
-﻿(function (Date, undefined) {
+﻿(function () {
     var ansi_up,
         ANSI_COLORS = [
           [
@@ -125,8 +125,8 @@
     Ansi_Up.prototype.process_chunk = function (text, options, markup) {
 
         // Are we using classes or styles?
-        options = typeof options == 'undefined' ? {} : options;
-        var use_classes = typeof options.use_classes != 'undefined' && options.use_classes;
+        options = typeof options === 'undefined' ? {} : options;
+        var use_classes = typeof options.use_classes !== 'undefined' && options.use_classes;
         var key = use_classes ? 'class' : 'color';
 
         // Each 'chunk' is the text after the CSI (ESC + '[') and before the next CSI/EOF.

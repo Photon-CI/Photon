@@ -46,17 +46,17 @@
     }
 
     function onAppendCallback(text) {
-        if (!!self.onAppend)
+        if (self.onAppend)
             self.onAppend(text);
     }
 
     function onDoneCallback() {
-        if (!!self.onDone)
+        if (self.onDone)
             self.onDone();
     }
 
     function onErrorCallback() {
-        if (!!self.onError)
+        if (self.onError)
             self.onError();
     }
 };

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Photon.MSBuild
 {
+    /// <summary>
+    /// Adapter for using MSBuild from the command line.
+    /// </summary>
     public class MSBuildCommand
     {
         private readonly IDomainContext context;
@@ -17,8 +20,14 @@ namespace Photon.MSBuild
         /// </summary>
         public string Exe {get; set;}
 
+        /// <summary>
+        /// Gets or sets the optional working directory for executing MSBuild.
+        /// </summary>
         public string WorkingDirectory {get; set;}
 
+        /// <summary>
+        /// Gets or sets whether the command run is echoed to the task output stream.
+        /// </summary>
         public bool EchoCommand {get; set;}
 
 

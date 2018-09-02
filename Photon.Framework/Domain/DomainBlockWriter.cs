@@ -4,7 +4,7 @@ using System;
 namespace Photon.Framework.Domain
 {
     [Serializable]
-    public class DomainBlockWriter : IDisposable
+    public class DomainBlockWriter : IBlockWriter<DomainBlockWriter>
     {
         private readonly DomainOutput domainOutput;
         private readonly ScriptOutput output;

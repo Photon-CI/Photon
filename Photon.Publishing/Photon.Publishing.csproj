@@ -70,12 +70,6 @@
     <Reference Include="NuGet.Versioning, Version=4.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\NuGet.Versioning.4.2.0\lib\net45\NuGet.Versioning.dll</HintPath>
     </Reference>
-    <Reference Include="Photon.Framework, Version=0.0.64.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Photon.Framework.0.0.64\lib\net46\Photon.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Photon.NuGet, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Photon.NuGet.0.0.10\lib\net46\Photon.NuGet.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel" />
@@ -101,6 +95,19 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Photon.Framework\Photon.Framework.csproj">
+      <Project>{e49360fd-beac-4713-a421-579564fb0992}</Project>
+      <Name>Photon.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\Photon.MSBuild\Photon.MSBuild.csproj">
+      <Project>{d84283d6-5285-4edb-adde-b2d94e423b50}</Project>
+      <Name>Photon.MSBuild</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\Photon.Nuget\Photon.NuGet.csproj">
+      <Project>{9eace28c-c3af-4d57-9b6a-6697a1e62e34}</Project>
+      <Name>Photon.NuGet</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

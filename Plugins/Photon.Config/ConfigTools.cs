@@ -5,6 +5,8 @@ namespace Photon.Config
 {
     public static class ConfigTools
     {
+
+
         public static void Transform(string configFilename, string transformFilename, string outputFilename)
         {
             using (var configDoc = new XmlTransformableDocument()) {

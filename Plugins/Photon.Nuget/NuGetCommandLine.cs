@@ -99,7 +99,7 @@ namespace Photon.NuGetPlugin
                     WorkingDirectory = path,
                 };
 
-                var result = ProcessRunner.Run(runInfo, Output);
+                var result = ProcessRunner.Run(runInfo, Output, token);
 
                 if (result.ExitCode != 0) {
                     if (existsExp.IsMatch(result.Error)) {
