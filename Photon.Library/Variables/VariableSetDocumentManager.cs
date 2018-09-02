@@ -47,7 +47,7 @@ namespace Photon.Library.Variables
             var _prevId = prevId ?? document.Id;
 
             if (!string.Equals(document.Id, _prevId, StringComparison.OrdinalIgnoreCase)) {
-                if (documents.TryGetValue(document.Id, out var _))
+                if (documents.TryGetValue(document.Id, out _))
                     throw new ApplicationException("A VariableSet with the specified ID already exists!");
 
                 if (!string.IsNullOrEmpty(_prevId) && documents.TryRemove(_prevId, out var _prevDoc)) {

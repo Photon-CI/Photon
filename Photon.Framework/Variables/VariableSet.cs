@@ -21,9 +21,9 @@ namespace Photon.Framework.Variables
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
-            var path = name.Split('.');
+            var path = name.Split('/');
 
-            return GetPathValue(variable, path, $"({variable.GetType()})");
+            return GetPathValue(variable, path, string.Empty);
         }
 
         public T GetValue<T>(string name)
@@ -42,7 +42,7 @@ namespace Photon.Framework.Variables
             if (path.Length == 1) return partValue;
 
             var subPath = path.Skip(1).ToArray();
-            var subSourcePath = $"{sourcePath}.{path[0]}";
+            var subSourcePath = $"{sourcePath}/{path[0]}";
             return GetPathValue(partValue, subPath, subSourcePath);
         }
 

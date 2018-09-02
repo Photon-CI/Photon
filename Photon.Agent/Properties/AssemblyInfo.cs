@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.200")]
-[assembly: AssemblyFileVersion("0.0.200")]
+[assembly: AssemblyVersion("0.0.201")]
+[assembly: AssemblyFileVersion("0.0.201")]
 
 [assembly: AssemblyTitle("Photon Agent")]
 [assembly: AssemblyDescription("Agent service for Photon.")]

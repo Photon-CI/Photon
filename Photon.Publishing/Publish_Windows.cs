@@ -34,7 +34,7 @@ namespace Photon.Publishing
                 throw new ApplicationException("Photon Variables were not found!");
 
             nugetPackageDir = Path.Combine(Context.WorkDirectory, "Packages");
-            nugetApiKey = Context.ServerVariables["global"]["nuget.apiKey"];
+            nugetApiKey = Context.ServerVariables["global"]["nuget/apiKey"];
             nugetExe = Path.Combine(Context.ContentDirectory, "bin", "NuGet.exe"); //Context.AgentVariables["global"]["nuget.exe"];
             apiUrl = photonVars["apiUrl"];
             ftpUrl = photonVars["ftp.url"];
