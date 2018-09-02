@@ -37,9 +37,9 @@ namespace Photon.Publishing
             nugetApiKey = Context.ServerVariables["global"]["nuget/apiKey"];
             nugetExe = Path.Combine(Context.ContentDirectory, "bin", "NuGet.exe"); //Context.AgentVariables["global"]["nuget.exe"];
             apiUrl = photonVars["apiUrl"];
-            ftpUrl = photonVars["ftp.url"];
-            ftpUser = photonVars["ftp.user"];
-            ftpPass = photonVars["ftp.pass"];
+            ftpUrl = photonVars["ftp/url"];
+            ftpUser = photonVars["ftp/user"];
+            ftpPass = photonVars["ftp/pass"];
 
             await BuildSolution(token);
 
