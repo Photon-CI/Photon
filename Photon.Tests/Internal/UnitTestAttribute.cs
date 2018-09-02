@@ -1,11 +1,16 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+using NUnit.Framework.Internal;
 using System;
 
 namespace Photon.Tests.Internal
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    internal class UnitTestAttribute : CategoryAttribute
+    internal class UnitTestAttribute : NUnitAttribute, IApplyToTest
     {
-        public UnitTestAttribute() : base("unit") {}
+        public void ApplyToTest(Test test)
+        {
+            test.Properties.Add(PropertyNames.Category, "unit");
+        }
     }
 }
