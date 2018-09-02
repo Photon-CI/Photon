@@ -66,6 +66,7 @@ namespace Photon.Publishing
         {
             var msbuild = new MSBuildCommand(Context) {
                 Exe = Context.AgentVariables["global"]["msbuild_exe"],
+                WorkingDirectory = Context.ContentDirectory,
             };
 
             var buildArgs = new MSBuildArguments {
