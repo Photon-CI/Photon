@@ -15,14 +15,6 @@ namespace Photon.Framework.Process
         {
             if (info.Filename == null) throw new ArgumentNullException(nameof(info.Filename));
 
-            var parts = info.Filename.Split(Path.DirectorySeparatorChar);
-            var firstPart = parts.FirstOrDefault();
-
-            if (firstPart == "." || firstPart == "..") {
-                info.Filename = Path.Combine(info.WorkingDirectory, info.Filename);
-                info.Filename = Path.GetFullPath(info.Filename);
-            }
-
             var startInfo = new ProcessStartInfo {
                 FileName = info.Filename,
                 Arguments = info.Arguments,
@@ -32,8 +24,17 @@ namespace Photon.Framework.Process
                 RedirectStandardError = true,
             };
 
-            if (!string.IsNullOrEmpty(info.WorkingDirectory))
+            if (!string.IsNullOrEmpty(info.WorkingDirectory)) {
                 startInfo.WorkingDirectory = info.WorkingDirectory;
+
+                var parts = info.Filename.Split(Path.DirectorySeparatorChar);
+                var firstPart = parts.FirstOrDefault();
+
+                if (firstPart == "." || firstPart == "..") {
+                    var _p = Path.Combine(info.WorkingDirectory, info.Filename);
+                    startInfo.FileName = Path.GetFullPath(_p);
+                }
+            }
 
             foreach (var key in info.EnvironmentVariables.Keys)
                 startInfo.EnvironmentVariables[key] = info.EnvironmentVariables[key];
@@ -43,44 +44,47 @@ namespace Photon.Framework.Process
 
         public static ProcessResult Run(ProcessRunInfo info, IWriteAnsi output = null, CancellationToken token = default(CancellationToken))
         {
-            using (var process = Start(info))
-            using (token.Register(() => process.Kill())) {
+            using (var process = Start(info)) {
                 if (process == null)
                     throw new ApplicationException("Failed to start process!");
 
-                var readOutTask = ReadToOutput(process.StandardOutput, output, ConsoleColor.Gray, token);
-                var readErrorTask = ReadToOutput(process.StandardError, output, ConsoleColor.DarkYellow, token);
+                var p = process;
+                using (token.Register(() => p.Kill())) {
+                    var readOutTask = ReadToOutput(process.StandardOutput, output, ConsoleColor.Gray, token);
+                    var readErrorTask = ReadToOutput(process.StandardError, output, ConsoleColor.DarkYellow, token);
 
-                process.WaitForExit();
-                Task.WaitAll(readOutTask, readErrorTask);
+                    process.WaitForExit();
+                    Task.WaitAll(readOutTask, readErrorTask);
 
-                return new ProcessResult {
-                    ExitCode = process.ExitCode,
-                    Output = readOutTask.Result,
-                    Error = readErrorTask.Result,
-                };
+                    return new ProcessResult {
+                        ExitCode = process.ExitCode,
+                        Output = readOutTask.Result,
+                        Error = readErrorTask.Result,
+                    };
+                }
             }
         }
 
         public static async Task<ProcessResult> RunAsync(ProcessRunInfo info, IWriteAnsi output = null, CancellationToken token = default(CancellationToken))
         {
-            using (var process = Start(info))
-            using (token.Register(() => process.Kill())) {
+            using (var process = Start(info)) {
                 if (process == null)
                     throw new ApplicationException("Failed to start process!");
 
-                var readOutTask = ReadToOutput(process.StandardOutput, output, ConsoleColor.Gray, token);
-                var readErrorTask = ReadToOutput(process.StandardError, output, ConsoleColor.DarkYellow, token);
+                var p = process;
+                using (token.Register(() => p.Kill())) {
+                    var readOutTask = ReadToOutput(process.StandardOutput, output, ConsoleColor.Gray, token);
+                    var readErrorTask = ReadToOutput(process.StandardError, output, ConsoleColor.DarkYellow, token);
 
-                //process.WaitForExit();
-                await Task.Run(() => process.WaitForExit(), token);
-                await Task.WhenAll(readOutTask, readErrorTask);
+                    await Task.Run(() => p.WaitForExit(), token);
+                    await Task.WhenAll(readOutTask, readErrorTask);
 
-                return new ProcessResult {
-                    ExitCode = process.ExitCode,
-                    Output = readOutTask.Result,
-                    Error = readErrorTask.Result,
-                };
+                    return new ProcessResult {
+                        ExitCode = process.ExitCode,
+                        Output = readOutTask.Result,
+                        Error = readErrorTask.Result,
+                    };
+                }
             }
         }
 
@@ -88,7 +92,10 @@ namespace Photon.Framework.Process
         {
             var builder = new StringBuilder();
 
+            //using (token.Register(() => reader.BaseStream.Close()))
             while (!reader.EndOfStream) {
+                token.ThrowIfCancellationRequested();
+
                 var line = await reader.ReadLineAsync();
 
                 builder.AppendLine(line);
