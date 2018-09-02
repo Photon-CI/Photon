@@ -22,17 +22,17 @@ namespace Photon.Framework.Variables
         public bool TryGetSet(string name, out VariableSet variableSet)
         {
             var result = Json.TryGetValue(name, out var json);
-            variableSet = result ? CreateSet(json) : null;
+            variableSet = result ? CreateSet(json, name) : null;
             return result;
         }
 
         public VariableSet GetSet(string name)
         {
             return Json.TryGetValue(name, out var json)
-                ? CreateSet(json) : null;
+                ? CreateSet(json, name) : null;
         }
 
-        private static VariableSet CreateSet(string json)
+        private static VariableSet CreateSet(string json, string name)
         {
             var serializer = JsonSerializer.CreateDefault();
             serializer.Formatting = Formatting.Indented;
@@ -41,7 +41,7 @@ namespace Photon.Framework.Variables
             using (var reader = new StringReader(json))
             using (var jsonReader = new JsonTextReader(reader)) {
                 var variable = serializer.Deserialize(jsonReader);
-                return new VariableSet(variable);
+                return new VariableSet(variable, name);
             }
         }
     }

@@ -7,14 +7,16 @@ namespace Photon.Framework.Variables
 {
     public class VariableSet
     {
+        public string RootName {get;}
         private readonly object variable;
 
         public string this[string name] => GetValue(name)?.ToString();
 
 
-        public VariableSet(object variable)
+        public VariableSet(object variable, string name = null)
         {
             this.variable = variable ?? throw new ArgumentNullException(nameof(variable));
+            this.RootName = name;
         }
 
         public object GetValue(string name)
@@ -23,7 +25,7 @@ namespace Photon.Framework.Variables
 
             var path = name.Split('/');
 
-            return GetPathValue(variable, path, string.Empty);
+            return GetPathValue(variable, path, RootName ?? string.Empty);
         }
 
         public T GetValue<T>(string name)
