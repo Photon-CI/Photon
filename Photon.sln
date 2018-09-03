@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Config", "Plugins\Ph
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.MSBuild", "Plugins\Photon.MSBuild\Photon.MSBuild.csproj", "{D84283D6-5285-4EDB-ADDE-B2D94E423B50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.NuGet.Core", "Plugins\Photon.NuGet.Core\Photon.NuGet.Core.csproj", "{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -247,6 +249,18 @@ Global
 		{D84283D6-5285-4EDB-ADDE-B2D94E423B50}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D84283D6-5285-4EDB-ADDE-B2D94E423B50}.Release|x86.ActiveCfg = Release|Any CPU
 		{D84283D6-5285-4EDB-ADDE-B2D94E423B50}.Release|x86.Build.0 = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Debug|x86.Build.0 = Debug|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Linux|Any CPU.ActiveCfg = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Linux|Any CPU.Build.0 = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Linux|x86.ActiveCfg = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Linux|x86.Build.0 = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Release|x86.ActiveCfg = Release|Any CPU
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -261,6 +275,7 @@ Global
 		{0DEF70A0-E6A9-4761-AD41-032D12D1AFBC} = {131C0824-D616-439B-B04D-92D720DDC02D}
 		{DBEBE942-C5DC-47DB-A472-3FFF8C965285} = {E08A45CF-4CA4-42BA-8250-D55D6C33C51F}
 		{D84283D6-5285-4EDB-ADDE-B2D94E423B50} = {E08A45CF-4CA4-42BA-8250-D55D6C33C51F}
+		{19A41046-BFB2-4B8A-8BF9-1D4E224FA8C7} = {E08A45CF-4CA4-42BA-8250-D55D6C33C51F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {16471B2A-9C76-4B4E-942F-5D0860A67320}

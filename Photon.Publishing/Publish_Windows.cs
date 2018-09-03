@@ -3,10 +3,12 @@ using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
 using Photon.MSBuild;
+using Photon.NuGet.CorePlugin;
 using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,10 +16,12 @@ namespace Photon.Publishing
 {
     public class Publish_Windows : IBuildTask
     {
+        private MSBuildCommand msbuild;
+        private NuGetCore nugetCore;
+        private NuGetCommand nugetCmd;
+
         private string frameworkVersion;
         private string nugetPackageDir;
-        private string nugetApiKey;
-        private string nugetExe;
         private string apiUrl;
         private string ftpUrl;
         private string ftpUser;
@@ -34,14 +38,28 @@ namespace Photon.Publishing
                 throw new ApplicationException("Photon Variables were not found!");
 
             nugetPackageDir = Path.Combine(Context.WorkDirectory, "Packages");
-            nugetApiKey = Context.ServerVariables["global"]["nuget/apiKey"];
-            nugetExe = Path.Combine(Context.ContentDirectory, "bin", "NuGet.exe"); //Context.AgentVariables["global"]["nuget.exe"];
+            var nugetApiKey = Context.ServerVariables["global"]["nuget/apiKey"];
             apiUrl = photonVars["apiUrl"];
             ftpUrl = photonVars["ftp/url"];
             ftpUser = photonVars["ftp/user"];
             ftpPass = photonVars["ftp/pass"];
 
+            msbuild = new MSBuildCommand(Context) {
+                Exe = Context.AgentVariables["global"]["msbuild_exe"],
+                WorkingDirectory = Context.ContentDirectory,
+            };
+
             await BuildSolution(token);
+
+            nugetCore = new NuGetCore(Context) {
+                ApiKey = nugetApiKey,
+            };
+            nugetCore.Initialize();
+
+            nugetCmd = new NuGetCommand(Context) {
+                Exe = Path.Combine(Context.ContentDirectory, "bin", "NuGet.exe"), //Context.AgentVariables["global"]["nuget_exe"];
+                WorkingDirectory = Context.ContentDirectory,
+            };
 
             await Task.WhenAll(
                 PublishServer(token),
@@ -59,17 +77,13 @@ namespace Photon.Publishing
             await PublishPluginPackage("Photon.WindowsServices", token);
             await PublishPluginPackage("Photon.Config", token);
             await PublishPluginPackage("Photon.NuGet", token);
+            await PublishPluginPackage("Photon.NuGet.Core", token);
             await PublishPluginPackage("Photon.IIS", token);
         }
 
         private async Task BuildSolution(CancellationToken token)
         {
-            var msbuild = new MSBuildCommand(Context) {
-                Exe = Context.AgentVariables["global"]["msbuild_exe"],
-                WorkingDirectory = Context.ContentDirectory,
-            };
-
-            var buildArgs = new MSBuildArguments {
+            await msbuild.RunAsync(new MSBuildArguments {
                 ProjectFile = "Photon.sln",
                 Targets = {"Rebuild"},
                 Properties = {
@@ -80,9 +94,7 @@ namespace Photon.Publishing
                 NodeReuse = false,
                 NoLogo = true,
                 MaxCpuCount = 0,
-            };
-
-            await msbuild.RunAsync(buildArgs, token);
+            }, token);
         }
 
         private async Task PublishServer(CancellationToken token)
@@ -159,29 +171,29 @@ namespace Photon.Publishing
 
         private async Task PublishPackage(string packageId, string packageDefinitionFilename, string assemblyVersion, CancellationToken token)
         {
-            var publisher = new NuGetPackagePublisher(Context) {
-                Mode = NugetModes.Hybrid,
-                PackageDirectory = nugetPackageDir,
-                PackageDefinition = packageDefinitionFilename,
-                PackageId = packageId,
+            var versionList = await nugetCore.GetAllPackageVersions(packageId, token);
+            var packageVersion = versionList.Any() ? versionList.Max() : null;
+
+            if (!VersionTools.HasUpdates(packageVersion, assemblyVersion)) {
+                Context.Output.WriteLine($"Package '{packageId}' is up-to-date. Version {packageVersion}", ConsoleColor.DarkCyan);
+                return;
+            }
+
+            await nugetCmd.RunAsync(new NuGetPackArguments {
+                Filename = packageDefinitionFilename,
                 Version = assemblyVersion,
-                CL = new NuGetCommandLine(Context) {
-                    ExeFilename = nugetExe,
-                    ApiKey = nugetApiKey,
-                },
-                Client = new NuGetCore(Context) {
-                    ApiKey = nugetApiKey,
-                },
-                PackProperties = {
+                Properties = {
                     ["Configuration"] = "Release",
                     ["Platform"] = "AnyCPU",
                     ["frameworkVersion"] = frameworkVersion,
                 },
-            };
+            }, token);
 
-            publisher.Client.Initialize();
+            var packageFilename = Directory
+                .GetFiles(nugetPackageDir, $"{packageId}.*.nupkg")
+                .FirstOrDefault();
 
-            await publisher.PublishAsync(token);
+            await nugetCore.PushAsync(packageFilename, token);
         }
     }
 }

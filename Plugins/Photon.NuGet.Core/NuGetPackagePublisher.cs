@@ -1,19 +1,21 @@
-﻿using Photon.Framework.Domain;
-using Photon.Framework.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework.Domain;
+using Photon.Framework.Tools;
 
-namespace Photon.NuGetPlugin
+namespace Photon.NuGet.CorePlugin
 {
     public class NuGetPackagePublisher
     {
         private readonly IDomainContext context;
 
+        public NugetModes Mode {get; set;}
         public NuGetCommand CL {get; set;}
+        public NuGetCore Client {get; set;}
 
         public string PackageId {get; set;}
         public string Version {get; set;}
@@ -122,5 +124,24 @@ namespace Photon.NuGetPlugin
 
             CL.Push(packageFilename, token);
         }
+    }
+
+    public enum NugetModes
+    {
+        /// <summary>
+        /// Uses the internal NuGet.Core library to pack and push packages.
+        /// </summary>
+        Core,
+
+        /// <summary>
+        /// Uses an external NuGet executable to pack and push packages.
+        /// </summary>
+        CommandLine,
+
+        /// <summary>
+        /// Uses an external NuGet executable to pack packages,
+        /// and the NuGet.Core library to push packages.
+        /// </summary>
+        Hybrid,
     }
 }

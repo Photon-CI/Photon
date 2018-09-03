@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("0.0.202")]
-[assembly: AssemblyFileVersion("0.0.202")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]
 
-[assembly: AssemblyTitle("Photon Agent")]
-[assembly: AssemblyDescription("Agent service for Photon.")]
+[assembly: AssemblyTitle("Photon.NuGet.Core")]
+[assembly: AssemblyDescription("NuGet.Core plugin for Photon.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Joshua Miller")]
 [assembly: AssemblyProduct("Photon")]
@@ -14,4 +14,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
-[assembly: Guid("2da02660-629d-48a9-bc50-a43bca23d768")]
+[assembly: Guid("19a41046-bfb2-4b8a-8bf9-1d4e224fa8c7")]

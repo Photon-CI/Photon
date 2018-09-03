@@ -94,6 +94,11 @@ namespace Photon.MSBuild
         /// </summary>
         public bool Version {get; set;}
 
+        /// <summary>
+        /// Allows additional undefined arguments to be provided.
+        /// </summary>
+        public List<string> AdditionalArguments {get; set;}
+
 
         public MSBuildArguments()
         {
@@ -103,6 +108,7 @@ namespace Photon.MSBuild
             IgnoreProjectExtensions = new List<string>();
             Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             Targets = new List<string>();
+            AdditionalArguments = new List<string>();
         }
 
         /// <summary>
@@ -154,6 +160,9 @@ namespace Photon.MSBuild
 
             if (!string.IsNullOrEmpty(ProjectFile))
                 yield return $"\"{ProjectFile}\"";
+
+            foreach (var arg in AdditionalArguments)
+                yield return arg;
         }
 
         private string GetVerbosityString()

@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Photon.Framework.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Photon.Framework.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -81,7 +83,9 @@
     <Compile Include="Packages\IPackageMetadata.cs" />
     <Compile Include="Pooling\ReferencePool.cs" />
     <Compile Include="Process\ProcessClient.cs" />
+    <Compile Include="Process\ProcessExitCodeException.cs" />
     <Compile Include="Process\ProcessRunInfo.cs" />
+    <Compile Include="Process\ProcessWrapperBase.cs" />
     <Compile Include="Projects\IProjectSource.cs" />
     <Compile Include="Projects\ProjectBuildTask.cs" />
     <Compile Include="Projects\ProjectEnvironment.cs" />

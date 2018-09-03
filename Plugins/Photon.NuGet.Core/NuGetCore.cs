@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.NuGetPlugin
+namespace Photon.NuGet.CorePlugin
 {
     public class NuGetCore : IDisposable
     {
