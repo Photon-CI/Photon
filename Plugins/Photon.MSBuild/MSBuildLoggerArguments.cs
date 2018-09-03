@@ -131,10 +131,10 @@ namespace Photon.MSBuild
             foreach (var logger in DistributedLoggers)
                 yield return $"/dl:\"{logger}\"";
 
-            if (FileLogger[0]) yield return "/fl";
+            if (FileLogger.Default) yield return "/fl";
 
-            foreach (var key in FileLoggerParameters[0].Keys)
-                yield return $"/flp:{key}=\"{FileLoggerParameters[0][key]}\"";
+            foreach (var key in FileLoggerParameters.Default.Keys)
+                yield return $"/flp:{key}=\"{FileLoggerParameters.Default[key]}\"";
 
             for (var i = 1; i < 10; i++) {
                 if (FileLogger[i]) yield return $"/fl{i}";
