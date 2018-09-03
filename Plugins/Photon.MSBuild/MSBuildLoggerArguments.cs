@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Photon.MSBuild
 {
@@ -68,6 +67,9 @@ namespace Photon.MSBuild
         {
             ConsoleLoggerParameters = MSBuildConsoleLoggerParameters.Default;
             DistributedLoggers = new List<string>();
+            FileLogger = new FileLoggerIndex();
+            FileLoggerParameters = new FileLoggerParameterIndex();
+            Loggers = new List<string>();
         }
 
         /// <summary>
