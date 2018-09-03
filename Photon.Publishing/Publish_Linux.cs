@@ -50,7 +50,7 @@ namespace Photon.Publishing
                     ["Configuration"] = "Release",
                     ["Platform"] = "Any CPU",
                 },
-                Verbosity = MSBuildVerbosityLevel.Minimal,
+                Verbosity = MSBuildVerbosityLevels.Minimal,
                 NodeReuse = false,
                 NoLogo = true,
                 MaxCpuCount = 0,
