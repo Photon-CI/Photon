@@ -87,12 +87,14 @@ namespace Photon.MSBuild
         /// Specifies the amount of information to display in the build log. Each logger displays events
         /// based on the verbosity level that you set for that logger.
         /// </summary>
-        public MSBuildVerbosityLevel Verbosity {get; set;}
+        public MSBuildVerbosityLevels Verbosity {get; set;}
 
         /// <summary>
         /// Display version information only. The project isn't built.
         /// </summary>
         public bool Version {get; set;}
+
+        public MSBuildLoggerArguments Logger {get; set;}
 
         /// <summary>
         /// Allows additional undefined arguments to be provided.
@@ -104,10 +106,11 @@ namespace Photon.MSBuild
         {
             MaxCpuCount = 1;
             NodeReuse = true;
-            Verbosity = MSBuildVerbosityLevel.Normal;
+            Verbosity = MSBuildVerbosityLevels.Normal;
             IgnoreProjectExtensions = new List<string>();
             Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             Targets = new List<string>();
+            Logger = new MSBuildLoggerArguments();
             AdditionalArguments = new List<string>();
         }
 
@@ -152,38 +155,20 @@ namespace Photon.MSBuild
             if (!string.IsNullOrEmpty(Validate))
                 yield return $"/val:\"{Validate}\"";
 
-            if (Verbosity != MSBuildVerbosityLevel.Normal)
-                yield return $"/v:{GetVerbosityString()}";
+            if (Verbosity != MSBuildVerbosityLevels.Normal)
+                yield return $"/v:{MSBuildVerbosityLevel.GetString(Verbosity)}";
 
             if (Version)
                 yield return "/ver";
 
-            if (!string.IsNullOrEmpty(ProjectFile))
-                yield return $"\"{ProjectFile}\"";
-
             foreach (var arg in AdditionalArguments)
                 yield return arg;
-        }
 
-        private string GetVerbosityString()
-        {
-            switch (Verbosity) {
-                case MSBuildVerbosityLevel.Quiet: return "q";
-                case MSBuildVerbosityLevel.Minimal: return "m";
-                case MSBuildVerbosityLevel.Detailed: return "d";
-                case MSBuildVerbosityLevel.Diagnostic: return "diag";
-                default:
-                case MSBuildVerbosityLevel.Normal: return "n";
-            }
-        }
-    }
+            foreach (var arg in Logger.GetArguments())
+                yield return arg;
 
-    public enum MSBuildVerbosityLevel
-    {
-        Quiet,
-        Minimal,
-        Normal,
-        Detailed,
-        Diagnostic,
+            if (!string.IsNullOrEmpty(ProjectFile))
+                yield return $"\"{ProjectFile}\"";
+        }
     }
 }

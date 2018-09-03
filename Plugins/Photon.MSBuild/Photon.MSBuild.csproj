@@ -43,6 +43,9 @@
   <ItemGroup>
     <Compile Include="MSBuildArguments.cs" />
     <Compile Include="MSBuildCommand.cs" />
+    <Compile Include="MSBuildConsoleLoggerParameters.cs" />
+    <Compile Include="MSBuildLoggerArguments.cs" />
+    <Compile Include="MSBuildVerbosityLevel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
