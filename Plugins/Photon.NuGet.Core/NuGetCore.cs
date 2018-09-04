@@ -72,7 +72,7 @@ namespace Photon.NuGet.CorePlugin
             sourceRepository = new SourceRepository(PackageSource, providers);
         }
 
-        public async Task<string[]> GetAllPackageVersions(string packageId, CancellationToken token)
+        public async Task<string[]> GetAllPackageVersions(string packageId, CancellationToken token = default(CancellationToken))
         {
             var searchResource = await sourceRepository.GetResourceAsync<FindPackageByIdResource>(token);
 
@@ -85,8 +85,11 @@ namespace Photon.NuGet.CorePlugin
             return versionList.Select(x => x.ToString()).ToArray();
         }
 
-        public void Pack(string nuspecFilename, string packageFilename, IDictionary<string, string> properties)
+        public void Pack(string nuspecFilename, string packageFilename)
         {
+            if (string.IsNullOrEmpty(nuspecFilename)) throw new ArgumentNullException(nameof(nuspecFilename));
+            if (string.IsNullOrEmpty(packageFilename)) throw new ArgumentNullException(nameof(packageFilename));
+
             var nuspecName = Path.GetFileName(nuspecFilename);
             var packageName = Path.GetFileName(packageFilename);
 
@@ -159,8 +162,10 @@ namespace Photon.NuGet.CorePlugin
             }
         }
 
-        public async Task PushAsync(string packageFilename, CancellationToken token)
+        public async Task PushAsync(string packageFilename, CancellationToken token = default(CancellationToken))
         {
+            if (string.IsNullOrEmpty(packageFilename)) throw new ArgumentNullException(nameof(packageFilename));
+
             var packageName = Path.GetFileName(packageFilename);
 
             Output?.WriteBlock()
