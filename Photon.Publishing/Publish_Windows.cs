@@ -186,6 +186,7 @@ namespace Photon.Publishing
             await nugetCmd.RunAsync(new NuGetPackArguments {
                 Filename = packageDefinitionFilename,
                 Version = assemblyVersion,
+                OutputDirectory = nugetPackageDir,
                 Properties = {
                     ["Configuration"] = "Release",
                     ["Platform"] = "AnyCPU",
@@ -196,6 +197,9 @@ namespace Photon.Publishing
             var packageFilename = Directory
                 .GetFiles(nugetPackageDir, $"{packageId}.*.nupkg")
                 .FirstOrDefault();
+
+            if (string.IsNullOrEmpty(packageFilename))
+                throw new ApplicationException($"No package found matching package ID '{packageId}'!");
 
             await nugetCore.PushAsync(packageFilename, token);
         }
