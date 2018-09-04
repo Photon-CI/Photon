@@ -93,11 +93,7 @@ namespace Photon.NuGet.CorePlugin
             var nuspecName = Path.GetFileName(nuspecFilename);
             var packageName = Path.GetFileName(packageFilename);
 
-            Output?.WriteBlock()
-                .Write("Parsing package definition ", ConsoleColor.DarkCyan)
-                .Write(nuspecName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan)
-                .Post();
+            Output?.WriteLine($"Parsing package definition '{nuspecName}'...", ConsoleColor.Gray);
 
             Manifest nuspec;
             try {
@@ -125,11 +121,7 @@ namespace Photon.NuGet.CorePlugin
                 throw;
             }
 
-            Output?.WriteBlock()
-                .Write("Creating Package ", ConsoleColor.DarkCyan)
-                .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan)
-                .Post();
+            Output?.WriteLine($"Creating Package '{packageName}'...", ConsoleColor.Gray);
 
             try {
                 var outputPath = Path.GetDirectoryName(packageFilename);
@@ -168,11 +160,7 @@ namespace Photon.NuGet.CorePlugin
 
             var packageName = Path.GetFileName(packageFilename);
 
-            Output?.WriteBlock()
-                .Write("Publishing Package ", ConsoleColor.DarkCyan)
-                .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan)
-                .Post();
+            Output?.WriteLine($"Publishing Package '{packageName}'...", ConsoleColor.Gray);
 
             try {
                 var updateResource = await sourceRepository.GetResourceAsync<PackageUpdateResource>(token);
