@@ -1,11 +1,11 @@
 ﻿using Photon.Framework.Agent;
 using Photon.Framework.Packages;
 using Photon.Framework.Tasks;
-using Photon.MSBuild;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.MSBuildPlugin;
 
 namespace Photon.Publishing
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Photon.MSBuild
+namespace Photon.MSBuildPlugin
 {
     /// <summary>
     /// Defines the collection of arguments that can be passed to MSBuild on the command line.

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Photon.NUnit</id>
+    <title>Photon NUnit Plugin</title>
+    <version>$version$</version>
+    <authors>null511, Photon.CI</authors>
+    <projectUrl>https://github.com/Photon-CI/Photon/tree/master/Plugins/Photon.NUnit</projectUrl>
+    <iconUrl>https://github.com/Photon-CI/Photon/raw/master/media/plugin_light.png</iconUrl>
+    <description>A Photon plugin for invoking NUnit.</description>
+    <copyright>Copyright 2018</copyright>
+    <tags>photon net automation NUnit</tags>
+    <dependencies>
+      <dependency id="Photon.Framework" version="$frameworkVersion$" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\*.dll" exclude="**\Photon.Framework.dll" />
+    <file src="bin\$configuration$\*.config" />
+  </files>
+</package>

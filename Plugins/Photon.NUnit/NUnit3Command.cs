@@ -5,25 +5,25 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.MSBuildPlugin
+namespace Photon.NUnitPlugin
 {
     /// <summary>
     /// Adapter for using MSBuild from the command line.
     /// </summary>
-    public class MSBuildCommand : ProcessWrapperBase
+    public class NUnit3Command : ProcessWrapperBase
     {
-        public MSBuildCommand(IDomainContext context = null) : base(context)
+        public NUnit3Command(IDomainContext context = null) : base(context)
         {
-            Exe = "msbuild";
+            Exe = "nunit3-console";
         }
 
-        public ProcessResult Run(MSBuildArguments arguments, CancellationToken cancelToken = default(CancellationToken))
+        public ProcessResult Run(NUnit3Arguments arguments, CancellationToken cancelToken = default(CancellationToken))
         {
             var argumentList = arguments.GetArguments().ToArray();
             return Execute(string.Join(" ", argumentList), cancelToken);
         }
 
-        public async Task<ProcessResult> RunAsync(MSBuildArguments arguments, CancellationToken cancelToken = default(CancellationToken))
+        public async Task<ProcessResult> RunAsync(NUnit3Arguments arguments, CancellationToken cancelToken = default(CancellationToken))
         {
             var argumentList = arguments.GetArguments().ToArray();
             return await ExecuteAsync(string.Join(" ", argumentList), cancelToken);

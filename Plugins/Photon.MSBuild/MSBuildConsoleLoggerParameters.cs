@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Photon.MSBuild
+namespace Photon.MSBuildPlugin
 {
     [Flags]
     public enum MSBuildConsoleLoggerParameters

@@ -2,7 +2,6 @@
 using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
-using Photon.MSBuild;
 using Photon.NuGet.CorePlugin;
 using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
@@ -11,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.MSBuildPlugin;
 
 namespace Photon.Publishing
 {
@@ -79,6 +79,7 @@ namespace Photon.Publishing
             await PublishPluginPackage("Photon.NuGet", token);
             await PublishPluginPackage("Photon.NuGet.Core", token);
             await PublishPluginPackage("Photon.IIS", token);
+            await PublishPluginPackage("Photon.NUnit", token);
         }
 
         private async Task BuildSolution(CancellationToken token)

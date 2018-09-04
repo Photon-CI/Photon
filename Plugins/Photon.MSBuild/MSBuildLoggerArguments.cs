@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Photon.MSBuild
+namespace Photon.MSBuildPlugin
 {
     public class MSBuildLoggerArguments
     {

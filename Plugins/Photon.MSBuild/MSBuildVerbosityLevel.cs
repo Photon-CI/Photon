@@ -1,4 +1,4 @@
-﻿namespace Photon.MSBuild
+﻿namespace Photon.MSBuildPlugin
 {
     public static class MSBuildVerbosityLevel
     {
