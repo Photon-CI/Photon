@@ -58,6 +58,7 @@ namespace Photon.Publishing
                     ".\\Photon.Tests\\bin\\Release\\Photon.Tests.dll",
                 },
                 Where = "cat == 'unit'",
+                NoHeader = true,
             }, token);
         }
     }

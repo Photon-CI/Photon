@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Photon.NuGet</id>
-    <title>Photon NuGet Plugin</title>
+    <id>Photon.NuGet.Core</id>
+    <title>Photon NuGet Core Plugin</title>
     <version>$version$</version>
     <authors>null511, Photon.CI</authors>
-    <projectUrl>https://github.com/Photon-CI/Photon/tree/master/Plugins/Photon.NuGet</projectUrl>
+    <projectUrl>https://github.com/Photon-CI/Photon/tree/master/Plugins/Photon.NuGet.Core</projectUrl>
     <iconUrl>https://github.com/Photon-CI/Photon/raw/master/media/plugin_light.png</iconUrl>
-    <description>A Photon plugin for interacting with NuGet using the command-line.</description>
+    <description>A Photon plugin for interacting with NuGet using the core libraries.</description>
     <copyright>Copyright 2018</copyright>
     <tags>photon net automation nuget</tags>
     <dependencies>
