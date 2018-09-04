@@ -2,6 +2,7 @@
 using Photon.Framework.Agent;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
+using Photon.MSBuildPlugin;
 using Photon.NuGet.CorePlugin;
 using Photon.NuGetPlugin;
 using Photon.Publishing.Internal;
@@ -10,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.MSBuildPlugin;
 
 namespace Photon.Publishing
 {

@@ -112,6 +112,10 @@
       <Project>{9eace28c-c3af-4d57-9b6a-6697a1e62e34}</Project>
       <Name>Photon.NuGet</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Plugins\Photon.NUnit\Photon.NUnit.csproj">
+      <Project>{ec4f12db-828b-48e3-aa92-d99806b6108d}</Project>
+      <Name>Photon.NUnit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

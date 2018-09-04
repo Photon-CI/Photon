@@ -1,31 +1,39 @@
 ﻿using Photon.Framework.Agent;
-using Photon.Framework.Process;
 using Photon.Framework.Tasks;
+using Photon.MSBuildPlugin;
+using Photon.NUnitPlugin;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.MSBuildPlugin;
 
 namespace Photon.Publishing
 {
     public class Build_Windows : IBuildTask
     {
+        private MSBuildCommand msbuild;
+        private NUnit3Command nunit;
+
         public IAgentBuildContext Context {get; set;}
 
 
         public async Task RunAsync(CancellationToken token)
         {
+            msbuild = new MSBuildCommand(Context) {
+                Exe = Context.AgentVariables["global"]["msbuild_exe"],
+                WorkingDirectory = Context.ContentDirectory,
+            };
+
+            nunit = new NUnit3Command(Context) {
+                Exe = Context.AgentVariables["global"]["nunit_exe"],
+                WorkingDirectory = Context.ContentDirectory,
+            };
+
             await BuildSolution(token);
             await UnitTest(token);
         }
 
         private async Task BuildSolution(CancellationToken token)
         {
-            var msbuild = new MSBuildCommand(Context) {
-                Exe = Context.AgentVariables["global"]["msbuild_exe"],
-                WorkingDirectory = Context.ContentDirectory,
-            };
-
-            var buildArgs = new MSBuildArguments {
+            await msbuild.RunAsync(new MSBuildArguments {
                 ProjectFile = "Photon.sln",
                 Targets = {"Rebuild"},
                 Properties = {
@@ -40,20 +48,17 @@ namespace Photon.Publishing
                 NodeReuse = false,
                 NoLogo = true,
                 MaxCpuCount = 0,
-            };
-
-            await msbuild.RunAsync(buildArgs, token);
+            }, token);
         }
 
         private async Task UnitTest(CancellationToken token)
         {
-            var info = new ProcessRunInfo {
-                Filename = Context.AgentVariables["global"]["nunit_exe"],
-                Arguments = "\".\\Photon.Tests\\bin\\Release\\Photon.Tests.dll\" --where=\"cat == 'unit'\"",
-                WorkingDirectory = Context.ContentDirectory,
-            };
-
-            await Context.Process.RunAsync(info, token);
+            await nunit.RunAsync(new NUnit3Arguments {
+                InputFiles = {
+                    ".\\Photon.Tests\\bin\\Release\\Photon.Tests.dll",
+                },
+                Where = "cat == 'unit'",
+            }, token);
         }
     }
 }
