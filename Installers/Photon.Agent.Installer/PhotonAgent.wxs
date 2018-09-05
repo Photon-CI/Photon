@@ -232,6 +232,9 @@
       <Component Id="Views_AccessDenied.html" Guid="3c957929-e106-4cb9-b76c-45de294afbfa">
         <File Id="Views_AccessDenied.html" Name="AccessDenied.html" Source="$(var.PhotonAgent_TargetDir)Views\AccessDenied.html" />
       </Component>
+      <Component Id="Views__ModelError.html" Guid="877eaac3-5f2e-4651-a373-bcf83e377272">
+        <File Id="Views__ModelError.html" Name="_ModelError.html" Source="$(var.PhotonAgent_TargetDir)Views\_ModelError.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>
@@ -367,6 +370,9 @@
     <ComponentGroup Id="Views_Applications_files" Directory="Views_Applications">
       <Component Id="Views_Applications_Index.html" Guid="fefa2420-552e-4202-8999-baf3c21cd8bf">
         <File Id="Views_Applications_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Applications\Index.html" />
+      </Component>
+      <Component Id="Views_Applications_Details.html" Guid="a7452ae5-7b00-4296-b1b6-6ac0010284f9">
+        <File Id="Views_Applications_Details.html" Name="Details.html" Source="$(var.PhotonAgent_TargetDir)Views\Applications\Details.html" />
       </Component>
     </ComponentGroup>
   </Fragment>
