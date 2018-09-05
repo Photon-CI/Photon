@@ -12,6 +12,14 @@ namespace Photon.Framework
         public CancellationToken Token => mergedTokenSource?.Token ?? parentToken;
 
 
+        public TimeoutTokenSource(TimeSpan timeout, CancellationToken parentToken = default(CancellationToken))
+        {
+            this.parentToken = parentToken;
+
+            timeoutTokenSource = new CancellationTokenSource(timeout);
+            mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token, parentToken);
+        }
+
         public TimeoutTokenSource(int timeoutMs = 0, CancellationToken parentToken = default(CancellationToken))
         {
             this.parentToken = parentToken;

@@ -2,6 +2,7 @@
 using Photon.Framework.Pooling;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Photon.Agent.Internal.Session
@@ -43,10 +44,12 @@ namespace Photon.Agent.Internal.Session
             Log.Info("Session pool stopped.");
         }
 
-        public void Abort()
+        public async Task Abort()
         {
-            foreach (var session in pool.Items)
-                session.Abort();
+            var abortTaskList = pool.Items
+                .Select(x => x.AbortAsync()).ToArray();
+
+            await Task.WhenAll(abortTaskList);
         }
 
         public void BeginSession(AgentSessionBase session)

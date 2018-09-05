@@ -12,16 +12,16 @@ namespace Photon.Agent.MessageHandlers
         private static readonly ILog Log = LogManager.GetLogger(typeof(SessionCancelProcessor));
 
 
-        public override Task<IResponseMessage> Process(SessionCancelRequest requestMessage)
+        public override async Task<IResponseMessage> Process(SessionCancelRequest requestMessage)
         {
             if (PhotonAgent.Instance.Sessions.TryGet(requestMessage.AgentSessionId, out var session)) {
-                session.Cancel();
+                await session.AbortAsync();
             }
             else {
                 Log.Error($"Failed to cancel session '{requestMessage.AgentSessionId}'. Session not found!");
             }
 
-            return Task.FromResult<IResponseMessage>(null);
+            return null;
         }
     }
 }

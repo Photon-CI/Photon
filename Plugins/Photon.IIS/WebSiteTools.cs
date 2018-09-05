@@ -1,4 +1,5 @@
 ﻿using Microsoft.Web.Administration;
+using Photon.Framework.Extensions;
 using System;
 using System.Linq;
 using System.Threading;
@@ -25,20 +26,11 @@ namespace Photon.Plugins.IIS
                 handle.CommitChanges();
 
                 if (!TryFind(websiteName, out webSite)) {
-                    using (var block = handle.Context.Output.WriteBlock()) {
-                        block.Write("Unable to create WebSite ", ConsoleColor.DarkRed);
-                        block.Write(websiteName, ConsoleColor.Red);
-                        block.WriteLine("!", ConsoleColor.DarkRed);
-                    }
-
-                    throw new Exception($"Unable to create WebSite '{websiteName}'!");
+                    handle.Context.WriteErrorBlock($"Failed to create IIS WebSite '{websiteName}'!");
+                    throw new Exception($"Failed to create IIS WebSite '{websiteName}'!");
                 }
 
-                using (var block = handle.Context.Output.WriteBlock()) {
-                    block.Write("Created new WebSite ", ConsoleColor.DarkBlue);
-                    block.Write(websiteName, ConsoleColor.Blue);
-                    block.WriteLine(".", ConsoleColor.DarkBlue);
-                }
+                handle.Context.WriteActionBlock($"Created new IIS WebSite '{websiteName}'.");
             }
 
             // TODO: Set Port

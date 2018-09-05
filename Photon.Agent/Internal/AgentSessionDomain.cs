@@ -30,18 +30,18 @@ namespace Photon.Agent.Internal
 
             Log.Debug($"Running build Task '{context.TaskName}'...");
 
-            var completeEvent = new RemoteTaskCompletionSource();
-            token.Register(completeEvent.SetCancelled);
+            using (var completeEvent = new RemoteTaskCompletionSource())
+            using (token.Register(completeEvent.SetCancelled)) {
+                try {
+                    Agent.RunBuildTask(context, completeEvent);
+                    await completeEvent.Task;
 
-            try {
-                Agent.RunBuildTask(context, completeEvent);
-                await completeEvent.Task;
-
-                Log.Info($"Build Task '{context.TaskName}' complete.");
-            }
-            catch (Exception error) {
-                Log.Error($"Build Task '{context.TaskName}' failed!", error);
-                throw;
+                    Log.Info($"Build Task '{context.TaskName}' complete.");
+                }
+                catch (Exception error) {
+                    Log.Error($"Build Task '{context.TaskName}' failed!", error);
+                    throw;
+                }
             }
         }
 
@@ -51,18 +51,18 @@ namespace Photon.Agent.Internal
 
             Log.Debug($"Running deployment Task '{context.TaskName}'...");
 
-            var completeEvent = new RemoteTaskCompletionSource();
-            token.Register(completeEvent.SetCancelled);
+            using (var completeEvent = new RemoteTaskCompletionSource()) 
+            using (token.Register(completeEvent.SetCancelled)) {
+                try {
+                    Agent.RunDeployTask(context, completeEvent);
+                    await completeEvent.Task;
 
-            try {
-                Agent.RunDeployTask(context, completeEvent);
-                await completeEvent.Task;
-
-                Log.Info($"Deployment Task '{context.TaskName}' complete.");
-            }
-            catch (Exception error) {
-                Log.Error($"Deployment Task '{context.TaskName}' failed!", error);
-                throw;
+                    Log.Info($"Deployment Task '{context.TaskName}' complete.");
+                }
+                catch (Exception error) {
+                    Log.Error($"Deployment Task '{context.TaskName}' failed!", error);
+                    throw;
+                }
             }
         }
     }

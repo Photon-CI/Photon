@@ -79,7 +79,13 @@ namespace Photon.Agent.Internal.Session
                     await NotifyGithubStarted(githubSource);
 
                 try {
-                    await Domain.RunBuildTask(context, TokenSource.Token);
+                    var task = Task.Run(async () => {
+                        await Domain.RunBuildTask(context, TokenSource.Token);
+                    });
+                    await taskList.AddOrUpdate(taskSessionId, id => task, (id, _) => task);
+                    await task.ContinueWith(t => {
+                        taskList.TryRemove(taskSessionId, out _);
+                    });
                 }
                 catch (Exception error) {
                     Exception = error;

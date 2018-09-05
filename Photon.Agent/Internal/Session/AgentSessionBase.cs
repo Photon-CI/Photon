@@ -8,9 +8,12 @@ using Photon.Framework.Server;
 using Photon.Framework.Tools;
 using Photon.Framework.Variables;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework;
 
 namespace Photon.Agent.Internal.Session
 {
@@ -19,6 +22,7 @@ namespace Photon.Agent.Internal.Session
         public event EventHandler ReleaseEvent;
 
         protected readonly CancellationTokenSource TokenSource;
+        protected readonly ConcurrentDictionary<string, Task> taskList;
         private readonly Lazy<ILog> _log;
         public DateTime TimeCreated {get;}
         public DateTime? TimeReleased {get; private set;}
@@ -58,6 +62,7 @@ namespace Photon.Agent.Internal.Session
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
             TokenSource = new CancellationTokenSource();
+            taskList = new ConcurrentDictionary<string, Task>(StringComparer.Ordinal);
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
             Output = new SessionOutput(transceiver, ServerSessionId, SessionClientId);
@@ -84,10 +89,10 @@ namespace Photon.Agent.Internal.Session
             Domain?.Dispose();
         }
 
-        public void Cancel()
-        {
-            TokenSource?.Cancel();
-        }
+        //public void Cancel()
+        //{
+        //    TokenSource?.Cancel();
+        //}
 
         public virtual void OnSessionBegin() {}
         public virtual void OnSessionEnd() {}
@@ -143,11 +148,18 @@ namespace Photon.Agent.Internal.Session
             PhotonAgent.Instance.ApplicationMgr.Save();
         }
 
-        public void Abort()
+        public async Task AbortAsync()
         {
             TokenSource.Cancel();
 
-            // TODO: Wait?
+            var timeout = TimeSpan.FromSeconds(30);
+            var tasks = taskList.Values.ToArray();
+
+            using (var timeoutTokenSource = new TimeoutTokenSource(timeout)) {
+                await Task.Run(async () => await Task.WhenAll(tasks), timeoutTokenSource.Token);
+            }
+
+            await ReleaseAsync();
         }
 
         public bool IsExpired()

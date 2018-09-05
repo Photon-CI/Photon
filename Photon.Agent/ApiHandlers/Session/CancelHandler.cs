@@ -1,17 +1,19 @@
-﻿using System;
-using log4net;
+﻿using log4net;
 using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Agent.ApiHandlers.Session
 {
     [HttpHandler("/api/session/cancel")]
-    internal class CancelHandler : HttpHandler
+    internal class CancelHandler : HttpHandlerAsync
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(CancelHandler));
 
 
-        public override HttpHandlerResult Post()
+        public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
             var sessionId = GetQuery("id");
 
@@ -22,7 +24,7 @@ namespace Photon.Agent.ApiHandlers.Session
                 return Response.BadRequest().SetText($"Session '{sessionId}' was not found!");
 
             try {
-                session.Abort();
+                await session.AbortAsync();
             }
             catch (Exception error) {
                 Log.Warn($"Failed to cancel session '{sessionId}'!", error);

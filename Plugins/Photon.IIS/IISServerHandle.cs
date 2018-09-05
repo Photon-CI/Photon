@@ -3,6 +3,7 @@ using Photon.Framework.Domain;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Photon.Framework;
 
 namespace Photon.Plugins.IIS
 {
@@ -12,6 +13,7 @@ namespace Photon.Plugins.IIS
         private ServerManager _server;
 
         public IDomainContext Context {get;}
+        public TimeSpan CommitTimeout {get; set;}
         public ServerManager Server => GetServer();
 
 
@@ -19,6 +21,8 @@ namespace Photon.Plugins.IIS
         {
             this.Context = context;
             this.serverName = serverName;
+
+            CommitTimeout = TimeSpan.FromSeconds(60);
         }
 
         public void Dispose()
@@ -26,27 +30,25 @@ namespace Photon.Plugins.IIS
             _server?.Dispose();
         }
 
-        public bool CommitChanges()
+        public bool CommitChanges(CancellationToken token = default(CancellationToken))
         {
-            _server.CommitChanges();
-
-            return DisposeServer();
-        }
-
-        public bool CommitChanges(TimeSpan timeout)
-        {
-            using (var tokenSource = new CancellationTokenSource(timeout)) {
-                Task.Run(() => _server.CommitChanges(), tokenSource.Token);
+            using (var timeoutToken = new TimeoutTokenSource(CommitTimeout, token)) {
+                return Task.Run(() => {
+                    _server.CommitChanges();
+                    return DisposeServer();
+                }, timeoutToken.Token)
+                    .GetAwaiter().GetResult();
             }
-
-            return DisposeServer();
         }
 
-        public async Task<bool> CommitChangesAsync(CancellationToken token)
+        public async Task<bool> CommitChangesAsync(CancellationToken token = default(CancellationToken))
         {
-            await Task.Run(() => _server.CommitChanges(), token);
-
-            return DisposeServer();
+            using (var timeoutToken = new TimeoutTokenSource(CommitTimeout, token)) {
+                return await Task.Run(() => {
+                    _server.CommitChanges();
+                    return DisposeServer();
+                }, timeoutToken.Token);
+            }
         }
 
         private ServerManager GetServer()

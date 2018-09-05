@@ -119,7 +119,13 @@ namespace Photon.Agent.Internal.Session
             };
 
             try {
-                await Domain.RunDeployTask(context, TokenSource.Token);
+                var task = Task.Run(async () => {
+                    await Domain.RunDeployTask(context, TokenSource.Token);
+                });
+                await taskList.AddOrUpdate(taskSessionId, id => task, (id, _) => task);
+                await task.ContinueWith(t => {
+                    taskList.TryRemove(taskSessionId, out _);
+                });
             }
             catch (Exception error) {
                 Exception = error;
@@ -127,9 +133,6 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        public override async Task CompleteAsync()
-        {
-            // TODO ?
-        }
+        public override async Task CompleteAsync() {}
     }
 }
