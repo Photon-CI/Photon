@@ -8,7 +8,6 @@ namespace Photon.Agent.ViewHandlers.Security
     [Secure]
     [RequiresRoles(GroupRole.SecurityView)]
     [HttpHandler("/security")]
-    [HttpHandler("/security/index")]
     internal class SecurityIndexHandler : HttpHandler
     {
         public override HttpHandlerResult Get()

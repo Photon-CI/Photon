@@ -1,0 +1,92 @@
+﻿{{#Master Master.html}}
+
+{{#Script}}
+<script>
+    $(function () {
+        $('#layoutNavbarContent [data-link="security"]').addClass('active');
+    });
+
+    function onDomainEnabledClick() {
+        var isDomainEnabled = $('#DomainEnabledCheckBox').is(':checked');
+        $('#PasswordTextBox').prop('disabled', isDomainEnabled);
+    }
+
+    function onDeleteClick() {
+        $('#EditUserForm')
+            .attr('action', '{{#Url security/user/delete}}')
+            .submit();
+    }
+</script>
+{{#EndScript}}
+
+<form id="EditUserForm" method="post">
+    <nav class="navbar navbar-dark bg-dark content-navbar">
+        <div class="navbar-brand mr-auto">
+            <h3 class="text-info my-0">Edit User</h3>
+        </div>
+        <div>
+            {{#If UserId}}
+            <button type="button" class="btn btn-danger" onclick="onDeleteClick()">
+                <i class="fas fa-trash"></i>&nbsp;Delete
+            </button>
+            {{#EndIf}}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>&nbsp;Save
+            </button>
+        </div>
+    </nav>
+
+    <input type="hidden" name="UserId" value="{{UserId}}" />
+    <div class="container mt-3 mb-2">
+        {{#If Errors}}
+        <div class="mb-3">
+            {{#Each Errors.error}}
+            <div class="alert alert-danger">
+                {{error}}
+            </div>
+            {{#EndEach}}
+        </div>
+        {{#EndIf}}
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="DisplayNameTextBox">Display Name</label>
+                    <input id="DisplayNameTextBox" name="UserDisplayName" type="text" class="form-control" value="{{UserDisplayName}}" />
+                    <small class="text-muted">The name that will be displayed.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="UsernameTextBox">Username</label>
+                    <input id="UsernameTextBox" name="UserUsername" type="text" class="form-control" value="{{UserUsername}}" />
+                    <small class="text-muted">The username to authenticate with.</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="PasswordTextBox">Password</label>
+                    <input id="PasswordTextBox" name="UserPassword" type="password" class="form-control" value="{{UserPassword}}" {{#If UserDomainEnabled}} disabled{{#EndIf}} />
+                    <small class="text-muted">The password to authenticate with. Not required for domain enabled accounts.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="line-height: 1.2;">
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input id="EnabledCheckBox" name="UserEnabled" type="checkbox" class="form-check-input" {{#If UserEnabled}} checked{{#EndIf}} />
+                    <label for="EnabledCheckBox" class="form-check-label">Enabled</label>
+                </div>
+                <small class="text-muted">Allow the user to authenticate using this account.</small>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input id="DomainEnabledCheckBox" name="UserDomainEnabled" type="checkbox" class="form-check-input" onclick="onDomainEnabledClick()" {{#If UserDomainEnabled}} checked{{#EndIf}} />
+                    <label for="DomainEnabledCheckBox" class="form-check-label">Domain Enabled</label>
+                </div>
+                <small class="text-muted">Allow the user to authenticate using this account.</small>
+            </div>
+        </div>
+    </div>
+</form>

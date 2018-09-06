@@ -97,6 +97,8 @@ namespace Photon.Agent.Internal
             // Load existing or default agent configuration
             AgentConfiguration.Load();
 
+            UserMgr.Directory = Configuration.Directory;
+
             SecurityTest.Initialize(UserMgr);
             ApplicationMgr.Initialize();
 

@@ -97,6 +97,7 @@
     </Compile>
     <Compile Include="ApiHandlers\Applications\ApplicationJsonHandler.cs" />
     <Compile Include="ApiHandlers\ConfigurationHandler.cs" />
+    <Compile Include="ApiHandlers\Security\SecurityDomainEnabledHandler.cs" />
     <Compile Include="ApiHandlers\Security\SecurityEnabledHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
     <Compile Include="ApiHandlers\LogHandler.cs" />
@@ -128,6 +129,9 @@
     <Compile Include="ViewHandlers\LoginHandler.cs" />
     <Compile Include="ViewHandlers\LogoutHandler.cs" />
     <Compile Include="Internal\Security\RequiresRolesAttribute.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityDeleteUserHandler.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityEditGroupHandler.cs" />
+    <Compile Include="ViewHandlers\Security\SecurityEditUserHandler.cs" />
     <Compile Include="ViewHandlers\Security\SecurityIndexHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionDetailsHandler.cs" />
     <Compile Include="ViewHandlers\Session\SessionIndexHandler.cs" />
@@ -169,6 +173,8 @@
     <Compile Include="ViewModels\LoginVM.cs" />
     <Compile Include="ViewModels\Configuration\ConfigurationIndexVM.cs" />
     <Compile Include="ViewModels\MasterVM.cs" />
+    <Compile Include="ViewModels\Security\SecurityEditGroupVM.cs" />
+    <Compile Include="ViewModels\Security\SecurityEditUserVM.cs" />
     <Compile Include="ViewModels\Security\SecurityIndexVM.cs" />
     <Compile Include="ViewModels\Session\SessionDetailsVM.cs" />
     <Compile Include="ViewModels\VariableSet\VariableSetEditJsonVM.cs" />
@@ -221,6 +227,15 @@
     </Content>
     <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.woff2">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-solid-900.woff2</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Security\EditGroup.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Security\EditUser.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Security\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\_ModelError.html">
@@ -359,9 +374,6 @@
     <Content Include="Views\Login.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Security\Index.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Views\Session\Index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -398,6 +410,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="TransformXml" AssemblyFile="..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\tools\VSToolsPath\Web\Microsoft.Web.Publishing.Tasks.dll" />
   <Target Name="App_config_AfterCompile" AfterTargets="AfterCompile" Condition="Exists('App.$(Configuration).config')">

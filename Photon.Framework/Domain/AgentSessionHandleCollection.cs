@@ -61,7 +61,9 @@ namespace Photon.Framework.Domain
             var taskList = new List<Task>();
             foreach (var task in taskNames) {
                 foreach (var session in agentSessionList) {
-                    taskList.Add(session.RunTaskAsync(task, token));
+                    taskList.Add(Task.Run(async () => {
+                        await session.RunTaskAsync(task, token);
+                    }, token));
                 }
             }
 
@@ -83,10 +85,10 @@ namespace Photon.Framework.Domain
                 throw;
             }
             catch (Exception error) {
-                context.Output.WriteBlock()
-                    .Write("Failed to run tasks! ", ConsoleColor.Red)
-                    .WriteLine(error.Message, ConsoleColor.DarkYellow)
-                    .Post();
+                using (var block = context.Output.WriteBlock()) {
+                    block.Write("Failed to run tasks! ", ConsoleColor.Red);
+                    block.WriteLine(error.Message, ConsoleColor.DarkYellow);
+                }
 
                 throw;
             }

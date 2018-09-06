@@ -8,6 +8,7 @@ namespace Photon.Agent.ViewModels
     internal class MasterVM
     {
         public bool IsSecured {get; set;}
+        public HttpUserContext UserContext {get; set;}
         public bool ShowSessions {get; set;}
         public bool ShowVariables {get; set;}
         public bool ShowApplications {get; set;}
@@ -22,17 +23,16 @@ namespace Photon.Agent.ViewModels
             if (IsSecured) {
                 var httpSecurity = (HttpSecurityManager)PhotonAgent.Instance.HttpContext.SecurityMgr;
 
-                if (!httpSecurity.TryGetUserContext(handler.HttpContext.Request, out var user))
-                    return;
+                UserContext = httpSecurity.GetUserContext(handler.HttpContext.Request);
+                if (UserContext == null) return;
 
-                var userId = user.UserId;
                 var userMgr = PhotonAgent.Instance.UserMgr;
 
-                ShowSessions = userMgr.UserHasRole(userId, GroupRole.SessionView);
-                ShowVariables = userMgr.UserHasRole(userId, GroupRole.VariablesView);
-                ShowApplications = userMgr.UserHasRole(userId, GroupRole.ApplicationView);
-                ShowSecurity = userMgr.UserHasRole(userId, GroupRole.SecurityView);
-                ShowConfiguration = userMgr.UserHasRole(userId, GroupRole.ConfigurationView);
+                ShowSessions = userMgr.UserHasRole(UserContext.UserId, GroupRole.SessionView);
+                ShowVariables = userMgr.UserHasRole(UserContext.UserId, GroupRole.VariablesView);
+                ShowApplications = userMgr.UserHasRole(UserContext.UserId, GroupRole.ApplicationView);
+                ShowSecurity = userMgr.UserHasRole(UserContext.UserId, GroupRole.SecurityView);
+                ShowConfiguration = userMgr.UserHasRole(UserContext.UserId, GroupRole.ConfigurationView);
             }
             else {
                 ShowSessions = true;

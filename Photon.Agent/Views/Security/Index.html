@@ -4,29 +4,66 @@
 <script>
     $(function () {
         $('#layoutNavbarContent [data-link="security"]').addClass('active');
+
+        $('#GroupListSearch').on('input', onGroupSearchChanged);
+        onGroupSearchChanged();
+
+        $('#UserListSearch').on('input', onUserSearchChanged);
+        onUserSearchChanged();
     });
 
-    function enableSecurity() {
-        $(this).attr('disabled', true);
+    function editGroup(row) {
+        var id = $(row).attr('data-id');
+        var url = '{{#Url security/group/edit}}';
+
+        var _id = encodeURIComponent(id);
+        document.location = url+'?id='+_id;
+    }
+
+    function editUser(row) {
+        var id = $(row).attr('data-id');
+        var url = '{{#Url security/user/edit}}';
+
+        var _id = encodeURIComponent(id);
+        document.location = url+'?id='+_id;
+    }
+
+    function enableSecurity(ctrl) {
+        $(ctrl).prop('disabled', true);
 
         requestSecurityEnabled('true')
-            .done(function() {
+            .done(function () {
                 document.location.reload();
-            }).fail(function() {
-                $(this).attr('disabled', false);
+            }).fail(function () {
                 alert('Failed to enable security!');
+                $(ctrl).prop('disabled', false);
             });
     }
 
-    function disableSecurity() {
-        $(this).attr('disabled', true);
+    function disableSecurity(ctrl) {
+        $(ctrl).prop('disabled', true);
 
         requestSecurityEnabled('false')
             .done(function () {
                 document.location.reload();
             }).fail(function () {
-                $(this).attr('disabled', false);
                 alert('Failed to enable security!');
+                $(ctrl).prop('disabled', false);
+            });
+    }
+
+    function onDomainEnabledChanged(ctrl) {
+        $(ctrl).prop('disabled', true);
+
+        var isChecked = $(ctrl).is(':checked');
+        var value = isChecked ? 'true' : 'false';
+
+        requestDomainEnabled(value)
+            .fail(function () {
+                alert('Failed to toggle domain security!');
+                $(ctrl).prop('checked', !isChecked);
+            }).always(function() {
+                $(ctrl).prop('disabled', false);
             });
     }
 
@@ -34,46 +71,209 @@
         var _value = encodeURIComponent(value);
 
         return $.ajax({
-            url: '{{#Url api/security/enabled}}?value='+_value,
+            url: '{{#Url api/security/enabled}}?value=' + _value,
             method: 'POST',
             dataType: 'text'
+        });
+    }
+
+    function requestDomainEnabled(value) {
+        var _value = encodeURIComponent(value);
+
+        return $.ajax({
+            url: '{{#Url api/security/domain/enabled}}?value=' + _value,
+            method: 'POST',
+            dataType: 'text'
+        });
+    }
+
+    function onGroupSearchChanged() {
+        var searchText = $('#GroupListSearch').val();
+
+        $('#GroupListTable tbody tr').each(function (i, e) {
+            var visible = false;
+
+            if (searchText.length === 0) {
+                visible = true;
+            } else {
+                var val = $(e).find('td')[0].innerText;
+
+                if (val.match(new RegExp(searchText, "i")))
+                    visible = true;
+            }
+
+            $(e).toggle(visible);
+        });
+    }
+
+    function onUserSearchChanged() {
+        var searchText = $('#UserListSearch').val();
+
+        $('#UserListTable tbody tr').each(function (i, e) {
+            var visible = false;
+
+            if (searchText.length === 0) {
+                visible = true;
+            } else {
+                var val = $(e).find('td')[0].innerText;
+
+                if (val.match(new RegExp(searchText, "i")))
+                    visible = true;
+            }
+
+            $(e).toggle(visible);
         });
     }
 </script>
 {{#EndScript}}
 
+{{#Style}}
+<style>
+    .user-group-row {
+        cursor: pointer;
+    }
+    .table-header {
+        color: #495057;
+        background-color: #e9ecef;
+        /*border: solid 1px #dee2e6;*/
+        font-weight: 700;
+        line-height: 32px;
+        padding: 2px;
+    }
+</style>
+{{#EndStyle}}
+
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto"></div>
 </nav>
 
-<div class="bg-light p-1">
+{{#If Master.IsSecured}}
+<div class="bg-info p-1">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <b class="text-light">Security is enabled.</b>
+            {{#If UserCanEdit}}
+            <a href="javascript:disableSecurity(this)" class="text-warning">
+                <i class="fas fa-lock-open"></i>&nbsp;<b>Disable Security</b>
+            </a>
+            {{#EndIf}}
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card text-center mt-3 mb-2">
+        <div class="card-header">
+            <ul id="SecurityTabs" class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <a id="GroupsTab" href="#groups" class="nav-link active" role="tab" data-toggle="tab">Groups</a>
+                </li>
+                <li class="nav-item">
+                    <a id="UsersTab" href="#users" class="nav-link" role="tab" data-toggle="tab">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a id="DomainTab" href="#domain" class="nav-link" role="tab" data-toggle="tab">Domain</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body text-left">
+            <div class="tab-content" id="myTabContent">
+                <div id="groups" class="tab-pane fade show active" role="tabpanel">
+                    <div class="border">
+                        <div class="table-header border-bottom clearfix">
+                            <div class="float-right">
+                                {{#If UserCanEdit}}
+                                <a href="{{#Url security/group/edit}}" class="text-success mr-2">New Group</a>
+                                {{#EndIf}}
+                                <form class="d-inline-block" style="width: 200px;">
+                                    <div class="input-group input-group-sm">
+                                        <input id="GroupListSearch" type="text" class="form-control"/>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <span class="px-1">Groups</span>
+                        </div>
+                        <div style="max-height: 600px; overflow-y: auto">
+                            <table id="GroupListTable" class="table table-sm table-hover bg-light m-0">
+                                <tbody>
+                                {{#Each UserGroups.group}}
+                                <tr class="user-group-row" data-id="{{group.Id}}" onclick="editGroup(this)">
+                                    <td>{{group.Name}}</td>
+                                </tr>
+                                {{#EndEach}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="users" class="tab-pane fade" role="tabpanel">
+                    <div class="border">
+                        <div class="table-header border-bottom clearfix">
+                            <div class="float-right">
+                                {{#If UserCanEdit}}
+                                <a href="{{#Url security/user/edit}}" class="text-success mr-2">New User</a>
+                                {{#EndIf}}
+                                <form class="d-inline-block" style="width: 200px;">
+                                    <div class="input-group input-group-sm">
+                                        <input id="UserListSearch" type="text" class="form-control" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <span class="px-1">Users</span>
+                        </div>
+                        <div style="max-height: 600px; overflow-y: auto">
+                            <table id="UserListTable" class="table table-sm table-hover bg-light m-0">
+                                <tbody>
+                                    {{#Each Users.user}}
+                                    <tr class="user-group-row" data-id="{{user.Id}}" onclick="editUser(this)">
+                                        <td>{{user.DisplayName}}</td>
+                                    </tr>
+                                    {{#EndEach}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="domain" class="tab-pane fade" role="tabpanel">
+                    <div class="form-group mt-3">
+                        <div class="form-check">
+                            <input id="DomainEnabledCheckbox" class="form-check-input" type="checkbox" onchange="onDomainEnabledChanged(this)" {{#If IsDomainEnabled}} checked{{#EndIf}} {{#If !UserCanEdit}} disabled{{#EndIf}}>
+                            <label for="DomainEnabledCheckbox" class="form-check-label">Enabled</label>
+                        </div>
+                        <small class="text-muted">Allows user credentials to be verified through an Active Directory controller.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{#Else}}
+<div class="bg-warning p-1">
     <div class="container">
         <div class="row h-100">
             <div class="col-12 col-md-4 col-lg-3 p-1 my-auto">
-                {{#If Master.IsSecured}}
-                <button class="btn btn-warning w-100" onclick="disableSecurity()">
-                    <i class="fas fa-lock-open"></i>&nbsp;Disable Security
-                </button>
-                {{#Else}}
-                <button class="btn btn-primary w-100" onclick="enableSecurity()">
+                <button class="btn btn-primary w-100" onclick="enableSecurity(this)">
                     <i class="fas fa-lock"></i>&nbsp;Enable Security
                 </button>
-                {{#EndIf}}
             </div>
             <div class="col-12 col-md-8 col-lg-9 py-1 my-auto">
-                <p class="align-middle m-0" style="line-height: 1.1">Enable security to require users to authenticate before accessing any resources.</p>
+                <b class="align-middle m-0 text-dark">Security is disabled!</b>
             </div>
         </div>
     </div>
 </div>
 
 <div class="container mt-3">
-    <div class="row">
-        <div class="col-3" style="height: 300px; background: #FAA;">
-
-        </div>
-        <div class="col-9" style="height: 300px; background: #AFA;">
-
-        </div>
-    </div>
+    <p>You must enable security before configuring security features.</p>
 </div>
+{{#EndIf}}
