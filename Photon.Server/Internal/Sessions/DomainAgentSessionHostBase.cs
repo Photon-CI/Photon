@@ -55,7 +55,7 @@ namespace Photon.Server.Internal.Sessions
             MessageClient.Disconnect();
         }
 
-        public async Task Abort(CancellationToken token = default(CancellationToken))
+        public void Abort() //(CancellationToken token = default(CancellationToken))
         {
             if (!MessageClient.IsConnected || string.IsNullOrEmpty(AgentSessionId)) return;
 
@@ -66,7 +66,7 @@ namespace Photon.Server.Internal.Sessions
                 Log.Error($"Failed to cancel Agent Session '{AgentSessionId}'! {error.Message}");
             }
 
-            await Tasks.Wait(token);
+            //await Tasks.Wait(token);
         }
 
         protected abstract Task OnBeginSession(CancellationToken token);

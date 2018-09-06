@@ -381,6 +381,12 @@
       <Component Id="Views_Security_Index.html" Guid="33d05a1b-902e-4fea-8084-ebaab13de32f">
         <File Id="Views_Security_Index.html" Name="Index.html" Source="$(var.PhotonAgent_TargetDir)Views\Security\Index.html" />
       </Component>
+      <Component Id="Views_Security_EditGroup.html" Guid="107d2c58-46cc-461c-90ca-9370b78ecf11">
+        <File Id="Views_Security_EditGroup.html" Name="EditGroup.html" Source="$(var.PhotonAgent_TargetDir)Views\Security\EditGroup.html" />
+      </Component>
+      <Component Id="Views_Security_EditUser.html" Guid="9cdb14ae-2f1f-40ff-bf66-6a4f1c6211ef">
+        <File Id="Views_Security_EditUser.html" Name="EditUser.html" Source="$(var.PhotonAgent_TargetDir)Views\Security\EditUser.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>

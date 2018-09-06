@@ -5,7 +5,11 @@ namespace Photon.Config
 {
     public static class ConfigTools
     {
-
+        //public static void ApplyWeb(string configFilename, string outputFilename)
+        //{
+        //    PathEx.Delete(outputFilename);
+        //    File.Copy(configFilename, outputFilename);
+        //}
 
         public static void Transform(string configFilename, string transformFilename, string outputFilename)
         {
