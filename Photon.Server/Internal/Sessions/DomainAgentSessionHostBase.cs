@@ -55,16 +55,18 @@ namespace Photon.Server.Internal.Sessions
             MessageClient.Disconnect();
         }
 
-        public void Abort()
+        public async Task Abort(CancellationToken token = default(CancellationToken))
         {
-            if (MessageClient.IsConnected && !string.IsNullOrEmpty(AgentSessionId)) {
-                try {
-                    OnCancelSession();
-                }
-                catch (Exception error) {
-                    Log.Error($"Failed to cancel Agent Session '{AgentSessionId}'! {error.Message}");
-                }
+            if (!MessageClient.IsConnected || string.IsNullOrEmpty(AgentSessionId)) return;
+
+            try {
+                OnCancelSession();
             }
+            catch (Exception error) {
+                Log.Error($"Failed to cancel Agent Session '{AgentSessionId}'! {error.Message}");
+            }
+
+            await Tasks.Wait(token);
         }
 
         protected abstract Task OnBeginSession(CancellationToken token);

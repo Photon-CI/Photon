@@ -1,8 +1,10 @@
 ﻿using Microsoft.Web.Administration;
+using Photon.Framework.Extensions;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Exception = System.Exception;
 
 namespace Photon.Plugins.IIS
 {
@@ -19,29 +21,16 @@ namespace Photon.Plugins.IIS
         public async Task<bool> StartAsync(string appPoolName, TimeSpan timeout)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                handle.Context.Output.WriteBlock()
-                    .Write("Application Pool ", ConsoleColor.DarkYellow)
-                    .Write(appPoolName, ConsoleColor.Yellow)
-                    .WriteLine(" not found.", ConsoleColor.DarkYellow)
-                    .Post();
-
+                handle.Context.WriteErrorBlock($"IIS Application Pool '{appPoolName}' not found!");
                 return false;
             }
 
             if (appPool.State == ObjectState.Started) {
-                handle.Context.Output.WriteBlock()
-                    .Write("Application Pool ", ConsoleColor.DarkBlue)
-                    .Write(appPoolName, ConsoleColor.Blue)
-                    .WriteLine(" is already started.", ConsoleColor.DarkBlue)
-                    .Post();
-
+                handle.Context.WriteTagLine($"IIS Application Pool '{appPoolName}' is already started.", ConsoleColor.White);
                 return true;
             }
 
             appPool.Start();
-
-            // TODO: Is this really necessary here?
-            //Server.CommitChanges();
 
             var startTime = DateTime.Now;
             while (appPool.State != ObjectState.Started && DateTime.Now - startTime < timeout) {
@@ -49,52 +38,28 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State != ObjectState.Started) {
-                handle.Context.Output.WriteBlock()
-                    .Write("A timeout was reached after ", ConsoleColor.DarkRed)
-                    .Write(timeout, ConsoleColor.Red)
-                    .Write(" waiting for Application Pool ", ConsoleColor.DarkRed)
-                    .Write(appPoolName, ConsoleColor.Red)
-                    .WriteLine(" to start!", ConsoleColor.DarkRed)
-                    .Post();
-
+                handle.Context.WriteErrorBlock($"A timeout was reached after {timeout} waiting for IIS Application Pool '{appPoolName}' to start!");
                 return false;
             }
 
-            handle.Context.Output.WriteBlock()
-                .Write("Application Pool ", ConsoleColor.DarkGreen)
-                .Write(appPoolName, ConsoleColor.Green)
-                .WriteLine(" started successfully.", ConsoleColor.DarkGreen)
-                .Post();
-
+            handle.Context.WriteTagLine($"IIS Application Pool '{appPoolName}' started successfully.", ConsoleColor.White);
             return true;
         }
 
         public async Task<bool> StopAsync(string appPoolName, TimeSpan timeout)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                handle.Context.Output.WriteBlock()
-                    .Write("Application Pool ", ConsoleColor.DarkYellow)
-                    .Write(appPoolName, ConsoleColor.Yellow)
-                    .WriteLine(" not found.", ConsoleColor.DarkYellow)
-                    .Post();
-
+                handle.Context.WriteErrorBlock($"IIS Application Pool '{appPoolName}' not found!");
                 return false;
             }
 
             if (appPool.State == ObjectState.Stopped) {
-                handle.Context.Output.WriteBlock()
-                    .Write("Application Pool ", ConsoleColor.DarkBlue)
-                    .Write(appPoolName, ConsoleColor.Blue)
-                    .WriteLine(" is already stopped.", ConsoleColor.DarkBlue)
-                    .Post();
+                handle.Context.WriteTagLine($"IIS Application Pool '{appPoolName}' is already stopped.", ConsoleColor.White);
 
                 return true;
             }
 
             appPool.Stop();
-
-            // TODO: Is this really necessary here?
-            //Server.CommitChanges();
 
             var startTime = DateTime.Now;
             while (appPool.State != ObjectState.Stopped && DateTime.Now - startTime < timeout) {
@@ -102,92 +67,86 @@ namespace Photon.Plugins.IIS
             }
 
             if (appPool.State != ObjectState.Stopped) {
-                handle.Context.Output.WriteBlock()
-                    .Write("A timeout was reached after ", ConsoleColor.DarkRed)
-                    .Write(timeout, ConsoleColor.Red)
-                    .Write(" waiting for Application Pool ", ConsoleColor.DarkRed)
-                    .Write(appPoolName, ConsoleColor.Red)
-                    .WriteLine(" to stop!", ConsoleColor.DarkRed)
-                    .Post();
-
+                handle.Context.WriteErrorBlock($"A timeout was reached after {timeout} waiting for IIS Application Pool '{appPoolName}' to stop!");
                 return false;
             }
 
-            handle.Context.Output.WriteBlock()
-                .Write("Application Pool ", ConsoleColor.DarkGreen)
-                .Write(appPoolName, ConsoleColor.Green)
-                .WriteLine(" stopped successfully.", ConsoleColor.DarkGreen)
-                .Post();
-
+            handle.Context.WriteTagLine($"IIS Application Pool '{appPoolName}' stopped successfully.", ConsoleColor.White);
             return true;
         }
 
         public void Configure(string appPoolName, Action<ApplicationPool> configureAction)
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                handle.Server.ApplicationPools.Add(appPoolName);
-                handle.CommitChanges();
+                handle.Context.WriteTagLine($"Creating IIS Application Pool '{appPoolName}'...", ConsoleColor.White);
 
-                if (!TryFind(appPoolName, out appPool)) {
-                    handle.Context.Output.WriteBlock()
-                        .Write("Unable to create Application Pool ", ConsoleColor.DarkRed)
-                        .Write(appPoolName, ConsoleColor.Red)
-                        .WriteLine("!", ConsoleColor.DarkRed)
-                        .Post();
-
-                    throw new Exception($"Unable to create Application Pool '{appPoolName}'!");
+                try {
+                    handle.Server.ApplicationPools.Add(appPoolName);
+                    handle.CommitChanges();
+                }
+                catch (Exception error) {
+                    handle.Context.WriteErrorBlock($"Failed to create IIS Application Pool '{appPoolName}'!", error.UnfoldMessages());
+                    throw;
                 }
 
-                handle.Context.Output.WriteBlock()
-                    .Write("Created new Application Pool ", ConsoleColor.DarkBlue)
-                    .Write(appPoolName, ConsoleColor.Blue)
-                    .WriteLine(".", ConsoleColor.DarkBlue)
-                    .Post();
+                if (!TryFind(appPoolName, out appPool)) {
+                    handle.Context.WriteErrorBlock($"Failed to create IIS Application Pool '{appPoolName}'!");
+                    throw new Exception($"Unable to create IIS Application Pool '{appPoolName}'!");
+                }
+
+                handle.Context.WriteTagLine($"Created IIS Application Pool '{appPoolName}' successfully.", ConsoleColor.White);
             }
 
-            configureAction(appPool);
+            try {
+                handle.Context.WriteTagLine($"Configuring IIS Application Pool '{appPoolName}'...", ConsoleColor.White);
 
-            handle.CommitChanges();
+                configureAction(appPool);
 
-            handle.Context.Output.WriteBlock()
-                .Write("Application Pool ", ConsoleColor.DarkGreen)
-                .Write(appPoolName, ConsoleColor.Green)
-                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen)
-                .Post();
+                handle.CommitChanges();
+
+                handle.Context.WriteTagLine($"Configured IIS Application Pool '{appPoolName}'.", ConsoleColor.White);
+            }
+            catch (Exception error) {
+                handle.Context.WriteErrorBlock($"Failed to configure IIS Application Pool '{appPoolName}'!", error.UnfoldMessages());
+                throw;
+            }
         }
 
         public async Task ConfigureAsync(string appPoolName, Action<ApplicationPool> configureAction, CancellationToken token = default(CancellationToken))
         {
             if (!TryFind(appPoolName, out var appPool)) {
-                handle.Server.ApplicationPools.Add(appPoolName);
-                await handle.CommitChangesAsync(token);
+                handle.Context.WriteTagLine($"Creating IIS Application Pool '{appPoolName}'...", ConsoleColor.White);
 
-                if (!TryFind(appPoolName, out appPool)) {
-                    handle.Context.Output.WriteBlock()
-                        .Write("Unable to create Application Pool ", ConsoleColor.DarkRed)
-                        .Write(appPoolName, ConsoleColor.Red)
-                        .WriteLine("!", ConsoleColor.DarkRed)
-                        .Post();
-
-                    throw new Exception($"Unable to create Application Pool '{appPoolName}'!");
+                try {
+                    handle.Server.ApplicationPools.Add(appPoolName);
+                    await handle.CommitChangesAsync(token);
+                }
+                catch (Exception error) {
+                    handle.Context.WriteErrorBlock($"Failed to create IIS Application Pool '{appPoolName}'!", error.UnfoldMessages());
+                    throw;
                 }
 
-                handle.Context.Output.WriteBlock()
-                    .Write("Created new Application Pool ", ConsoleColor.DarkBlue)
-                    .Write(appPoolName, ConsoleColor.Blue)
-                    .WriteLine(".", ConsoleColor.DarkBlue)
-                    .Post();
+                if (!TryFind(appPoolName, out appPool)) {
+                    handle.Context.WriteErrorBlock($"Failed to create IIS Application Pool '{appPoolName}'!");
+                    throw new Exception($"Unable to create IIS Application Pool '{appPoolName}'!");
+                }
+
+                handle.Context.WriteTagLine($"Created IIS Application Pool '{appPoolName}' successfully.", ConsoleColor.White);
             }
 
-            configureAction(appPool);
+            try {
+                handle.Context.WriteTagLine($"Configuring IIS Application Pool '{appPoolName}'...", ConsoleColor.White);
 
-            await handle.CommitChangesAsync(token);
+                configureAction(appPool);
 
-            handle.Context.Output.WriteBlock()
-                .Write("Application Pool ", ConsoleColor.DarkGreen)
-                .Write(appPoolName, ConsoleColor.Green)
-                .WriteLine(" configured successfully.", ConsoleColor.DarkGreen)
-                .Post();
+                await handle.CommitChangesAsync(token);
+
+                handle.Context.WriteTagLine($"Configured IIS Application Pool '{appPoolName}' successfully.", ConsoleColor.White);
+            }
+            catch (Exception error) {
+                handle.Context.WriteErrorBlock($"Failed to configure IIS Application Pool '{appPoolName}'!", error.UnfoldMessages());
+                throw;
+            }
         }
 
         private bool TryFind(string appPoolName, out ApplicationPool appPool)

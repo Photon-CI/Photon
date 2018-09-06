@@ -19,68 +19,140 @@ namespace Photon.Plugins.IIS
             this.handle = handle;
         }
 
+        public async Task<bool> StartAsync(string websiteName, TimeSpan timeout)
+        {
+            if (!TryFind(websiteName, out var website)) {
+                handle.Context.WriteErrorBlock($"IIS WebSite '{websiteName}' not found!");
+                return false;
+            }
+
+            if (website.State == ObjectState.Started) {
+                handle.Context.WriteTagLine($"IIS WebSite '{websiteName}' is already started.", ConsoleColor.White);
+                return true;
+            }
+
+            website.Start();
+
+            var startTime = DateTime.Now;
+            while (website.State != ObjectState.Started && DateTime.Now - startTime < timeout) {
+                await Task.Delay(400);
+            }
+
+            if (website.State != ObjectState.Started) {
+                handle.Context.WriteErrorBlock($"A timeout was reached after {timeout} waiting for IIS WebSite '{websiteName}' to start!");
+                return false;
+            }
+
+            handle.Context.WriteTagLine($"IIS WebSite '{websiteName}' started successfully.", ConsoleColor.White);
+            return true;
+        }
+
+        public async Task<bool> StopAsync(string websiteName, TimeSpan timeout)
+        {
+            if (!TryFind(websiteName, out var website)) {
+                handle.Context.WriteErrorBlock($"IIS WebSite '{websiteName}' not found!");
+                return false;
+            }
+
+            if (website.State == ObjectState.Stopped) {
+                handle.Context.WriteTagLine($"IIS WebSite '{websiteName}' is already stopped.", ConsoleColor.White);
+
+                return true;
+            }
+
+            website.Stop();
+
+            var startTime = DateTime.Now;
+            while (website.State != ObjectState.Stopped && DateTime.Now - startTime < timeout) {
+                await Task.Delay(400);
+            }
+
+            if (website.State != ObjectState.Stopped) {
+                handle.Context.WriteErrorBlock($"A timeout was reached after {timeout} waiting for IIS WebSite '{websiteName}' to stop!");
+                return false;
+            }
+
+            handle.Context.WriteTagLine($"IIS WebSite '{websiteName}' stopped successfully.", ConsoleColor.White);
+            return true;
+        }
+
         public void Configure(string websiteName, int port, Action<Site> configureAction)
         {
             if (!TryFind(websiteName, out var webSite)) {
-                handle.Server.Sites.Add(websiteName, DefaultPhysicalPath, port);
-                handle.CommitChanges();
+                handle.Context.WriteTagLine($"Creating IIS WebSite '{websiteName}'...", ConsoleColor.White);
+
+                try {
+                    handle.Server.Sites.Add(websiteName, DefaultPhysicalPath, port);
+                    handle.CommitChanges();
+                }
+                catch (Exception error) {
+                    handle.Context.WriteErrorBlock($"Failed to create IIS WebSite '{websiteName}'!", error.UnfoldMessages());
+                    throw;
+                }
 
                 if (!TryFind(websiteName, out webSite)) {
                     handle.Context.WriteErrorBlock($"Failed to create IIS WebSite '{websiteName}'!");
                     throw new Exception($"Failed to create IIS WebSite '{websiteName}'!");
                 }
 
-                handle.Context.WriteActionBlock($"Created new IIS WebSite '{websiteName}'.");
+                handle.Context.WriteActionBlock($"Created new IIS WebSite '{websiteName}' successfully.");
             }
 
-            // TODO: Set Port
-            //webSite.Bindings.FirstOrDefault()?.po
+            try {
+                handle.Context.WriteTagLine($"Configuring IIS WebSite '{websiteName}'...", ConsoleColor.White);
 
-            configureAction(webSite);
+                // TODO: Set Port
+                //webSite.Bindings.FirstOrDefault()?.po
 
-            handle.CommitChanges();
+                configureAction(webSite);
 
-            using (var block = handle.Context.Output.WriteBlock()) {
-                block.Write("WebSite ", ConsoleColor.DarkGreen);
-                block.Write(websiteName, ConsoleColor.Green);
-                block.WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
+                handle.CommitChanges();
+
+                handle.Context.WriteTagLine($"Configured IIS WebSite '{websiteName}' successfully.", ConsoleColor.White);
+            }
+            catch (Exception error) {
+                handle.Context.WriteErrorBlock($"Failed to configure IIS WebSite '{websiteName}'!", error.UnfoldMessages());
+                throw;
             }
         }
 
         public async Task ConfigureAsync(string websiteName, int port, Action<Site> configureAction, CancellationToken token = default(CancellationToken))
         {
             if (!TryFind(websiteName, out var webSite)) {
-                handle.Server.Sites.Add(websiteName, DefaultPhysicalPath, port);
-                await handle.CommitChangesAsync(token);
+                handle.Context.WriteTagLine($"Creating IIS WebSite '{websiteName}'...", ConsoleColor.White);
+
+                try {
+                    handle.Server.Sites.Add(websiteName, DefaultPhysicalPath, port);
+                    await handle.CommitChangesAsync(token);
+                }
+                catch (Exception error) {
+                    handle.Context.WriteErrorBlock($"Failed to create IIS WebSite '{websiteName}'!", error.UnfoldMessages());
+                    throw;
+                }
 
                 if (!TryFind(websiteName, out webSite)) {
-                    using (var block = handle.Context.Output.WriteBlock()) {
-                        block.Write("Unable to create WebSite ", ConsoleColor.DarkRed);
-                        block.Write(websiteName, ConsoleColor.Red);
-                        block.WriteLine("!", ConsoleColor.DarkRed);
-                    }
-
-                    throw new Exception($"Unable to create WebSite '{websiteName}'!");
+                    handle.Context.WriteErrorBlock($"Failed to create IIS WebSite '{websiteName}'!");
+                    throw new Exception($"Failed to create IIS WebSite '{websiteName}'!");
                 }
 
-                using (var block = handle.Context.Output.WriteBlock()) {
-                    block.Write("Created new WebSite ", ConsoleColor.DarkBlue);
-                    block.Write(websiteName, ConsoleColor.Blue);
-                    block.WriteLine(".", ConsoleColor.DarkBlue);
-                }
+                handle.Context.WriteTagLine($"Created IIS WebSite '{websiteName}' successfully.", ConsoleColor.White);
             }
 
-            // TODO: Set Port
-            //webSite.Bindings.FirstOrDefault()?.po
+            try {
+                handle.Context.WriteTagLine($"Configuring IIS WebSite '{websiteName}'...", ConsoleColor.White);
 
-            configureAction(webSite);
+                // TODO: Set Port
+                //webSite.Bindings.FirstOrDefault()?.po
 
-            await handle.CommitChangesAsync(token);
+                configureAction(webSite);
 
-            using (var block = handle.Context.Output.WriteBlock()) {
-                block.Write("WebSite ", ConsoleColor.DarkGreen);
-                block.Write(websiteName, ConsoleColor.Green);
-                block.WriteLine(" configured successfully.", ConsoleColor.DarkGreen);
+                await handle.CommitChangesAsync(token);
+
+                handle.Context.WriteTagLine($"Configured IIS WebSite '{websiteName}' successfully.", ConsoleColor.White);
+            }
+            catch (Exception error) {
+                handle.Context.WriteErrorBlock($"Failed to configure IIS WebSite '{websiteName}'!", error.UnfoldMessages());
+                throw;
             }
         }
 

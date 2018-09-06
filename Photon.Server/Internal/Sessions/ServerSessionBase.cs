@@ -9,6 +9,7 @@ using Photon.Server.Internal.Packages;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -162,15 +163,21 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        public void Abort()
+        public async Task Abort()
         {
             IsUserAborted = true;
             TokenSource.Cancel();
 
-            foreach (var host in hostList.Values)
-                host.Abort();
+            using (var timeoutTokenSource = new CancellationTokenSource(60_000)) {
+                var tasks = hostList.Values.Select(x =>
+                    x.Abort(timeoutTokenSource.Token)).ToArray();
 
-            // TODO: Wait?
+                await Task.Run(async () => {
+                    await Task.WhenAll(tasks);
+                }, timeoutTokenSource.Token);
+            }
+
+            await ReleaseAsync();
         }
 
         public void Complete(TaskResult result)

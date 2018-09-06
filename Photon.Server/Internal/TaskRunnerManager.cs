@@ -1,5 +1,7 @@
 ﻿using Photon.Framework.Pooling;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal
 {
@@ -38,6 +40,13 @@ namespace Photon.Server.Internal
         public bool TryGet(string taskId, out TaskRunner taskRunner)
         {
             return pool.TryGet(taskId, out taskRunner);
+        }
+
+        public async Task Wait(CancellationToken token)
+        {
+            // TODO: Wait for pending tasks!
+            //pool.Items.Where(x => x.);
+            await Task.Delay(3_000, token);
         }
     }
 }
