@@ -5,7 +5,6 @@ using Photon.Agent.Internal.Security;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System;
-using Photon.Library.Http.Security;
 
 namespace Photon.Agent.ApiHandlers.Security
 {
@@ -30,8 +29,7 @@ namespace Photon.Agent.ApiHandlers.Security
             var value = GetQuery("value", true);
 
             try {
-                var httpSecurity = (HttpSecurityManager)PhotonAgent.Instance.HttpContext.SecurityMgr;
-                httpSecurity.Restricted = value;
+                PhotonAgent.Instance.Http.Security.Restricted = value;
 
                 var config = PhotonAgent.Instance.AgentConfiguration;
 

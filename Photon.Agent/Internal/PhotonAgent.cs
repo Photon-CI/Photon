@@ -1,6 +1,8 @@
 ﻿using log4net;
 using Photon.Agent.Internal.AgentConfiguration;
+using Photon.Agent.Internal.Applications;
 using Photon.Agent.Internal.Git;
+using Photon.Agent.Internal.Http;
 using Photon.Agent.Internal.Security;
 using Photon.Agent.Internal.Session;
 using Photon.Communication;
@@ -8,30 +10,23 @@ using Photon.Framework;
 using Photon.Library;
 using Photon.Library.Security;
 using Photon.Library.Variables;
-using PiServerLite.Http;
-using PiServerLite.Http.Content;
 using System;
 using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Agent.Internal.Applications;
-using Photon.Library.Http.Security;
 
 namespace Photon.Agent.Internal
 {
     internal class PhotonAgent : IDisposable
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PhotonAgent));
-
         public static PhotonAgent Instance {get;} = new PhotonAgent();
 
-        private readonly MessageListener messageListener;
-        private HttpReceiver receiver;
+        internal MessageListener messageListener {get;}
         private bool isStarted;
 
-        public HttpReceiverContext HttpContext {get; private set;}
-
+        public HttpServer Http {get;}
         public string WorkDirectory {get;}
         public AgentSessionManager Sessions {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
@@ -46,6 +41,7 @@ namespace Photon.Agent.Internal
         {
             WorkDirectory = Configuration.WorkDirectory;
 
+            Http = new HttpServer(this);
             Sessions = new AgentSessionManager();
             MessageRegistry = new MessageProcessorRegistry();
             Variables = new VariableSetDocumentManager();
@@ -78,13 +74,7 @@ namespace Photon.Agent.Internal
                 Log.Error("Failed to dispose session manager!", error);
             }
 
-            try {
-                receiver?.Dispose();
-                receiver = null;
-            }
-            catch (Exception error) {
-                Log.Error("Failed to dispose HTTP receiver!", error);
-            }
+            Http.Dispose();
         }
 
         public void Start()
@@ -105,6 +95,8 @@ namespace Photon.Agent.Internal
             if (!IPAddress.TryParse(AgentConfiguration.Value.Tcp.Host, out var _address))
                 throw new Exception($"Invalid TCP Host '{AgentConfiguration.Value.Tcp.Host}'!");
 
+            Http.Initialize();
+
             MessageRegistry.Scan(Assembly.GetExecutingAssembly());
             MessageRegistry.Scan(typeof(ILibraryAssembly).Assembly);
             MessageRegistry.Scan(typeof(IFrameworkAssembly).Assembly);
@@ -114,7 +106,7 @@ namespace Photon.Agent.Internal
 
             var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskRepositories = Task.Run(() => RepositorySources.Initialize());
-            var taskHttp = Task.Run(() => StartHttpServer());
+            var taskHttp = Task.Run(() => Http.Start());
 
             Task.WaitAll(
                 taskVariables,
@@ -150,12 +142,7 @@ namespace Photon.Agent.Internal
                 Log.Error("Failed to stop session manager!", error);
             }
 
-            try {
-                receiver?.Stop();
-            }
-            catch (Exception error) {
-                Log.Error("Failed to stop HTTP receiver!", error);
-            }
+            Http.Stop();
 
             Log.Info("Agent stopped.");
         }
@@ -167,67 +154,9 @@ namespace Photon.Agent.Internal
             using (var tokenSource = new CancellationTokenSource(timeout)) {
                 var token = tokenSource.Token;
 
-                token.Register(() => {
-                    Sessions.Abort();
-                });
-
-                await Task.Run(() => {
-                    Sessions.Stop();
-                }, token);
-            }
-        }
-
-        private void StartHttpServer()
-        {
-            var enableSecurity = AgentConfiguration.Value.Security?.Enabled ?? false;
-            var httpConfig = AgentConfiguration.Value.Http;
-
-            var contentDir = new ContentDirectory {
-                DirectoryPath = Configuration.HttpContentDirectory,
-                UrlPath = "/Content/",
-            };
-
-            var sharedContentDir = new ContentDirectory {
-                DirectoryPath = Configuration.HttpSharedContentDirectory,
-                UrlPath = "/SharedContent/",
-            };
-
-            HttpContext = new HttpReceiverContext {
-                ListenerPath = httpConfig.Path,
-                SecurityMgr = new HttpSecurityManager {
-                    Authorization = new HybridAuthorization {
-                        UserMgr = UserMgr,
-                    },
-                    Restricted = enableSecurity,
-                    CookieName = "PHOTON.AGENT.AUTH",
-                },
-                ContentDirectories = {
-                    contentDir,
-                    sharedContentDir,
-                },
-            };
-
-            HttpContext.Views.AddFolderFromExternal(Configuration.HttpViewDirectory);
-
-            var httpPrefix = $"http://{httpConfig.Host}:{httpConfig.Port}/";
-
-            if (!string.IsNullOrEmpty(httpConfig.Path))
-                httpPrefix = NetPath.Combine(httpPrefix, httpConfig.Path);
-
-            if (!httpPrefix.EndsWith("/"))
-                httpPrefix += "/";
-
-            receiver = new HttpReceiver(HttpContext);
-            receiver.Routes.Scan(Assembly.GetExecutingAssembly());
-            receiver.AddPrefix(httpPrefix);
-
-            try {
-                receiver.Start();
-
-                Log.Info($"HTTP Server listening at {httpPrefix}");
-            }
-            catch (Exception error) {
-                Log.Error("Failed to start HTTP Receiver!", error);
+                using (token.Register(async () => await Sessions.Abort())) {
+                    await Task.Run(() => Sessions.Stop(), token);
+                }
             }
         }
 

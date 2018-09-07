@@ -23,7 +23,7 @@ namespace Photon.Agent.ViewModels.Applications
                 .Select(app => new ApplicationRow {
                     ProjectId = app.ProjectId,
                     Name = app.Name,
-                    RevisionCount = app.Revisions.Count.ToString("N0"),
+                    RevisionCount = app.Revisions.Count().ToString("N0"),
                 }).OrderBy(x => x.Name).ToArray();
         }
 

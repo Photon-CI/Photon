@@ -1,6 +1,5 @@
 ﻿using log4net;
 using Photon.Library.Http;
-using Photon.Library.Http.Security;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Security;
 using Photon.Server.Internal.ServerConfiguration;
@@ -31,8 +30,7 @@ namespace Photon.Server.ApiHandlers.Security
             var value = GetQuery("value", true);
 
             try {
-                var httpSecurity = (HttpSecurityManager)PhotonServer.Instance.HttpContext.SecurityMgr;
-                httpSecurity.Restricted = value;
+                PhotonServer.Instance.Http.Security.Restricted = value;
 
                 var config = PhotonServer.Instance.ServerConfiguration;
 

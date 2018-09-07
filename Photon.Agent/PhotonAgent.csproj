@@ -118,12 +118,14 @@
     <Compile Include="Internal\Applications\ApplicationRevision.cs" />
     <Compile Include="Internal\Applications\ApplicationHost.cs" />
     <Compile Include="Internal\Applications\ProjectApplicationList.cs" />
+    <Compile Include="Internal\Http\HttpServer.cs" />
     <Compile Include="Internal\Packages\PackageHost.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\Security\SecurityTest.cs" />
     <Compile Include="MessageHandlers\HealthCheckProcessor.cs" />
     <Compile Include="ViewHandlers\AccessDeniedHandler.cs" />
     <Compile Include="ViewHandlers\Applications\ApplicationDetailsHandler.cs" />
+    <Compile Include="ViewHandlers\Applications\ApplicationRevisionsHandler.cs" />
     <Compile Include="ViewHandlers\Applications\ApplicationIndexHandler.cs" />
     <Compile Include="ViewHandlers\Configuration\ConfigurationIndexHandler.cs" />
     <Compile Include="ViewHandlers\LoginHandler.cs" />
@@ -168,6 +170,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\Applications\ApplicationDetailsVM.cs" />
+    <Compile Include="ViewModels\Applications\ApplicationRevisionsVM.cs" />
     <Compile Include="ViewModels\Applications\ApplicationIndexVM.cs" />
     <Compile Include="ViewModels\IndexVM.cs" />
     <Compile Include="ViewModels\LoginVM.cs" />
@@ -227,6 +230,9 @@
     </Content>
     <Content Include="..\SharedContent\fontawesome-5.2.0\webfonts\fa-solid-900.woff2">
       <Link>Content\fontawesome-5.2.0\webfonts\fa-solid-900.woff2</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Applications\Details.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Security\EditGroup.html">
@@ -362,7 +368,7 @@
     <Content Include="Views\AccessDenied.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Applications\Details.html">
+    <Content Include="Views\Applications\Revisions.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Applications\Index.html">

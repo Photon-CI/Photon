@@ -8,91 +8,59 @@
 </script>
 {{#EndScript}}
 
-<nav class="navbar navbar-dark bg-dark content-navbar">
-    <div class="navbar-brand mr-auto">
-        <!--<h3 class="text-primary my-0">Configuration</h3>-->
-    </div>
-</nav>
+<form method="post">
+    <nav class="navbar navbar-dark bg-dark content-navbar">
+        <div class="navbar-brand mr-auto">
+            <h3 class="text-primary my-0">Server Configuration</h3>
+        </div>
+        <button id="SaveButton" type="submit" class="btn btn-sm btn-success">
+            <i class="fas fa-save"></i> Save
+        </button>
+    </nav>
 
-<div class="container mt-3">
-    <div class="card">
-        <div class="card-header">
-            <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                <li id="ApplicationTabLink" class="nav-item">
-                    <a class="nav-link active" href="#application" data-toggle="tab" role="tab">Application</a>
-                </li>
-                <li id="SystemTabLink" class="nav-item">
-                    <a class="nav-link" href="#system" data-toggle="tab" role="tab">System</a>
-                </li>
-                <li id="NetworkTabLink" class="nav-item">
-                    <a class="nav-link" href="#network" data-toggle="tab" role="tab">Network</a>
-                </li>
-                <li id="SecurityTabLink" class="nav-item">
-                    <a class="nav-link" href="#security" data-toggle="tab" role="tab">Security</a>
-                </li>
+    <div class="container mt-3">
+        {{#If Errors}}
+        <div class="alert alert-danger mb-2">
+            <ul class="my-0">
+                {{#Each Errors.error}}
+                <li>{{error.Message}}</li>
+                {{#EndEach}}
             </ul>
         </div>
-        <div class="card-body">
-            <div class="tab-content">
-                <div id="application" class="tab-pane fade show active" role="tabpanel">
-                    <table class="table table-sm">
-                        <tbody>
-                            <tr>
-                                <td style="width: 40%">Server Version</td>
-                                <td>{{ServerVersion}}</td>
-                            </tr>
-                            <tr>
-                                <td>Architecture</td>
-                                <td>{{ProcessArchitecture}}</td>
-                            </tr>
-                            <tr>
-                                <td>Architecture</td>
-                                <td>{{ProcessArchitecture}}</td>
-                            </tr>
-                            <tr>
-                                <td>HTTP URL</td>
-                                <td>{{ServerHttpUrl}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        {{#EndIf}}
+        <h4 class="mb-0 mt-2">HTTP</h4>
+        <hr class="mt-0 mb-2" />
+        <div class="alert alert-warning mt-0 mb-2 px-2 py-0">
+            Changes to HTTP settings will cause the HTTP server to be restarted, which will disconnect any connections that are currently active.
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="HttpHostTextBox" class="my-0">Host</label>
+                    <input id="HttpHostTextBox" name="HttpHost" type="text" class="form-control" value="{{HttpHost}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The host segment of the listening URI. To allow only local communication, use <code>localhost</code>. To allow remote requests, use <code>*</code>.
+                    </small>
                 </div>
-                <div id="system" class="tab-pane fade" role="tabpanel">
-                    <table class="table table-sm">
-                        <tbody>
-                            <tr>
-                                <td style="width: 40%">Operating System</td>
-                                <td>{{OsDescription}}</td>
-                            </tr>
-                            <tr>
-                                <td>Architecture</td>
-                                <td>{{OsArchitecture}}</td>
-                            </tr>
-                            <tr>
-                                <td>Processor Count</td>
-                                <td>{{MachineProcessorCount}}</td>
-                            </tr>
-                            <tr>
-                                <td>Machine Name</td>
-                                <td>{{MachineName}}</td>
-                            </tr>
-                            <tr>
-                                <td>Framework</td>
-                                <td>{{FrameworkDescription}}</td>
-                            </tr>
-                            <tr>
-                                <td>CLR Version</td>
-                                <td>{{MachineClrVersion}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="HttpPathTextBox" class="my-0">Path</label>
+                    <input id="HttpPathTextBox" name="HttpPath" type="text" class="form-control" value="{{HttpPath}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The optional path segment of the listening URI.
+                    </small>
                 </div>
-                <div id="network" class="tab-pane fade" role="tabpanel">
-                    ...
-                </div>
-                <div id="security" class="tab-pane fade" role="tabpanel">
-                    ...
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="HttpPortTextBox" class="my-0">Port</label>
+                    <input id="HttpPortTextBox" name="HttpPort" type="number" class="form-control" value="{{HttpPort}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The port of the listening URI.
+                    </small>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</form>

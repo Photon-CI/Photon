@@ -10,7 +10,7 @@
 
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto">
-        <!--<h3 class="text-primary my-0">Applications</h3>-->
+        <h3 class="text-primary my-0">Agent Applications</h3>
     </div>
 </nav>
 
@@ -29,7 +29,7 @@
         <tr>
             <td>{{app.ProjectId}}</td>
             <td>
-                <a href="{{#Url Application/Details}}?project={{&app.ProjectId}}&name={{&app.Name}}">{{app.Name}}</a>
+                <a href="{{#Url Application/Revisions}}?project={{&app.ProjectId}}&name={{&app.Name}}">{{app.Name}}</a>
             </td>
             <td>{{app.RevisionCount}}</td>
         </tr>

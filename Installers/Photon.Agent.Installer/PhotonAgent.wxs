@@ -374,6 +374,9 @@
       <Component Id="Views_Applications_Details.html" Guid="a7452ae5-7b00-4296-b1b6-6ac0010284f9">
         <File Id="Views_Applications_Details.html" Name="Details.html" Source="$(var.PhotonAgent_TargetDir)Views\Applications\Details.html" />
       </Component>
+      <Component Id="Views_Applications_Revisions.html" Guid="f9c56cb9-5ecf-4638-a10c-67b63800857d">
+        <File Id="Views_Applications_Revisions.html" Name="Revisions.html" Source="$(var.PhotonAgent_TargetDir)Views\Applications\Revisions.html" />
+      </Component>
     </ComponentGroup>
   </Fragment>
   <Fragment>

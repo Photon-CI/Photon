@@ -7,20 +7,20 @@ namespace Photon.Agent.ViewHandlers.Applications
 {
     [Secure]
     [RequiresRoles(GroupRole.ApplicationView)]
-    [HttpHandler("/application/details")]
-    internal class ApplicationDetailsHandler : HttpHandler
+    [HttpHandler("/application/revisions")]
+    [HttpHandler("/application/revision/index")]
+    internal class ApplicationRevisionsHandler : HttpHandler
     {
         public override HttpHandlerResult Get()
         {
-            var vm = new ApplicationDetailsVM(this) {
+            var vm = new ApplicationRevisionsVM(this) {
                 ProjectId = GetQuery("project"),
                 Name = GetQuery("name"),
-                DeploymentNumber = GetQuery<uint>("rev"),
             };
 
             vm.Build();
 
-            return Response.View("Applications\\Details.html", vm);
+            return Response.View("Applications\\Revisions.html", vm);
         }
     }
 }

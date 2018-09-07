@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.NuGet.Core", "Plugin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.NUnit", "Plugins\Photon.NUnit\Photon.NUnit.csproj", "{EC4F12DB-828B-48E3-AA92-D99806B6108D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photon.Worker", "Photon.Worker\Photon.Worker.csproj", "{78FB60FE-0EA6-4511-B08E-DFF409924324}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -275,6 +277,18 @@ Global
 		{EC4F12DB-828B-48E3-AA92-D99806B6108D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EC4F12DB-828B-48E3-AA92-D99806B6108D}.Release|x86.ActiveCfg = Release|Any CPU
 		{EC4F12DB-828B-48E3-AA92-D99806B6108D}.Release|x86.Build.0 = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Debug|x86.Build.0 = Debug|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Linux|Any CPU.ActiveCfg = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Linux|Any CPU.Build.0 = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Linux|x86.ActiveCfg = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Linux|x86.Build.0 = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Release|x86.ActiveCfg = Release|Any CPU
+		{78FB60FE-0EA6-4511-B08E-DFF409924324}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

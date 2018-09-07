@@ -8,13 +8,82 @@
 </script>
 {{#EndScript}}
 
-{{#Style}}
-<style>
-</style>
-{{#EndStyle}}
+<form method="post">
+    <nav class="navbar navbar-dark bg-dark content-navbar">
+        <div class="navbar-brand mr-auto">
+            <h3 class="text-primary my-0">Agent Configuration</h3>
+        </div>
+        <button id="SaveButton" type="submit" class="btn btn-sm btn-success">
+            <i class="fas fa-save"></i> Save
+        </button>
+    </nav>
 
-<nav class="navbar navbar-dark bg-dark content-navbar">
-    <div class="navbar-brand mr-auto">
-        <!--<h3 class="text-primary my-0">Configuration</h3>-->
+    <div class="container mt-3">
+        {{#If Errors}}
+        <div class="alert alert-danger mb-2">
+            <ul class="my-0">
+                {{#Each Errors.error}}
+                <li>{{error.Message}}</li>
+                {{#EndEach}}
+            </ul>
+        </div>
+        {{#EndIf}}
+        <h4 class="mb-0 mt-2">HTTP</h4>
+        <hr class="mt-0 mb-2" />
+        <div class="alert alert-warning mt-0 mb-2 px-2 py-0">
+            Changes made here require the HTTP server to be restarted, which will disconnect any open connections.
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="HttpHostTextBox" class="my-0">Host</label>
+                    <input id="HttpHostTextBox" name="HttpHost" type="text" class="form-control" value="{{HttpHost}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The host segment of the listening URI. To allow only local communication, use <code>localhost</code>. To allow remote requests, use <code>*</code>.
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="HttpPathTextBox" class="my-0">Path</label>
+                    <input id="HttpPathTextBox" name="HttpPath" type="text" class="form-control" value="{{HttpPath}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The optional path segment of the listening URI.
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="HttpPortTextBox" class="my-0">Port</label>
+                    <input id="HttpPortTextBox" name="HttpPort" type="number" class="form-control" value="{{HttpPort}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The port of the listening URI.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="mb-0 mt-2">TCP</h4>
+        <hr class="mt-0 mb-2" />
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="TcpHostTextBox" class="my-0">Address</label>
+                    <input id="TcpHostTextBox" name="TcpHost" type="text" class="form-control" value="{{TcpHost}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The IP address accepting incoming connection requests. To bind to any address, use <code>0.0.0.0</code>.
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="TcpPortTextBox" class="my-0">Port</label>
+                    <input id="TcpPortTextBox" name="TcpPort" type="number" class="form-control" value="{{TcpPort}}" />
+                    <small class="text-muted d-block mt-1" style="line-height: 1.1">
+                        The port to use when listening for incoming connections.
+                    </small>
+                </div>
+            </div>
+        </div>
     </div>
-</nav>
+</form>

@@ -14,7 +14,9 @@
     </div>
 </nav>
 
-<div class="container mt-3">
+<div class="container mt-2">
+    <a href="{{#Url application/revisions}}?project={{&ProjectId}}&name={{&Name}}">Return to Application Revision List</a>
+
     {{#If Errors}}
     <div class="alert alert-danger">
         <ul class="my-0">
@@ -24,30 +26,36 @@
         </ul>
     </div>
     {{#EndIf}}
-    {{#If Revisions}}
-    <table class="table table-sm table-striped bg-light">
-        <thead class="thead-light">
-        <tr>
-            <th>#</th>
-            <th>Environment</th>
-            <th>Package</th>
-            <th>Time</th>
-        </tr>
-        </thead>
+    <table class="table table-sm table-striped bg-light mt-2">
         <tbody>
-        {{#Each Revisions.revision}}
         <tr>
-            <td>{{revision.DeploymentNumber}}</td>
-            <td>{{revision.EnvironmentName}}</td>
-            <td>{{revision.Package}}</td>
-            <td>{{revision.Time}}</td>
+            <td>Project ID</td>
+            <td>{{ProjectId}}</td>
         </tr>
-        {{#EndEach}}
+        <tr>
+            <td>Application Name</td>
+            <td>{{Name}}</td>
+        </tr>
+        <tr>
+            <td>Deployment Number</td>
+            <td>{{DeploymentNumber}}</td>
+        </tr>
+        <tr>
+            <td>Environment</td>
+            <td>{{RevisionEnvironmentName}}</td>
+        </tr>
+        <tr>
+            <td>Package</td>
+            <td>{{RevisionPackage}}</td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td>{{RevisionLocation}}</td>
+        </tr>
+        <tr>
+            <td>Time</td>
+            <td>{{RevisionTime}}</td>
+        </tr>
         </tbody>
     </table>
-    {{#Else}}
-    <div class="alert alert-warning">
-        No revisions of this application are currently deployed.
-    </div>
-    {{#EndIf}}
 </div>

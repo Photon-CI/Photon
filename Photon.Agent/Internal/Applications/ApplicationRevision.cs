@@ -11,6 +11,7 @@ namespace Photon.Agent.Internal.Applications
         public uint DeploymentNumber {get; set;}
         public string EnvironmentName {get; set;}
         public string Location {get; set;}
+        public bool IsCurrent {get; set;}
         public DateTime Time {get; set;}
 
 

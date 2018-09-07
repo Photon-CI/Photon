@@ -1,6 +1,5 @@
 ﻿using PiServerLite.Http.Handlers;
 using System.Linq;
-using Photon.Library.Http.Security;
 
 namespace Photon.Agent.Internal.Security
 {
@@ -12,6 +11,7 @@ namespace Photon.Agent.Internal.Security
         public RequiresRolesAttribute(params string[] roles)
         {
             this.Roles = roles;
+
             Events = HttpFilterEvents.Before;
             Function = OnPreFilter;
         }
@@ -21,8 +21,7 @@ namespace Photon.Agent.Internal.Security
             var isSecurityEnabled = PhotonAgent.Instance.AgentConfiguration.Value.Security?.Enabled ?? false;
             if (!isSecurityEnabled) return null;
 
-            var httpSecurity = (HttpSecurityManager)PhotonAgent.Instance.HttpContext.SecurityMgr;
-            if (!httpSecurity.TryGetUserContext(httpHandler.HttpContext.Request, out var userContext))
+            if (!PhotonAgent.Instance.Http.Security.TryGetUserContext(httpHandler.HttpContext.Request, out var userContext))
                 return httpHandler.Response.Redirect("AccessDenied");
 
             var rolesRequired = httpHandler.GetType()

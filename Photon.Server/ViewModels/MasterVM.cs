@@ -24,9 +24,9 @@ namespace Photon.Server.ViewModels
             IsSecured = PhotonServer.Instance.ServerConfiguration.Value.Security?.Enabled ?? false;
 
             if (IsSecured) {
-                var httpSecurity = (HttpSecurityManager)PhotonServer.Instance.HttpContext.SecurityMgr;
+                UserContext = PhotonServer.Instance.Http.Security
+                    .GetUserContext(handler.HttpContext.Request);
 
-                UserContext = httpSecurity.GetUserContext(handler.HttpContext.Request);
                 if (UserContext == null) return;
 
                 var userMgr = PhotonServer.Instance.UserMgr;

@@ -1,7 +1,6 @@
 ﻿using Photon.Agent.Internal;
 using PiServerLite.Http.Handlers;
 using System;
-using System.Linq;
 
 namespace Photon.Agent.ViewModels.Applications
 {
@@ -9,12 +8,17 @@ namespace Photon.Agent.ViewModels.Applications
     {
         public string ProjectId {get; set;}
         public string Name {get; set;}
-        public RevisionRow[] Revisions {get; set;}
+        public uint DeploymentNumber {get; set;}
+        public string RevisionEnvironmentName {get; set;}
+        public string RevisionPackage {get; set;}
+        public string RevisionLocation {get; set;}
+        public string RevisionTime {get; set;}
+        public bool RevisionIsCurrent {get; set;}
 
 
         public ApplicationDetailsVM(IHttpHandler handler) : base(handler)
         {
-            PageTitle = Name ?? "Photon Agent Application";
+            PageTitle = Name ?? "Photon Agent Application Details";
         }
 
         protected override void OnBuild()
@@ -24,23 +28,14 @@ namespace Photon.Agent.ViewModels.Applications
             var app = PhotonAgent.Instance.ApplicationMgr.GetApplication(ProjectId, Name);
             if (app == null) throw new ApplicationException($"Application '{Name}' not found under Project '{ProjectId}'!");
 
-            Revisions = app.Revisions.OrderByDescending(x => x.DeploymentNumber)
-                .Select(x => new RevisionRow {
-                    DeploymentNumber = x.DeploymentNumber,
-                    EnvironmentName = x.EnvironmentName,
-                    Package = $"{x.PackageId}@{x.PackageVersion}",
-                    Location = x.Location,
-                    Time = x.Time.ToString("G"),
-                }).ToArray();
-        }
+            var revision = app.GetRevision(DeploymentNumber);
+            if (revision == null) throw new ApplicationException($"Revision '{DeploymentNumber}' not found under application '{Name}', Project '{ProjectId}'!");
 
-        public class RevisionRow
-        {
-            public uint DeploymentNumber {get; set;}
-            public string EnvironmentName {get; set;}
-            public string Package {get; set;}
-            public string Location {get; set;}
-            public string Time {get; set;}
+            RevisionEnvironmentName = revision.EnvironmentName;
+            RevisionPackage = $"{revision.PackageId} @{revision.PackageVersion}";
+            RevisionLocation = revision.Location;
+            RevisionTime = revision.Time.ToString("F");
+            RevisionIsCurrent = revision.IsCurrent;
         }
     }
 }

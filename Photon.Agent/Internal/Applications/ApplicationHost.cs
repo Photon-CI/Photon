@@ -58,7 +58,7 @@ namespace Photon.Agent.Internal.Applications
                 Time = DateTime.Now,
             };
 
-            app.Revisions.Add(revision);
+            app.RegisterRevision(revision);
             appMgr.Save();
 
             revision.Initialize();

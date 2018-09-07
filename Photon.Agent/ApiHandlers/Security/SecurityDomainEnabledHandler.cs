@@ -3,7 +3,6 @@ using Photon.Agent.Internal;
 using Photon.Agent.Internal.AgentConfiguration;
 using Photon.Agent.Internal.Security;
 using Photon.Library.Http;
-using Photon.Library.Http.Security;
 using PiServerLite.Http.Handlers;
 using PiServerLite.Http.Security;
 using System;
@@ -31,9 +30,7 @@ namespace Photon.Agent.ApiHandlers.Security
             var value = GetQuery("value", true);
 
             try {
-                var httpSecurity = (HttpSecurityManager)PhotonAgent.Instance.HttpContext.SecurityMgr;
-                var httpAuth = (HybridAuthorization)httpSecurity.Authorization;
-                httpAuth.DomainEnabled = value;
+                PhotonAgent.Instance.Http.Authorization.DomainEnabled = value;
 
                 var config = PhotonAgent.Instance.AgentConfiguration;
 
