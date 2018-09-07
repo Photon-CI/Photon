@@ -47,7 +47,7 @@ namespace Photon.Server.ApiHandlers.Agent
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
 
-                var response = new HttpAgentUpdateStartResponse {
+                var response = new HttpSessionStartResponse {
                     SessionId = session.SessionId,
                 };
 

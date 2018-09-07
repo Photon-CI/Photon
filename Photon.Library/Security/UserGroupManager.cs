@@ -12,7 +12,6 @@ namespace Photon.Library.Security
     {
         private const string jsonFilename = "UserGroups.json";
         
-        //private readonly JsonDynamicDocument serverDocument;
         private DataContainer data;
 
         public string Directory {get; set;}
@@ -24,8 +23,6 @@ namespace Photon.Library.Security
         public UserGroupManager()
         {
             data = new DataContainer();
-
-            //serverDocument = new JsonDynamicDocument();
         }
 
         public bool Initialize()
@@ -42,13 +39,20 @@ namespace Photon.Library.Security
 
         public void Save()
         {
-            //serverDocument.Update(Document_OnUpdate);
-
             var filename = Path.Combine(Directory, jsonFilename);
 
             using (var stream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.Write)) {
                 JsonSettings.Serializer.Serialize(stream, data);
             }
+        }
+
+        public void SetData(UserGroup[] groups, User[] users)
+        {
+            data.Groups.Clear();
+            data.Groups.AddRange(groups);
+
+            data.Users.Clear();
+            data.Users.AddRange(users);
         }
 
         public void AddGroup(UserGroup group)
@@ -101,18 +105,7 @@ namespace Photon.Library.Security
             return roles.All(role => userGroups.Any(x => x.RoleList.Contains(role, StringComparer.OrdinalIgnoreCase)));
         }
 
-        //private void Document_OnLoad(dynamic document)
-        //{
-        //    data = document.ToObject<DataContainer>();
-        //}
-
-        //private void Document_OnUpdate(dynamic document)
-        //{
-        //    var mergeValue = JObject.FromObject(data, serverDocument.Serializer);
-        //    ((JObject)document).Merge(mergeValue);
-        //}
-
-        private class DataContainer
+        public class DataContainer
         {
             [JsonProperty("groups")]
             public List<UserGroup> Groups {get;}

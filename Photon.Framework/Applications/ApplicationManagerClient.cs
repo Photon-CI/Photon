@@ -29,7 +29,7 @@ namespace Photon.Framework.Applications
             });
         }
 
-        public async Task<DomainApplicationRevision> RegisterApplicationRevision(string appName, string packageId, string packageVersion)
+        public async Task<DomainApplicationRevision> RegisterApplicationRevision(string appName, string packageId, string packageVersion, string environmentName = null)
         {
             var revisionRequest = new DomainApplicationRevisionRequest {
                 ProjectId = CurrentProjectId,
@@ -37,6 +37,7 @@ namespace Photon.Framework.Applications
                 DeploymentNumber = CurrentDeploymentNumber,
                 PackageId = packageId,
                 PackageVersion = packageVersion,
+                EnvironmentName = environmentName,
             };
 
             return await RegisterApplicationRevision(revisionRequest);

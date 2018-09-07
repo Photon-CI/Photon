@@ -2,7 +2,7 @@
 
 namespace Photon.Library.Http.Messages
 {
-    public class HttpDeployStartResponse
+    public class HttpSessionStartResponse
     {
         [JsonProperty("sessionId")]
         public string SessionId {get; set;}

@@ -71,7 +71,7 @@ namespace Photon.Server.ApiHandlers.Deploy
                 PhotonServer.Instance.Sessions.BeginSession(session);
                 PhotonServer.Instance.Queue.Add(session);
 
-                var response = new HttpDeployStartResponse {
+                var response = new HttpSessionStartResponse {
                     SessionId = session.SessionId,
                 };
 

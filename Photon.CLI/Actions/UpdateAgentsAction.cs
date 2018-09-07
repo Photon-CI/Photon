@@ -129,7 +129,7 @@ namespace Photon.CLI.Actions
             ConsoleEx.Out.WriteLine("Update completed successfully.", ConsoleColor.DarkGreen);
         }
 
-        private async Task<HttpAgentUpdateStartResponse> StartSession(PhotonServerDefinition server, string[] agentIds, string updateFilename)
+        private async Task<HttpSessionStartResponse> StartSession(PhotonServerDefinition server, string[] agentIds, string updateFilename)
         {
             return await WebClientEx(server,
                 client => {
@@ -141,7 +141,7 @@ namespace Photon.CLI.Actions
 
                     client.BodyFunc = () => File.Open(updateFilename, FileMode.Open, FileAccess.Read);
                 },
-                client => client.ParseJsonResponse<HttpAgentUpdateStartResponse>());
+                client => client.ParseJsonResponse<HttpSessionStartResponse>());
         }
 
         private async Task<OutputData> UpdateOutput(PhotonServerDefinition server, string sessionId, int position)

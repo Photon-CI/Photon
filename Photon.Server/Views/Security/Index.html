@@ -1,14 +1,19 @@
 ﻿{{#Master Master.html}}
 
 {{#Script}}
+<script src="{{#Url SharedContent/SessionOutput.js}}"></script>
+<script src="{{#Url SharedContent/ansi_up.js}}"></script>
 <script>
+    var reader;
+
     $(function () {
         $('#layoutNavbarContent [data-link="security"]').addClass('active');
 
+        $('#PublishOutputModal').on('shown.bs.modal', beginRead);
         $('#GroupListSearch').on('input', onGroupSearchChanged);
-        onGroupSearchChanged();
-
         $('#UserListSearch').on('input', onUserSearchChanged);
+
+        onGroupSearchChanged();
         onUserSearchChanged();
     });
 
@@ -124,6 +129,55 @@
             $(e).toggle(visible);
         });
     }
+
+    var sessionId;
+
+    function onPublish() {
+        $('#PublishModal').modal('hide');
+
+        $('#ModalPublishButton').prop('disabled', true);
+
+        $.ajax({
+            url: '{{#Url api/security/publish}}',
+            method: 'POST',
+            dataType: 'json'
+        }).done(function (data) {
+            sessionId = data.sessionId;
+
+            $('#PublishOutputModal').modal({
+                backdrop: 'static'
+            });
+        }).fail(function() {
+            //
+        }).always(function() {
+            $('#ModalPublishButton').prop('disabled', false);
+        });
+    }
+
+    function beginRead() {
+        var _sessionId = encodeURIComponent(sessionId);
+        var outputUrl = '{{#Url api/session/output-stream}}?id='+_sessionId;
+
+        reader = new SessionOutputReader();
+        reader.onAppend = onAppend;
+        reader.onDone = onDone;
+        reader.onError = onError;
+        reader.begin(outputUrl);
+    }
+
+    function onAppend(text) {
+        var text_out = ansi_up.escape_for_html(text);
+        text_out = ansi_up.ansi_to_html(text_out);
+        $('#SessionOutput').append(text_out);
+    }
+
+    function onDone() {
+        //
+    }
+
+    function onError() {
+        alert('An error occurred while publishing the security configuration!');
+    }
 </script>
 {{#EndScript}}
 
@@ -132,6 +186,7 @@
     .user-group-row {
         cursor: pointer;
     }
+
     .table-header {
         color: #495057;
         background-color: #e9ecef;
@@ -140,11 +195,32 @@
         line-height: 32px;
         padding: 2px;
     }
+
+    .output-container {
+        height: 100%;
+        background: #111;
+        overflow-x: hidden;
+        white-space: normal;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+
+    .session-output {
+        word-wrap: break-word;
+        line-break: strict;
+        line-height: 1.2;
+        width: 100%;
+        color: #CCC;
+        overflow: visible;
+    }
 </style>
 {{#EndStyle}}
 
 <nav class="navbar navbar-dark bg-dark content-navbar">
     <div class="navbar-brand mr-auto"></div>
+    <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#PublishModal">
+        <i class="fas fa-upload"></i> Publish
+    </button>
 </nav>
 
 {{#If Master.IsSecured}}
@@ -187,7 +263,7 @@
                                 {{#EndIf}}
                                 <form class="d-inline-block" style="width: 200px;">
                                     <div class="input-group input-group-sm">
-                                        <input id="GroupListSearch" type="text" class="form-control"/>
+                                        <input id="GroupListSearch" type="text" class="form-control" />
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 <i class="fas fa-search"></i>
@@ -201,11 +277,11 @@
                         <div style="max-height: 600px; overflow-y: auto">
                             <table id="GroupListTable" class="table table-sm table-hover bg-light m-0">
                                 <tbody>
-                                {{#Each UserGroups.group}}
-                                <tr class="user-group-row" data-id="{{group.Id}}" onclick="editGroup(this)">
-                                    <td>{{group.Name}}</td>
-                                </tr>
-                                {{#EndEach}}
+                                    {{#Each UserGroups.group}}
+                                    <tr class="user-group-row" data-id="{{group.Id}}" onclick="editGroup(this)">
+                                        <td>{{group.Name}}</td>
+                                    </tr>
+                                    {{#EndEach}}
                                 </tbody>
                             </table>
                         </div>
@@ -277,3 +353,39 @@
     <p>You must enable security before configuring security features.</p>
 </div>
 {{#EndIf}}
+
+<div id="PublishModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Publish Security Configuration</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Publishes the current security configuration to all attached agents.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="ModalPublishButton" type="button" class="btn btn-primary" onclick="onPublish()">Publish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="PublishOutputModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Publishing Security Configuration...</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="output-container">
+                <pre id="SessionOutput" class="session-output px-2 py-1"></pre>
+            </div>
+        </div>
+    </div>
+</div>

@@ -25,7 +25,7 @@ namespace Photon.CLI.Actions
         {
             var server = context.Servers.Get(ServerName);
 
-            HttpDeployStartResponse startResult = null;
+            HttpSessionStartResponse startResult = null;
             await AuthRetryAsync(async () => {
                 startResult = await StartSession(server);
             });
@@ -56,7 +56,7 @@ namespace Photon.CLI.Actions
             Result = await GetResult(server, sessionId);
         }
 
-        private async Task<HttpDeployStartResponse> StartSession(PhotonServerDefinition server)
+        private async Task<HttpSessionStartResponse> StartSession(PhotonServerDefinition server)
         {
             return await WebClientEx(server,
                 client => {
@@ -69,7 +69,7 @@ namespace Photon.CLI.Actions
                         env = Environment,
                     };
                 },
-                client => client.ParseJsonResponse<HttpDeployStartResponse>());
+                client => client.ParseJsonResponse<HttpSessionStartResponse>());
         }
 
         private async Task<OutputData> UpdateOutput(PhotonServerDefinition server, string sessionId, int position)

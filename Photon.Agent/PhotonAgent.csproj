@@ -122,6 +122,7 @@
     <Compile Include="Internal\Packages\PackageHost.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\Security\SecurityTest.cs" />
+    <Compile Include="MessageHandlers\SecurityPublishProcessor.cs" />
     <Compile Include="MessageHandlers\HealthCheckProcessor.cs" />
     <Compile Include="ViewHandlers\AccessDeniedHandler.cs" />
     <Compile Include="ViewHandlers\Applications\ApplicationDetailsHandler.cs" />
