@@ -80,6 +80,7 @@ namespace Photon.Publishing
             await PublishPluginPackage("Photon.NuGet.Core", token);
             await PublishPluginPackage("Photon.IIS", token);
             await PublishPluginPackage("Photon.NUnit", token);
+            await PublishPluginPackage("Photon.DotNet", token);
         }
 
         private async Task BuildSolution(CancellationToken token)

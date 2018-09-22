@@ -1,5 +1,6 @@
 ﻿using Photon.Framework.Domain;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,6 +47,16 @@ namespace Photon.Framework.Process
         public async Task<ProcessResult> RunAsync(string arguments, CancellationToken cancelToken = default(CancellationToken))
         {
             return await ExecuteAsync(arguments, cancelToken);
+        }
+
+        public ProcessResult Run(IEnumerable<string> arguments, CancellationToken cancelToken = default(CancellationToken))
+        {
+            return Execute(string.Join(" ", arguments), cancelToken);
+        }
+
+        public async Task<ProcessResult> RunAsync(IEnumerable<string> arguments, CancellationToken cancelToken = default(CancellationToken))
+        {
+            return await ExecuteAsync(string.Join(" ", arguments), cancelToken);
         }
 
         protected ProcessResult Execute(string arguments, CancellationToken cancelToken)

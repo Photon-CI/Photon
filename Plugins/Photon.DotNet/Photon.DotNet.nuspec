@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Photon.DotNet</id>
+    <title>Photon DotNet Plugin</title>
+    <version>$version$</version>
+    <authors>null511, Photon.CI</authors>
+    <projectUrl>https://github.com/Photon-CI/Photon/tree/master/Plugins/Photon.DotNet</projectUrl>
+    <iconUrl>https://github.com/Photon-CI/Photon/raw/master/media/plugin_light.png</iconUrl>
+    <description>A Photon plugin for invoking DotNet.</description>
+    <copyright>Copyright 2018</copyright>
+    <tags>photon net automation dotnet core netcore netstandard</tags>
+    <dependencies>
+      <dependency id="Photon.Framework" version="$frameworkVersion$" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\*.dll" exclude="**\Photon.Framework.dll" />
+    <file src="bin\$configuration$\*.xml" exclude="**\Photon.Framework.xml" />
+  </files>
+</package>
