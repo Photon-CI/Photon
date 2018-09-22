@@ -13,8 +13,6 @@ namespace Photon.CLI.Actions
         public Task Run()
         {
             throw new NotImplementedException();
-
-            return Task.CompletedTask;
         }
     }
 }

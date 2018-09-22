@@ -27,11 +27,26 @@ namespace Photon.Communication
             queue = new ActionBlock<MessageProcessorHandle>(OnProcess);
         }
 
-        public void Stop(CancellationToken token = default(CancellationToken))
+        public void Flush(CancellationToken cancellationToken = default(CancellationToken))
         {
             queue.Complete();
-            queue.Completion.Wait(token);
+            queue.Completion.Wait(cancellationToken);
         }
+
+        public async Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            queue.Complete();
+
+            await Task.Run(async () => {
+                await queue.Completion;
+            }, cancellationToken);
+        }
+
+        //public void Stop(CancellationToken token = default(CancellationToken))
+        //{
+        //    queue.Complete();
+        //    queue.Completion.Wait(token);
+        //}
 
         public MessageProcessorHandle Process(IRequestMessage requestMessage)
         {

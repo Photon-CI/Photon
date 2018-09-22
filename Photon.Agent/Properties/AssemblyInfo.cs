@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.0.209")]
@@ -15,3 +16,4 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 [assembly: Guid("2da02660-629d-48a9-bc50-a43bca23d768")]
+[assembly: InternalsVisibleTo("Photon.Tests")]

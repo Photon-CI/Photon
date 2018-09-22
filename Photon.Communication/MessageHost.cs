@@ -33,7 +33,9 @@ namespace Photon.Communication
             };
 
             Transceiver.ThreadException += Transceiver_OnThreadException;
-            Transceiver.Start(client);
+
+            var stream = client.GetStream();
+            Transceiver.Start(stream);
         }
 
         public void Dispose()
@@ -50,7 +52,8 @@ namespace Photon.Communication
             handshakeResult.TrySetCanceled();
 
             try {
-                Transceiver.Stop(token);
+                Transceiver.Flush(token);
+                Transceiver.Stop();
             }
             catch {}
 

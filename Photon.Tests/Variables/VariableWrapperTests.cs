@@ -6,6 +6,7 @@ using System;
 namespace Photon.Tests.Variables
 {
     [TestFixture, UnitTest]
+    [Parallelizable(ParallelScope.All)]
     public class VariableWrapperTests
     {
         private readonly VariableSet wrapper;

@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Photon.Communication.Messages;
 
-namespace Photon.Library.TcpMessages
+namespace Photon.Library.TcpMessages.Packages
 {
-    public class ProjectPackagePushRequest : IFileRequestMessage
+    public class AgentProjectPackagePushRequest : IFileRequestMessage
     {
         public string MessageId {get; set;}
         public string ServerSessionId {get; set;}
@@ -11,4 +11,9 @@ namespace Photon.Library.TcpMessages
         [JsonIgnore]
         public string Filename {get; set;}
     }
+
+    //public class AgentProjectPackagePushResponse : ResponseMessageBase
+    //{
+    //    //
+    //}
 }

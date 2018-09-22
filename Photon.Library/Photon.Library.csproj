@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -84,12 +86,18 @@
     <Compile Include="Security\UserGroup.cs" />
     <Compile Include="Security\UserGroupManager.cs" />
     <Compile Include="Session\SessionStatusArgs.cs" />
+    <Compile Include="TcpMessages\Applications\WorkerApplicationRegisterRevisionMessage.cs" />
+    <Compile Include="TcpMessages\Applications\WorkerApplicationGetRevisionMessage.cs" />
     <Compile Include="TcpMessages\HealthCheckResponse.cs" />
     <Compile Include="TcpMessages\AgentGetVersionResponse.cs" />
     <Compile Include="TcpMessages\AgentGetVersionRequest.cs" />
     <Compile Include="TcpMessages\AgentUpdateResponse.cs" />
     <Compile Include="TcpMessages\AgentUpdateRequest.cs" />
     <Compile Include="TcpMessages\HealthCheckRequest.cs" />
+    <Compile Include="TcpMessages\Packages\AgentApplicationPackagePushMessage.cs" />
+    <Compile Include="TcpMessages\Packages\WorkerApplicationPackagePullMessage.cs" />
+    <Compile Include="TcpMessages\Packages\WorkerProjectPackagePushMessage.cs" />
+    <Compile Include="TcpMessages\Packages\WorkerProjectPackagePullMessage.cs" />
     <Compile Include="TcpMessages\Security\SecurityPublishRequest.cs" />
     <Compile Include="TcpMessages\Security\SecurityPublishResponse.cs" />
     <Compile Include="TcpMessages\SessionCancelRequest.cs" />
@@ -104,6 +112,8 @@
     <Compile Include="TcpMessages\BuildSessionBeginResponse.cs" />
     <Compile Include="TcpMessages\SessionReleaseRequest.cs" />
     <Compile Include="TcpMessages\SessionReleaseResponse.cs" />
+    <Compile Include="TcpMessages\Session\WorkerTestSessionBeginMessage.cs" />
+    <Compile Include="TcpMessages\Session\WorkerBuildSessionRunMessage.cs" />
     <Compile Include="TcpMessages\TaskCompleteMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\SessionDomainBase.cs" />
@@ -112,10 +122,12 @@
     <Compile Include="TcpMessages\TaskRunResponse.cs" />
     <Compile Include="TcpMessages\DeploySessionBeginRequest.cs" />
     <Compile Include="TcpMessages\DeploySessionBeginResponse.cs" />
-    <Compile Include="TcpMessages\Packages\ProjectPackagePullRequest.cs" />
-    <Compile Include="TcpMessages\Packages\ProjectPackagePullResponse.cs" />
-    <Compile Include="TcpMessages\Packages\ProjectPackagePushRequest.cs" />
-    <Compile Include="TcpMessages\Packages\ProjectPackagePushResponse.cs" />
+    <Compile Include="TcpMessages\Packages\AgentProjectPackagePullMessage.cs" />
+    <Compile Include="TcpMessages\Packages\AgentProjectPackagePushMessage.cs" />
+    <Compile Include="TcpMessages\Packages\WorkerApplicationPackagePushMessage.cs" />
+    <Compile Include="TcpMessages\Session\WorkerTaskBeginMessage.cs" />
+    <Compile Include="TcpMessages\Session\WorkerBuildSessionBeginMessage.cs" />
+    <Compile Include="TcpMessages\Session\WorkerDisconnectMessage.cs" />
     <Compile Include="Variables\VariableSetDocument.cs" />
     <Compile Include="Variables\VariableSetDocumentManager.cs" />
     <Compile Include="ViewModelBase.cs" />

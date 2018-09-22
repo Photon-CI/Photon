@@ -11,6 +11,7 @@ namespace Photon.Framework.Variables
     {
         public Dictionary<string, string> Json {get;}
 
+        [JsonIgnore]
         public VariableSet this[string name] => GetSet(name);
 
 

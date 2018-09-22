@@ -50,7 +50,8 @@ namespace Photon.Communication
                 await Tcp.ConnectAsync(hostname, port);
             }
 
-            Transceiver.Start(Tcp);
+            var stream = Tcp.GetStream();
+            Transceiver.Start(stream);
         }
 
         public void Disconnect(int seconds = 30)
@@ -63,7 +64,8 @@ namespace Photon.Communication
         {
             try {
                 using (var tokenSource = new CancellationTokenSource(timeout)) {
-                    Transceiver.Stop(tokenSource.Token);
+                    Transceiver.Flush(tokenSource.Token);
+                    Transceiver.Stop();
                 }
             }
             catch {}

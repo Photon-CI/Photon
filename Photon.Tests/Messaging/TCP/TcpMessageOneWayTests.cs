@@ -6,15 +6,15 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.Tests.Messaging
+namespace Photon.Tests.Messaging.TCP
 {
     [TestFixture, IntegrationTest]
-    public class MessageOneWayTests
+    public class TcpMessageOneWayTests
     {
         private readonly MessageProcessorRegistry registry;
 
 
-        public MessageOneWayTests()
+        public TcpMessageOneWayTests()
         {
             registry = new MessageProcessorRegistry();
             registry.Register(typeof(TestMessageProcessor));

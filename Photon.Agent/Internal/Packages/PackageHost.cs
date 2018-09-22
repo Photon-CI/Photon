@@ -5,6 +5,7 @@ using Photon.Framework.Packages;
 using Photon.Library.TcpMessages;
 using System;
 using System.Threading.Tasks;
+using Photon.Library.TcpMessages.Packages;
 
 namespace Photon.Agent.Internal.Packages
 {
@@ -31,7 +32,7 @@ namespace Photon.Agent.Internal.Packages
 
         private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)
         {
-            var packageRequest = new ProjectPackagePushRequest {
+            var packageRequest = new AgentProjectPackagePushRequest {
                 ServerSessionId = ServerSessionId,
                 Filename = filename,
             };
@@ -55,14 +56,14 @@ namespace Photon.Agent.Internal.Packages
 
         private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
         {
-            var packageRequest = new ProjectPackagePullRequest {
+            var packageRequest = new AgentProjectPackagePullRequest {
                 ProjectPackageId = id,
                 ProjectPackageVersion = version,
             };
 
             Task.Run(async () => {
                 var response = await Transceiver.Send(packageRequest)
-                    .GetResponseAsync<ProjectPackagePullResponse>();
+                    .GetResponseAsync<AgentProjectPackagePullResponse>();
 
                 return response.Filename;
             }).ContinueWith(taskHandle.FromTask);

@@ -3,7 +3,7 @@ using Photon.Framework.Agent;
 using Photon.Framework.Applications;
 using Photon.Framework.Domain;
 using Photon.Framework.Packages;
-using Photon.Library.TcpMessages;
+using Photon.Library.TcpMessages.Packages;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -31,20 +31,20 @@ namespace Photon.Agent.Internal.Session
 
             await DownloadProjectPackage();
 
-            LoadProjectAssembly();
+            //LoadProjectAssembly();
         }
 
         private async Task DownloadProjectPackage()
         {
-            var packageRequest = new ProjectPackagePullRequest {
+            var packageRequest = new AgentProjectPackagePullRequest {
                 ProjectPackageId = ProjectPackageId,
                 ProjectPackageVersion = ProjectPackageVersion,
             };
 
-            ProjectPackagePullResponse packageResponse;
+            AgentProjectPackagePullResponse packageResponse;
             try {
                 packageResponse = await Transceiver.Send(packageRequest)
-                    .GetResponseAsync<ProjectPackagePullResponse>();
+                    .GetResponseAsync<AgentProjectPackagePullResponse>();
             }
             catch (Exception error) {
                 throw new ApplicationException($"Failed to download package '{ProjectPackageId}.{ProjectPackageVersion}'! {error.Message}");
@@ -65,22 +65,22 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        private void LoadProjectAssembly()
-        {
-            if (!File.Exists(AssemblyFilename)) {
-                Output.WriteLine($"The assembly file '{AssemblyFilename}' could not be found!", ConsoleColor.DarkYellow);
-                throw new ApplicationException($"The assembly file '{AssemblyFilename}' could not be found!");
-            }
+        //private void LoadProjectAssembly()
+        //{
+        //    if (!File.Exists(AssemblyFilename)) {
+        //        Output.WriteLine($"The assembly file '{AssemblyFilename}' could not be found!", ConsoleColor.DarkYellow);
+        //        throw new ApplicationException($"The assembly file '{AssemblyFilename}' could not be found!");
+        //    }
 
-            try {
-                Domain = new AgentSessionDomain();
-                Domain.Initialize(AssemblyFilename);
-            }
-            catch (Exception error) {
-                Output.WriteLine($"An error occurred while initializing the assembly! {error.Message} [{SessionId}]", ConsoleColor.DarkRed);
-                throw new ApplicationException($"Failed to initialize assembly! [{SessionId}]", error);
-            }
-        }
+        //    try {
+        //        Domain = new AgentSessionDomain();
+        //        Domain.Initialize(AssemblyFilename);
+        //    }
+        //    catch (Exception error) {
+        //        Output.WriteLine($"An error occurred while initializing the assembly! {error.Message} [{SessionId}]", ConsoleColor.DarkRed);
+        //        throw new ApplicationException($"Failed to initialize assembly! [{SessionId}]", error);
+        //    }
+        //}
 
         public override async Task RunTaskAsync(string taskName, string taskSessionId)
         {
@@ -92,31 +92,31 @@ namespace Photon.Agent.Internal.Session
             domainOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
             domainOutput.OnWriteRaw += text => Output.WriteRaw(text);
 
-            var packageClient = new DomainPackageClient(Packages.Boundary);
-            var applicationClient = new ApplicationManagerClient(Applications.Boundary) {
-                CurrentProjectId = Project.Id,
-                CurrentDeploymentNumber = DeploymentNumber,
-            };
+            //var packageClient = new DomainPackageClient(Packages.Boundary);
+            //var applicationClient = new ApplicationManagerClient(Applications.Boundary) {
+            //    CurrentProjectId = Project.Id,
+            //    CurrentDeploymentNumber = DeploymentNumber,
+            //};
 
-            var context = new AgentDeployContext {
-                DeploymentNumber = DeploymentNumber,
-                Project = Project,
-                ProjectPackageId = ProjectPackageId,
-                ProjectPackageVersion = ProjectPackageVersion,
-                AssemblyFilename = AssemblyFilename,
-                TaskName = taskName,
-                WorkDirectory = WorkDirectory,
-                ContentDirectory = ContentDirectory,
-                BinDirectory = BinDirectory,
-                ApplicationsDirectory = ApplicationsDirectory,
-                Output = domainOutput,
-                Packages = packageClient,
-                AgentVariables = AgentVariables,
-                ServerVariables = ServerVariables,
-                Applications = applicationClient,
-                EnvironmentName = EnvironmentName,
-                Agent = Agent,
-            };
+            //var context = new AgentDeployContext {
+            //    DeploymentNumber = DeploymentNumber,
+            //    Project = Project,
+            //    ProjectPackageId = ProjectPackageId,
+            //    ProjectPackageVersion = ProjectPackageVersion,
+            //    AssemblyFilename = AssemblyFilename,
+            //    TaskName = taskName,
+            //    WorkDirectory = WorkDirectory,
+            //    ContentDirectory = ContentDirectory,
+            //    BinDirectory = BinDirectory,
+            //    ApplicationsDirectory = ApplicationsDirectory,
+            //    Output = domainOutput,
+            //    Packages = packageClient,
+            //    AgentVariables = AgentVariables,
+            //    ServerVariables = ServerVariables,
+            //    Applications = applicationClient,
+            //    EnvironmentName = EnvironmentName,
+            //    Agent = Agent,
+            //};
 
             try {
                 var task = Task.Run(async () => {

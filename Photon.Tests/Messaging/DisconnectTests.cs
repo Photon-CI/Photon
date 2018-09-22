@@ -2,62 +2,116 @@
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Tests.Internal;
-using System.Net;
-using System.Threading;
+using Photon.Tests.Internal.TRx;
 using System.Threading.Tasks;
 
 namespace Photon.Tests.Messaging
 {
-    [TestFixture, IntegrationTest]
+    [TestFixture, UnitTest]
+    [Parallelizable(ParallelScope.All)]
     public class DisconnectTests
     {
-        private const string Host = "localhost";
-        private const int Port = 10931;
+        private readonly MessageProcessorRegistry registry;
 
+
+        public DisconnectTests()
+        {
+            registry = new MessageProcessorRegistry();
+            registry.Register(typeof(HostDisconnectProcessor));
+        }
 
         [Test]
-        public async Task ClientDisconnectWaitsForMessages()
+        public void HostDisconnectWaits()
         {
-            var registry = new MessageProcessorRegistry();
-            registry.Register(typeof(DelayedTestProcessor));
+            var context = new DisconnectContext {
+                Handle = new TaskCompletionSource<object>(),
+                Complete = false,
+            };
 
-            using (var listener = new MessageListener(registry))
-            using (var client = new MessageClient(registry)) {
-                listener.Listen(IPAddress.Loopback, Port);
-                await client.ConnectAsync(Host, Port, CancellationToken.None);
+            using (var duplexer = new Duplexer())
+            using (var host = new MessageTransceiver(registry))
+            using (var client = new MessageTransceiver(registry)) {
+                host.Context = context;
+                client.Context = context;
 
-                DelayedTestProcessor.Complete = false;
-                var message = new DelayedTestRequest();
-                var _ = client.Send(message).GetResponseAsync<DelayedTestResponse>();
+                host.Start(duplexer.StreamA);
+                client.Start(duplexer.StreamB);
 
-                client.Disconnect();
-                //await task;
+                var message = new HostDisconnectRequest();
+                host.Send(message);
 
-                Assert.That(DelayedTestProcessor.Complete, Is.True);
+                host.Flush();
+                host.Stop();
 
-                listener.Stop();
+                context.Handle.Task.Wait(600);
+
+                client.Flush();
+                client.Stop();
+
+                Assert.That(context.Complete, Is.True);
             }
         }
 
-        private class DelayedTestRequest : IRequestMessage
+        [Test]
+        public async Task ClientDisconnectWaits()
+        {
+            var context = new DisconnectContext {
+                Handle = new TaskCompletionSource<object>(),
+                Complete = false,
+            };
+
+            using (var duplexer = new Duplexer())
+            using (var host = new MessageTransceiver(registry))
+            using (var client = new MessageTransceiver(registry)) {
+                host.Context = context;
+                client.Context = context;
+
+                host.Start(duplexer.StreamA);
+                client.Start(duplexer.StreamB);
+
+                var _client = client;
+                var clientTask = Task.Run(async () => {
+                    await context.Handle.Task;
+
+                    await _client.FlushAsync();
+                    _client.Stop();
+                });
+
+                var message = new HostDisconnectRequest();
+                if (!host.Send(message).GetResponseAsync().Wait(10_000))
+                    Assert.Fail("Timeout waiting for response message!");
+
+                await host.FlushAsync();
+                host.Stop();
+
+                if (!clientTask.Wait(10_000))
+                    Assert.Fail("Timeout waiting for client task to complete!");
+
+                Assert.That(context.Complete, Is.True);
+            }
+        }
+
+        private class HostDisconnectRequest : IRequestMessage
         {
             public string MessageId {get; set;}
         }
 
-        private class DelayedTestResponse : ResponseMessageBase {}
-
-        private class DelayedTestProcessor : MessageProcessorBase<DelayedTestRequest>
+        private class HostDisconnectProcessor : MessageProcessorBase<HostDisconnectRequest>
         {
-            public static bool Complete {get; set;}
-
-
-            public override async Task<IResponseMessage> Process(DelayedTestRequest requestMessage)
+            public override async Task<IResponseMessage> Process(HostDisconnectRequest requestMessage)
             {
-                await Task.Delay(800);
+                var context = (DisconnectContext)Transceiver.Context;
+                context.Complete = true;
+                context.Handle.SetResult(null);
 
-                Complete = true;
-                return new DelayedTestResponse();
+                return await Task.FromResult(new ResponseMessageBase());
             }
+        }
+
+        private class DisconnectContext
+        {
+            public TaskCompletionSource<object> Handle {get; set;}
+            public bool Complete {get; set;}
         }
     }
 }

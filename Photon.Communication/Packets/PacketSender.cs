@@ -4,6 +4,7 @@ using Photon.Communication.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -25,9 +26,8 @@ namespace Photon.Communication.Packets
         public int BufferSize {get;}
 
 
-        public PacketSender(BinaryWriter writer, int bufferSize)
+        public PacketSender(Stream stream, Encoding encoding, int bufferSize)
         {
-            this.writer = writer;
             this.BufferSize = bufferSize;
 
             if (bufferSize <= 0) throw new ArgumentOutOfRangeException(nameof(bufferSize), "Value must be greater than zero!");
@@ -35,20 +35,19 @@ namespace Photon.Communication.Packets
             BufferSize = 4;
             packetSourceList = new List<PacketSource>();
             jsonSerializer = new JsonSerializer();
+            writer = new BinaryWriter(stream, encoding, true);
         }
 
         public void Dispose()
         {
-            try {
-                tokenSource?.Cancel();
-            }
-            catch { }
+            Stop();
+
+            tokenSource?.Dispose();
 
             foreach (var packetSource in packetSourceList)
                 packetSource.Dispose();
 
             packetSourceList.Clear();
-            tokenSource?.Dispose();
         }
 
         public void Start()
@@ -57,10 +56,23 @@ namespace Photon.Communication.Packets
 
             queue = new BufferBlock<IMessage>();
 
-            task = Process(queue, tokenSource.Token);
+            task = Process(tokenSource.Token);
         }
 
-        public void Stop(CancellationToken token = default(CancellationToken))
+        public void Stop()
+        {
+            try {
+                tokenSource?.Cancel();
+            }
+            catch {}
+
+            try {
+                writer?.Dispose();
+            }
+            catch {}
+        }
+
+        public void Flush(CancellationToken token = default(CancellationToken))
         {
             queue.Complete();
             queue.Completion.Wait(token);
@@ -68,12 +80,22 @@ namespace Photon.Communication.Packets
             task.Wait(token);
         }
 
+        public async Task FlushAsync(CancellationToken token = default(CancellationToken))
+        {
+            queue.Complete();
+
+            await Task.Run(async () => {
+                await queue.Completion;
+                await task;
+            }, token);
+        }
+
         public void Enqueue(IMessage message)
         {
             queue.Post(message);
         }
 
-        private async Task Process(BufferBlock<IMessage> queue, CancellationToken token)
+        private async Task Process(CancellationToken token)
         {
             while (await queue.OutputAvailableAsync(token)) {
                 var firstRun = true;
@@ -116,21 +138,25 @@ namespace Photon.Communication.Packets
             var messageData = new MemoryStream();
 
             Stream streamData = null;
-            if (message is IStreamMessage streamMessage) {
-                try {
-                    streamData = streamMessage.StreamFunc();
-                }
-                catch (Exception error) {
-                    OnThreadError(new ApplicationException("Failed to open message stream source!", error));
-                }
-            }
-            else if (message is IFileMessage fileMessage) {
-                try {
-                    streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-                }
-                catch (Exception error) {
-                    OnThreadError(new ApplicationException("Failed to open message file source!", error));
-                }
+            switch (message) {
+                case IStreamMessage streamMessage:
+                    try {
+                        streamData = streamMessage.StreamFunc();
+                    }
+                    catch (Exception error) {
+                        OnThreadError(new ApplicationException("Failed to open message stream source!", error));
+                    }
+
+                    break;
+                case IFileMessage fileMessage:
+                    try {
+                        streamData = File.Open(fileMessage.Filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    }
+                    catch (Exception error) {
+                        OnThreadError(new ApplicationException("Failed to open message file source!", error));
+                    }
+
+                    break;
             }
 
             // TODO: BsonDataWriter should be disposed!

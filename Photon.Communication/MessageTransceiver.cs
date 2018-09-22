@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
-    public class MessageTransceiver
+    public class MessageTransceiver : IDisposable
     {
         public event UnhandledExceptionEventHandler ThreadException;
 
@@ -16,15 +17,14 @@ namespace Photon.Communication
         private readonly ConcurrentDictionary<string, MessageHandle> messageHandles;
         private readonly MessageSender messageSender;
         private readonly MessageReceiver messageReceiver;
-        private TcpClient tcpClient;
-        private NetworkStream stream;
+        private Stream stream;
 
         internal MessageProcessor Processor {get;}
         public object Context {get; set;}
         public bool IsStarted {get; private set;}
 
 
-        internal MessageTransceiver(MessageProcessorRegistry registry)
+        public MessageTransceiver(MessageProcessorRegistry registry)
         {
             startStopLock = new object();
             messageHandles = new ConcurrentDictionary<string, MessageHandle>(StringComparer.Ordinal);
@@ -34,7 +34,7 @@ namespace Photon.Communication
 
             messageSender.ThreadError += MessageSender_OnThreadError;
             messageReceiver.MessageReceived += MessageReceiver_MessageReceived;
-            messageReceiver.ThreadException += MessageReceiver_OnThreadException;
+            //messageReceiver.ThreadException += MessageReceiver_OnThreadException;
         }
 
         public void Dispose()
@@ -42,25 +42,43 @@ namespace Photon.Communication
             messageSender?.Dispose();
             messageReceiver.Dispose();
             stream?.Dispose();
-            tcpClient?.Dispose();
         }
 
-        public void Start(TcpClient client)
+        public void Start(Stream stream)
         {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (!stream.CanRead) throw new ArgumentException("Stream must be readable!", nameof(stream));
+            if (!stream.CanWrite) throw new ArgumentException("Stream must be writable!", nameof(stream));
+
             lock (startStopLock) {
                 if (IsStarted) throw new Exception("Transceiver is already started!");
                 IsStarted = true;
             }
 
-            tcpClient = client;
-            stream = tcpClient.GetStream();
+            this.stream = stream;
 
             Processor.Start();
             messageSender.Start(stream);
             messageReceiver.Start(stream);
         }
 
-        public void Stop(CancellationToken token = default(CancellationToken))
+        public void Flush(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            messageReceiver.Flush(cancellationToken);
+            Processor.Flush(cancellationToken);
+            messageSender.Flush(cancellationToken);
+            stream.Flush();
+        }
+
+        public async Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            messageReceiver.Flush(cancellationToken);
+            await Processor.FlushAsync(cancellationToken);
+            await messageSender.FlushAsync(cancellationToken);
+            await stream.FlushAsync(cancellationToken);
+        }
+
+        public void Stop()
         {
             lock (startStopLock) {
                 if (!IsStarted) return;
@@ -68,23 +86,12 @@ namespace Photon.Communication
             }
 
             try {
-                messageSender.Stop(token);
+                messageSender.Stop();
             }
             catch {}
 
             try {
-                messageReceiver.Stop(token);
-            }
-            catch {}
-
-            try {
-                Processor.Stop(token);
-            }
-            catch {}
-
-            try {
-                stream.Flush();
-                stream.Close();
+                messageReceiver.Stop();
             }
             catch {}
         }
@@ -159,10 +166,10 @@ namespace Photon.Communication
             }
         }
 
-        private void MessageReceiver_OnThreadException(object sender, UnhandledExceptionEventArgs e)
-        {
-            OnThreadException(e.ExceptionObject);
-        }
+        //private void MessageReceiver_OnThreadException(object sender, UnhandledExceptionEventArgs e)
+        //{
+        //    OnThreadException(e.ExceptionObject);
+        //}
 
         private void MessageSender_OnThreadError(object sender, ThreadExceptionEventArgs e)
         {

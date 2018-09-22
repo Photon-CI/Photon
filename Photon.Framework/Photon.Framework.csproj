@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Photon.Framework.xml</DocumentationFile>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Photon.Framework.xml</DocumentationFile>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -51,7 +53,7 @@
     <Compile Include="Applications\DomainApplicationRevision.cs" />
     <Compile Include="Artifacts\ArtifactManagerClient.cs" />
     <Compile Include="Artifacts\ArtifactManagerBoundary.cs" />
-    <Compile Include="Domain\DomainAgentBase.cs" />
+    <Compile Include="CombinedStream.cs" />
     <Compile Include="Domain\DomainAgentSessionClient.cs" />
     <Compile Include="Domain\DomainAgentSessionHandle.cs" />
     <Compile Include="Domain\DomainBlockWriter.cs" />
@@ -73,11 +75,10 @@
     <Compile Include="IWriteAnsi.cs" />
     <Compile Include="JsonSettings.cs" />
     <Compile Include="Packages\ApplicationPackageDefinition.cs" />
-    <Compile Include="Packages\DomainPackageBoundary.cs" />
+    <Compile Include="Packages\IPackageClient.cs" />
     <Compile Include="Packages\ProjectPackageDefinition.cs" />
     <Compile Include="Packages\ProjectPackageUtility.cs" />
     <Compile Include="Packages\ApplicationPackageUtility.cs" />
-    <Compile Include="Packages\DomainPackageClient.cs" />
     <Compile Include="Packages\PackageReference.cs" />
     <Compile Include="Pooling\IReferenceItem.cs" />
     <Compile Include="Pooling\LifespanReferenceItem.cs" />

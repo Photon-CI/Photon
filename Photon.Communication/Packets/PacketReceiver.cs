@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ namespace Photon.Communication.Packets
     {
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        private readonly NetworkStream stream;
+        private readonly Stream stream;
         private readonly ManualResetEventSlim completeEvent;
         private readonly BinaryReader reader;
         private readonly Dictionary<string, PacketBuilder> packetBuilderList;
@@ -21,7 +20,7 @@ namespace Photon.Communication.Packets
         public int Count => packetBuilderList.Count;
 
 
-        public PacketReceiver(NetworkStream stream)
+        public PacketReceiver(Stream stream)
         {
             this.stream = stream;
 
@@ -37,14 +36,16 @@ namespace Photon.Communication.Packets
             stream?.Dispose();
         }
 
-        public void Stop(CancellationToken token)
+        public void Flush(CancellationToken cancellationToken = default(CancellationToken))
         {
             try {
-                completeEvent.Wait(token);
+                completeEvent.Wait(cancellationToken);
             }
             catch (OperationCanceledException) {}
+        }
 
-            stream.Flush();
+        public void Stop(CancellationToken token)
+        {
             stream.Close();
         }
 
@@ -71,7 +72,7 @@ namespace Photon.Communication.Packets
                 packetBuilder.Dispose();
 
                 // TODO: Lock Access
-                if (packetBuilderList.Count == 0 && !stream.DataAvailable)
+                if (packetBuilderList.Count == 0)
                     completeEvent.Set();
             }
         }
@@ -114,7 +115,10 @@ namespace Photon.Communication.Packets
 
                 var remainingSize = buffer.Length - bufferPos;
                 var readSize = await stream.ReadAsync(buffer, bufferPos, remainingSize, token);
-                if (readSize == 0) throw new EndOfStreamException();
+                if (readSize == 0) {
+                    //throw new EndOfStreamException();
+                    await Task.Delay(20, token);
+                }
 
                 bufferPos += readSize;
             }

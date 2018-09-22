@@ -2,107 +2,131 @@
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Tests.Internal;
-using System;
-using System.Collections.Generic;
+using Photon.Tests.Internal.TRx;
 using System.Diagnostics;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Tests.Messaging
 {
-    [TestFixture, IntegrationTest]
-    public class SendMessageTests : IDisposable
+    [TestFixture, UnitTest]
+    [Parallelizable(ParallelScope.All)]
+    public class SendMessageTests
     {
-        private const int Port = 10933;
-
-        private readonly MessageListener listener;
-        private readonly MessageClient client;
+        private readonly MessageProcessorRegistry registry;
 
 
         public SendMessageTests()
         {
-            var registry = new MessageProcessorRegistry();
+            registry = new MessageProcessorRegistry();
             registry.Register(typeof(TestMessageProcessor));
             registry.Register(typeof(TestMessageOneWayProcessor));
-
-            listener = new MessageListener(registry);
-            client = new MessageClient(registry);
-        }
-
-        public void Dispose()
-        {
-            client?.Dispose();
-            listener?.Dispose();
-        }
-
-        [OneTimeSetUp]
-        public async Task Begin()
-        {
-            listener.Listen(IPAddress.Any, Port);
-
-            await client.ConnectAsync("localhost", Port, CancellationToken.None);
-        }
-
-        [OneTimeTearDown]
-        public void End()
-        {
-            client.Disconnect();
-            listener.Stop();
         }
 
         [Test]
         public async Task SendMessageOneWay()
         {
-            var completeEvent = new TaskCompletionSource<bool>();
-            TestMessageOneWayProcessor._event = completeEvent;
+            var context = new MessageCompleteContext();
 
-            var message = new TestRequestOneWayMessage();
-            client.SendOneWay(message);
+            using (var duplexer = new Duplexer())
+            using (var transceiverA = new MessageTransceiver(registry))
+            using (var transceiverB = new MessageTransceiver(registry)) {
+                transceiverA.Context = context;
+                transceiverB.Context = context;
 
-            var result = await completeEvent.Task;
-            Assert.That(result, Is.True);
+                transceiverA.Start(duplexer.StreamA);
+                transceiverB.Start(duplexer.StreamB);
+
+                var message = new TestRequestOneWayMessage();
+                transceiverA.SendOneWay(message);
+
+                var result = await context.CompleteEvent.Task;
+                Assert.That(result, Is.True);
+            }
         }
 
         [Test]
         public async Task SendMessageResponse()
         {
-            var request = new TestRequestMessage {
-                Value = 2,
-            };
+            using (var duplexer = new Duplexer())
+            using (var transceiverA = new MessageTransceiver(registry))
+            using (var transceiverB = new MessageTransceiver(registry)) {
+                transceiverA.Start(duplexer.StreamA);
+                transceiverB.Start(duplexer.StreamB);
 
-            var response = await client.Send(request)
-                .GetResponseAsync<TestResponseMessage>();
+                var request = new TestRequestMessage {
+                    Value = 2,
+                };
 
-            Assert.That(response.Value, Is.EqualTo(4));
+                var response = await transceiverA.Send(request)
+                    .GetResponseAsync<TestResponseMessage>();
+
+                Assert.That(response.Value, Is.EqualTo(4));
+            }
         }
 
         [Test]
         public async Task Send_1000_MessageResponses()
         {
             var timer = Stopwatch.StartNew();
+            const int count = 1_000;
 
-            var responseList = new List<Task<TestResponseMessage>>();
+            using (var duplexer = new Duplexer())
+            using (var transceiverA = new MessageTransceiver(registry))
+            using (var transceiverB = new MessageTransceiver(registry)) {
+                transceiverA.Start(duplexer.StreamA);
+                transceiverB.Start(duplexer.StreamB);
 
-            for (var i = 0; i < 1000; i++) {
-                var request = new TestRequestMessage {
-                    Value = 2,
-                };
+                for (var i = 0; i < count; i++) {
+                    var request = new TestRequestMessage {
+                        Value = 2,
+                    };
 
-                responseList.Add(client.Send(request)
-                    .GetResponseAsync<TestResponseMessage>());
-            }
+                    var response = await transceiverA.Send(request)
+                        .GetResponseAsync<TestResponseMessage>();
 
-            await Task.WhenAll(responseList);
-
-            foreach (var responseTask in responseList) {
-                Assert.That(responseTask.Result.Value, Is.EqualTo(4));
+                    Assert.That(response.Value, Is.EqualTo(4));
+                }
             }
 
             timer.Stop();
 
-            var count = responseList.Count;
             await TestContext.Out.WriteLineAsync($"Sent {count:N0} request/response messages in {timer.Elapsed}.");
+        }
+
+        [Test]
+        public async Task Send_Delayed_MessageResponses()
+        {
+            var timer = Stopwatch.StartNew();
+            const int count = 3;
+
+            using (var duplexer = new Duplexer())
+            using (var transceiverA = new MessageTransceiver(registry))
+            using (var transceiverB = new MessageTransceiver(registry)) {
+                transceiverA.Start(duplexer.StreamA);
+                transceiverB.Start(duplexer.StreamB);
+
+                for (var i = 0; i < count; i++) {
+                    var request = new TestRequestMessage {
+                        Value = 2,
+                    };
+
+                    await Task.Delay(3_000);
+
+                    var response = await transceiverA.Send(request)
+                        .GetResponseAsync<TestResponseMessage>();
+
+                    Assert.That(response.Value, Is.EqualTo(4));
+                }
+            }
+
+            timer.Stop();
+
+            await TestContext.Out.WriteLineAsync($"Sent {count:N0} request/response messages in {timer.Elapsed}.");
+        }
+
+        private class MessageCompleteContext
+        {
+            public TaskCompletionSource<object> CompleteEvent {get;} = new TaskCompletionSource<object>();
         }
 
         private class TestRequestOneWayMessage : IRequestMessage
@@ -125,23 +149,21 @@ namespace Photon.Tests.Messaging
         {
             public override async Task<IResponseMessage> Process(TestRequestMessage requestMessage)
             {
-                return await Task.FromResult(new TestResponseMessage {
+                return new TestResponseMessage {
                     RequestMessageId = requestMessage.MessageId,
                     Value = requestMessage.Value * 2,
-                });
+                };
             }
         }
 
         private class TestMessageOneWayProcessor : MessageProcessorBase<TestRequestOneWayMessage>
         {
-            internal static TaskCompletionSource<bool> _event;
-
-            
-            public override async Task<IResponseMessage> Process(TestRequestOneWayMessage requestMessage)
+            public override Task<IResponseMessage> Process(TestRequestOneWayMessage requestMessage)
             {
-                _event?.SetResult(true);
+                var context = (MessageCompleteContext)Transceiver.Context;
+                context.CompleteEvent.SetResult(true);
 
-                return await Task.FromResult((IResponseMessage)null);
+                return Task.FromResult<IResponseMessage>(null);
             }
         }
     }

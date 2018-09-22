@@ -1,13 +1,9 @@
 ﻿using Photon.Agent.Internal.Git;
 using Photon.Communication;
-using Photon.Framework.Agent;
-using Photon.Framework.Applications;
-using Photon.Framework.Domain;
-using Photon.Framework.Packages;
-using Photon.Framework.Process;
 using Photon.Framework.Projects;
 using Photon.Framework.Tools.Content;
 using Photon.Library.GitHub;
+using Photon.Library.TcpMessages.Session;
 using System;
 using System.IO;
 using System.Threading;
@@ -36,61 +32,47 @@ namespace Photon.Agent.Internal.Session
 
             await LoadProjectSource();
 
-            LoadProjectAssembly();
+            StartWorker();
+
+            var msg = new WorkerBuildSessionBeginRequest {
+                AgentSessionId = SessionId,
+                ServerSessionId = ServerSessionId,
+                SessionClientId = SessionClientId,
+                BinDirectory = BinDirectory,
+                WorkDirectory = WorkDirectory,
+                ContentDirectory = ContentDirectory,
+                AssemblyFilename = AssemblyFilename,
+                Project = Project,
+                Agent = Agent,
+            };
+
+            await WorkerHandle.Transceiver.Send(msg)
+                .GetResponseAsync(TokenSource.Token);
         }
 
-        public override async Task RunTaskAsync(string taskName, string taskSessionId)
+        public async Task RunTaskAsync(string taskName, string taskSessionId)
         {
-            using (var contextOutput = new DomainOutput()) {
-                contextOutput.OnWrite += (text, color) => Output.Write(text, color);
-                contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
-                contextOutput.OnWriteRaw += text => Output.WriteRaw(text);
+            var githubSource = Project?.Source as ProjectGithubSource;
+            var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-                var packageClient = new DomainPackageClient(Packages.Boundary);
-                var applicationClient = new ApplicationManagerClient(Applications.Boundary) {
-                    CurrentProjectId = Project.Id,
-                    CurrentDeploymentNumber = BuildNumber, // TODO: BuildTask should not have access
-                };
+            if (notifyGithub && SourceCommit != null)
+                await NotifyGithubStarted(githubSource);
 
-                var context = new AgentBuildContext {
-                    Project = Project,
-                    Agent = Agent,
-                    AssemblyFilename = AssemblyFilename,
-                    GitRefspec = GitRefspec,
-                    TaskName = taskName,
-                    WorkDirectory = WorkDirectory,
-                    ContentDirectory = ContentDirectory,
-                    BinDirectory = BinDirectory,
-                    BuildNumber = BuildNumber,
-                    Output = contextOutput,
-                    Packages = packageClient,
-                    ServerVariables = ServerVariables,
-                    AgentVariables = AgentVariables,
-                    Applications = applicationClient,
-                    CommitHash = CommitHash,
-                    CommitAuthor = CommitAuthor,
-                    CommitMessage = CommitMessage,
-                };
+            try {
+                var task = Task.Run(async () => {
+                    var request = new WorkerBuildSessionRunRequest();
 
-                var githubSource = Project?.Source as ProjectGithubSource;
-                var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
-
-                if (notifyGithub && SourceCommit != null)
-                    await NotifyGithubStarted(githubSource);
-
-                try {
-                    var task = Task.Run(async () => {
-                        await Domain.RunBuildTask(context, TokenSource.Token);
-                    });
-                    await taskList.AddOrUpdate(taskSessionId, id => task, (id, _) => task);
-                    await task.ContinueWith(t => {
-                        taskList.TryRemove(taskSessionId, out _);
-                    });
-                }
-                catch (Exception error) {
-                    Exception = error;
-                    throw;
-                }
+                    await WorkerHandle.Transceiver.Send(request)
+                        .GetResponseAsync();
+                });
+                await taskList.AddOrUpdate(taskSessionId, id => task, (id, _) => task);
+                await task.ContinueWith(t => {
+                    taskList.TryRemove(taskSessionId, out _);
+                });
+            }
+            catch (Exception error) {
+                Exception = error;
+                throw;
             }
         }
 
@@ -163,56 +145,7 @@ namespace Photon.Agent.Internal.Session
             throw new TimeoutException("A timeout occurred waiting for the repository.");
         }
 
-        private void LoadProjectAssembly()
-        {
-            if (string.IsNullOrEmpty(AssemblyFilename)) {
-                Output.WriteLine("No assembly filename defined!", ConsoleColor.DarkRed);
-                throw new ApplicationException("Assembly filename is undefined!");
-            }
-
-            if (!string.IsNullOrWhiteSpace(PreBuild)) {
-                Output.WriteLine("Running Pre-Build Script...", ConsoleColor.DarkCyan);
-
-                try {
-                    RunCommandScript(PreBuild);
-                }
-                catch (Exception error) {
-                    Output.WriteLine($"An error occurred while executing the Pre-Build script! {error.Message} [{SessionId}]", ConsoleColor.DarkYellow);
-                    throw new ApplicationException($"Script Pre-Build failed! [{SessionId}]", error);
-                }
-            }
-
-            var assemblyFilename = Path.Combine(ContentDirectory, AssemblyFilename);
-
-            if (!File.Exists(assemblyFilename)) {
-                Output.WriteLine($"The assembly file '{assemblyFilename}' could not be found!", ConsoleColor.DarkYellow);
-                throw new ApplicationException($"The assembly file '{assemblyFilename}' could not be found!");
-            }
-
-            // Shadow-Copy assembly folder
-            string assemblyCopyFilename;
-            try {
-                var sourcePath = Path.GetDirectoryName(assemblyFilename);
-                var assemblyName = Path.GetFileName(assemblyFilename);
-                assemblyCopyFilename = Path.Combine(BinDirectory, assemblyName);
-                CopyDirectory(sourcePath, BinDirectory);
-            }
-            catch (Exception error) {
-                Output.WriteLine($"Failed to shadow-copy assembly '{assemblyFilename}'!", ConsoleColor.DarkYellow);
-                throw new ApplicationException($"Failed to shadow-copy assembly '{assemblyFilename}'!", error);
-            }
-
-            try {
-                Domain = new AgentSessionDomain();
-                Domain.Initialize(assemblyCopyFilename);
-            }
-            catch (Exception error) {
-                Output.WriteLine($"An error occurred while initializing the assembly! {error.Message} [{SessionId}]", ConsoleColor.DarkRed);
-                throw new ApplicationException($"Failed to initialize Assembly! [{SessionId}]", error);
-            }
-        }
-
-        private void CopyDirectory(string sourcePath, string destPath)
+        private static void CopyDirectory(string sourcePath, string destPath)
         {
             var filter = new ContentFilter {
                 SourceDirectory = sourcePath,
@@ -274,19 +207,6 @@ namespace Photon.Agent.Internal.Session
             }
 
             await GetStatusUpdater(githubSource).Post(status);
-        }
-
-        protected void RunCommandScript(string command)
-        {
-            var runInfo = ProcessRunInfo.FromCommand(command);
-            runInfo.WorkingDirectory = ContentDirectory;
-
-            var result = new ProcessRunner {
-                Output = Output.Writer,
-            }.Run(runInfo);
-
-            if (result.ExitCode != 0)
-                throw new ApplicationException("Process terminated with a non-zero exit code!");
         }
     }
 }

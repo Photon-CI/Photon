@@ -6,6 +6,7 @@ using System;
 namespace Photon.Tests.Extensions
 {
     [TestFixture, UnitTest]
+    [Parallelizable(ParallelScope.All)]
     public class ArgSplitTests
     {
         [Test]

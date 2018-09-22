@@ -2,7 +2,7 @@
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Framework.Domain;
-using Photon.Library.TcpMessages;
+using Photon.Library.TcpMessages.Packages;
 using Photon.Server.Internal;
 using System;
 using System.IO;
@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Photon.Server.MessageProcessors
 {
-    internal class ProjectPackagePushProcessor : MessageProcessorBase<ProjectPackagePushRequest>
+    internal class ProjectPackagePushProcessor : MessageProcessorBase<AgentProjectPackagePushRequest>
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ProjectPackagePushProcessor));
 
 
-        public override async Task<IResponseMessage> Process(ProjectPackagePushRequest requestMessage)
+        public override async Task<IResponseMessage> Process(AgentProjectPackagePushRequest requestMessage)
         {
             try {
                 if (!PhotonServer.Instance.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
@@ -34,7 +34,7 @@ namespace Photon.Server.MessageProcessors
                 }
             }
 
-            return new ProjectPackagePushResponse();
+            return new ResponseMessageBase();
         }
     }
 }

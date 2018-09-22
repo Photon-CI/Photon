@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Applications;
+using System;
 
 namespace Photon.Framework.Agent
 {
@@ -11,5 +12,6 @@ namespace Photon.Framework.Agent
         public string CommitHash {get; set;}
         public string CommitAuthor {get; set;}
         public string CommitMessage {get; set;}
+        public IApplicationReader Applications {get; set;}
     }
 }

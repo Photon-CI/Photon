@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -43,11 +44,47 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\Configuration.cs" />
+    <Compile Include="Internal\MessageContext.cs" />
+    <Compile Include="Internal\Clients\ApplicationClient.cs" />
+    <Compile Include="Internal\Clients\PackageClient.cs" />
+    <Compile Include="Internal\MessageProcessorExtensions.cs" />
+    <Compile Include="Internal\ProcessArguments.cs" />
+    <Compile Include="Internal\Session\SessionBlockWriter.cs" />
+    <Compile Include="Internal\Session\SessionOutput.cs" />
+    <Compile Include="Internal\Session\WorkerTestSession.cs" />
+    <Compile Include="Internal\Session\WorkerDeploymentSession.cs" />
+    <Compile Include="Internal\Session\WorkerBuildSession.cs" />
+    <Compile Include="Internal\Session\WorkerSession.cs" />
+    <Compile Include="MessageHandlers\TestSessionBeginProcessor.cs" />
+    <Compile Include="MessageHandlers\BuildSessionRunProcessor.cs" />
+    <Compile Include="MessageHandlers\DisconnectProcessor.cs" />
+    <Compile Include="MessageHandlers\TaskBeginProcessor.cs" />
+    <Compile Include="MessageHandlers\BuildSessionBeginProcessor.cs" />
+    <Compile Include="MessageHandlers\HandshakeProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Photon.Communication\Photon.Communication.csproj">
+      <Project>{E167A349-7691-4406-9F4B-989BD5E6E12F}</Project>
+      <Name>Photon.Communication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Photon.Framework\Photon.Framework.csproj">
+      <Project>{e49360fd-beac-4713-a421-579564fb0992}</Project>
+      <Name>Photon.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Photon.Library\Photon.Library.csproj">
+      <Project>{76d31d86-404d-4812-9101-c2f7614f28e7}</Project>
+      <Name>Photon.Library</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y "$(TargetDir)*.*" "$(SolutionDir)Photon.Agent\bin\$(Configuration)\Worker\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

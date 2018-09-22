@@ -1,7 +1,8 @@
 ﻿using log4net;
 using Photon.Agent.Internal.Applications;
-using Photon.Agent.Internal.Packages;
+using Photon.Agent.Internal.Workers;
 using Photon.Communication;
+using Photon.Framework;
 using Photon.Framework.Extensions;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
@@ -13,7 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Photon.Framework;
 
 namespace Photon.Agent.Internal.Session
 {
@@ -39,8 +39,6 @@ namespace Photon.Agent.Internal.Session
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
-        protected AgentSessionDomain Domain {get; set;}
-        protected PackageHost Packages {get;}
         protected ApplicationHost Applications {get;}
         public MessageTransceiver Transceiver {get;}
         public SessionOutput Output {get;}
@@ -49,6 +47,8 @@ namespace Photon.Agent.Internal.Session
         public bool IsReleased {get; set;}
 
         protected ILog Log => _log.Value;
+
+        protected Worker WorkerHandle {get;}
 
 
         protected AgentSessionBase(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
@@ -70,12 +70,12 @@ namespace Photon.Agent.Internal.Session
             ContentDirectory = Path.Combine(WorkDirectory, "content");
             BinDirectory = Path.Combine(WorkDirectory, "bin");
 
-            Packages = new PackageHost {
-                ServerSessionId = serverSessionId,
-                Transceiver = transceiver,
-            };
-
             Applications = new ApplicationHost();
+
+            WorkerHandle = new Worker {
+                Filename = Path.Combine(Configuration.AssemblyPath, "Worker", "Photon.Worker.exe"),
+                ShowConsole = true,
+            };
         }
 
         public virtual void Dispose()
@@ -85,8 +85,6 @@ namespace Photon.Agent.Internal.Session
             
             TokenSource?.Dispose();
             Applications.Dispose();
-            Packages?.Dispose();
-            Domain?.Dispose();
         }
 
         //public void Cancel()
@@ -94,8 +92,9 @@ namespace Photon.Agent.Internal.Session
         //    TokenSource?.Cancel();
         //}
 
-        public virtual void OnSessionBegin() {}
-        public virtual void OnSessionEnd() {}
+        //public virtual void OnSessionBegin() {}
+
+        //public virtual void OnSessionEnd() {}
 
         public virtual async Task InitializeAsync()
         {
@@ -106,7 +105,7 @@ namespace Photon.Agent.Internal.Session
             Directory.CreateDirectory(BinDirectory);
         }
 
-        public abstract Task RunTaskAsync(string taskName, string taskSessionId);
+        //public abstract Task RunTaskAsync(string taskName, string taskSessionId);
 
         public abstract Task CompleteAsync();
 
@@ -120,32 +119,32 @@ namespace Photon.Agent.Internal.Session
             OnReleased();
 
             using (var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(8))) {
-                Transceiver.Stop(tokenSource.Token);
+                await Transceiver.FlushAsync(tokenSource.Token);
+                Transceiver.Stop();
             }
 
-            if (Domain != null) {
-                try {
-                    await Domain.Unload(true);
-                }
-                catch (Exception error) {
-                    Log.Error($"An error occurred while unloading the session domain [{SessionId}]!", error);
-                }
-
-                try {
-                    Domain.Dispose();
-                }
-                catch (Exception error) {
-                    Log.Error($"An error occurred while disposing the session domain [{SessionId}]!", error);
-                }
-
-                Domain = null;
+            try {
+                WorkerHandle.Disconnect();
+            }
+            catch (Exception error) {
+                Log.Error($"An error occurred while unloading session [{SessionId}]!", error);
             }
 
-            await CleanupWorkDir();
+            try {
+                await CleanupWorkDir();
+            }
+            catch (Exception error) {
+                Log.Error($"Failed to clean the work directory! {error.UnfoldMessages()}");
+            }
 
-            var maxAppCount = PhotonAgent.Instance.AgentConfiguration.Value.Applications.MaxCount;
-            PhotonAgent.Instance.ApplicationMgr.ApplyRetentionPolicy(maxAppCount);
-            PhotonAgent.Instance.ApplicationMgr.Save();
+            try {
+                var maxAppCount = PhotonAgent.Instance.AgentConfiguration.Value.Applications.MaxCount;
+                PhotonAgent.Instance.ApplicationMgr.ApplyRetentionPolicy(maxAppCount);
+                PhotonAgent.Instance.ApplicationMgr.Save();
+            }
+            catch (Exception error) {
+                Log.Error("Failed to apply application revision policy!", error);
+            }
         }
 
         public async Task AbortAsync()
@@ -177,6 +176,16 @@ namespace Photon.Agent.Internal.Session
             ReleaseEvent?.Invoke(this, EventArgs.Empty);
         }
 
+        protected void StartWorker()
+        {
+            // TODO
+            WorkerHandle.Username = null;
+            WorkerHandle.Password = null;
+            WorkerHandle.LoadUserProfile = false;
+
+            WorkerHandle.Start();
+        }
+
         private async Task CleanupWorkDir()
         {
             const int retryDelay = 3000;
@@ -201,7 +210,7 @@ namespace Photon.Agent.Internal.Session
             }
 
             if (!successful) {
-                Log.Warn($"Failed to clean the work directory after {retryCount} attempts! {lastError?.UnfoldMessages()}");
+                throw new ApplicationException($"Failed after {retryCount} attempts!", lastError);
             }
         }
     }

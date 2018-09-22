@@ -24,11 +24,11 @@ namespace Photon.Framework
         IBlockWriter WriteBlock();
     }
 
-    public interface IWriteBlocks<out T, out Z> : IWriteBlocks, IWrite<T>
-        where T : IWrite<T>
-        where Z : IBlockWriter<Z>
+    public interface IWriteBlocks<out TWriter, out TBlockWriter> : IWriteBlocks, IWrite<TWriter>
+        where TWriter : IWrite<TWriter>
+        where TBlockWriter : IBlockWriter<TBlockWriter>
     {
-        new Z WriteBlock();
+        new TBlockWriter WriteBlock();
     }
 
     public interface IBlockWriter : IWrite, IDisposable

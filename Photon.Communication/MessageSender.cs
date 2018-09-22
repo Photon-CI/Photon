@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Communication
 {
@@ -15,7 +16,6 @@ namespace Photon.Communication
         private PacketSender packetSender;
 
         private Stream stream;
-        private BinaryWriter writer;
         private bool isStarted;
 
 
@@ -27,7 +27,6 @@ namespace Photon.Communication
         public void Dispose()
         {
             packetSender?.Dispose();
-            writer?.Dispose();
             stream?.Dispose();
         }
 
@@ -40,21 +39,29 @@ namespace Photon.Communication
 
             this.stream = stream;
 
-            writer = new BinaryWriter(stream, Encoding.UTF8, true);
-
-            packetSender = new PacketSender(writer, 4096);
+            packetSender = new PacketSender(stream, Encoding.UTF8, 4096);
             packetSender.ThreadError += PacketSender_ThreadError;
             packetSender.Start();
         }
 
-        public void Stop(CancellationToken token)
+        public void Flush(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            packetSender.Flush(cancellationToken);
+        }
+
+        public async Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            await packetSender.FlushAsync(cancellationToken);
+        }
+
+        public void Stop()
         {
             lock (startStopLock) {
                 if (!isStarted) return;
                 isStarted = false;
             }
 
-            packetSender.Stop(token);
+            packetSender.Stop();
         }
 
         public void Send(IMessage message)
