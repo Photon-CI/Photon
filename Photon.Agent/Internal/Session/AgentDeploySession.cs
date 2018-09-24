@@ -1,9 +1,7 @@
 ﻿using Photon.Communication;
-using Photon.Framework.Agent;
-using Photon.Framework.Applications;
-using Photon.Framework.Domain;
 using Photon.Framework.Packages;
 using Photon.Library.TcpMessages.Packages;
+using Photon.Library.TcpMessages.Session;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -82,15 +80,15 @@ namespace Photon.Agent.Internal.Session
         //    }
         //}
 
-        public override async Task RunTaskAsync(string taskName, string taskSessionId)
+        public async Task RunTaskAsync(string taskName, string taskSessionId)
         {
             if (taskName == null) throw new ArgumentNullException(nameof(taskName));
             if (taskSessionId == null) throw new ArgumentNullException(nameof(taskSessionId));
 
-            var domainOutput = new DomainOutput();
-            domainOutput.OnWrite += (text, color) => Output.Write(text, color);
-            domainOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
-            domainOutput.OnWriteRaw += text => Output.WriteRaw(text);
+            //var domainOutput = new DomainOutput();
+            //domainOutput.OnWrite += (text, color) => Output.Write(text, color);
+            //domainOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+            //domainOutput.OnWriteRaw += text => Output.WriteRaw(text);
 
             //var packageClient = new DomainPackageClient(Packages.Boundary);
             //var applicationClient = new ApplicationManagerClient(Applications.Boundary) {
@@ -120,7 +118,12 @@ namespace Photon.Agent.Internal.Session
 
             try {
                 var task = Task.Run(async () => {
-                    await Domain.RunDeployTask(context, TokenSource.Token);
+                    var request = new WorkerDeploymentSessionRunRequest {
+                        // TODO
+                    };
+
+                    await WorkerHandle.Transceiver.Send(request)
+                        .GetResponseAsync();
                 });
                 await taskList.AddOrUpdate(taskSessionId, id => task, (id, _) => task);
                 await task.ContinueWith(t => {

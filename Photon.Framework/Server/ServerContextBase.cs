@@ -1,39 +1,30 @@
-﻿using Photon.Framework.Domain;
+﻿using Photon.Framework.AgentConnection;
+using Photon.Framework.Domain;
 using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Photon.Framework.Server
 {
-    [Serializable]
     public abstract class ServerContextBase : DomainContextBase, IServerContext
     {
         public ServerAgent[] Agents {get; set;}
         public string ServerSessionId {get; set;}
-        public DomainConnectionFactory ConnectionFactory {get; set;}
-        public AgentSelector RegisterAgents => new AgentSelector(this);
+        public IAgentConnectionClient ConnectionFactory {get; set;}
+        public WorkerAgentSelector RegisterAgents => new WorkerAgentSelector(ConnectionFactory);
 
-        [NonSerialized]
-        internal List<DomainAgentSessionHandle> agentSessions;
+        //[NonSerialized]
+        //[JsonIgnore]
+        //internal WorkerAgentConnectionCollection agentConnections;
 
 
         protected ServerContextBase()
         {
-            agentSessions = new List<DomainAgentSessionHandle>();
-        }
-
-        [OnDeserializing]
-        private void OnDeserializing(StreamingContext c)
-        {
-            agentSessions = new List<DomainAgentSessionHandle>();
+            //agentConnections = new AgentConnectionCollection();
         }
 
         public virtual void Dispose()
         {
-            foreach (var session in agentSessions)
-                session.Dispose();
-
-            agentSessions.Clear();
+            //agentConnections?.Dispose();
         }
     }
 }

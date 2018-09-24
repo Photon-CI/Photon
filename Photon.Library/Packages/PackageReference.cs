@@ -1,4 +1,4 @@
-﻿namespace Photon.Framework.Packages
+﻿namespace Photon.Library.Packages
 {
     public class PackageReference
     {

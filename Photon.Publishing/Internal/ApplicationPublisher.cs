@@ -30,13 +30,13 @@ namespace Photon.Publishing.Internal
             this.context = context;
         }
 
-        public async Task PublishAsync(string packageName, string packageId, CancellationToken token = default(CancellationToken))
+        public async Task PublishAsync(string packageName, string packageId, CancellationToken token = default)
         {
-            context.Output.WriteBlock()
-                .Write("Updating Application ", ConsoleColor.DarkCyan)
-                .Write(packageName, ConsoleColor.Cyan)
-                .WriteLine("...", ConsoleColor.DarkCyan)
-                .Post();
+            using (var block = context.Output.WriteBlock()) {
+                block.Write("Updating Application ", ConsoleColor.DarkCyan);
+                block.Write(packageName, ConsoleColor.Cyan);
+                block.WriteLine("...", ConsoleColor.DarkCyan);
+            }
 
             var photonVars = context.ServerVariables["photon"];
 
@@ -48,12 +48,12 @@ namespace Photon.Publishing.Internal
             var webVersion = await GetWebVersion();
 
             if (!VersionTools.HasUpdates(webVersion, assemblyVersion)) {
-                context.Output.WriteBlock()
-                    .Write("Application ", ConsoleColor.DarkBlue)
-                    .Write(packageName, ConsoleColor.Blue)
-                    .Write(" is up-to-date. Version ", ConsoleColor.DarkBlue)
-                    .WriteLine(assemblyVersion, ConsoleColor.Blue)
-                    .Post();
+                using (var block = context.Output.WriteBlock()) {
+                    block.Write("Application ", ConsoleColor.DarkBlue);
+                    block.Write(packageName, ConsoleColor.Blue);
+                    block.Write(" is up-to-date. Version ", ConsoleColor.DarkBlue);
+                    block.WriteLine(assemblyVersion, ConsoleColor.Blue);
+                }
 
                 return;
             }
@@ -93,13 +93,13 @@ namespace Photon.Publishing.Internal
 
             await UpdateLatest(assemblyVersion, token);
 
-            context.Output.WriteBlock()
-                .Write("Application ", ConsoleColor.DarkGreen)
-                .Write(packageName, ConsoleColor.Green)
-                .Write(" updated successfully. ", ConsoleColor.DarkGreen)
-                .Write("Version ", ConsoleColor.DarkCyan)
-                .WriteLine(assemblyVersion, ConsoleColor.Cyan)
-                .Post();
+            using (var block = context.Output.WriteBlock()) {
+                block.Write("Application ", ConsoleColor.DarkGreen);
+                block.Write(packageName, ConsoleColor.Green);
+                block.Write(" updated successfully. ", ConsoleColor.DarkGreen);
+                block.Write("Version ", ConsoleColor.DarkCyan);
+                block.WriteLine(assemblyVersion, ConsoleColor.Cyan);
+            }
         }
 
         private async Task CreateWebPath(string assemblyVersion, CancellationToken token)

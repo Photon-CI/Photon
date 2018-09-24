@@ -93,9 +93,13 @@
     <Compile Include="ApiHandlers\Session\OutputHandler.cs" />
     <Compile Include="ApiHandlers\Session\OutputStreamHandler.cs" />
     <Compile Include="Commands\RootCommands.cs" />
+    <Compile Include="Internal\AgentConnections\ServerAgentSelector.cs" />
+    <Compile Include="Internal\AgentConnections\ServerAgentConnectionCollection.cs" />
     <Compile Include="Internal\Deployments\DeploymentData.cs" />
     <Compile Include="Internal\Deployments\DeploymentDataManager.cs" />
     <Compile Include="Internal\Http\HttpServer.cs" />
+    <Compile Include="Internal\AgentConnections\AgentConnection.cs" />
+    <Compile Include="Internal\AgentConnections\AgentConnectionManager.cs" />
     <Compile Include="Internal\Packages\ProjectPackageCache.cs" />
     <Compile Include="Internal\Packages\PackageHost.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
@@ -106,6 +110,7 @@
     <Compile Include="Internal\Projects\ServerProject.cs" />
     <Compile Include="Internal\Security\RequiresRolesAttribute.cs" />
     <Compile Include="Internal\Security\DefaultSecurityGroups.cs" />
+    <Compile Include="Internal\New\ServerContext.cs" />
     <Compile Include="Internal\ServerViewModel.cs" />
     <Compile Include="Internal\Sessions\ServerSecurityPublishSession.cs" />
     <Compile Include="ViewHandlers\Agent\AgentEditHandler.cs" />

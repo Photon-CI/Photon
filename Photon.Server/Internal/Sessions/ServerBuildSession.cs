@@ -1,13 +1,14 @@
-﻿using Photon.Framework.Domain;
-using Photon.Framework.Extensions;
-using Photon.Framework.Packages;
+﻿using Photon.Framework.Extensions;
 using Photon.Framework.Server;
 using Photon.Library.GitHub;
 using Photon.Library.Http.Messages;
 using Photon.Server.Internal.Builds;
+using Photon.Server.Internal.New;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Photon.Framework.AgentConnection;
+using Photon.Server.Internal.AgentConnections;
 
 namespace Photon.Server.Internal.Sessions
 {
@@ -23,39 +24,44 @@ namespace Photon.Server.Internal.Sessions
         public GithubCommit Commit {get; set;}
 
 
+        public ServerBuildSession(ServerContext context) : base(context)
+        {
+            //
+        }
+
         public override async Task RunAsync()
         {
-            var contextOutput = new DomainOutput();
-            contextOutput.OnWrite += (text, color) => Output.Write(text, color);
-            contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
-            contextOutput.OnWriteRaw += text => Output.WriteRaw(text);
+            //var contextOutput = new DomainOutput();
+            //contextOutput.OnWrite += (text, color) => Output.Write(text, color);
+            //contextOutput.OnWriteLine += (text, color) => Output.WriteLine(text, color);
+            //contextOutput.OnWriteRaw += text => Output.WriteRaw(text);
 
-            var packageClient = new DomainPackageClient(Packages.Client);
+            //var packageClient = new DomainPackageClient(Packages.Client);
 
-            var context = new ServerBuildContext {
-                BuildNumber = Build.Number,
-                Agents = PhotonServer.Instance.Agents.All.ToArray(),
-                Project = Project,
-                AssemblyFilename = AssemblyFilename,
-                PreBuild = PreBuild,
-                TaskName = TaskName,
-                WorkDirectory = WorkDirectory,
-                ContentDirectory = ContentDirectory,
-                BinDirectory = BinDirectory,
-                Packages = packageClient,
-                ConnectionFactory = ConnectionFactory,
-                Output = contextOutput,
-                ServerVariables = Variables,
-                Commit = Commit,
-            };
+            //var context = new ServerBuildContext {
+            //    BuildNumber = Build.Number,
+            //    Agents = PhotonServer.Instance.Agents.All.ToArray(),
+            //    Project = Project,
+            //    AssemblyFilename = AssemblyFilename,
+            //    PreBuild = PreBuild,
+            //    TaskName = TaskName,
+            //    WorkDirectory = WorkDirectory,
+            //    ContentDirectory = ContentDirectory,
+            //    BinDirectory = BinDirectory,
+            //    Packages = packageClient,
+            //    ConnectionFactory = ConnectionFactory,
+            //    Output = contextOutput,
+            //    ServerVariables = Variables,
+            //    Commit = Commit,
+            //};
 
             try {
                 switch (Mode) {
                     case AgentStartModes.All:
-                        await RunAll(context);
+                        await RunAll();
                         break;
                     case AgentStartModes.Any:
-                        await RunAny(context);
+                        await RunAny();
                         break;
                 }
 
@@ -86,23 +92,33 @@ namespace Photon.Server.Internal.Sessions
             return new DomainAgentBuildSessionHost(this, agent, TokenSource.Token);
         }
 
-        private async Task RunAll(ServerBuildContext context)
+        private async Task RunAll()
         {
-            var sessionHandleCollection = context.RegisterAgents.All(Roles);
+            var selector = new ServerAgentSelector(ConnectionFactory) {
+                Agents = PhotonServer.Instance.Agents.All.ToArray(),
+                Project = Project,
+            };
+
+            var sessionHandleCollection = selector.All(Roles);
 
             try {
-                await sessionHandleCollection.InitializeAsync(TokenSource.Token);
+                await sessionHandleCollection.BeginAsync(TokenSource.Token);
 
                 await sessionHandleCollection.RunTasksAsync(new [] {TaskName}, TokenSource.Token);
             }
             finally {
-                await sessionHandleCollection.ReleaseAllAsync(TokenSource.Token);
+                await sessionHandleCollection.ReleaseAsync(TokenSource.Token);
             }
         }
 
-        private async Task RunAny(ServerBuildContext context)
+        private async Task RunAny()
         {
-            using (var sessionHandle = context.RegisterAgents.Any(Roles)) {
+            var selector = new ServerAgentSelector(ConnectionFactory) {
+                Agents = PhotonServer.Instance.Agents.All.ToArray(),
+                Project = Project,
+            };
+
+            using (var sessionHandle = selector.Any(Roles)) {
                 try {
                     await sessionHandle.BeginAsync(TokenSource.Token);
 

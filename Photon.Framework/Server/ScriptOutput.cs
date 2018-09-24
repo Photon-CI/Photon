@@ -1,11 +1,10 @@
-﻿using Photon.Framework.Domain;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
 namespace Photon.Framework.Server
 {
-    public class ScriptOutput : MarshalByRefInstance, IWriteBlocks<ScriptOutput, ScriptOutputBlock>
+    public class ScriptOutput : IWriteBlocks<ScriptOutput, ScriptOutputBlock>, IDisposable
     {
         public event EventHandler Changed;
 
@@ -34,10 +33,8 @@ namespace Photon.Framework.Server
             writer.NewLine = "\n";
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
-            base.Dispose(disposing);
-
             writer?.Dispose();
         }
 

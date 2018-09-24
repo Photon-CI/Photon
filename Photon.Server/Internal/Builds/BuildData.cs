@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Photon.Framework;
 using Photon.Framework.Extensions;
-using Photon.Framework.Packages;
 using Photon.Framework.Tools;
 using Photon.Library;
 using Photon.Library.GitHub;
+using Photon.Library.Packages;
 using System;
 using System.IO;
 using System.Threading.Tasks;

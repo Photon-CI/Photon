@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
-using Photon.Agent.Internal.Workers;
 using Photon.Library.TcpMessages.Session;
+using Photon.Library.Worker;
 using Photon.Tests.Internal;
 
 namespace Photon.Tests.Workers

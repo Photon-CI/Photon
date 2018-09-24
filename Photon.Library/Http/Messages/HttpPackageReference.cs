@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Photon.Framework.Packages;
+using Photon.Library.Packages;
 
 namespace Photon.Library.Http.Messages
 {

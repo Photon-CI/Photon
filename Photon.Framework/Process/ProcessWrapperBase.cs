@@ -23,7 +23,7 @@ namespace Photon.Framework.Process
         /// <summary>
         /// Gets or sets the writer to print to process output to.
         /// </summary>
-        public DomainOutput Output {get; set;}
+        public IWriteBlocks Output {get; set;}
 
         /// <summary>
         /// Gets or sets whether the command run is echoed to the task output stream.

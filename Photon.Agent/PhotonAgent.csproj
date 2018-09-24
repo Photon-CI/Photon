@@ -111,6 +111,7 @@
     <Compile Include="ApiHandlers\Variable\JsonHandler.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentApplicationConfiguration.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentTcpConfiguration.cs" />
+    <Compile Include="Internal\AgentContext.cs" />
     <Compile Include="Internal\AgentViewModel.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentConfiguration.cs" />
     <Compile Include="Internal\AgentConfiguration\AgentConfigurationManager.cs" />
@@ -119,13 +120,10 @@
     <Compile Include="Internal\Applications\Application.cs" />
     <Compile Include="Internal\Applications\ApplicationManager.cs" />
     <Compile Include="Internal\Applications\ApplicationRevision.cs" />
-    <Compile Include="Internal\Applications\ApplicationHost.cs" />
     <Compile Include="Internal\Applications\ProjectApplicationList.cs" />
     <Compile Include="Internal\Http\HttpServer.cs" />
-    <Compile Include="Internal\Packages\PackageHost.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\Security\SecurityTest.cs" />
-    <Compile Include="Internal\Workers\Worker.cs" />
     <Compile Include="MessageHandlers\Packages\ApplicationPackagePushProcessor.cs" />
     <Compile Include="MessageHandlers\Packages\ProjectPackagePushProcessor.cs" />
     <Compile Include="MessageHandlers\SecurityPublishProcessor.cs" />
@@ -422,6 +420,10 @@
     <Content Include="Views\Master.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Internal\Packages\" />
+    <Folder Include="Internal\Workers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="TransformXml" AssemblyFile="..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\tools\VSToolsPath\Web\Microsoft.Web.Publishing.Tasks.dll" />

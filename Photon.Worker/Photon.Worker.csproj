@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\AgentConnection.cs" />
+    <Compile Include="Internal\Clients\AgentConnectionClient.cs" />
+    <Compile Include="Internal\Clients\ArtifactClient.cs" />
     <Compile Include="Internal\Configuration.cs" />
     <Compile Include="Internal\MessageContext.cs" />
     <Compile Include="Internal\Clients\ApplicationClient.cs" />
@@ -56,6 +59,7 @@
     <Compile Include="Internal\Session\WorkerDeploymentSession.cs" />
     <Compile Include="Internal\Session\WorkerBuildSession.cs" />
     <Compile Include="Internal\Session\WorkerSession.cs" />
+    <Compile Include="MessageHandlers\StatusGetProcessor.cs" />
     <Compile Include="MessageHandlers\TestSessionBeginProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionRunProcessor.cs" />
     <Compile Include="MessageHandlers\DisconnectProcessor.cs" />

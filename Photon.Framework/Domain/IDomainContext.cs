@@ -13,10 +13,9 @@ namespace Photon.Framework.Domain
         string WorkDirectory {get;}
         string ContentDirectory {get;}
         string BinDirectory {get;}
-        DomainOutput Output {get;}
+        IWriteBlocks Output {get;}
         VariableSetCollection ServerVariables {get;}
         VariableSetCollection AgentVariables {get;}
-        //ApplicationManagerClient Applications {get;}
         IPackageClient Packages {get;}
         ProcessClient Process {get;}
     }

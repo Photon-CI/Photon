@@ -81,13 +81,21 @@
     <Compile Include="LazyAsync.cs" />
     <Compile Include="Packages\ApplicationPackageManager.cs" />
     <Compile Include="Packages\PackageManagerBase.cs" />
+    <Compile Include="Packages\PackageReference.cs" />
     <Compile Include="Packages\ProjectPackageManager.cs" />
     <Compile Include="Security\User.cs" />
     <Compile Include="Security\UserGroup.cs" />
     <Compile Include="Security\UserGroupManager.cs" />
     <Compile Include="Session\SessionStatusArgs.cs" />
+    <Compile Include="TcpMessages\AgentConnection\ServerAgentConnectionRunMessage.cs" />
+    <Compile Include="TcpMessages\AgentConnection\ServerAgentConnectionReleaseMessage.cs" />
+    <Compile Include="TcpMessages\AgentConnection\ServerAgentConnectionBeginMessage.cs" />
     <Compile Include="TcpMessages\Applications\WorkerApplicationRegisterRevisionMessage.cs" />
     <Compile Include="TcpMessages\Applications\WorkerApplicationGetRevisionMessage.cs" />
+    <Compile Include="TcpMessages\Artifacts\WorkerDeploymentArtifactArchiveMessage.cs" />
+    <Compile Include="TcpMessages\Artifacts\WorkerBuildArtifactArchiveMessage.cs" />
+    <Compile Include="TcpMessages\Artifacts\WorkerDeploymentArtifactGetMessage.cs" />
+    <Compile Include="TcpMessages\Artifacts\WorkerBuildArtifactGetMessage.cs" />
     <Compile Include="TcpMessages\HealthCheckResponse.cs" />
     <Compile Include="TcpMessages\AgentGetVersionResponse.cs" />
     <Compile Include="TcpMessages\AgentGetVersionRequest.cs" />
@@ -112,8 +120,11 @@
     <Compile Include="TcpMessages\BuildSessionBeginResponse.cs" />
     <Compile Include="TcpMessages\SessionReleaseRequest.cs" />
     <Compile Include="TcpMessages\SessionReleaseResponse.cs" />
+    <Compile Include="TcpMessages\Session\WorkerDeploymentSessionRunMessage.cs" />
+    <Compile Include="TcpMessages\Session\WorkerDeploymentSessionBeginMessage.cs" />
     <Compile Include="TcpMessages\Session\WorkerTestSessionBeginMessage.cs" />
     <Compile Include="TcpMessages\Session\WorkerBuildSessionRunMessage.cs" />
+    <Compile Include="TcpMessages\Status\WorkerStatusGetMessage.cs" />
     <Compile Include="TcpMessages\TaskCompleteMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\SessionDomainBase.cs" />
@@ -132,6 +143,8 @@
     <Compile Include="Variables\VariableSetDocumentManager.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="WebSocketHost.cs" />
+    <Compile Include="Worker\Worker.cs" />
+    <Compile Include="Worker\WorkerCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

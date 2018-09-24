@@ -1,6 +1,4 @@
-﻿using Photon.Framework.Domain;
-using Photon.Framework.Extensions;
-using Photon.Framework.Packages;
+﻿using Photon.Framework.Packages;
 using Photon.Library.Packages;
 using System;
 using System.Collections.Generic;
@@ -8,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.Packages
 {
-    internal class PackageHost : IDisposable
+    internal class PackageHost
     {
         private readonly ProjectPackageManager projectPackages;
         private readonly ApplicationPackageManager applicationPackages;
@@ -18,7 +16,6 @@ namespace Photon.Server.Internal.Packages
         public IEnumerable<PackageReference> PushedProjectPackages => PushedProjectPackageList;
         public IEnumerable<PackageReference> PushedApplicationPackages => PushedApplicationPackageList;
 
-        public DomainPackageBoundary Client {get;}
         public string ProjectId {get; set;}
 
 
@@ -29,59 +26,40 @@ namespace Photon.Server.Internal.Packages
 
             projectPackages = PhotonServer.Instance.ProjectPackages;
             applicationPackages = PhotonServer.Instance.ApplicationPackages;
-
-            Client = new DomainPackageBoundary();
-            Client.OnPushProjectPackage += PackageClient_OnPushProjectPackage;
-            Client.OnPushApplicationPackage += PackageClient_OnPushApplicationPackage;
-            Client.OnPullProjectPackage += PackageClient_OnPullProjectPackage;
-            Client.OnPullApplicationPackage += PackageClient_OnPullApplicationPackage;
         }
 
-        public void Dispose()
+        private async Task PackageClient_OnPushProjectPackage(string filename)
         {
-            Client.Dispose();
+            var metadata = await ProjectPackageTools.GetMetadataAsync(filename);
+            if (metadata == null) throw new ApplicationException($"Invalid Project Package '{filename}'! No metadata found.");
+
+            await projectPackages.Add(filename);
+            PushedProjectPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
         }
 
-        private void PackageClient_OnPushProjectPackage(string filename, RemoteTaskCompletionSource taskHandle)
+        private async Task PackageClient_OnPushApplicationPackage(string filename)
         {
-            Task.Run(async () => {
-                var metadata = await ProjectPackageTools.GetMetadataAsync(filename);
-                if (metadata == null) throw new ApplicationException($"Invalid Project Package '{filename}'! No metadata found.");
+            var metadata = await ApplicationPackageTools.GetMetadataAsync(filename);
+            if (metadata == null) throw new ApplicationException($"Invalid Project Package '{filename}'! No metadata found.");
 
-                await projectPackages.Add(filename);
-                PushedProjectPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
-            }).ContinueWith(taskHandle.FromTask);
+            await applicationPackages.Add(filename);
+            PushedApplicationPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
         }
 
-        private void PackageClient_OnPushApplicationPackage(string filename, RemoteTaskCompletionSource taskHandle)
+        private async Task<string> PackageClient_OnPullProjectPackage(string id, string version)
         {
-            Task.Run(async () => {
-                var metadata = await ApplicationPackageTools.GetMetadataAsync(filename);
-                if (metadata == null) throw new ApplicationException($"Invalid Project Package '{filename}'! No metadata found.");
+            if (!projectPackages.TryGet(id, version, out var packageFilename))
+                throw new ApplicationException($"Project Package '{id}.{version}' not found!");
 
-                await applicationPackages.Add(filename);
-                PushedApplicationPackageList.Add(new PackageReference(metadata.Id, metadata.Version));
-            }).ContinueWith(taskHandle.FromTask);
+            return await Task.FromResult(packageFilename);
         }
 
-        private void PackageClient_OnPullProjectPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
+        private async Task<string> PackageClient_OnPullApplicationPackage(string id, string version)
         {
-            Task.Run(async () => {
-                if (!projectPackages.TryGet(id, version, out var packageFilename))
-                    throw new ApplicationException($"Project Package '{id}.{version}' not found!");
+            if (!applicationPackages.TryGet(id, version, out var packageFilename))
+                throw new ApplicationException($"Application Package '{id}.{version}' not found!");
 
-                return await Task.FromResult(packageFilename);
-            }).ContinueWith(taskHandle.FromTask);
-        }
-
-        private void PackageClient_OnPullApplicationPackage(string id, string version, RemoteTaskCompletionSource<string> taskHandle)
-        {
-            Task.Run(async () => {
-                if (!applicationPackages.TryGet(id, version, out var packageFilename))
-                    throw new ApplicationException($"Application Package '{id}.{version}' not found!");
-
-                return await Task.FromResult(packageFilename);
-            }).ContinueWith(taskHandle.FromTask);
+            return await Task.FromResult(packageFilename);
         }
     }
 }

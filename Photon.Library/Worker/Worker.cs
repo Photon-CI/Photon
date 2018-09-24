@@ -9,15 +9,16 @@ using System.IO.Pipes;
 using System.Security;
 using System.Threading;
 
-namespace Photon.Agent.Internal.Workers
+namespace Photon.Library.Worker
 {
-    internal class Worker : IDisposable
+    public class Worker : IDisposable
     {
         private Process _process;
         private AnonymousPipeServerStream _pipeIn;
         private AnonymousPipeServerStream _pipeOut;
         private bool _isStarted;
 
+        public string Id {get;}
         public string Filename {get; set;}
         public MessageProcessorRegistry MessageRegistry {get; set;}
         public MessageTransceiver Transceiver {get; private set;}
@@ -27,6 +28,11 @@ namespace Photon.Agent.Internal.Workers
         public string Password {get; set;}
         public bool LoadUserProfile {get; set;}
 
+
+        public Worker()
+        {
+            Id = Guid.NewGuid().ToString("D");
+        }
 
         public void Dispose()
         {

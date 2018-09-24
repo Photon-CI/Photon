@@ -60,7 +60,9 @@ namespace Photon.Agent.Internal.Session
 
             try {
                 var task = Task.Run(async () => {
-                    var request = new WorkerBuildSessionRunRequest();
+                    var request = new WorkerBuildSessionRunRequest {
+                        // TODO
+                    };
 
                     await WorkerHandle.Transceiver.Send(request)
                         .GetResponseAsync();
@@ -127,7 +129,7 @@ namespace Photon.Agent.Internal.Session
             throw new ApplicationException($"Unknown source type '{Project.Source?.GetType().Name}'!");
         }
 
-        private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout, CancellationToken token = default(CancellationToken))
+        private async Task<RepositoryHandle> GetRepositoryHandle(string url, TimeSpan timeout, CancellationToken token = default)
         {
             var repositorySource = PhotonAgent.Instance.RepositorySources.GetOrCreate(url);
 

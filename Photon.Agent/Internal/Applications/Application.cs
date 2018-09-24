@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Photon.Agent.Internal.Applications
 {
-    [Serializable]
     public class Application
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Application));

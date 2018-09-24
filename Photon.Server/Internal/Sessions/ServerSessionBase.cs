@@ -1,10 +1,11 @@
 ﻿using log4net;
-using Photon.Framework.Domain;
 using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Framework.Tasks;
 using Photon.Framework.Tools;
 using Photon.Framework.Variables;
+using Photon.Server.Internal.AgentConnections;
+using Photon.Server.Internal.New;
 using Photon.Server.Internal.Packages;
 using System;
 using System.Collections.Concurrent;
@@ -16,13 +17,14 @@ namespace Photon.Server.Internal.Sessions
 {
     internal abstract class ServerSessionBase : IServerSession
     {
-        private readonly ConcurrentDictionary<string, DomainAgentSessionHostBase> hostList;
+        //private readonly ConcurrentDictionary<string, DomainAgentSessionHostBase> hostList;
 
         public event EventHandler PreBuildEvent;
         public event EventHandler PostBuildEvent;
         public event EventHandler ReleaseEvent;
 
         private readonly Lazy<ILog> _log;
+        public ServerContext Context {get;}
         public DateTime TimeCreated {get;}
         public DateTime? TimeReleased {get; private set;}
         public bool IsUserAborted {get; private set;}
@@ -38,7 +40,7 @@ namespace Photon.Server.Internal.Sessions
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
         public ScriptOutput Output {get;}
-        protected DomainConnectionFactory ConnectionFactory {get;}
+        protected AgentConnectionManager ConnectionFactory {get;}
         public PackageHost Packages {get;}
         public TaskResult Result {get; private set;}
         public VariableSetCollection Variables {get; private set;}
@@ -49,8 +51,10 @@ namespace Photon.Server.Internal.Sessions
         protected readonly CancellationTokenSource TokenSource;
 
 
-        protected ServerSessionBase()
+        protected ServerSessionBase(ServerContext context)
         {
+            this.Context = context;
+
             SessionId = Guid.NewGuid().ToString("N");
             TimeCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(8);
@@ -63,8 +67,8 @@ namespace Photon.Server.Internal.Sessions
             BinDirectory = Path.Combine(WorkDirectory, "bin");
             ContentDirectory = Path.Combine(WorkDirectory, "content");
 
-            ConnectionFactory = new DomainConnectionFactory();
-            ConnectionFactory.OnConnectionRequest += ConnectionFactory_OnConnectionRequest;
+            ConnectionFactory = new AgentConnectionManager();
+            //ConnectionFactory.OnConnectionRequest += ConnectionFactory_OnConnectionRequest;
 
             Packages = new PackageHost();
 
@@ -162,7 +166,23 @@ namespace Photon.Server.Internal.Sessions
             }
         }
 
-        public async Task Abort()
+        public void Abort()
+        {
+            IsUserAborted = true;
+            TokenSource.Cancel();
+
+            foreach (var host in hostList.Values) {
+                try {
+                    host.Abort();
+                }
+                catch {}
+            }
+
+            Complete(TaskResult.Cancel());
+            ReleaseAsync().GetAwaiter().GetResult();
+        }
+
+        public async Task AbortAsync()
         {
             IsUserAborted = true;
             TokenSource.Cancel();
@@ -216,12 +236,12 @@ namespace Photon.Server.Internal.Sessions
             ReleaseEvent?.Invoke(this, EventArgs.Empty);
         }
 
-        private DomainAgentSessionClient ConnectionFactory_OnConnectionRequest(ServerAgent agent)
-        {
-            var host = OnCreateHost(agent);
-            hostList[host.SessionClientId] = host;
+        //public DomainAgentSessionClient GetClient(ServerAgent agent)
+        //{
+        //    var host = OnCreateHost(agent);
+        //    hostList[host.SessionClientId] = host;
 
-            return host.SessionClient;
-        }
+        //    return host.SessionClient;
+        //}
     }
 }

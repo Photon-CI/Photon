@@ -42,7 +42,7 @@ namespace Photon.Worker.Internal.Clients
             return response.Filename;
         }
 
-        public async Task PushApplicationPackageAsync(string filename, CancellationToken token = default(CancellationToken))
+        public async Task PushApplicationPackageAsync(string filename, CancellationToken token = default)
         {
             var request = new WorkerApplicationPackagePushRequest {
                 AgentSessionId = agentSessionId,

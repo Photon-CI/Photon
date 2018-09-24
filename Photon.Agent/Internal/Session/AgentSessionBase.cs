@@ -1,6 +1,5 @@
 ﻿using log4net;
 using Photon.Agent.Internal.Applications;
-using Photon.Agent.Internal.Workers;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
@@ -8,6 +7,7 @@ using Photon.Framework.Projects;
 using Photon.Framework.Server;
 using Photon.Framework.Tools;
 using Photon.Framework.Variables;
+using Photon.Library.Worker;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -24,6 +24,7 @@ namespace Photon.Agent.Internal.Session
         protected readonly CancellationTokenSource TokenSource;
         protected readonly ConcurrentDictionary<string, Task> taskList;
         private readonly Lazy<ILog> _log;
+        public AgentContext Context {get;}
         public DateTime TimeCreated {get;}
         public DateTime? TimeReleased {get; private set;}
 
@@ -50,6 +51,11 @@ namespace Photon.Agent.Internal.Session
 
         protected Worker WorkerHandle {get;}
 
+
+        protected AgentSessionBase(AgentContext context)
+        {
+            this.Context = context;
+        }
 
         protected AgentSessionBase(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
         {
