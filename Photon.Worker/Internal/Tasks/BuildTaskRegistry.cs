@@ -1,9 +1,10 @@
 ﻿using Photon.Framework.Agent;
+using Photon.Framework.Tasks;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.Framework.Tasks
+namespace Photon.Worker.Internal.Tasks
 {
     internal class BuildTaskRegistry : TaskRegistryBase<IBuildTask>
     {

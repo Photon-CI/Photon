@@ -28,6 +28,8 @@ namespace Photon.Server.ViewModels.Project
 
         protected override void OnBuild()
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             base.OnBuild();
 
             if (string.IsNullOrEmpty(ProjectId)) {
@@ -36,7 +38,7 @@ namespace Photon.Server.ViewModels.Project
                 ProjectName = "New Project";
                 ProjectDescription = "";
             }
-            else if (PhotonServer.Instance.Projects.TryGetDescription(ProjectId, out var project)) {
+            else if (serverContext.Projects.TryGetDescription(ProjectId, out var project)) {
                 ProjectId_Source = ProjectId = project.Id;
                 ProjectName = project.Name;
                 ProjectDescription = project.Description;
@@ -45,18 +47,20 @@ namespace Photon.Server.ViewModels.Project
 
         public void Save()
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             ServerProject project;
 
             if (string.IsNullOrEmpty(ProjectId_Source)) {
-                project = PhotonServer.Instance.Projects.New(ProjectId);
+                project = serverContext.Projects.New(ProjectId);
             }
             else {
                 if (!string.Equals(ProjectId_Source, ProjectId, StringComparison.OrdinalIgnoreCase)) {
-                    if (!PhotonServer.Instance.Projects.Rename(ProjectId_Source, ProjectId))
+                    if (!serverContext.Projects.Rename(ProjectId_Source, ProjectId))
                         throw new ApplicationException($"Failed to rename project '{ProjectId}'!");
                 }
 
-                if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out project))
+                if (!serverContext.Projects.TryGet(ProjectId, out project))
                     throw new ApplicationException($"Project '{ProjectId}' not found!");
             }
 

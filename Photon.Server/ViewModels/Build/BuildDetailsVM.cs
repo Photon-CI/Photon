@@ -37,12 +37,14 @@ namespace Photon.Server.ViewModels.Build
         {
             base.OnBuild();
 
+            var serverContext = PhotonServer.Instance.Context;
+
             CanStartBuild = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.BuildStart);
             CanDeleteBuild = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.BuildDelete);
 
             IconClass = "fas fa-ellipses-h text-muted";
 
-            if (!string.IsNullOrEmpty(ProjectId) && PhotonServer.Instance.Projects.TryGet(ProjectId, out var project)) {
+            if (!string.IsNullOrEmpty(ProjectId) && serverContext.Projects.TryGet(ProjectId, out var project)) {
                 ProjectName = project.Description.Name;
 
                 if (project.Builds.TryGet(BuildNumber, out var buildData)) {
@@ -66,7 +68,7 @@ namespace Photon.Server.ViewModels.Build
 
                     IconClass = GetIconClass(buildData);
 
-                    if (!string.IsNullOrEmpty(buildData.ServerSessionId) && PhotonServer.Instance.Sessions.TryGet(buildData.ServerSessionId, out var session)) {
+                    if (!string.IsNullOrEmpty(buildData.ServerSessionId) && serverContext.Sessions.TryGet(buildData.ServerSessionId, out var session)) {
                         IsRunning = !session.IsComplete;
                     }
                 }

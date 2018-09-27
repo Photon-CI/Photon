@@ -24,8 +24,9 @@ namespace Photon.Server.Internal.Packages
             PushedProjectPackageList = new List<PackageReference>();
             PushedApplicationPackageList = new List<PackageReference>();
 
-            projectPackages = PhotonServer.Instance.ProjectPackages;
-            applicationPackages = PhotonServer.Instance.ApplicationPackages;
+            var context = PhotonServer.Instance.Context;
+            projectPackages = context.ProjectPackages;
+            applicationPackages = context.ApplicationPackages;
         }
 
         private async Task PackageClient_OnPushProjectPackage(string filename)

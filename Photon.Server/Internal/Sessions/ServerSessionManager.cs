@@ -46,6 +46,8 @@ namespace Photon.Server.Internal.Sessions
 
         public void BeginSession(ServerSessionBase session)
         {
+            if (session == null) throw new ArgumentNullException(nameof(session));
+
             pool.Add(session);
 
             session.ReleaseEvent += Session_OnReleased;
@@ -56,6 +58,8 @@ namespace Photon.Server.Internal.Sessions
 
         public bool TryGet(string sessionId, out ServerSessionBase session)
         {
+            if (sessionId == null) throw new ArgumentNullException(nameof(sessionId));
+
             return pool.TryGet(sessionId, out session);
         }
 

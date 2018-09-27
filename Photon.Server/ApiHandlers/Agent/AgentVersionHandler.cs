@@ -2,6 +2,7 @@
 using Photon.Communication;
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
+using Photon.Library.Communication;
 using Photon.Library.Extensions;
 using Photon.Library.Http;
 using Photon.Library.Http.Messages;
@@ -107,7 +108,7 @@ namespace Photon.Server.ApiHandlers.Agent
                 messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry);
                 await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, token);
 
-                await ClientHandshake.Verify(messageClient, token);
+                await ClientHandshake.Verify(messageClient, Configuration.Version, token);
 
                 var agentVersionRequest = new AgentGetVersionRequest();
 

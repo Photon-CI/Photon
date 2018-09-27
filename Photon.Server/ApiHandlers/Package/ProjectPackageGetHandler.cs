@@ -14,6 +14,8 @@ namespace Photon.Server.ApiHandlers.Package
     {
         public override HttpHandlerResult Get()
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var qId = GetQuery("id");
             var qVersion = GetQuery("version");
 
@@ -23,7 +25,7 @@ namespace Photon.Server.ApiHandlers.Package
             if (string.IsNullOrEmpty(qVersion))
                 return Response.BadRequest().SetText("'version' is undefined!");
 
-            if (!PhotonServer.Instance.ProjectPackages.TryGet(qId, qVersion, out var filename))
+            if (!serverContext.ProjectPackages.TryGet(qId, qVersion, out var filename))
                 return Response.BadRequest().SetText($"Package '{qId} @ {qVersion}' not found!");
 
             var name = Path.GetFileName(filename);

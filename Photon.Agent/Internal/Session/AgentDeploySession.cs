@@ -18,7 +18,7 @@ namespace Photon.Agent.Internal.Session
         public string EnvironmentName {get; set;}
 
 
-        public AgentDeploySession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId) : base(transceiver, serverSessionId, sessionClientId)
+        public AgentDeploySession(MessageTransceiver serverTransceiver) : base(serverTransceiver)
         {
             ApplicationsDirectory = Configuration.ApplicationsDirectory;
         }
@@ -30,37 +30,6 @@ namespace Photon.Agent.Internal.Session
             await DownloadProjectPackage();
 
             //LoadProjectAssembly();
-        }
-
-        private async Task DownloadProjectPackage()
-        {
-            var packageRequest = new AgentProjectPackagePullRequest {
-                ProjectPackageId = ProjectPackageId,
-                ProjectPackageVersion = ProjectPackageVersion,
-            };
-
-            AgentProjectPackagePullResponse packageResponse;
-            try {
-                packageResponse = await Transceiver.Send(packageRequest)
-                    .GetResponseAsync<AgentProjectPackagePullResponse>();
-            }
-            catch (Exception error) {
-                throw new ApplicationException($"Failed to download package '{ProjectPackageId}.{ProjectPackageVersion}'! {error.Message}");
-            }
-
-            try {
-                Metadata = await ProjectPackageTools.UnpackAsync(packageResponse.Filename, BinDirectory);
-
-                AssemblyFilename = Path.Combine(BinDirectory, Metadata.AssemblyFilename);
-            }
-            finally {
-                try {
-                    File.Delete(packageResponse.Filename);
-                }
-                catch (Exception error) {
-                    Log.Warn("Failed to remove temporary package file!", error);
-                }
-            }
         }
 
         //private void LoadProjectAssembly()
@@ -136,6 +105,37 @@ namespace Photon.Agent.Internal.Session
             }
         }
 
-        public override async Task CompleteAsync() {}
+        private async Task DownloadProjectPackage()
+        {
+            var packageRequest = new AgentProjectPackagePullRequest {
+                ProjectPackageId = ProjectPackageId,
+                ProjectPackageVersion = ProjectPackageVersion,
+            };
+
+            AgentProjectPackagePullResponse packageResponse;
+            try {
+                packageResponse = await ServerTransceiver.Send(packageRequest)
+                    .GetResponseAsync<AgentProjectPackagePullResponse>();
+            }
+            catch (Exception error) {
+                throw new ApplicationException($"Failed to download package '{ProjectPackageId}.{ProjectPackageVersion}'! {error.Message}");
+            }
+
+            try {
+                Metadata = await ProjectPackageTools.UnpackAsync(packageResponse.Filename, BinDirectory);
+
+                AssemblyFilename = Path.Combine(BinDirectory, Metadata.AssemblyFilename);
+            }
+            finally {
+                try {
+                    File.Delete(packageResponse.Filename);
+                }
+                catch (Exception error) {
+                    Log.Warn("Failed to remove temporary package file!", error);
+                }
+            }
+        }
+
+        //public override async Task CompleteAsync() {}
     }
 }

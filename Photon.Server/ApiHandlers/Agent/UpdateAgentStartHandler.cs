@@ -25,6 +25,8 @@ namespace Photon.Server.ApiHandlers.Agent
 
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var agentIds = GetQuery("agents");
 
             var updateDirectory = Path.Combine(Configuration.Directory, "Updates");
@@ -37,15 +39,15 @@ namespace Photon.Server.ApiHandlers.Agent
             }
 
             try {
-                var session = new ServerUpdateSession {
+                var session = new ServerUpdateSession(serverContext) {
                     UpdateFilename = updateFilename,
                 };
 
                 if (!string.IsNullOrEmpty(agentIds))
                     session.AgentIds = ParseNames(agentIds).OrderBy(x => x).ToArray();
 
-                PhotonServer.Instance.Sessions.BeginSession(session);
-                PhotonServer.Instance.Queue.Add(session);
+                serverContext.Sessions.BeginSession(session);
+                serverContext.Queue.Add(session);
 
                 var response = new HttpSessionStartResponse {
                     SessionId = session.SessionId,

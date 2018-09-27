@@ -44,8 +44,9 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentConnection\WorkerAgentConnectionCollection.cs" />
+    <Compile Include="AgentConnection\AgentConnectionHandle.cs" />
     <Compile Include="AgentConnection\IAgentConnection.cs" />
+    <Compile Include="AgentConnection\IWorkerAgentConnectionCollection.cs" />
     <Compile Include="Agent\AgentContextBase.cs" />
     <Compile Include="AgentConnection\IAgentConnectionClient.cs" />
     <Compile Include="Agent\IAgentContext.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Projects\ProjectFileSystemSource.cs" />
     <Compile Include="Projects\ProjectGithubSource.cs" />
     <Compile Include="Projects\ProjectSourceSerializer.cs" />
-    <Compile Include="Server\WorkerAgentSelector.cs" />
     <Compile Include="Server\IServerContext.cs" />
     <Compile Include="Server\IServerBuildContext.cs" />
     <Compile Include="Server\ScriptOutput.cs" />
@@ -113,7 +113,6 @@
     <Compile Include="Server\ServerDeployContext.cs" />
     <Compile Include="Agent\AgentBuildContext.cs" />
     <Compile Include="Agent\AgentDeployContext.cs" />
-    <Compile Include="Tasks\DeployTaskRegistry.cs" />
     <Compile Include="Tasks\IBuildTask.cs" />
     <Compile Include="Agent\IAgentDeployContext.cs" />
     <Compile Include="Agent\IAgentBuildContext.cs" />
@@ -121,7 +120,6 @@
     <Compile Include="Packages\IPackageDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks\RolesAttribute.cs" />
-    <Compile Include="Tasks\BuildTaskRegistry.cs" />
     <Compile Include="Tasks\TaskDescription.cs" />
     <Compile Include="Tasks\TaskRegistryBase.cs" />
     <Compile Include="Tasks\TaskResult.cs" />

@@ -7,7 +7,7 @@ namespace Photon.Agent.Internal.Session
 {
     internal interface IAgentSession : IReferenceItem, IDisposable
     {
-        MessageTransceiver Transceiver {get;}
+        MessageTransceiver ServerTransceiver {get;}
         Exception Exception {get; set;}
 
         Task InitializeAsync();

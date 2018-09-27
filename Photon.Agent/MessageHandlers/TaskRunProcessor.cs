@@ -1,5 +1,6 @@
 ﻿using log4net;
 using Photon.Agent.Internal;
+using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Library.TcpMessages;
@@ -15,11 +16,16 @@ namespace Photon.Agent.MessageHandlers
 
         public override async Task<IResponseMessage> Process(TaskRunRequest requestMessage)
         {
-            if (!PhotonAgent.Instance.Sessions.TryGet(requestMessage.AgentSessionId, out var session))
+            var context = PhotonAgent.Instance.Context;
+
+            if (!context.Sessions.TryGet(requestMessage.AgentSessionId, out var session))
                 throw new ApplicationException($"Session '{requestMessage.AgentSessionId}' not found!");
 
+            if (!(session is AgentDeploySession deploySession))
+                throw new ApplicationException("Execution of individual tasks is only available on deployment sessions!");
+
             try {
-                await session.RunTaskAsync(requestMessage.TaskName, requestMessage.TaskSessionId);
+                await deploySession.RunTaskAsync(requestMessage.TaskName, requestMessage.TaskSessionId);
 
                 return new TaskRunResponse();
             }

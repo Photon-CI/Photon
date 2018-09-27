@@ -11,7 +11,9 @@ namespace Photon.Server.MessageProcessors
     {
         public override Task<IResponseMessage> Process(AgentProjectPackagePullRequest requestMessage)
         {
-            if (!PhotonServer.Instance.ProjectPackages.TryGet(requestMessage.ProjectPackageId, requestMessage.ProjectPackageVersion, out var packageFilename))
+            var serverContext = PhotonServer.Instance.Context;
+
+            if (!serverContext.ProjectPackages.TryGet(requestMessage.ProjectPackageId, requestMessage.ProjectPackageVersion, out var packageFilename))
                 throw new Exception($"Project Package '{requestMessage.ProjectPackageId}.{requestMessage.ProjectPackageVersion}' not found!");
 
             return Task.FromResult<IResponseMessage>(new AgentProjectPackagePullResponse {

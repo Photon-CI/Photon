@@ -4,18 +4,18 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.Server.Internal
+namespace Photon.Library.Communication
 {
-    internal static class ClientHandshake
+    public static class ClientHandshake
     {
         private const int HandshakeTimeoutSec = 30;
 
 
-        public static async Task Verify(MessageClient client, CancellationToken token = default(CancellationToken))
+        public static async Task Verify(MessageClient client, string serverVersion, CancellationToken token = default)
         {
             var handshakeRequest = new HandshakeRequest {
                 Key = Guid.NewGuid().ToString(),
-                ServerVersion = Configuration.Version,
+                ServerVersion = serverVersion,
             };
 
             var handshakeTimeout = TimeSpan.FromSeconds(HandshakeTimeoutSec);

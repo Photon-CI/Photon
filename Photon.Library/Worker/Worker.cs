@@ -44,7 +44,7 @@ namespace Photon.Library.Worker
             Transceiver?.Dispose();
         }
 
-        public void Start()
+        public void Connect()
         {
             if (_isStarted) throw new InvalidOperationException("Worker has already been started!");
             _isStarted = true;
@@ -52,7 +52,20 @@ namespace Photon.Library.Worker
             StartProcess();
         }
 
-        public void Stop()
+        public void Disconnect(int milliseconds = 6_000)
+        {
+            var disconnectMessage = new WorkerDisconnectRequestMessage();
+
+            var _ = Transceiver.Send(disconnectMessage)
+                .GetResponseAsync<WorkerDisconnectResponseMessage>();
+
+            if (!_process.WaitForExit(milliseconds))
+                throw new TimeoutException("Timeout waiting for worker to disconnect!");
+
+            Transceiver.Stop();
+        }
+
+        private void Stop()
         {
             if (!_isStarted) return;
             _isStarted = false;
@@ -70,19 +83,6 @@ namespace Photon.Library.Worker
 
             if (_process != null)
                 StopProcess();
-        }
-
-        public void Disconnect(int milliseconds = 6_000)
-        {
-            var disconnectMessage = new WorkerDisconnectRequestMessage();
-
-            var _ = Transceiver.Send(disconnectMessage)
-                .GetResponseAsync<WorkerDisconnectResponseMessage>();
-
-            if (!_process.WaitForExit(milliseconds))
-                throw new TimeoutException("Timeout waiting for worker to disconnect!");
-
-            Transceiver.Stop();
         }
 
         private void StartProcess()

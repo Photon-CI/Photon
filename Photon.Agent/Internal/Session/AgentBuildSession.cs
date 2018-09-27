@@ -2,17 +2,20 @@
 using Photon.Communication;
 using Photon.Framework.Projects;
 using Photon.Framework.Tools.Content;
+using Photon.Library.Communication.Messages.Session;
 using Photon.Library.GitHub;
-using Photon.Library.TcpMessages.Session;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Exception = System.Exception;
 
 namespace Photon.Agent.Internal.Session
 {
     internal class AgentBuildSession : AgentSessionBase
     {
+        //private readonly TaskCompletionSource<object> completeTask;
+
         public string PreBuild {get; set;}
         public string GitRefspec {get; set;}
         public string TaskName {get; set;}
@@ -22,9 +25,13 @@ namespace Photon.Agent.Internal.Session
         public string CommitAuthor {get; private set;}
         public string CommitMessage {get; private set;}
 
+        //public Task CompletionTask => completeTask.Task;
 
-        public AgentBuildSession(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
-            : base(transceiver, serverSessionId, sessionClientId) {}
+
+        public AgentBuildSession(MessageTransceiver serverTransceiver) : base(serverTransceiver)
+        {
+            //completeTask = new TaskCompletionSource<object>();
+        }
 
         public override async Task InitializeAsync()
         {
@@ -34,10 +41,10 @@ namespace Photon.Agent.Internal.Session
 
             StartWorker();
 
-            var msg = new WorkerBuildSessionBeginRequest {
+            var msg = new WorkerBuildSessionRunRequest {
                 AgentSessionId = SessionId,
                 ServerSessionId = ServerSessionId,
-                SessionClientId = SessionClientId,
+                //SessionClientId = SessionClientId,
                 BinDirectory = BinDirectory,
                 WorkDirectory = WorkDirectory,
                 ContentDirectory = ContentDirectory,
@@ -50,42 +57,45 @@ namespace Photon.Agent.Internal.Session
                 .GetResponseAsync(TokenSource.Token);
         }
 
-        public async Task RunTaskAsync(string taskName, string taskSessionId)
+        public async Task RunTaskAsync()
         {
-            var githubSource = Project?.Source as ProjectGithubSource;
-            var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
+            try {
+                var githubSource = Project?.Source as ProjectGithubSource;
+                var notifyGithub = githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-            if (notifyGithub && SourceCommit != null)
-                await NotifyGithubStarted(githubSource);
+                if (notifyGithub && SourceCommit != null)
+                    await NotifyGithubStarted(githubSource);
+            }
+            catch (Exception error) {
+                Log.Error("Failed to send GitHub pre-build notification!", error);
+            }
 
             try {
-                var task = Task.Run(async () => {
-                    var request = new WorkerBuildSessionRunRequest {
-                        // TODO
-                    };
+                var request = new WorkerBuildSessionRunRequest {
+                    // TODO
+                };
 
-                    await WorkerHandle.Transceiver.Send(request)
-                        .GetResponseAsync();
-                });
-                await taskList.AddOrUpdate(taskSessionId, id => task, (id, _) => task);
-                await task.ContinueWith(t => {
-                    taskList.TryRemove(taskSessionId, out _);
-                });
+                var response = await WorkerHandle.Transceiver.Send(request)
+                    .GetResponseAsync();
+
+                //await taskList.AddOrUpdate(taskSessionId, id => task, (id, _) => task);
+                //await task.ContinueWith(t => {taskList.TryRemove(taskSessionId, out _);});
             }
             catch (Exception error) {
                 Exception = error;
+                //completeTask.SetException(error);
                 throw;
             }
         }
 
-        public override async Task CompleteAsync()
-        {
-            var githubSource = Project?.Source as ProjectGithubSource;
-            var notifyGithub =  githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
+        //public override async Task CompleteAsync()
+        //{
+        //    var githubSource = Project?.Source as ProjectGithubSource;
+        //    var notifyGithub =  githubSource != null && githubSource.NotifyOrigin == NotifyOrigin.Agent;
 
-            if (notifyGithub && SourceCommit != null)
-                await NotifyGithubComplete(githubSource);
-        }
+        //    if (notifyGithub && SourceCommit != null)
+        //        await NotifyGithubComplete(githubSource);
+        //}
 
         private async Task LoadProjectSource()
         {

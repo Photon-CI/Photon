@@ -9,7 +9,7 @@ namespace Photon.Server.Internal.AgentConnections
     internal class ServerConnectionCollection : IDisposable
     {
         private readonly AgentConnection[] connections;
-        private volatile bool isInitialized;
+        //private volatile bool isInitialized;
 
 
         public ServerConnectionCollection(IEnumerable<AgentConnection> connections)
@@ -23,26 +23,29 @@ namespace Photon.Server.Internal.AgentConnections
                 connection.Dispose();
         }
 
-        public async Task BeginAsync(CancellationToken token)
-        {
-            var taskList = connections.Select(x => 
-                Task.Run(() => x.BeginAsync(token), token)).ToArray();
+        //public async Task BeginAsync(CancellationToken token)
+        //{
+        //    var taskList = connections.Select(x => 
+        //        Task.Run(() => x.BeginAsync(token), token)).ToArray();
 
-            await Task.WhenAll(taskList);
-            isInitialized = true;
+        //    await Task.WhenAll(taskList);
+        //    isInitialized = true;
+        //}
+
+        public void Release()
+        {
+            foreach (var connection in connections)
+                connection.Release();
         }
 
-        public async Task ReleaseAsync(CancellationToken token)
+        public Task RunTaskAsync(string taskName, CancellationToken token = default)
         {
-            var taskList = connections.Select(x => 
-                Task.Run(() => x.ReleaseAsync(token), token)).ToArray();
-
-            await Task.WhenAll(taskList);
+            return RunTasksAsync(new[] {taskName}, token);
         }
 
-        public async Task RunTasksAsync(string[] taskNames, CancellationToken token)
+        public async Task RunTasksAsync(string[] taskNames, CancellationToken token = default)
         {
-            if (!isInitialized) throw new ApplicationException("Agent collection has not been initialized!");
+            //if (!isInitialized) throw new ApplicationException("Agent collection has not been initialized!");
 
             var taskList = new List<Task>();
             foreach (var task in taskNames) {
@@ -59,6 +62,14 @@ namespace Photon.Server.Internal.AgentConnections
             catch (Exception error) {
                 throw new Exception($"Failed to run tasks '{string.Join(";", taskNames)}'!", error);
             }
+        }
+
+        public async Task RunAsync(Func<AgentConnection, Task> connectionFunc)
+        {
+            //if (!isInitialized) throw new ApplicationException("Agent collection has not been initialized!");
+
+            var taskList = connections.Select(connectionFunc).ToArray();
+            await Task.WhenAll(taskList);
         }
     }
 }

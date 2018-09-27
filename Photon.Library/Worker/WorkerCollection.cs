@@ -33,7 +33,7 @@ namespace Photon.Library.Worker
             };
 
             try {
-                worker.Start();
+                worker.Connect();
 
                 worker.Transceiver.Context = context;
                 workerList.AddOrUpdate(worker.Id, k => worker, (k, w) => worker);

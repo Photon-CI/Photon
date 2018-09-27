@@ -8,7 +8,6 @@ namespace Photon.Framework.Server
 {
     public class WorkerAgentSelector
     {
-        //private readonly ServerContextBase context;
         private readonly IAgentConnectionClient connectionClient;
 
         public Project Project {get; set;}
@@ -18,7 +17,6 @@ namespace Photon.Framework.Server
         public WorkerAgentSelector(IAgentConnectionClient connectionClient)
         {
             this.connectionClient = connectionClient;
-            //this.context = context;
         }
 
         public IAgentConnection Any(params string[] roles)
@@ -27,10 +25,7 @@ namespace Photon.Framework.Server
             var roleAgents = AgentsInRoles(agents, roles);
             var agent = GetRandomAgent(roleAgents);
 
-            //PrintFoundAgents(new[] {agent});
-
             var handle = ConnectTo(agent);
-            //context.agentConnections.Add(handle);
             return handle;
         }
 
@@ -38,7 +33,6 @@ namespace Photon.Framework.Server
         {
             var agents = GetAllAgents().ToArray();
 
-            //PrintFoundAgents(agents);
             return CreateCollection(agents);
         }
 
@@ -47,7 +41,6 @@ namespace Photon.Framework.Server
             var agents = GetAllAgents();
             var roleAgents = AgentsInRoles(agents, roles).ToArray();
 
-            //PrintFoundAgents(roleAgents);
             return CreateCollection(roleAgents);
         }
 
@@ -56,7 +49,6 @@ namespace Photon.Framework.Server
             var agents = GetAllAgents();
             var environmentAgents = AgentsInEnvironment(agents, name).ToArray();
 
-            //PrintFoundAgents(environmentAgents);
             return CreateCollection(environmentAgents);
         }
 
@@ -66,7 +58,6 @@ namespace Photon.Framework.Server
             var environmentAgents = AgentsInEnvironment(allAgents, name);
             var roleAgents = AgentsInRoles(environmentAgents, roles).ToArray();
 
-            //PrintFoundAgents(roleAgents);
             return CreateCollection(roleAgents);
         }
 
@@ -74,7 +65,6 @@ namespace Photon.Framework.Server
         {
             var connection = connectionClient.RequestConnection(agent);
 
-            //context.agentConnections.Add(connection);
             return connection;
         }
 
@@ -82,7 +72,6 @@ namespace Photon.Framework.Server
         {
             if (Agents?.Any() ?? false) return Agents;
 
-            //context.Output.WriteLine("No agents have been defined!", ConsoleColor.DarkRed);
             throw new ApplicationException("No agents have been defined!");
         }
 
@@ -92,18 +81,6 @@ namespace Photon.Framework.Server
 
             if (roleAgents.Any()) return roleAgents;
 
-            //context.Output.Write("No agents were found in roles ", ConsoleColor.DarkYellow);
-
-            //var i = 0;
-            //foreach (var role in roles) {
-            //    if (i > 0) context.Output.Write(", ", ConsoleColor.DarkYellow);
-            //    i++;
-
-            //    context.Output.Write(role, ConsoleColor.Yellow);
-            //}
-
-            //context.Output.WriteLine("!", ConsoleColor.DarkYellow);
-
             throw new ApplicationException($"No agents were found in roles '{string.Join(", ", roles)}'!");
         }
 
@@ -111,18 +88,14 @@ namespace Photon.Framework.Server
         {
             var environmentList = Project?.Environments;
 
-            if (!(environmentList?.Any() ?? false)) {
-                //context.Output.WriteLine("No environments have been defined!", ConsoleColor.DarkRed);
+            if (!(environmentList?.Any() ?? false))
                 throw new ApplicationException("No environments have been defined!");
-            }
 
             var environment = environmentList.FirstOrDefault(x =>
                 string.Equals(x.Name, environmentName, StringComparison.OrdinalIgnoreCase));
 
-            if (environment == null) {
-                //context.Output.WriteLine($"Environment '{environmentName}' was not found!", ConsoleColor.DarkYellow);
+            if (environment == null)
                 throw new ApplicationException($"Environment '{environmentName}' was not found!");
-            }
 
             var environmentAgents = agents
                 .Where(a => environment.AgentIdList.Contains(a.Id, StringComparer.OrdinalIgnoreCase))
@@ -131,7 +104,6 @@ namespace Photon.Framework.Server
             if (environmentAgents.Any())
                 return environmentAgents;
 
-            //context.Output.WriteLine($"No agents were found in environment '{environmentName}'!", ConsoleColor.DarkYellow);
             throw new ApplicationException($"No agents were found in environment '{environmentName}'!");
         }
 
@@ -149,25 +121,8 @@ namespace Photon.Framework.Server
         private WorkerAgentConnectionCollection CreateCollection(IEnumerable<ServerAgent> agents)
         {
             var connections = agents.Select(ConnectTo).ToArray();
-            //context.agentConnections.Add(handle);
 
             return new WorkerAgentConnectionCollection(connections);
         }
-
-        //private void PrintFoundAgents(IEnumerable<ServerAgent> agents)
-        //{
-        //    var agentNames = agents.Select(x => x.Name);
-        //    context.Output.Write("Found Agents: ", ConsoleColor.DarkCyan);
-
-        //    var i = 0;
-        //    foreach (var name in agentNames) {
-        //        if (i > 0) context.Output.Write("; ", ConsoleColor.DarkCyan);
-        //        i++;
-
-        //        context.Output.Write(name, ConsoleColor.Cyan);
-        //    }
-
-        //    context.Output.WriteLine(".", ConsoleColor.DarkCyan);
-        //}
     }
 }

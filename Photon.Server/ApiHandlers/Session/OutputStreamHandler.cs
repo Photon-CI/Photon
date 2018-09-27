@@ -14,13 +14,15 @@ namespace Photon.Server.ApiHandlers.Session
     {
         public override HttpHandlerResult Get()
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var sessionId = GetQuery("id");
 
             if (string.IsNullOrEmpty(sessionId))
                 return Response.BadRequest().SetText("'id' is undefined!");
 
             try {
-                if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
+                if (!serverContext.Sessions.TryGet(sessionId, out var session))
                     return Response.BadRequest().SetText($"Session '{sessionId}' not found!");
 
                 return Response.Ok()

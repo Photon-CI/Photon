@@ -21,11 +21,13 @@ namespace Photon.Server.ApiHandlers.Security
 
         public override HttpHandlerResult Post()
         {
-            try {
-                var session = new ServerSecurityPublishSession();
+            var serverContext = PhotonServer.Instance.Context;
 
-                PhotonServer.Instance.Sessions.BeginSession(session);
-                PhotonServer.Instance.Queue.Add(session);
+            try {
+                var session = new ServerSecurityPublishSession(serverContext);
+
+                serverContext.Sessions.BeginSession(session);
+                serverContext.Queue.Add(session);
 
                 var response = new HttpSessionStartResponse {
                     SessionId = session.SessionId,

@@ -1,7 +1,5 @@
 ﻿using Photon.Framework.AgentConnection;
 using Photon.Framework.Domain;
-using System;
-using Newtonsoft.Json;
 
 namespace Photon.Framework.Server
 {
@@ -10,7 +8,7 @@ namespace Photon.Framework.Server
         public ServerAgent[] Agents {get; set;}
         public string ServerSessionId {get; set;}
         public IAgentConnectionClient ConnectionFactory {get; set;}
-        public WorkerAgentSelector RegisterAgents => new WorkerAgentSelector(ConnectionFactory);
+        //public WorkerAgentSelector RegisterAgents => new WorkerAgentSelector(ConnectionFactory);
 
         //[NonSerialized]
         //[JsonIgnore]

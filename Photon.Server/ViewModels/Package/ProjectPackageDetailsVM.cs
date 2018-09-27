@@ -23,8 +23,9 @@ namespace Photon.Server.ViewModels.Package
         {
             base.OnBuild();
 
-            var packagePath = PhotonServer.Instance
-                .ProjectPackages.GetPackagePath(PackageId);
+            var serverContext = PhotonServer.Instance.Context;
+
+            var packagePath = serverContext.ProjectPackages.GetPackagePath(PackageId);
 
             if (!Directory.Exists(packagePath))
                 throw new ApplicationException($"Package '{PackageId}' not found!");

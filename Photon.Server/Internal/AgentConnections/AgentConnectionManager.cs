@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Server;
+using System;
 using System.Collections.Concurrent;
 
 namespace Photon.Server.Internal.AgentConnections
@@ -26,19 +27,18 @@ namespace Photon.Server.Internal.AgentConnections
             return connectionList.TryGetValue(connectionId, out connection);
         }
 
-        public AgentConnection Create()
+        public AgentConnection Create(ServerAgent agent)
         {
-            var connectionId = Guid.NewGuid().ToString("D");
-            var connection = new AgentConnection(connectionId);
+            var connection = new AgentConnection(agent);
             connection.Released += Connection_OnReleased;
 
-            connectionList[connectionId] = connection;
+            connectionList[connection.ConnectionId] = connection;
             return connection;
         }
 
         private void Connection_OnReleased(object sender, AgentConnectionReleaseEventArgs e)
         {
-            connectionList.TryRemove(e.AgentId, out _);
+            connectionList.TryRemove(e.ConnectionId, out _);
         }
     }
 }

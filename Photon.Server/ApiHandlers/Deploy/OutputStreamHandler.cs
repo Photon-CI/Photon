@@ -16,10 +16,12 @@ namespace Photon.Server.ApiHandlers.Deploy
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var sessionId = GetQuery<string>("session");
 
             if (!string.IsNullOrEmpty(sessionId)) {
-                if (PhotonServer.Instance.Sessions.TryGet(sessionId, out var session)) {
+                if (serverContext.Sessions.TryGet(sessionId, out var session)) {
                     if (!session.IsComplete)
                         return Response.Redirect("api/session/output-stream", new {id = sessionId});
                 }
@@ -35,7 +37,7 @@ namespace Photon.Server.ApiHandlers.Deploy
                 return Response.BadRequest().SetText("'number' is undefined!");
 
             try {
-                if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
+                if (!serverContext.Projects.TryGet(projectId, out var project))
                     return Response.BadRequest().SetText($"Project '{projectId}' not found!");
 
                 if (!project.Deployments.TryGet(deploymentNumber.Value, out var deploymentData))

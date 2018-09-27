@@ -23,11 +23,9 @@ namespace Photon.Server.ViewModels.Package
         {
             base.OnBuild();
 
-            ProjectPackages = PhotonServer.Instance
-                .ProjectPackages.GetAllPackages().ToArray();
-            
-            ApplicationPackages = PhotonServer.Instance
-                .ApplicationPackages.GetAllPackages().ToArray();
+            var serverContext = PhotonServer.Instance.Context;
+            ProjectPackages = serverContext.ProjectPackages.GetAllPackages().ToArray();
+            ApplicationPackages = serverContext.ApplicationPackages.GetAllPackages().ToArray();
         }
     }
 }

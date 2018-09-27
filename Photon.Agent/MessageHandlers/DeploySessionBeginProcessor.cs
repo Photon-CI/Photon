@@ -13,7 +13,8 @@ namespace Photon.Agent.MessageHandlers
         {
             var response = new DeploySessionBeginResponse();
 
-            var session = new AgentDeploySession(Transceiver, requestMessage.ServerSessionId, requestMessage.SessionClientId) {
+            var session = new AgentDeploySession(Transceiver) {
+                ServerSessionId = requestMessage.ServerSessionId,
                 DeploymentNumber = requestMessage.DeploymentNumber,
                 EnvironmentName = requestMessage.EnvironmentName,
                 Project = requestMessage.Project,
@@ -25,7 +26,7 @@ namespace Photon.Agent.MessageHandlers
 
             await session.InitializeAsync();
 
-            PhotonAgent.Instance.Sessions.BeginSession(session);
+            PhotonAgent.Instance.Context.Sessions.BeginSession(session);
 
             response.AgentSessionId = session.SessionId;
 

@@ -11,14 +11,14 @@ namespace Photon.Agent.MessageHandlers.Packages
     {
         public override async Task<IResponseMessage> Process(WorkerApplicationPackagePushRequest request)
         {
-            if (!PhotonAgent.Instance.Sessions.TryGet(request.AgentSessionId, out var session))
+            if (!PhotonAgent.Instance.Context.Sessions.TryGet(request.AgentSessionId, out var session))
                 throw new ApplicationException($"Session '{request.AgentSessionId}' not found!");
 
             var agentRequest = new AgentApplicationPackagePushRequest {
                 Filename = request.Filename,
             };
 
-            await session.Transceiver.Send(agentRequest)
+            await session.ServerTransceiver.Send(agentRequest)
                 .GetResponseAsync(session.Token);
 
             return new ResponseMessageBase();

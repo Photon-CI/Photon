@@ -10,11 +10,13 @@ namespace Photon.Server.ApiHandlers.Session
     {
         public override HttpHandlerResult Get()
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var sessionId = GetQuery("session");
             var startPos = GetQuery<int>("start");
 
             try {
-                if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
+                if (!serverContext.Sessions.TryGet(sessionId, out var session))
                     return Response.BadRequest().SetText($"Session '{sessionId}' not found!");
 
                 var currentLength = session.Output.Length;

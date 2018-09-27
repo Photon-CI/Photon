@@ -7,22 +7,26 @@ namespace Photon.Server.Internal.Sessions
 
     internal class ServerSessionWatch : IDisposable
     {
+        private readonly ServerSessionManager sessionMgr;
+
         public event EventHandler<SessionStatusArgs> SessionChanged;
 
 
-        public ServerSessionWatch()
+        public ServerSessionWatch(ServerSessionManager sessionMgr)
         {
-            PhotonServer.Instance.Sessions.SessionChanged += Session_OnChanged;
+            this.sessionMgr = sessionMgr;
+
+            sessionMgr.SessionChanged += Session_OnChanged;
         }
 
         public void Dispose()
         {
-            PhotonServer.Instance.Sessions.SessionChanged -= Session_OnChanged;
+            sessionMgr.SessionChanged -= Session_OnChanged;
         }
 
         public void Initialize()
         {
-            var sessionList = PhotonServer.Instance.Sessions.All
+            var sessionList = sessionMgr.All
                 .OrderBy(x => x.TimeCreated).ToArray();
 
             foreach (var session in sessionList)

@@ -14,7 +14,7 @@ namespace Photon.Worker.Internal.Session
     {
         private readonly string serverSessionId;
         private readonly string agentSessionId;
-        private readonly string sessionClientId;
+        //private readonly string sessionClientId;
         private readonly MessageTransceiver transceiver;
         private int readPos;
         private bool isClosed;
@@ -24,11 +24,11 @@ namespace Photon.Worker.Internal.Session
         public int Length => Writer.Length;
 
 
-        public SessionOutput(MessageTransceiver transceiver, string serverSessionId, string agentSessionId, string sessionClientId)
+        public SessionOutput(MessageTransceiver transceiver, string serverSessionId, string agentSessionId)
         {
             this.transceiver = transceiver;
             this.serverSessionId = serverSessionId;
-            this.sessionClientId = sessionClientId;
+            //this.sessionClientId = sessionClientId;
             this.agentSessionId = agentSessionId;
 
             Writer = new ScriptOutput();
@@ -99,7 +99,7 @@ namespace Photon.Worker.Internal.Session
             var message = new SessionOutputMessage {
                 ServerSessionId = serverSessionId,
                 AgentSessionId = agentSessionId,
-                SessionClientId = sessionClientId,
+                //SessionClientId = sessionClientId,
                 Text = newText,
             };
 

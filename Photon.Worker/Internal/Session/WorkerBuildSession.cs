@@ -10,7 +10,8 @@ namespace Photon.Worker.Internal.Session
 {
     internal class WorkerBuildSession : WorkerSession
     {
-        public IAgentBuildContext BuildContext => (IAgentBuildContext)Context;
+        public override IAgentContext Context => BuildContext; 
+        public AgentBuildContext BuildContext {get; set;}
 
 
         public override async Task Initialize(CancellationToken token = default)
@@ -29,7 +30,7 @@ namespace Photon.Worker.Internal.Session
 
         private void LoadProjectAssembly()
         {
-            if (string.IsNullOrEmpty(BuildContext.AssemblyFilename)) {
+            if (string.IsNullOrEmpty(Context.AssemblyFilename)) {
                 Output.WriteLine("No assembly filename defined!", ConsoleColor.DarkRed);
                 throw new ApplicationException("Assembly filename is undefined!");
             }

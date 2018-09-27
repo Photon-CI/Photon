@@ -24,12 +24,14 @@ namespace Photon.Server.ApiHandlers.Build
 
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var qProject = GetQuery("project");
             var qGitRefspec = GetQuery("refspec");
             var qTaskName = GetQuery("task");
 
             try {
-                if (!PhotonServer.Instance.Projects.TryGet(qProject, out var project))
+                if (!serverContext.Projects.TryGet(qProject, out var project))
                     return Response.BadRequest().SetText($"Project '{qProject}' was not found!");
 
                 var buildTask = project.Description.BuildTasks
@@ -45,7 +47,7 @@ namespace Photon.Server.ApiHandlers.Build
                 build.AssemblyFilename = project.Description.AssemblyFile;
                 build.GitRefspec = qGitRefspec ?? buildTask.GitRefspec;
 
-                var session = new ServerBuildSession {
+                var session = new ServerBuildSession(serverContext) {
                     Project = project.Description,
                     AssemblyFilename = project.Description.AssemblyFile,
                     PreBuild = project.Description.PreBuild,
@@ -58,8 +60,8 @@ namespace Photon.Server.ApiHandlers.Build
 
                 build.ServerSessionId = session.SessionId;
 
-                PhotonServer.Instance.Sessions.BeginSession(session);
-                PhotonServer.Instance.Queue.Add(session);
+                serverContext.Sessions.BeginSession(session);
+                serverContext.Queue.Add(session);
 
                 var response = new HttpBuildStartResponse {
                     SessionId = session.SessionId,

@@ -12,17 +12,17 @@ namespace Photon.Agent.Internal.Session
 
         public AgentSessionWatch()
         {
-            PhotonAgent.Instance.Sessions.SessionChanged += Session_OnChanged;
+            PhotonAgent.Instance.Context.Sessions.SessionChanged += Session_OnChanged;
         }
 
         public void Dispose()
         {
-            PhotonAgent.Instance.Sessions.SessionChanged -= Session_OnChanged;
+            PhotonAgent.Instance.Context.Sessions.SessionChanged -= Session_OnChanged;
         }
 
         public void Initialize()
         {
-            var sessionList = PhotonAgent.Instance.Sessions.All
+            var sessionList = PhotonAgent.Instance.Context.Sessions.All
                 .OrderBy(x => x.TimeCreated).ToArray();
 
             foreach (var session in sessionList)

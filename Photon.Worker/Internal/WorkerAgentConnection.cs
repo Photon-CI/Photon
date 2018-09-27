@@ -1,14 +1,21 @@
 ﻿using Photon.Communication;
+using Photon.Framework.AgentConnection;
 using Photon.Library.TcpMessages.AgentConnection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Photon.Worker.Internal
 {
-    internal class AgentConnection
+    internal class WorkerAgentConnection : IAgentConnection
     {
+        public string AgentId {get; set;}
+        public string ConnectionId {get; set;}
         public MessageTransceiver Transceiver {get; set;}
 
+
+        public WorkerAgentConnection() {}
+
+        public void Dispose() {}
 
         public async Task BeginAsync(CancellationToken token)
         {

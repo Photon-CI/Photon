@@ -21,17 +21,19 @@ namespace Photon.Server.ViewModels.Build
         {
             base.OnBuild();
 
+            var serverContext = PhotonServer.Instance.Context;
+
             CanStartBuild = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.BuildStart);
 
-            IsLoading = PhotonServer.Instance.Projects.IsLoading;
+            IsLoading = serverContext.Projects.IsLoading;
             if (IsLoading) return;
 
-            Projects = PhotonServer.Instance.Projects.All
+            Projects = serverContext.Projects.All
                 .Select(x => x.Description).ToArray();
 
             var allBuilds = new List<BuildRow>();
 
-            foreach (var project in PhotonServer.Instance.Projects.All) {
+            foreach (var project in serverContext.Projects.All) {
                 var projectName = project.Description.Name;
 
                 foreach (var projectBuild in project.Builds.AllBuilds) {

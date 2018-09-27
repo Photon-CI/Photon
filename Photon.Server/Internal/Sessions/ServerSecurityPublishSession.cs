@@ -1,6 +1,7 @@
 ﻿using Photon.Communication;
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
+using Photon.Library.Communication;
 using Photon.Library.TcpMessages.Security;
 using System;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Photon.Server.Internal.Sessions
     {
         //public string[] AgentIds {get; set;}
 
+
+        public ServerSecurityPublishSession(ServerContext context) : base(context) {}
 
         public override async Task RunAsync()
         {
@@ -39,10 +42,10 @@ namespace Photon.Server.Internal.Sessions
             await queue.Completion;
         }
 
-        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
-        {
-            return null;
-        }
+        //protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
+        //{
+        //    return null;
+        //}
 
         private async Task AgentAction(ServerAgent agent)
         {
@@ -52,7 +55,7 @@ namespace Photon.Server.Internal.Sessions
 
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
 
-                    await ClientHandshake.Verify(messageClient, TokenSource.Token);
+                    await ClientHandshake.Verify(messageClient, Configuration.Version, TokenSource.Token);
 
                     Output.WriteLine($"[{agent.Name}] Connected.", ConsoleColor.DarkCyan);
                 }

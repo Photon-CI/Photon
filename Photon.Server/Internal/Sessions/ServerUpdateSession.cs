@@ -2,6 +2,7 @@
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
 using Photon.Framework.Tools;
+using Photon.Library.Communication;
 using Photon.Library.TcpMessages;
 using System;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace Photon.Server.Internal.Sessions
         public string UpdateFilename {get; set;}
         public string UpdateVersion {get; set;}
 
+
+        public ServerUpdateSession(ServerContext context) : base(context) {}
 
         public override async Task RunAsync()
         {
@@ -43,11 +46,6 @@ namespace Photon.Server.Internal.Sessions
             await queue.Completion;
         }
 
-        protected override DomainAgentSessionHostBase OnCreateHost(ServerAgent agent)
-        {
-            return null;
-        }
-
         private async Task AgentAction(ServerAgent agent)
         {
             using (var messageClient = new MessageClient(PhotonServer.Instance.MessageRegistry)) {
@@ -59,7 +57,7 @@ namespace Photon.Server.Internal.Sessions
                 try {
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, TokenSource.Token);
 
-                    await ClientHandshake.Verify(messageClient, TokenSource.Token);
+                    await ClientHandshake.Verify(messageClient, Configuration.Version, TokenSource.Token);
                 }
                 catch (Exception error) {
                     Output.WriteBlock(block => block
@@ -154,7 +152,7 @@ namespace Photon.Server.Internal.Sessions
                         using (var connectTokenSource = CancellationTokenSource.CreateLinkedTokenSource(mergedTokenSource.Token, connectionTimeoutTokenSource.Token)) {
                             await client.ConnectAsync(agent.TcpHost, agent.TcpPort, connectTokenSource.Token);
 
-                            await ClientHandshake.Verify(client, connectTokenSource.Token);
+                            await ClientHandshake.Verify(client, Configuration.Version, connectTokenSource.Token);
 
                             var versionRequest = new AgentGetVersionRequest();
 

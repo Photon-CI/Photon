@@ -17,9 +17,10 @@ namespace Photon.Server.ApiHandlers.Build
         public override HttpHandlerResult Get()
         {
             var sessionId = GetQuery("session");
+            var serverContext = PhotonServer.Instance.Context;
 
             try {
-                if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
+                if (!serverContext.Sessions.TryGet(sessionId, out var session))
                     return Response.BadRequest().SetText($"Server Session '{sessionId}' was not found!");
 
                 if (!(session is ServerBuildSession buildSession))
@@ -28,9 +29,9 @@ namespace Photon.Server.ApiHandlers.Build
                 var response = new HttpBuildResultResponse {
                     BuildNumber = buildSession.Build.Number,
                     Result = buildSession.Result,
-                    ProjectPackages = buildSession.Packages.PushedProjectPackages
+                    ProjectPackages = buildSession.PushedProjectPackages
                         .Select(x => new HttpPackageReference(x)).ToArray(),
-                    ApplicationPackages = buildSession.Packages.PushedApplicationPackages
+                    ApplicationPackages = buildSession.PushedApplicationPackages
                         .Select(x => new HttpPackageReference(x)).ToArray(),
                 };
 

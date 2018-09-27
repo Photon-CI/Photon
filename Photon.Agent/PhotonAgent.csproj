@@ -124,6 +124,7 @@
     <Compile Include="Internal\Http\HttpServer.cs" />
     <Compile Include="Internal\Security\GroupRoles.cs" />
     <Compile Include="Internal\Security\SecurityTest.cs" />
+    <Compile Include="MessageHandlers\AgentBuildSessionRunProcessor.cs" />
     <Compile Include="MessageHandlers\Packages\ApplicationPackagePushProcessor.cs" />
     <Compile Include="MessageHandlers\Packages\ProjectPackagePushProcessor.cs" />
     <Compile Include="MessageHandlers\SecurityPublishProcessor.cs" />
@@ -155,7 +156,6 @@
     <Compile Include="Internal\Session\AgentBuildSession.cs" />
     <Compile Include="Internal\Session\AgentDeploySession.cs" />
     <Compile Include="Internal\Session\AgentSessionBase.cs" />
-    <Compile Include="Internal\AgentSessionDomain.cs" />
     <Compile Include="Internal\Session\AgentSessionManager.cs" />
     <Compile Include="Internal\Session\IAgentSession.cs" />
     <Compile Include="Internal\PhotonAgent.cs" />
@@ -170,7 +170,6 @@
     <Compile Include="MessageHandlers\HandshakeProcessor.cs" />
     <Compile Include="MessageHandlers\TaskRunProcessor.cs" />
     <Compile Include="MessageHandlers\SessionReleaseProcessor.cs" />
-    <Compile Include="MessageHandlers\BuildSessionBeginProcessor.cs" />
     <Compile Include="ViewHandlers\IndexHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

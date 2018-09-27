@@ -17,12 +17,14 @@ namespace Photon.Server.ApiHandlers.Project
     {
         public override async Task<HttpHandlerResult> GetAsync(CancellationToken token)
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var projectId = GetQuery("id");
 
             if (string.IsNullOrEmpty(projectId))
                 return Response.BadRequest().SetText("'id' is undefined!");
 
-            if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
+            if (!serverContext.Projects.TryGet(projectId, out var project))
                 return Response.BadRequest().SetText($"Project '{projectId}' not found!");
 
             if (!File.Exists(project.ProjectFilename))
@@ -36,12 +38,14 @@ namespace Photon.Server.ApiHandlers.Project
         // TODO: Require ProjectEdit attribute
         public override async Task<HttpHandlerResult> PostAsync(CancellationToken token)
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var projectId = GetQuery("id");
 
             if (string.IsNullOrEmpty(projectId))
                 return Response.BadRequest().SetText("'id' is undefined!");
 
-            if (!PhotonServer.Instance.Projects.TryGet(projectId, out var project))
+            if (!serverContext.Projects.TryGet(projectId, out var project))
                 return Response.BadRequest().SetText($"Project '{projectId}' not found!");
 
             PathEx.CreatePath(project.ContentPath);

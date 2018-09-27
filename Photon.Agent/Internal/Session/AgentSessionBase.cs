@@ -1,5 +1,4 @@
 ﻿using log4net;
-using Photon.Agent.Internal.Applications;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Extensions;
@@ -24,13 +23,14 @@ namespace Photon.Agent.Internal.Session
         protected readonly CancellationTokenSource TokenSource;
         protected readonly ConcurrentDictionary<string, Task> taskList;
         private readonly Lazy<ILog> _log;
-        public AgentContext Context {get;}
+        //public AgentContext Context {get;}
         public DateTime TimeCreated {get;}
         public DateTime? TimeReleased {get; private set;}
+        public MessageTransceiver ServerTransceiver {get;}
 
-        public string SessionId {get;}
-        public string ServerSessionId {get;}
-        public string SessionClientId {get;}
+        public string ServerSessionId {get; set;}
+        public string AgentSessionId {get;}
+        //public string SessionClientId {get;}
         public string WorkDirectory {get;}
         public string ContentDirectory {get;}
         public string BinDirectory {get;}
@@ -40,30 +40,32 @@ namespace Photon.Agent.Internal.Session
         public TimeSpan CacheSpan {get; set;}
         public TimeSpan LifeSpan {get; set;}
         public Exception Exception {get; set;}
-        protected ApplicationHost Applications {get;}
-        public MessageTransceiver Transceiver {get;}
-        public SessionOutput Output {get;}
+        //protected ApplicationHost Applications {get;}
+        public SessionOutput Output {get; private set;}
         public VariableSetCollection ServerVariables {get; set;}
         public VariableSetCollection AgentVariables {get; set;}
         public bool IsReleased {get; set;}
 
         protected ILog Log => _log.Value;
+        public CancellationToken Token => TokenSource.Token;
 
         protected Worker WorkerHandle {get;}
 
+        public string SessionId => AgentSessionId;
 
-        protected AgentSessionBase(AgentContext context)
+
+        //protected AgentSessionBase(AgentContext context)
+        //{
+        //    this.Context = context;
+        //}
+
+        protected AgentSessionBase(MessageTransceiver serverTransceiver)
         {
-            this.Context = context;
-        }
+            this.ServerTransceiver = serverTransceiver;
+            //this.ServerSessionId = ServerSessionId;
+            //this.SessionClientId = SessionClientId;
 
-        protected AgentSessionBase(MessageTransceiver transceiver, string serverSessionId, string sessionClientId)
-        {
-            this.Transceiver = transceiver;
-            this.ServerSessionId = serverSessionId;
-            this.SessionClientId = sessionClientId;
-
-            SessionId = Guid.NewGuid().ToString("N");
+            AgentSessionId = Guid.NewGuid().ToString("N");
             TimeCreated = DateTime.UtcNow;
             CacheSpan = TimeSpan.FromHours(1);
             LifeSpan = TimeSpan.FromHours(8);
@@ -71,12 +73,11 @@ namespace Photon.Agent.Internal.Session
             taskList = new ConcurrentDictionary<string, Task>(StringComparer.Ordinal);
 
             _log = new Lazy<ILog>(() => LogManager.GetLogger(GetType()));
-            Output = new SessionOutput(transceiver, ServerSessionId, SessionClientId);
-            WorkDirectory = Path.Combine(Configuration.WorkDirectory, SessionId);
+            WorkDirectory = Path.Combine(Configuration.WorkDirectory, AgentSessionId);
             ContentDirectory = Path.Combine(WorkDirectory, "content");
             BinDirectory = Path.Combine(WorkDirectory, "bin");
 
-            Applications = new ApplicationHost();
+            //Applications = new ApplicationHost();
 
             WorkerHandle = new Worker {
                 Filename = Path.Combine(Configuration.AssemblyPath, "Worker", "Photon.Worker.exe"),
@@ -90,7 +91,7 @@ namespace Photon.Agent.Internal.Session
                 Log.Error("Session was disposed without being released!");
             
             TokenSource?.Dispose();
-            Applications.Dispose();
+            //Applications.Dispose();
         }
 
         //public void Cancel()
@@ -104,6 +105,8 @@ namespace Photon.Agent.Internal.Session
 
         public virtual async Task InitializeAsync()
         {
+            Output = new SessionOutput(ServerTransceiver, ServerSessionId);
+
             AgentVariables = await PhotonAgent.Instance.Variables.GetCollection();
 
             Directory.CreateDirectory(WorkDirectory);
@@ -113,7 +116,7 @@ namespace Photon.Agent.Internal.Session
 
         //public abstract Task RunTaskAsync(string taskName, string taskSessionId);
 
-        public abstract Task CompleteAsync();
+        //public abstract Task CompleteAsync();
 
         public async Task ReleaseAsync()
         {
@@ -125,15 +128,15 @@ namespace Photon.Agent.Internal.Session
             OnReleased();
 
             using (var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(8))) {
-                await Transceiver.FlushAsync(tokenSource.Token);
-                Transceiver.Stop();
+                await ServerTransceiver.FlushAsync(tokenSource.Token);
+                ServerTransceiver.Stop();
             }
 
             try {
                 WorkerHandle.Disconnect();
             }
             catch (Exception error) {
-                Log.Error($"An error occurred while unloading session [{SessionId}]!", error);
+                Log.Error($"An error occurred while unloading session [{AgentSessionId}]!", error);
             }
 
             try {
@@ -189,7 +192,7 @@ namespace Photon.Agent.Internal.Session
             WorkerHandle.Password = null;
             WorkerHandle.LoadUserProfile = false;
 
-            WorkerHandle.Start();
+            WorkerHandle.Connect();
         }
 
         private async Task CleanupWorkDir()

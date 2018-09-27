@@ -14,7 +14,7 @@ namespace Photon.Agent.MessageHandlers
 
         public override async Task<IResponseMessage> Process(SessionCancelRequest requestMessage)
         {
-            if (PhotonAgent.Instance.Sessions.TryGet(requestMessage.AgentSessionId, out var session)) {
+            if (PhotonAgent.Instance.Context.Sessions.TryGet(requestMessage.AgentSessionId, out var session)) {
                 await session.AbortAsync();
             }
             else {

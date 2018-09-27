@@ -4,7 +4,6 @@ using Photon.Agent.Internal.Applications;
 using Photon.Agent.Internal.Git;
 using Photon.Agent.Internal.Http;
 using Photon.Agent.Internal.Security;
-using Photon.Agent.Internal.Session;
 using Photon.Communication;
 using Photon.Framework;
 using Photon.Library;
@@ -28,7 +27,6 @@ namespace Photon.Agent.Internal
 
         public HttpServer Http {get;}
         public string WorkDirectory {get;}
-        public AgentSessionManager Sessions {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
         public VariableSetDocumentManager Variables {get;}
         public RepositorySourceManager RepositorySources {get;}
@@ -36,13 +34,14 @@ namespace Photon.Agent.Internal
         public UserGroupManager UserMgr {get;}
         public ApplicationManager ApplicationMgr {get;}
 
+        public AgentContext Context {get; set;}
+
 
         public PhotonAgent()
         {
             WorkDirectory = Configuration.WorkDirectory;
 
             Http = new HttpServer(this);
-            Sessions = new AgentSessionManager();
             MessageRegistry = new MessageProcessorRegistry();
             Variables = new VariableSetDocumentManager();
             RepositorySources = new RepositorySourceManager();
@@ -50,6 +49,8 @@ namespace Photon.Agent.Internal
             AgentConfiguration = new AgentConfigurationManager();
             UserMgr = new UserGroupManager();
             ApplicationMgr = new ApplicationManager();
+
+            Context = new AgentContext();
 
             RepositorySources.RepositorySourceDirectory = Configuration.RepositoryDirectory;
             messageListener.ConnectionReceived += MessageListener_ConnectionReceived;
@@ -67,12 +68,7 @@ namespace Photon.Agent.Internal
                 Log.Error("Failed to dispose TCP message listener!", error);
             }
 
-            try {
-                Sessions?.Dispose();
-            }
-            catch (Exception error) {
-                Log.Error("Failed to dispose session manager!", error);
-            }
+            Context?.Dispose();
 
             Http.Dispose();
         }
@@ -102,7 +98,7 @@ namespace Photon.Agent.Internal
             MessageRegistry.Scan(typeof(IFrameworkAssembly).Assembly);
             messageListener.Listen(_address, AgentConfiguration.Value.Tcp.Port);
 
-            Sessions.Start();
+            Context.Start();
 
             var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskRepositories = Task.Run(() => RepositorySources.Initialize());
@@ -135,12 +131,7 @@ namespace Photon.Agent.Internal
                 }
             }
 
-            try {
-                Sessions?.Stop();
-            }
-            catch (Exception error) {
-                Log.Error("Failed to stop session manager!", error);
-            }
+            Context.Stop();
 
             Http.Stop();
 
@@ -154,8 +145,8 @@ namespace Photon.Agent.Internal
             using (var tokenSource = new CancellationTokenSource(timeout)) {
                 var token = tokenSource.Token;
 
-                using (token.Register(async () => await Sessions.Abort())) {
-                    await Task.Run(() => Sessions.Stop(), token);
+                using (token.Register(async () => await Context.Sessions.Abort())) {
+                    await Task.Run(() => Context.Sessions.Stop(), token);
                 }
             }
         }

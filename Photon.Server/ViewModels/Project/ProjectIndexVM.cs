@@ -21,9 +21,12 @@ namespace Photon.Server.ViewModels.Project
         {
             base.OnBuild();
 
-            UserCanEdit = !Master.IsSecured || PhotonServer.Instance.UserMgr.UserHasRole(Master.UserContext.UserId, GroupRole.ProjectEdit);
+            var serverContext = PhotonServer.Instance.Context;
 
-            Projects = PhotonServer.Instance.Projects.All
+            UserCanEdit = !Master.IsSecured || PhotonServer.Instance.UserMgr
+                .UserHasRole(Master.UserContext.UserId, GroupRole.ProjectEdit);
+
+            Projects = serverContext.Projects.All
                 .Select(x => x.Description).ToList();
         }
     }

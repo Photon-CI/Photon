@@ -19,13 +19,11 @@ namespace Photon.Tests.Workers
                 worker.Filename = workerFilename;
                 worker.ShowConsole = true;
 
-                worker.Start();
-                worker.Transceiver.Context = null;
+                worker.Connect();
 
                 var beginMessage = new WorkerTestSessionBeginRequest();
 
                 var responseTask = worker.Transceiver.Send(beginMessage).GetResponseAsync();
-
                 if (!responseTask.Wait(4_000)) Assert.Fail("Timeout waiting for message response!");
 
                 worker.Disconnect();

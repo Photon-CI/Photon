@@ -20,7 +20,7 @@ namespace Photon.Agent.ApiHandlers.Session
             if (string.IsNullOrEmpty(sessionId))
                 return Response.BadRequest().SetText("'id' is undefined!");
 
-            if (!PhotonAgent.Instance.Sessions.TryGet(sessionId, out var session))
+            if (!PhotonAgent.Instance.Context.Sessions.TryGet(sessionId, out var session))
                 return Response.BadRequest().SetText($"Session '{sessionId}' was not found!");
 
             try {

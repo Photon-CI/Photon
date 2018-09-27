@@ -11,7 +11,7 @@ namespace Photon.Worker.MessageHandlers
         public override Task<IResponseMessage> Process(WorkerDisconnectRequestMessage requestMessage)
         {
             var context = (MessageContext)Transceiver.Context;
-            context.CompleteTask.SetResult(null);
+            context.Complete();
 
             var response = new WorkerDisconnectResponseMessage();
             return Task.FromResult<IResponseMessage>(response);

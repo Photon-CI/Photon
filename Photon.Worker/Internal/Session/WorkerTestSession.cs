@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Framework.Agent;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,6 +7,9 @@ namespace Photon.Worker.Internal.Session
 {
     internal class WorkerTestSession : WorkerSession
     {
+        public AgentContextBase TestContext {get; set;}
+        public override IAgentContext Context => TestContext;
+
         public override async Task Initialize(CancellationToken token = default)
         {
             await base.Initialize(token);

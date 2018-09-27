@@ -10,27 +10,32 @@ namespace Photon.Worker.Internal.Session
 {
     internal abstract class WorkerSession : IDisposable
     {
-        private readonly TaskCompletionSource<object> completeTask;
+        protected readonly TaskCompletionSource<object> completeTask;
+        protected readonly CancellationTokenSource tokenSource;
 
-        public IAgentContext Context {get; set;}
+        public abstract IAgentContext Context {get;}
         public MessageTransceiver Transceiver {get; set;}
         public SessionOutput Output {get; private set;}
+
+        public CancellationToken Token => tokenSource.Token;
 
 
         protected WorkerSession()
         {
             completeTask = new TaskCompletionSource<object>();
+            tokenSource = new CancellationTokenSource();
         }
 
         public virtual void Dispose()
         {
             Output?.Dispose();
+            tokenSource.Dispose();
             //Transceiver?.Dispose();
         }
 
         public virtual Task Initialize(CancellationToken token = default)
         {
-            Output = new SessionOutput(Transceiver, Context.ServerSessionId, Context.AgentSessionId, Context.ClientId);
+            Output = new SessionOutput(Transceiver, Context.ServerSessionId, Context.AgentSessionId);
 
             return Task.CompletedTask;
         }

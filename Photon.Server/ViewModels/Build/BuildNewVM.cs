@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Photon.Library.Http.Messages;
 using Photon.Server.Internal;
 using Photon.Server.Internal.Sessions;
 using PiServerLite.Http.Handlers;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using Photon.Library.Http.Messages;
 
 namespace Photon.Server.ViewModels.Build
 {
@@ -38,10 +38,12 @@ namespace Photon.Server.ViewModels.Build
         {
             base.OnBuild();
 
+            var serverContext = PhotonServer.Instance.Context;
+
             if (string.IsNullOrEmpty(ProjectId))
                 throw new ApplicationException("Project ID is undefined!");
 
-            if (!PhotonServer.Instance.Projects.TryGetDescription(ProjectId, out var projectDesc))
+            if (!serverContext.Projects.TryGetDescription(ProjectId, out var projectDesc))
                 throw new ApplicationException($"Project '{ProjectId}' not found!");
 
             ProjectFound = true;
@@ -79,10 +81,12 @@ namespace Photon.Server.ViewModels.Build
             if (string.IsNullOrWhiteSpace(TaskName))
                 throw new ApplicationException("'Task Name' is undefined!");
 
+            var serverContext = PhotonServer.Instance.Context;
+
             var _roles = TaskRoles.Split(new[] {',', ';'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim()).ToArray();
 
-            if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out var project))
+            if (!serverContext.Projects.TryGet(ProjectId, out var project))
                 throw new ApplicationException($"Project '{ProjectId}' was not found!");
 
             if (string.IsNullOrEmpty(GitRefspec))
@@ -95,7 +99,7 @@ namespace Photon.Server.ViewModels.Build
             build.AssemblyFilename = AssemblyFilename;
             build.GitRefspec = GitRefspec;
 
-            var session = new ServerBuildSession {
+            var session = new ServerBuildSession(serverContext) {
                 Project = project.Description,
                 AssemblyFilename = AssemblyFilename,
                 PreBuild = PreBuildCommand,
@@ -108,8 +112,8 @@ namespace Photon.Server.ViewModels.Build
 
             build.ServerSessionId = session.SessionId;
 
-            PhotonServer.Instance.Sessions.BeginSession(session);
-            PhotonServer.Instance.Queue.Add(session);
+            serverContext.Sessions.BeginSession(session);
+            serverContext.Queue.Add(session);
 
             ServerSessionId = session.SessionId;
             BuildNumber = session.Build.Number;

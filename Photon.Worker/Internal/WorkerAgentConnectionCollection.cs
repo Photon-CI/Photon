@@ -1,18 +1,20 @@
-﻿using System;
+﻿using Photon.Framework.AgentConnection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Photon.Framework.AgentConnection
+namespace Photon.Worker.Internal
 {
-    public class WorkerAgentConnectionCollection : IDisposable
+    internal class WorkerAgentConnectionCollection : IWorkerAgentConnectionCollection, IDisposable
     {
-        private readonly IAgentConnection[] connections;
+        private readonly WorkerAgentConnection[] connections;
         private volatile bool isInitialized;
+        private volatile bool isReleased;
 
 
-        public WorkerAgentConnectionCollection(IEnumerable<IAgentConnection> connections)
+        public WorkerAgentConnectionCollection(IEnumerable<WorkerAgentConnection> connections)
         {
             this.connections = connections.ToArray();
         }
@@ -25,15 +27,20 @@ namespace Photon.Framework.AgentConnection
 
         public async Task BeginAsync(CancellationToken token)
         {
+            if (isInitialized) throw new ApplicationException("Collection has already been initialized!");
+            isInitialized = true;
+
             var taskList = connections.Select(x => 
                 Task.Run(() => x.BeginAsync(token), token)).ToArray();
 
             await Task.WhenAll(taskList);
-            isInitialized = true;
         }
 
         public async Task ReleaseAsync(CancellationToken token)
         {
+            if (isReleased) return;
+            isReleased = true;
+
             var taskList = connections.Select(x => 
                 Task.Run(() => x.ReleaseAsync(token), token)).ToArray();
 
@@ -42,7 +49,8 @@ namespace Photon.Framework.AgentConnection
 
         public async Task RunTasksAsync(string[] taskNames, CancellationToken token)
         {
-            if (!isInitialized) throw new ApplicationException("Agent collection has not been initialized!");
+            if (!isInitialized) throw new ApplicationException("Collection has not been initialized!");
+            if (isReleased) throw new ApplicationException("Collection has already been released!");
 
             var taskList = new List<Task>();
             foreach (var task in taskNames) {

@@ -1,4 +1,5 @@
 ﻿using Photon.Framework.Packages;
+using Photon.Library.Packages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,19 +9,21 @@ namespace Photon.Server.Internal.Packages
 {
     internal class ProjectPackageCache
     {
+        private readonly ProjectPackageManager packageMgr;
         private readonly Dictionary<string, Dictionary<string, ProjectPackage>> items;
 
         public IEnumerable<ProjectPackage> All => items.Values.SelectMany(x => x.Values);
 
 
-        public ProjectPackageCache()
+        public ProjectPackageCache(ProjectPackageManager packageMgr)
         {
+            this.packageMgr = packageMgr;
+
             items = new Dictionary<string, Dictionary<string, ProjectPackage>>(StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task Initialize()
         {
-            var packageMgr = PhotonServer.Instance.ProjectPackages;
             var packageIdList = packageMgr.GetAllPackages().ToArray();
 
             foreach (var packageId in packageIdList) {
@@ -41,8 +44,6 @@ namespace Photon.Server.Internal.Packages
 
         private async Task<ProjectPackage> LoadItem(string packageId, string version)
         {
-            var packageMgr = PhotonServer.Instance.ProjectPackages;
-
             if (!packageMgr.TryGet(packageId, version, out var filename))
                 throw new ApplicationException($"Package '{packageId}' version '{version}' not found!");
 
@@ -59,13 +60,4 @@ namespace Photon.Server.Internal.Packages
             cacheVersionList[item.Version] = item;
         }
     }
-
-    //internal class ProjectPackageCacheItem
-    //{
-    //    public string ProjectId {get; set;}
-    //    public string PackageId {get; set;}
-    //    public string PackageName {get; set;}
-    //    public string PackageDescription {get; set;}
-    //    public string PackageVersion {get; set;}
-    //}
 }

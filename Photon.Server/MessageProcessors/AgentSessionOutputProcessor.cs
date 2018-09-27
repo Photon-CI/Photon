@@ -11,7 +11,9 @@ namespace Photon.Server.MessageProcessors
     {
         public override async Task<IResponseMessage> Process(SessionOutputMessage requestMessage)
         {
-            if (!PhotonServer.Instance.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
+            var serverContext = PhotonServer.Instance.Context;
+
+            if (!serverContext.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
                 throw new Exception($"Agent Session ID '{requestMessage.ServerSessionId}' not found!");
 
             await Task.Run(() => session.Output.WriteRaw(requestMessage.Text));

@@ -3,6 +3,8 @@ using Photon.Framework.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Photon.Server.Internal.AgentConnections
 {
@@ -21,7 +23,7 @@ namespace Photon.Server.Internal.AgentConnections
             //this.context = context;
         }
 
-        public AgentConnection Any(params string[] roles)
+        public Task<ServerConnectionCollection> GetAnyAsync(string[] roles, CancellationToken token = default)
         {
             var agents = GetAllAgents();
             var roleAgents = AgentsInRoles(agents, roles);
@@ -29,54 +31,63 @@ namespace Photon.Server.Internal.AgentConnections
 
             //PrintFoundAgents(new[] {agent});
 
-            var handle = ConnectTo(agent);
+            return ConnectTo(new[] {agent}, token);
             //context.agentConnections.Add(handle);
-            return handle;
+            //return handle;
         }
 
-        public ServerConnectionCollection All()
+        public Task<ServerConnectionCollection> GetAllAsync()
         {
             var agents = GetAllAgents().ToArray();
 
             //PrintFoundAgents(agents);
-            return CreateCollection(agents);
+            return ConnectTo(agents);
         }
 
-        public ServerConnectionCollection All(params string[] roles)
+        public Task<ServerConnectionCollection> GetAllAsync(params string[] roles)
         {
             var agents = GetAllAgents();
             var roleAgents = AgentsInRoles(agents, roles).ToArray();
 
             //PrintFoundAgents(roleAgents);
-            return CreateCollection(roleAgents);
+            return ConnectTo(roleAgents);
         }
 
-        public ServerConnectionCollection Environment(string name)
+        public Task<ServerConnectionCollection> ByEnvironmentAsync(string name)
         {
             var agents = GetAllAgents();
             var environmentAgents = AgentsInEnvironment(agents, name).ToArray();
 
             //PrintFoundAgents(environmentAgents);
-            return CreateCollection(environmentAgents);
+            return ConnectTo(environmentAgents);
         }
 
-        public ServerConnectionCollection Environment(string name, params string[] roles)
+        public Task<ServerConnectionCollection> ByEnvironmentAsync(string name, params string[] roles)
         {
             var allAgents = GetAllAgents();
             var environmentAgents = AgentsInEnvironment(allAgents, name);
             var roleAgents = AgentsInRoles(environmentAgents, roles).ToArray();
 
             //PrintFoundAgents(roleAgents);
-            return CreateCollection(roleAgents);
+            return ConnectTo(roleAgents);
         }
 
-        public AgentConnection ConnectTo(ServerAgent agent)
+        private async Task<ServerConnectionCollection> ConnectTo(IEnumerable<ServerAgent> agents, CancellationToken token = default)
         {
-            var connection = connectionMgr.Create();
-            connection.Connect();
+            var connectionTasks = agents.Select(agent => {
+                var connection = connectionMgr.Create(agent);
+                //context.agentConnections.Add(connection);
 
-            //context.agentConnections.Add(connection);
-            return connection;
+                return Task.Run(async () => {
+                    await connection.BeginAsync(token);
+                    return connection;
+                }, token);
+            }).ToArray();
+
+            await Task.WhenAll(connectionTasks);
+
+            var connections = connectionTasks.Select(task => task.Result).ToArray();
+            return new ServerConnectionCollection(connections);
         }
 
         private IEnumerable<ServerAgent> GetAllAgents()
@@ -145,14 +156,6 @@ namespace Photon.Server.Internal.AgentConnections
 
             var random = new Random();
             return _agentArray[random.Next(_agentArray.Length)];
-        }
-
-        private ServerConnectionCollection CreateCollection(IEnumerable<ServerAgent> agents)
-        {
-            var connections = agents.Select(ConnectTo).ToArray();
-            //context.agentConnections.Add(handle);
-
-            return new ServerConnectionCollection(connections);
         }
 
         //private void PrintFoundAgents(IEnumerable<ServerAgent> agents)

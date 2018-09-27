@@ -51,7 +51,9 @@ namespace Photon.Server.ApiHandlers.GitHub
 
         private async Task StartBuild(GithubCommit commit)
         {
-            var project = PhotonServer.Instance.Projects.All.FirstOrDefault(x =>
+            var serverContext = PhotonServer.Instance.Context;
+
+            var project = serverContext.Projects.All.FirstOrDefault(x =>
                 string.Equals((x.Description.Source as ProjectGithubSource)?.CloneUrl, commit.RepositoryUrl, StringComparison.OrdinalIgnoreCase));
 
             if (project == null)
@@ -66,7 +68,7 @@ namespace Photon.Server.ApiHandlers.GitHub
             build.GitRefspec = commit.Refspec;
             build.Commit = commit;
 
-            var session = new ServerBuildSession {
+            var session = new ServerBuildSession(serverContext) {
                 Project = project.Description,
                 AssemblyFilename = project.Description.AssemblyFile,
                 PreBuild = project.Description.PreBuild,
@@ -82,8 +84,8 @@ namespace Photon.Server.ApiHandlers.GitHub
             if (source.NotifyOrigin == NotifyOrigin.Server && !string.IsNullOrEmpty(commit.Sha))
                 ApplyGithubNotification(session, source, commit);
 
-            PhotonServer.Instance.Sessions.BeginSession(session);
-            PhotonServer.Instance.Queue.Add(session);
+            serverContext.Sessions.BeginSession(session);
+            serverContext.Queue.Add(session);
         }
 
         private void ApplyGithubNotification(ServerBuildSession session, ProjectGithubSource source, GithubCommit commit)

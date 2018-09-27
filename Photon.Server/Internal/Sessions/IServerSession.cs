@@ -18,11 +18,11 @@ namespace Photon.Server.Internal.Sessions
         bool IsUserAborted {get;}
 
         Task InitializeAsync();
-        Task PrepareWorkDirectoryAsync();
+        //Task PrepareWorkDirectoryAsync();
         Task RunAsync();
-        Task ReleaseAsync();
+        void Release();
         void Complete(TaskResult result);
-        void OnPreBuildEvent();
-        void OnPostBuildEvent();
+        //void OnPreBuildEvent();
+        //void OnPostBuildEvent();
     }
 }

@@ -32,7 +32,9 @@ namespace Photon.Server.ViewModels.Deployment
         {
             base.OnBuild();
 
-            if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out var project))
+            var serverContext = PhotonServer.Instance.Context;
+
+            if (!serverContext.Projects.TryGet(ProjectId, out var project))
                 throw new ApplicationException($"Project '{ProjectId}' not found!");
 
             ProjectName = project.Description.Name;
@@ -59,13 +61,15 @@ namespace Photon.Server.ViewModels.Deployment
 
         public async Task StartDeployment()
         {
-            if (!PhotonServer.Instance.ProjectPackages.TryGet(PackageId, PackageVersion, out var packageFilename))
+            var serverContext = PhotonServer.Instance.Context;
+
+            if (!serverContext.ProjectPackages.TryGet(PackageId, PackageVersion, out var packageFilename))
                 throw new ApplicationException($"Project Package '{PackageId}.{PackageVersion}' was not found!");
 
             if (string.IsNullOrEmpty(ProjectId))
                 throw new ApplicationException("'project' is undefined!");
 
-            if (!PhotonServer.Instance.Projects.TryGet(ProjectId, out var project))
+            if (!serverContext.Projects.TryGet(ProjectId, out var project))
                 throw new ApplicationException($"Project '{ProjectId}' was not found!");
 
             var deployment = await project.StartNewDeployment();
@@ -73,7 +77,7 @@ namespace Photon.Server.ViewModels.Deployment
             deployment.PackageVersion = PackageVersion;
             deployment.EnvironmentName = EnvironmentName;
 
-            var session = new ServerDeploySession {
+            var session = new ServerDeploySession(serverContext) {
                 Project = project.Description,
                 Deployment = deployment,
                 ProjectPackageId = PackageId,
@@ -84,8 +88,8 @@ namespace Photon.Server.ViewModels.Deployment
 
             deployment.ServerSessionId = session.SessionId;
 
-            PhotonServer.Instance.Sessions.BeginSession(session);
-            PhotonServer.Instance.Queue.Add(session);
+            serverContext.Sessions.BeginSession(session);
+            serverContext.Queue.Add(session);
 
             ServerSessionId = session.SessionId;
             DeploymentNumber = session.Deployment.Number;

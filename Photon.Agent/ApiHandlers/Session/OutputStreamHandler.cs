@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Photon.Agent.Internal;
+using PiServerLite.Http.Handlers;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using Photon.Agent.Internal;
-using PiServerLite.Http.Handlers;
 
 namespace Photon.Agent.ApiHandlers.Session
 {
@@ -17,7 +17,7 @@ namespace Photon.Agent.ApiHandlers.Session
                 return Response.BadRequest().SetText("'id' is undefined!");
 
             try {
-                if (!PhotonAgent.Instance.Sessions.TryGet(sessionId, out var session))
+                if (!PhotonAgent.Instance.Context.Sessions.TryGet(sessionId, out var session))
                     return Response.BadRequest().SetText($"Session '{sessionId}' not found!");
 
                 return Response.Ok()

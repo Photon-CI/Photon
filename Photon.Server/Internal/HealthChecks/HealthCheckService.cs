@@ -2,6 +2,7 @@
 using Photon.Communication;
 using Photon.Framework.Extensions;
 using Photon.Framework.Server;
+using Photon.Library.Communication;
 using Photon.Library.TcpMessages;
 using System;
 using System.Collections.Concurrent;
@@ -143,7 +144,7 @@ namespace Photon.Server.Internal.HealthChecks
                 try {
                     await messageClient.ConnectAsync(agent.TcpHost, agent.TcpPort, token);
 
-                    await ClientHandshake.Verify(messageClient, token);
+                    await ClientHandshake.Verify(messageClient, Configuration.Version, token);
                 }
                 catch (Exception error) {
                     return new HealthCheckResult {

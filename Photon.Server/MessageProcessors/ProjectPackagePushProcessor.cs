@@ -1,7 +1,8 @@
 ﻿using log4net;
 using Photon.Communication;
 using Photon.Communication.Messages;
-using Photon.Framework.Domain;
+using Photon.Framework.Packages;
+using Photon.Library.Packages;
 using Photon.Library.TcpMessages.Packages;
 using Photon.Server.Internal;
 using System;
@@ -17,13 +18,17 @@ namespace Photon.Server.MessageProcessors
 
         public override async Task<IResponseMessage> Process(AgentProjectPackagePushRequest requestMessage)
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             try {
-                if (!PhotonServer.Instance.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
+                if (!serverContext.Sessions.TryGet(requestMessage.ServerSessionId, out var session))
                     throw new Exception($"Agent Session ID '{requestMessage.ServerSessionId}' not found!");
 
-                await RemoteTaskCompletionSource.Run(taskHandle => {
-                    session.Packages.Client.PushProjectPackage(requestMessage.Filename, taskHandle);
-                });
+                var metadata = await ProjectPackageTools.GetMetadataAsync(requestMessage.Filename);
+                if (metadata == null) throw new ApplicationException($"Invalid Project Package '{requestMessage.Filename}'! No metadata found.");
+
+                await serverContext.ProjectPackages.Add(requestMessage.Filename);
+                session.PushedProjectPackages.Add(new PackageReference(metadata.Id, metadata.Version));
             }
             finally {
                 try {

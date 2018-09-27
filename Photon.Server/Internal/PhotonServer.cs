@@ -3,17 +3,14 @@ using Photon.Communication;
 using Photon.Framework;
 using Photon.Framework.Packages;
 using Photon.Library;
-using Photon.Library.Packages;
 using Photon.Library.Security;
 using Photon.Library.Variables;
 using Photon.Server.Internal.HealthChecks;
 using Photon.Server.Internal.Http;
 using Photon.Server.Internal.Packages;
-using Photon.Server.Internal.Projects;
 using Photon.Server.Internal.Security;
 using Photon.Server.Internal.ServerAgents;
 using Photon.Server.Internal.ServerConfiguration;
-using Photon.Server.Internal.Sessions;
 using System;
 using System.Reflection;
 using System.Threading;
@@ -29,11 +26,6 @@ namespace Photon.Server.Internal
         private bool isStarted;
 
         public HttpServer Http {get;}
-        public ProjectManager Projects {get;}
-        public ServerSessionManager Sessions {get;}
-        public ScriptQueue Queue {get;}
-        public ProjectPackageManager ProjectPackages {get;}
-        public ApplicationPackageManager ApplicationPackages {get;}
         public MessageProcessorRegistry MessageRegistry {get;}
         public VariableSetDocumentManager Variables {get;}
         public ServerConfigurationManager ServerConfiguration {get;}
@@ -41,43 +33,32 @@ namespace Photon.Server.Internal
         public HealthCheckService HealthChecks {get;}
         public UserGroupManager UserMgr {get;}
         public ProjectPackageCache ProjectPackageCache {get;}
-        //public PackageCache ApplicationPackageCache {get;}
+
+        public ServerContext Context {get; set;}
 
 
         public PhotonServer()
         {
             Http = new HttpServer(this);
-            Projects = new ProjectManager();
-            Sessions = new ServerSessionManager();
             MessageRegistry = new MessageProcessorRegistry();
             Variables = new VariableSetDocumentManager();
             HealthChecks = new HealthCheckService();
             UserMgr = new UserGroupManager();
-            ProjectPackageCache = new ProjectPackageCache();
             ServerConfiguration = new ServerConfigurationManager();
             Agents = new ServerAgentManager();
 
-            ProjectPackages = new ProjectPackageManager {
-                PackageDirectory = Configuration.ProjectPackageDirectory,
-            };
+            Context = new ServerContext();
 
-            ApplicationPackages = new ApplicationPackageManager {
-                PackageDirectory = Configuration.ApplicationPackageDirectory,
-            };
+            ProjectPackageCache = new ProjectPackageCache(Context.ProjectPackages);
 
-            Queue = new ScriptQueue {
-                MaxDegreeOfParallelism = Configuration.Parallelism,
-            };
-
-            ProjectPackages.PackageAdded += ProjectPackages_OnPackageAdded;
+            Context.ProjectPackages.PackageAdded += ProjectPackages_OnPackageAdded;
         }
 
         public void Dispose()
         {
             if (isStarted) Stop();
 
-            Queue?.Dispose();
-            Sessions?.Dispose();
+            Context?.Dispose();
             HealthChecks.Dispose();
             Http.Dispose();
         }
@@ -106,13 +87,12 @@ namespace Photon.Server.Internal
             // TODO: Cache Project Package Index?
             //ProjectPackages.Initialize();
 
-            Sessions.Start();
-            Queue.Start();
+            Context.Initialize();
 
             var taskVariables = Task.Run(() => Variables.Load(Configuration.VariablesDirectory));
             var taskHttp = Task.Run(() => Http.Start());
             var taskAgents = Task.Run(() => Agents.Load());
-            var taskProjects = Task.Run(() => Projects.Load());
+            var taskProjects = Task.Run(() => Context.Projects.Load());
 
             Task.WaitAll(
                 taskVariables,
@@ -132,8 +112,7 @@ namespace Photon.Server.Internal
         {
             Log.Debug("Stopping Server...");
 
-            Queue.Stop();
-            Sessions.Stop();
+            Context.End();
             HealthChecks.Stop();
 
             Http.Stop();
@@ -149,12 +128,11 @@ namespace Photon.Server.Internal
                 var token = tokenSource.Token;
 
                 using (token.Register(() => {
-                    Queue.Abort();
-                    Sessions.Abort();
+                    Context.Queue.Abort();
+                    Context.Sessions.Abort();
                 })) {
                     await Task.Run(() => {
-                        Queue.Stop();
-                        Sessions.Stop();
+                        Context.End();
                     }, token);
                 }
             }
@@ -164,8 +142,8 @@ namespace Photon.Server.Internal
         {
             Log.Debug("Server abort started...");
 
-            Queue.Abort();
-            Sessions.Abort();
+            Context.Queue.Abort();
+            Context.Sessions.Abort();
             Http.Stop();
         }
 

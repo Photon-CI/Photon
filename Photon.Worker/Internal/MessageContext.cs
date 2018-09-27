@@ -33,6 +33,11 @@ namespace Photon.Worker.Internal
             StartTask.SetResult(null);
         }
 
+        public void Complete()
+        {
+            CompleteTask.SetResult(null);
+        }
+
         public void Abort()
         {
             tokenSource.Cancel();

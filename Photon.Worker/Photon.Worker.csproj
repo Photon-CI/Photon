@@ -44,7 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Internal\AgentConnection.cs" />
+    <Compile Include="Internal\Tasks\BuildTaskRegistry.cs" />
+    <Compile Include="Internal\Tasks\DeployTaskRegistry.cs" />
+    <Compile Include="Internal\WorkerAgentConnection.cs" />
     <Compile Include="Internal\Clients\AgentConnectionClient.cs" />
     <Compile Include="Internal\Clients\ArtifactClient.cs" />
     <Compile Include="Internal\Configuration.cs" />
@@ -59,12 +61,12 @@
     <Compile Include="Internal\Session\WorkerDeploymentSession.cs" />
     <Compile Include="Internal\Session\WorkerBuildSession.cs" />
     <Compile Include="Internal\Session\WorkerSession.cs" />
+    <Compile Include="Internal\WorkerAgentConnectionCollection.cs" />
     <Compile Include="MessageHandlers\StatusGetProcessor.cs" />
     <Compile Include="MessageHandlers\TestSessionBeginProcessor.cs" />
     <Compile Include="MessageHandlers\BuildSessionRunProcessor.cs" />
     <Compile Include="MessageHandlers\DisconnectProcessor.cs" />
     <Compile Include="MessageHandlers\TaskBeginProcessor.cs" />
-    <Compile Include="MessageHandlers\BuildSessionBeginProcessor.cs" />
     <Compile Include="MessageHandlers\HandshakeProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

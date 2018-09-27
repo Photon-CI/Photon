@@ -17,10 +17,12 @@ namespace Photon.Server.ApiHandlers.Agent
     {
         public override HttpHandlerResult Get()
         {
+            var serverContext = PhotonServer.Instance.Context;
+
             var sessionId = GetQuery("session");
 
             try {
-                if (!PhotonServer.Instance.Sessions.TryGet(sessionId, out var session))
+                if (!serverContext.Sessions.TryGet(sessionId, out var session))
                     return Response.BadRequest().SetText($"Server Session '{sessionId}' was not found!");
 
                 if (!(session is ServerUpdateSession updateSession))

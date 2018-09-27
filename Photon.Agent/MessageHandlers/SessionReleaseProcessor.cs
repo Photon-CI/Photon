@@ -11,13 +11,15 @@ namespace Photon.Agent.MessageHandlers
     {
         public override async Task<IResponseMessage> Process(SessionReleaseRequest requestMessage)
         {
-            if (!PhotonAgent.Instance.Sessions.TryGet(requestMessage.AgentSessionId, out var session))
+            var context = PhotonAgent.Instance.Context;
+
+            if (!context.Sessions.TryGet(requestMessage.AgentSessionId, out var session))
                 throw new ApplicationException("");
 
-            await session.CompleteAsync();
+            await session.ReleaseAsync();
 
             var _ = Task.Delay(800).ContinueWith(async t => {
-                await PhotonAgent.Instance.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
+                await context.Sessions.ReleaseSessionAsync(requestMessage.AgentSessionId);
             });
 
             return null;

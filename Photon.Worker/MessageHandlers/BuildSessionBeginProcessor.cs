@@ -1,7 +1,7 @@
 ﻿using Photon.Communication;
 using Photon.Communication.Messages;
 using Photon.Framework.Agent;
-using Photon.Library.TcpMessages.Session;
+using Photon.Library.Communication.Messages.Session;
 using Photon.Worker.Internal;
 using Photon.Worker.Internal.Clients;
 using Photon.Worker.Internal.Session;
@@ -24,7 +24,7 @@ namespace Photon.Worker.MessageHandlers
                 //CurrentDeploymentNumber = 0, // TODO: BuildTask should not have access
             };
 
-            context.Session = new WorkerBuildSession {
+            var session = new WorkerBuildSession {
                 //...
                 Context = new AgentBuildContext {
                     Project = requestMessage.Project,
@@ -46,6 +46,9 @@ namespace Photon.Worker.MessageHandlers
                     //Output = contextOutput,
                 },
             };
+
+            // TODO: This sucks
+            context.Session = session;
 
             //context.Session.Context.Output = context.Session.Output;
 
@@ -70,7 +73,7 @@ namespace Photon.Worker.MessageHandlers
             //}
 
             try {
-                await context.Session.Initialize(context.Token);
+                await context.Session.Initialize(session.Token);
                 context.Begin();
             }
             catch {

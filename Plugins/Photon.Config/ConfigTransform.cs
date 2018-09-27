@@ -1,11 +1,9 @@
 ﻿using Microsoft.Web.XmlTransform;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Framework;
-using Photon.Framework.Agent;
 using Photon.Framework.Domain;
 using Photon.Framework.Extensions;
+using System;
+using System.Collections.Generic;
 
 namespace Photon.Config
 {
@@ -13,8 +11,7 @@ namespace Photon.Config
     {
         private readonly IDomainContext context;
 
-        //public IWriteAnsiBlocks Output {get; set;}
-        public DomainOutput Output {get; set;}
+        public IWriteBlocks Output {get; set;}
 
 
         public ConfigTransform() {}
